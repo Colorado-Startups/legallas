@@ -1,0 +1,61 @@
+# Every commit on a pull request carries a Signed-off-by line (the DCO, CONTRIBUTING.md). The same job adds the area
+# labels (.github/labeler.yml), which had a workflow of their own: one job a push instead of two, each billed a minute.
+name: DCO
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  # The merge queue's run. The queue admits a pull request only once this check
+  # passed on its head, and drops it if the head changes, so every commit it
+  # merges was already read here. The group's own commits are GitHub's squashes,
+  # whose messages GitHub writes, so the job is skipped on it, and a skipped
+  # job reports success.
+  merge_group:
+    types: [checks_requested]
+
+permissions: {}
+
+# A new push cancels the run it supersedes. The required check is read on the head commit, which gets its own run. An
+# event with no pull request number (a merge group, say) falls back to its own ref, so such runs never cancel each other.
+concurrency:
+  group: dco-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dco:
+    if: github.event_name == 'pull_request' && github.event.pull_request.user.type != 'Bot'
+    # A few seconds of git, so the 1-core runner, a third of the price.
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    # GitHub-hosted on purpose: the labels need a write token, which stays on GitHub's own runners. This job runs no
+    # code from the pull request, only git over its commits and the pinned labeler.
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
+      # Area labels from the paths the pull request changes, for the release notes' sections (.github/release.yml).
+      # Before the check, so a missing sign-off still labels. Not part of it: a labeler error leaves the labels as
+      # they were, and the sign-off alone decides `dco`. Branches of this repository only, since a fork's token can't
+      # write; Dependabot and other bots never reach this job and set their own labels.
+      - name: Area labels
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        continue-on-error: true
+        uses: actions/labeler@bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 # v7.0.0
+      - name: Every commit is signed off
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          missing=0
+          for commit in $(git rev-list "$BASE..$HEAD"); do
+            if ! git log -1 --format=%B "$commit" | grep -q '^Signed-off-by: '; then
+              echo "::error::$commit has no Signed-off-by line (git commit -s)"
+              missing=1
+            fi
+          done
+          exit "$missing"

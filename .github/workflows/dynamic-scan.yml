@@ -1,0 +1,89 @@
+# The automated dynamic scan (DAST) of the fictional sample room. OWASP ZAP attacks both
+# Workers, the room and legallas-mcp, as a member and as a stranger, inside this job. It
+# writes a dated report with each finding's severity and remediation status
+# (quality-speed/pages/security/dast/README.md). It is not a penetration test.
+#
+# Monthly, by hand, and on a pull request that changes the scan itself. Never on other pull
+# requests: a run takes about 45 Linux minutes.
+#
+#   gh workflow run dynamic-scan.yml -R Colorado-Startups/legallas --ref <branch>
+#
+# Runner: GitHub-hosted ubuntu-latest, the label Code-OS compute-detail.md names for a
+# workflow outside ci-standard. Not Blacksmith: CLAUDE.md counts only ci.yml and
+# quality-speed.yml against its free minutes. ZAP runs in Docker, which ubuntu-latest has.
+#
+# Fixture data only, and no secrets: every wrangler call is --local on 127.0.0.1, the
+# settings are the committed examples, and the MCP token is made in the job for the job's own
+# server, then masked and scrubbed from every uploaded file. The run fails if ZAP reports any
+# site other than the four targets.
+name: Dynamic scan
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 06:41 UTC on the 2nd of each month.
+    - cron: "41 6 2 * *"
+  pull_request:
+    paths:
+      - .github/workflows/dynamic-scan.yml
+      - quality-speed/pages/security/dast/**
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dynamic-scan-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  scan:
+    # A fork's pull request gets no run.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Tools that read their config from HOME (wrangler, npm, docker) start without
+      # anyone's logins. The ZAP image is public, so docker needs none.
+      - name: Private HOME
+        run: |
+          mkdir -p "$RUNNER_TEMP/home"
+          echo "HOME=$RUNNER_TEMP/home" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Toolchain
+        run: |
+          uname -a
+          node --version
+          docker version --format 'Docker {{.Server.Version}}'
+      # No install scripts, as in ci.yml's checks: the only ones in the lockfile place or
+      # check a binary their platform package already ships.
+      - name: Web install
+        working-directory: web
+        run: npm ci --ignore-scripts
+      - name: Scan tests
+        run: node --test quality-speed/pages/security/dast/dast.test.ts
+      - name: Scan
+        env:
+          SCAN_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node quality-speed/pages/security/dast/run.ts --out "$RUNNER_TEMP/dast" --room "$RUNNER_TEMP/dast-room"
+      # always(): a failed scan's report and logs are what show why. ZAP's home folder is
+      # never uploaded.
+      - name: Upload
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dynamic-scan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/dast/report.md
+            ${{ runner.temp }}/dast/report.json
+            ${{ runner.temp }}/dast/logs/
+            ${{ runner.temp }}/dast/zap/out/
+            ${{ runner.temp }}/dast/zap/plan.json
+            ${{ runner.temp }}/dast/zap/room-openapi.json
+            ${{ runner.temp }}/dast/zap/mcp-openapi.json
+          if-no-files-found: warn
+          retention-days: 90

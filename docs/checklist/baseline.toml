@@ -1,0 +1,2477 @@
+# Legallas baseline company checklist
+#
+# You aren't receiving legal advice from a licensed lawyer. No lawyer has reviewed this list.
+#
+# One [[item]] per document or agreement startups commonly keep. README.md in this folder and web/worker/checklist-baseline.ts
+# are generated from this file: run `npm run checklist` in web/ after any change, and a test fails if you don't. Field meanings are in [fields] below; allowed values are in [vocabulary]. An item's text reaches founders as the
+# product's own words, so it follows docs/legal/product-notices.md, A1.
+
+schema_version = 1
+title = "Legallas baseline company checklist"
+notice = "Legallas is an AI agent for legal work, not a lawyer or law firm. Using it creates no attorney-client relationship. AI can be wrong. Have your own lawyer review before you sign, file or rely on anything."
+template_notice = "Here's every template we have for this. You choose. We don't pick one for you. We fill in only the answers you give us."
+template_licence_notice = "Licence: CC0 1.0, a public-domain dedication by Colorado Startups, LTD. Free to use, change and pass on, with no conditions. Forms from other publishers keep their own licences."
+template_card_notice = "Not reviewed by a lawyer. It's a starting point, and it may not fit your facts. Have your own lawyer review before you sign."
+status = "You aren't receiving legal advice from a licensed lawyer. No lawyer has reviewed this list. Tax items show the law with its source; have your own tax professional review."
+drafted = "2026-10-31"
+scope = "United States federal law, Delaware and Colorado; a company whose employees work in Colorado"
+
+[fields]
+id = "Stable identifier, <category>.<slug>; never reused"
+title = "What the document or agreement is called"
+category = "Kind of document (vocabulary.categories)"
+relationship = "Who the document is between, as the plan groups the checklist (vocabulary.relationships)"
+stage = "When it is usually first needed (vocabulary.stages); a company past that stage still needs it"
+repeats = "Optional. When it must be redone or kept current"
+deadline = "Optional. A fixed deadline the law or the document sets"
+due = "Optional. How the room works out a date: after a matched document's date, yearly, or the Colorado report window"
+note = "Optional. One more plain line a reader commonly wants next to the deadline"
+date_label = "Optional. What a match's date means for this item, in the words the form uses"
+templates = "Optional. Files in templates/founders/ for this item. Title, fit and law date come from each file's own front matter"
+applies_when = "Optional. The condition that makes the item apply; without it the item applies to every listed entity type"
+entity_types = "Entity types it applies to (vocabulary.entity_types)"
+why = "Why it matters, in one line"
+provided_by = "Who usually provides it (vocabulary.providers)"
+room_roles = "Room roles that need it besides the owner (vocabulary.room_roles); empty means owner only"
+evidence = "What a complete copy looks like, for matching and for the signed-or-not check"
+title_by_entity = "Optional. The document's name for a given entity type, when it differs from title"
+sources = "Public sources, each a title and a URL"
+
+[vocabulary]
+categories = [
+  "formation",
+  "founders",
+  "intellectual-property",
+  "equity",
+  "financing",
+  "people",
+  "commercial",
+  "compliance-and-governance",
+]
+relationships = [
+  "company-and-state",
+  "founders-and-company",
+  "company-and-investors",
+  "company-and-people",
+  "customers-vendors-and-partners",
+  "ip-and-assets",
+  "disputes-and-regulators",
+]
+stages = ["pre-formation", "formation", "first-hires", "first-financing", "priced-round", "ongoing"]
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+providers = [
+  "founder",
+  "lawyer",
+  "accountant",
+  "registered-agent",
+  "valuation-firm",
+  "insurance-broker",
+  "payroll-provider",
+]
+room_roles = ["counsel", "investors"]
+
+[labels.categories]
+formation = "Formation"
+founders = "Founders"
+intellectual-property = "Intellectual property"
+equity = "Equity"
+financing = "Financing"
+people = "People"
+commercial = "Commercial"
+compliance-and-governance = "Compliance and governance"
+
+[labels.relationships]
+company-and-state = "The company and the state"
+founders-and-company = "Founders and the company"
+company-and-investors = "The company and its investors"
+company-and-people = "The company and its people"
+customers-vendors-and-partners = "Customers, vendors and partners"
+ip-and-assets = "IP and assets"
+disputes-and-regulators = "Disputes and regulators"
+
+[labels.stages]
+pre-formation = "Pre-formation"
+formation = "Formation"
+first-hires = "First hires"
+first-financing = "First financing"
+priced-round = "Priced round"
+ongoing = "Ongoing"
+
+[labels.entity_types]
+delaware-c-corporation = "Delaware C corporation"
+colorado-llc = "Colorado LLC"
+colorado-corporation = "Colorado corporation"
+delaware-llc = "Delaware LLC"
+
+[labels.providers]
+founder = "Founder"
+lawyer = "Lawyer"
+accountant = "Accountant"
+registered-agent = "Registered agent"
+valuation-firm = "Valuation firm"
+insurance-broker = "Insurance broker"
+payroll-provider = "Payroll provider"
+
+[labels.room_roles]
+counsel = "Counsel"
+investors = "Investors"
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Formation
+# ---------------------------------------------------------------------------------------------------------------------
+
+[[item]]
+id = "formation.entity-choice"
+title = "Entity type and state decision"
+category = "formation"
+relationship = "company-and-state"
+stage = "pre-formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Sets tax treatment, investor fit and every form that follows; the NVCA model documents assume a Delaware corporation."
+provided_by = ["founder", "lawyer", "accountant"]
+room_roles = ["counsel"]
+evidence = "A short written note of the choice and the reasons, ideally from a lawyer or accountant."
+templates = [
+  "founders/entity-comparison.md",
+  "founders/delaware-llc-comparison.md",
+]
+sources = [
+  { title = "U.S. Small Business Administration: choose a business structure", url = "https://www.sba.gov/counseling/launch-your-business/#business-structure" },
+  { title = "IRS: business structures", url = "https://www.irs.gov/businesses/small-businesses-self-employed/business-structures" },
+  { title = "NVCA model legal documents", url = "https://nvca.org/model-legal-documents/" },
+]
+
+[[item]]
+id = "formation.name-availability"
+title = "Company name availability check"
+category = "formation"
+relationship = "company-and-state"
+stage = "pre-formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "The state refuses a name too close to one on its register, and a clash can also start a trademark dispute. Delaware lets a founder reserve a name for 120 days, renewable, for $75 (8 Del. C. 102(e))."
+provided_by = ["founder"]
+room_roles = ["counsel"]
+evidence = "Dated search results from each state where the company will form or register."
+sources = [
+  { title = "Colorado Secretary of State: business database search", url = "https://www.coloradosos.gov/biz/BusinessEntityCriteriaExt.do" },
+  { title = "Colorado Secretary of State: names FAQ", url = "https://www.coloradosos.gov/pubs/business/FAQs/entityNames.html" },
+  { title = "Delaware Division of Corporations: entity search", url = "https://icis.corp.delaware.gov/ecorp/entitysearch/namesearch.aspx" },
+  { title = "Delaware Division of Corporations: how to form a new business entity (name reservation)", url = "https://corp.delaware.gov/howtoform/" },
+]
+
+[[item]]
+id = "formation.formation-document"
+title = "Formation document filed with the state"
+category = "formation"
+relationship = "company-and-state"
+stage = "formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Creates the company; investors check the filed copy and every amendment."
+provided_by = ["lawyer", "registered-agent"]
+room_roles = ["counsel", "investors"]
+evidence = "Copy stamped or certified by the Secretary of State, plus every filed amendment."
+note = "Colorado Secretary of State fee schedule, revised July 1, 2024: \"Articles of Organization\" $50.00; \"Articles of Incorporation\" $50.00 for a profit corporation; \"Amend Articles of Organization\" $25.00."
+title_by_entity = { delaware-c-corporation = "Certificate of incorporation", colorado-llc = "Articles of organization", colorado-corporation = "Articles of incorporation", delaware-llc = "Certificate of formation" }
+templates = [
+  "founders/colorado-corporation-articles.md",
+  "founders/delaware-corporation-certificate.md",
+  "founders/colorado-llc-articles.md",
+  "founders/delaware-llc-certificate.md",
+]
+sources = [
+  { title = "Delaware General Corporation Law sections 101 and 102", url = "https://delcode.delaware.gov/title8/c001/sc01/index.html" },
+  { title = "Delaware Division of Corporations: how to form a new business entity", url = "https://corp.delaware.gov/howtoform/" },
+  { title = "Colorado Revised Statutes sections 7-80-204 and 7-102-102 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+  { title = "Colorado Secretary of State: starting a business FAQ", url = "https://www.coloradosos.gov/pubs/business/FAQs/startBusiness.html" },
+  { title = "Colorado Secretary of State: business organizations fee schedule, revised July 1, 2024", url = "https://www.sos.state.co.us/pubs/info_center/fees/business.html" },
+  { title = "Delaware Limited Liability Company Act section 18-201", url = "https://delcode.delaware.gov/title6/c018/sc02/index.html" },
+]
+
+
+[[item]]
+id = "formation.colorado-articles-clauses"
+title = "Written consent and cumulative voting clauses in the Colorado articles"
+category = "formation"
+relationship = "company-and-state"
+stage = "formation"
+entity_types = ["colorado-corporation"]
+why = "Colorado shareholders act by written consent only unanimously unless the articles allow less, and cumulative voting applies unless the articles opt out."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Filed articles that state the choice on each clause, or a dated note of why a clause was left out."
+templates = [
+  "founders/colorado-corporation-articles.md",
+]
+sources = [
+  { title = "Colorado Revised Statutes sections 7-107-104 and 7-102-102(3) (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+]
+[[item]]
+id = "formation.bylaws"
+title = "Bylaws"
+category = "formation"
+relationship = "company-and-state"
+stage = "formation"
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Set how the board, officers and stockholders act; investors and lenders rely on them."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Bylaws as adopted by the board, with every amendment and the consent that adopted it."
+templates = [
+  "founders/colorado-corporation-bylaws.md",
+  "founders/delaware-corporation-bylaws.md",
+]
+sources = [
+  { title = "Delaware General Corporation Law section 109", url = "https://delcode.delaware.gov/title8/c001/sc01/index.html" },
+  { title = "Colorado Revised Statutes section 7-102-106 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+]
+
+[[item]]
+id = "formation.operating-agreement"
+title = "Operating agreement"
+category = "formation"
+relationship = "company-and-state"
+stage = "formation"
+entity_types = ["colorado-llc", "delaware-llc"]
+why = "Sets members' ownership, management, vesting and transfer rules; the state's default rules fill any gap."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Operating agreement signed by every member, with every amendment and joinder."
+templates = [
+  "founders/colorado-llc-operating-agreement.md",
+  "founders/colorado-llc-single-member-operating-agreement.md",
+  "founders/delaware-llc-agreement.md",
+  "founders/delaware-llc-operating-agreement.md",
+]
+sources = [
+  { title = "Colorado Revised Statutes section 7-80-108 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+  { title = "Colorado Secretary of State: starting a business FAQ", url = "https://www.coloradosos.gov/pubs/business/FAQs/startBusiness.html" },
+  { title = "Delaware Limited Liability Company Act section 18-1101", url = "https://delcode.delaware.gov/title6/c018/sc11/index.html" },
+]
+
+[[item]]
+id = "formation.incorporator-action"
+title = "Action of the incorporator"
+category = "formation"
+relationship = "founders-and-company"
+stage = "formation"
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "The incorporator, who signed the charter, names the first board when the charter doesn't and then steps away: a different signer from the board's own consent."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed action of the incorporator, dated on or after the charter's filing date."
+templates = [
+  "founders/incorporator-action.md",
+]
+sources = [
+  { title = "Delaware General Corporation Law sections 107 and 108", url = "https://delcode.delaware.gov/title8/c001/sc01/index.html" },
+  { title = "Colorado Revised Statutes section 7-102-105 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+]
+
+
+[[item]]
+id = "formation.organizational-consent"
+title = "Organizational consent of the first board"
+category = "formation"
+relationship = "founders-and-company"
+stage = "formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Puts the first directors, managers and officers in place, adopts the governing documents, approves founder equity, and authorizes the bank account and tax filings."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed consent of those who first run the company, dated on or after the filing date and, for a corporation, after the incorporator's action."
+title_by_entity = { colorado-llc = "Initial member or manager consent", delaware-llc = "Initial member or manager consent" }
+templates = [
+  "founders/initial-board-consent.md",
+  "founders/llc-initial-consent.md",
+]
+sources = [
+  { title = "Delaware General Corporation Law sections 107 and 108", url = "https://delcode.delaware.gov/title8/c001/sc01/index.html" },
+  { title = "Delaware General Corporation Law section 141(f)", url = "https://delcode.delaware.gov/title8/c001/sc04/index.html" },
+  { title = "Colorado Revised Statutes section 7-102-105 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+]
+
+
+[[item]]
+id = "formation.initial-stockholder-consent"
+title = "Initial stockholder consent"
+category = "formation"
+relationship = "company-and-state"
+stage = "formation"
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Records what the first stockholders approve at formation, such as the equity plan and indemnification agreements."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Consent signed by the stockholders, kept in the minute book."
+templates = [
+  "founders/initial-stockholder-consent.md",
+]
+sources = [
+  { title = "Delaware General Corporation Law section 228", url = "https://delcode.delaware.gov/title8/c001/sc07/index.html" },
+  { title = "Colorado Revised Statutes section 7-107-104 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+]
+[[item]]
+id = "formation.employer-identification-number"
+title = "Employer identification number confirmation from the IRS"
+category = "formation"
+relationship = "company-and-state"
+stage = "formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Needed for the bank account, payroll and tax returns. The IRS issues it for free: an applicant will \"never have to pay a fee for an EIN\" (read 2026-11-07). Its notice proves the number."
+provided_by = ["founder", "accountant"]
+room_roles = ["counsel", "investors"]
+evidence = "IRS notice CP 575, or a 147C verification letter."
+sources = [
+  { title = "IRS: get an employer identification number", url = "https://www.irs.gov/businesses/small-businesses-self-employed/get-an-employer-identification-number" },
+]
+
+[[item]]
+id = "formation.responsible-party-change"
+title = "Form 8822-B for a new responsible party"
+category = "formation"
+relationship = "company-and-state"
+stage = "formation"
+deadline = "Within 60 days of the change."
+applies_when = "When the person the IRS has as the company's responsible party changes, such as a founder leaving."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "The IRS requires a new responsible party to be reported within 60 days, so its notices reach someone who runs the company."
+provided_by = ["founder", "accountant"]
+room_roles = ["counsel"]
+evidence = "Filed Form 8822-B."
+sources = [
+  { title = "IRS: about Form 8822-B, change of address or responsible party", url = "https://www.irs.gov/forms-pubs/about-form-8822-b" },
+]
+
+
+[[item]]
+id = "formation.tax-classification-election"
+title = "Tax classification or S corporation election"
+category = "formation"
+relationship = "company-and-state"
+stage = "formation"
+deadline = "Form 8832 can take effect no more than 75 days before it is filed, and no later than 12 months after. Form 2553 is due no more than 2 months and 15 days after the start of the tax year it is to take effect."
+applies_when = "Only if the company chooses a tax treatment other than its default."
+entity_types = ["colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Changes how the company is taxed; S corporation status limits owners and share classes, which venture funds usually cannot fit."
+provided_by = ["accountant"]
+room_roles = ["counsel", "investors"]
+evidence = "Filed Form 8832 or Form 2553, and the IRS acceptance letter."
+templates = [
+  "founders/tax-classification-election.md",
+]
+sources = [
+  { title = "IRS: about Form 8832, entity classification election", url = "https://www.irs.gov/forms-pubs/about-form-8832" },
+  { title = "IRS: about Form 2553, election by a small business corporation", url = "https://www.irs.gov/forms-pubs/about-form-2553" },
+  { title = "IRS: instructions for Form 2553", url = "https://www.irs.gov/instructions/i2553" },
+  { title = "IRS: Form 8832 and its instructions", url = "https://www.irs.gov/pub/irs-pdf/f8832.pdf" },
+]
+
+[[item]]
+id = "formation.foreign-qualification"
+title = "Authority to do business in each other state where it operates"
+category = "formation"
+relationship = "company-and-state"
+stage = "formation"
+applies_when = "When the company does business outside its state of formation, such as a Delaware corporation working in Colorado."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "A company formed elsewhere must get authority before doing business in Colorado. Until it does, it can't sue in a Colorado court to collect its debts, owes up to $100 for each year without authority, and can face a civil penalty of up to $5,000."
+provided_by = ["lawyer", "registered-agent"]
+room_roles = ["counsel", "investors"]
+evidence = "Filed statement of foreign entity authority (Colorado) or the other state's equivalent."
+note = "Colorado Secretary of State fee schedule, revised July 1, 2024: \"Foreign Entity Authority Statement\" $100.00."
+templates = [
+  "founders/foreign-qualification.md",
+]
+sources = [
+  { title = "Colorado Revised Statutes sections 7-90-801 and 7-90-802 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+  { title = "Colorado Secretary of State: foreign entities FAQ", url = "https://www.coloradosos.gov/pubs/business/FAQs/foreigns.html" },
+  { title = "Colorado Secretary of State: business organizations fee schedule, revised July 1, 2024", url = "https://www.sos.state.co.us/pubs/info_center/fees/business.html" },
+]
+
+[[item]]
+id = "formation.bank-account"
+title = "Company bank account, separate from the founders"
+category = "formation"
+relationship = "company-and-state"
+stage = "formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Keeping company money apart from founders' money protects limited liability."
+provided_by = ["founder"]
+room_roles = ["counsel"]
+evidence = "Account opening documents in the company's name and the consent authorizing signers."
+sources = [
+  { title = "U.S. Small Business Administration: open a business bank account", url = "https://www.sba.gov/counseling/launch-your-business/#bank-account" },
+  { title = "Colorado Revised Statutes section 7-80-107 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+]
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Founders
+# ---------------------------------------------------------------------------------------------------------------------
+
+[[item]]
+id = "founders.founder-agreement"
+title = "Founders' written agreement on ownership, roles and vesting"
+category = "founders"
+relationship = "founders-and-company"
+stage = "pre-formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Settles the split, roles, vesting and IP before money or a departure tests them."
+provided_by = ["founder", "lawyer"]
+room_roles = ["counsel"]
+evidence = "Signed founders' term sheet or agreement, later carried into the formation documents."
+templates = [
+  "founders/founders-agreement.md",
+]
+sources = [
+  { title = "Y Combinator: how to split equity among co-founders", url = "https://www.ycombinator.com/blog/splitting-equity-among-founders/" },
+]
+
+[[item]]
+id = "founders.prior-employer-agreements"
+title = "Review of each founder's agreements with past employers"
+category = "founders"
+relationship = "founders-and-company"
+stage = "pre-formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "A past employer's invention assignment or restrictive covenant can claim the company's IP or limit a founder's work."
+provided_by = ["founder", "lawyer"]
+room_roles = ["counsel"]
+evidence = "Copies of each founder's past invention assignment, confidentiality and restrictive covenant agreements, with a lawyer's note."
+sources = [
+  { title = "U.S. Copyright Act, 17 U.S.C. section 201(b), works made for hire", url = "https://www.copyright.gov/title17/92chap2.html" },
+  { title = "Colorado Revised Statutes section 8-2-113 (title 8, 2026)", url = "https://olls.info/crs/crs2026-title-08.pdf" },
+]
+
+[[item]]
+id = "founders.stock-purchase-agreement"
+title = "Founder stock purchase agreement"
+category = "founders"
+relationship = "founders-and-company"
+stage = "formation"
+date_label = "Transfer date"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Issues the founder's shares or units for cash or IP and lets the company buy back unvested ones if the founder leaves."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Agreement signed by the founder and the company, with proof the purchase price was paid, a stock power signed in blank, and escrow instructions while the company can buy back unvested shares."
+title_by_entity = { colorado-llc = "Founder unit issuance and vesting agreement", delaware-llc = "Founder unit issuance and vesting agreement" }
+templates = [
+  "founders/founder-stock-purchase.md",
+]
+sources = [
+  { title = "Delaware General Corporation Law sections 152 and 153", url = "https://delcode.delaware.gov/title8/c001/sc05/index.html" },
+  { title = "Y Combinator: how to split equity among co-founders", url = "https://www.ycombinator.com/blog/splitting-equity-among-founders/" },
+  { title = "Colorado Revised Statutes section 7-106-202 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+]
+
+
+[[item]]
+id = "founders.stock-exemption-record"
+title = "Record of the securities exemption for founder stock or units"
+category = "founders"
+relationship = "founders-and-company"
+stage = "formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Founder equity is a security; the record shows which exemption covers the issuance, so no registration was needed."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "A short dated note naming the exemption, each founder who bought, and what each paid."
+templates = [
+  "founders/initial-board-consent.md",
+  "founders/llc-initial-consent.md",
+]
+sources = [
+  { title = "Securities Act section 4(a)(2), 15 U.S.C. 77d", url = "https://uscode.house.gov/us/usc/t15/s77d/" },
+  { title = "Colorado Revised Statutes section 11-51-308(1)(i) (title 11, 2026)", url = "https://olls.info/crs/crs2026-title-11.pdf" },
+]
+[[item]]
+id = "founders.section-83b-election"
+title = "Section 83(b) election with proof of timely filing"
+category = "founders"
+relationship = "founders-and-company"
+stage = "formation"
+deadline = "Within 30 days after the transfer of the shares or units; it cannot be extended. A last day on a weekend or legal holiday moves to the next business day."
+applies_when = "When founder stock or capital interests are subject to vesting. A profits interest under Revenue Procedure 2001-43 need not file."
+due = { kind = "after", from = ["founders.stock-purchase-agreement"], days = 30, pick = "each", what = "the transfer date on the stock or unit agreement" }
+note = "This cannot be fixed later. The founder signs under penalties of perjury; filing early and keeping the confirmation or proof of mailing are common practice."
+date_label = "Date filed"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Without it, tax on restricted stock is generally worked out as it vests; with it, at the transfer. A missed deadline cannot be fixed."
+provided_by = ["founder", "accountant", "lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed election (Form 15620 or a letter), the online filing confirmation or proof of mailing, and the copy given to the company."
+templates = [
+  "founders/section-83b-election.md",
+]
+sources = [
+  { title = "IRS Form 15620, section 83(b) election", url = "https://www.irs.gov/pub/irs-pdf/f15620.pdf" },
+  { title = "Treasury Regulation section 1.83-2", url = "https://www.ecfr.gov/current/title-26/section-1.83-2" },
+  { title = "IRS Revenue Procedure 2001-43, profits interests", url = "https://www.irs.gov/pub/irs-drop/rp-01-43.pdf" },
+  { title = "Internal Revenue Code section 7503, time for acts falling on a weekend or holiday", url = "https://uscode.house.gov/us/usc/t26/s7503/" },
+  { title = "IRS: mobile-friendly forms, Form 15620 (not checked: its row was not read at source)", url = "https://www.irs.gov/forms-pubs/mobile-friendly-forms?find=15620" },
+]
+
+[[item]]
+id = "founders.vesting-schedule"
+title = "Founder vesting schedule, repurchase right and acceleration terms"
+category = "founders"
+relationship = "founders-and-company"
+stage = "formation"
+repeats = "Check at each vesting milestone and any acceleration event."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Investors expect founder shares to vest, commonly over four years with a one-year cliff, which protects the company if a founder leaves."
+provided_by = ["lawyer", "founder"]
+room_roles = ["counsel", "investors"]
+evidence = "Vesting start date, schedule, cliff and acceleration terms in the signed agreement, matching the cap table, with the restriction noted on the certificate or notice."
+templates = [
+  "founders/founder-stock-purchase.md",
+]
+sources = [
+  { title = "Y Combinator: how to split equity among co-founders", url = "https://www.ycombinator.com/blog/splitting-equity-among-founders/" },
+  { title = "Delaware General Corporation Law section 202", url = "https://delcode.delaware.gov/title8/c001/sc06/index.html" },
+  { title = "Colorado Revised Statutes section 7-106-208 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+]
+
+
+[[item]]
+id = "founders.cause-and-good-reason-definitions"
+title = "Definitions of cause and good reason"
+category = "founders"
+relationship = "founders-and-company"
+stage = "formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "They decide whether a removal costs a founder stock or units, and they are set in the founder stock or employment agreement before any dispute starts."
+provided_by = ["lawyer"]
+room_roles = ["counsel"]
+evidence = "Founder stock or employment agreement with both terms defined, or a dated note that it has neither."
+sources = [
+  { title = "Cooley GO: founders' stock", url = "https://www.cooleygo.com/founder-basics-founders-stock/" },
+  { title = "Colorado Revised Statutes sections 7-108-303 and 7-108-304 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+  { title = "Delaware General Corporation Law section 142", url = "https://delcode.delaware.gov/title8/c001/sc04/index.html" },
+]
+
+[[item]]
+id = "founders.indemnification"
+title = "Founder indemnification and advancement of legal costs"
+category = "founders"
+relationship = "founders-and-company"
+stage = "formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Says whether the company pays a founder's legal costs in a dispute, and whether it pays them before the outcome is known."
+provided_by = ["lawyer"]
+room_roles = ["counsel"]
+evidence = "Bylaws, operating agreement or signed agreement with the indemnification and advancement terms. Formation sets often add an indemnification agreement with each director and officer; optional."
+sources = [
+  { title = "Delaware General Corporation Law section 145", url = "https://delcode.delaware.gov/title8/c001/sc04/index.html" },
+  { title = "Colorado Revised Statutes sections 7-109-104, 7-109-109 and 7-80-407 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+  { title = "Delaware Limited Liability Company Act section 18-108", url = "https://delcode.delaware.gov/title6/c018/sc01/index.html" },
+]
+
+[[item]]
+id = "founders.removal-rule-check"
+title = "Check of who can remove a founder"
+category = "founders"
+relationship = "founders-and-company"
+stage = "formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Who can remove a founder as officer, director or manager differs by entity type and depends on the bylaws or operating agreement."
+provided_by = ["lawyer", "founder"]
+room_roles = ["counsel"]
+evidence = "Dated note of the removal rule for each founder's role, with the document section it comes from."
+templates = [
+  "founders/removal-rule-check.md",
+]
+sources = [
+  { title = "Delaware General Corporation Law sections 141(k) and 142", url = "https://delcode.delaware.gov/title8/c001/sc04/index.html" },
+  { title = "Colorado Revised Statutes sections 7-108-108, 7-108-303, 7-80-402 and 7-80-403 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+  { title = "Delaware Limited Liability Company Act section 18-402", url = "https://delcode.delaware.gov/title6/c018/sc04/index.html" },
+]
+# ---------------------------------------------------------------------------------------------------------------------
+# Intellectual property
+# ---------------------------------------------------------------------------------------------------------------------
+
+[[item]]
+id = "intellectual-property.founder-technology-assignment"
+title = "Founder technology and IP assignment"
+category = "intellectual-property"
+relationship = "founders-and-company"
+stage = "formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Moves code, designs, names and domains a founder made before formation into the company; investors check the chain of title."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed assignment with a schedule of what was assigned."
+templates = [
+  "founders/invention-assignment.md",
+]
+sources = [
+  { title = "U.S. Copyright Act, 17 U.S.C. section 204(a), transfers in writing", url = "https://www.copyright.gov/title17/92chap2.html" },
+  { title = "35 U.S.C. section 261, patent assignments", url = "https://uscode.house.gov/us/usc/t35/s261/" },
+]
+
+[[item]]
+id = "intellectual-property.founder-invention-assignment"
+title = "Founder confidential information and invention assignment agreement"
+category = "intellectual-property"
+relationship = "founders-and-company"
+stage = "formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Covers what each founder creates after formation; investors usually require one from every founder."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed agreement, with any excluded prior inventions listed."
+templates = [
+  "founders/invention-assignment.md",
+]
+sources = [
+  { title = "U.S. Copyright Act, 17 U.S.C. sections 201 and 204", url = "https://www.copyright.gov/title17/92chap2.html" },
+  { title = "NVCA model stock purchase agreement (representations on proprietary information agreements)", url = "https://nvca.org/model-legal-documents/" },
+]
+
+[[item]]
+id = "intellectual-property.employee-invention-assignment"
+title = "Employee confidential information and invention assignment agreement"
+category = "intellectual-property"
+relationship = "company-and-people"
+stage = "first-hires"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Patent rights stay with the inventor unless assigned in writing, so a signed agreement makes sure the company owns what employees build."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "One signed agreement per employee, signed on or before the first day of work."
+templates = [
+  "founders/invention-assignment.md",
+]
+sources = [
+  { title = "U.S. Copyright Act, 17 U.S.C. section 101, work made for hire", url = "https://www.copyright.gov/title17/92chap1.html" },
+  { title = "35 U.S.C. section 261, patent assignments", url = "https://uscode.house.gov/us/usc/t35/s261/" },
+  { title = "Colorado Revised Statutes section 8-2-113 (title 8, 2026)", url = "https://olls.info/crs/crs2026-title-08.pdf" },
+]
+
+[[item]]
+id = "intellectual-property.contractor-ip-assignment"
+title = "Contractor IP assignment"
+category = "intellectual-property"
+relationship = "company-and-people"
+stage = "first-hires"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Software a contractor writes is usually not a work made for hire, so only a signed assignment moves ownership."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Assignment clause in each signed contractor agreement, or a separate signed assignment."
+sources = [
+  { title = "U.S. Copyright Office Circular 30, works made for hire", url = "https://www.copyright.gov/circs/circ30.pdf" },
+  { title = "U.S. Copyright Act, 17 U.S.C. section 101, work made for hire", url = "https://www.copyright.gov/title17/92chap1.html" },
+]
+
+[[item]]
+id = "intellectual-property.trademark-search"
+title = "Trademark knockout search for the company and product names"
+category = "intellectual-property"
+relationship = "ip-and-assets"
+stage = "pre-formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Finds conflicting marks before money goes into a name, logo or domain."
+provided_by = ["founder", "lawyer"]
+room_roles = ["counsel"]
+evidence = "Dated search results and a lawyer's clearance note."
+sources = [
+  { title = "USPTO: search trademark database", url = "https://www.uspto.gov/trademarks/search" },
+  { title = "USPTO: trademark basics", url = "https://www.uspto.gov/trademarks/basics" },
+]
+
+[[item]]
+id = "intellectual-property.trademark-registration"
+title = "Federal trademark application or registration"
+category = "intellectual-property"
+relationship = "ip-and-assets"
+stage = "formation"
+repeats = "Declaration of use \"Between the fifth and sixth years after the registration date\"; declaration and renewal \"Between the ninth and 10th years after the registration date\", then every 10 years. \"There is a six-month grace period after each of the above deadlines\" (USPTO, read 2026-11-07)."
+deadline = "15 U.S.C. 1051(d)(1): the statement of use is due \"within six months after the date on which the notice of allowance\" is issued; (d)(2) allows an extension for \"one additional 6-month period\". 15 U.S.C. 1058(a): the declaration is due \"Within the 1-year period immediately preceding the expiration of 6 years following the date of registration\", and again within the year before 10 years. The USPTO's pages, read 2026-11-07: claim use \"Within six months of the Notice of Allowance (NOA) issue date\" or within a granted extension; an office action response is due \"within three months of the date specified in the heading of the email notice\"."
+applies_when = "When the company has a name or logo it plans to keep."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "A federal registration gives nationwide priority and makes the brand easier to defend."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "USPTO filing receipt or registration certificate in the company's name."
+sources = [
+  { title = "USPTO: trademark basics", url = "https://www.uspto.gov/trademarks/basics" },
+  { title = "USPTO: keeping your registration alive", url = "https://www.uspto.gov/trademarks/maintain/keeping-your-registration-alive" },
+  { title = "Lanham Act section 1(d), 15 U.S.C. 1051(d)", url = "https://uscode.house.gov/us/usc/t15/s1051/" },
+  { title = "Lanham Act section 8, 15 U.S.C. 1058", url = "https://uscode.house.gov/us/usc/t15/s1058/" },
+  { title = "USPTO: intent-to-use (ITU) basis", url = "https://www.uspto.gov/trademarks/apply/intent-use-itu-applications" },
+  { title = "USPTO: response time period", url = "https://www.uspto.gov/trademarks/apply/response-time-period" },
+]
+
+[[item]]
+id = "intellectual-property.colorado-trade-name"
+title = "Colorado statement of trade name"
+category = "intellectual-property"
+relationship = "ip-and-assets"
+stage = "formation"
+applies_when = "Only if the company does business in Colorado under a name other than its exact legal name."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Colorado requires a statement of trade name before a company does business under any other name."
+provided_by = ["founder", "registered-agent"]
+room_roles = ["counsel"]
+evidence = "Filed statement of trade name."
+note = "Until it files, it can't sue in a Colorado court to collect a debt from those it dealt with under that name, and can face a civil penalty of up to $500."
+templates = [
+  "founders/colorado-trade-name.md",
+]
+sources = [
+  { title = "Colorado Revised Statutes sections 7-71-101 and 7-71-102 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+  { title = "Colorado Secretary of State: trade names FAQ", url = "https://www.coloradosos.gov/pubs/business/FAQs/tradeNames.html" },
+]
+
+[[item]]
+id = "intellectual-property.domain-names"
+title = "Domain names registered to the company"
+category = "intellectual-property"
+relationship = "ip-and-assets"
+stage = "pre-formation"
+repeats = "Renew before each expiry date."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "A domain held in a founder's or contractor's personal account is a common diligence gap."
+provided_by = ["founder"]
+room_roles = ["counsel", "investors"]
+evidence = "Registrar account in the company's name, with each domain's renewal date."
+sources = [
+  { title = "ICANN: registrant benefits and responsibilities", url = "https://www.icann.org/resources/pages/benefits-2013-09-16-en" },
+]
+
+[[item]]
+id = "intellectual-property.open-source-inventory"
+title = "Open-source licence inventory"
+category = "intellectual-property"
+relationship = "ip-and-assets"
+stage = "first-financing"
+repeats = "Update with each release."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Copyleft licences can require releasing source code; investors and acquirers ask for the list."
+provided_by = ["founder"]
+room_roles = ["counsel", "investors"]
+evidence = "List of dependencies and their licences, ideally generated from the build."
+sources = [
+  { title = "Open Source Initiative: approved licences", url = "https://opensource.org/licenses" },
+  { title = "SPDX license list", url = "https://spdx.org/licenses/" },
+]
+
+[[item]]
+id = "intellectual-property.patent-filings"
+title = "Patent filings and invention records"
+category = "intellectual-property"
+relationship = "ip-and-assets"
+stage = "first-financing"
+deadline = "A provisional application has \"a pendency lasting 12 months from the date the provisional application is filed\", and \"can be filed up to 12 months following an inventor's public disclosure of the invention\" (USPTO, read 2026-11-07). 35 U.S.C. 102(b)(1): \"A disclosure made 1 year or less before the effective filing date of a claimed invention shall not be prior art\" in the cases the statute lists; a disclosure can already cost foreign rights. 35 U.S.C. 41(b): maintenance fees are due at 3, 7 and 11 \"years and 6 months after grant\"; with a \"grace period of 6 months\" after each, and the patent expires at the end of the grace period if the fee is not paid. The USPTO: pay \"without surcharge at 3 to 3.5 years, 7 to 7.5 years, and 11 to 11.5 years after the date of issue\", or with a surcharge in the grace periods (read 2026-11-07)."
+applies_when = "Only if the company has inventions it may patent."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Publishing or selling an invention starts clocks that can bar a patent; a provisional application sets an early filing date."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "USPTO filing receipts and the signed inventor assignments."
+sources = [
+  { title = "USPTO: provisional application for patent", url = "https://www.uspto.gov/patents/basics/apply/provisional-application" },
+  { title = "Patent Act section 102, 35 U.S.C. 102", url = "https://uscode.house.gov/us/usc/t35/s102/" },
+  { title = "Patent Act section 41(b), 35 U.S.C. 41", url = "https://uscode.house.gov/us/usc/t35/s41/" },
+  { title = "USPTO: maintain your patent", url = "https://www.uspto.gov/patents/maintain" },
+]
+
+
+[[item]]
+id = "intellectual-property.patent-assignment-recording"
+title = "Patent assignments recorded at the USPTO"
+category = "intellectual-property"
+relationship = "ip-and-assets"
+stage = "first-financing"
+deadline = "Within 3 months of the assignment's date, or before a later sale or mortgage of the patent. 35 U.S.C. 261 makes an assignment void against a later buyer or lender who paid without notice \"unless it is recorded in the Patent and Trademark Office within three months from its date or prior to the date of such subsequent purchase or mortgage\" (MPEP 301, read 2026-11-07)."
+applies_when = "Only if a patent or patent application was assigned to the company."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "An unrecorded assignment can lose the patent to a later buyer."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "USPTO notice of recordation for each assignment."
+sources = [
+  { title = "Patent Act section 261, 35 U.S.C. 261", url = "https://uscode.house.gov/us/usc/t35/s261/" },
+  { title = "USPTO: MPEP 301, ownership and assignability of patents", url = "https://www.uspto.gov/web/offices/pac/mpep/s301.html" },
+]
+
+[[item]]
+id = "intellectual-property.copyright-registration"
+title = "Copyright registration"
+category = "intellectual-property"
+relationship = "ip-and-assets"
+stage = "first-financing"
+deadline = "17 U.S.C. 412(2): statutory damages and attorney's fees are not available for infringement that begins after first publication and before registration \"unless such registration is made within three months after the first publication of the work.\""
+applies_when = "Only if the company publishes software, writing, images or other works it may need to enforce."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Registration date decides whether statutory damages and attorney's fees are open if someone copies a published work."
+provided_by = ["founder", "lawyer"]
+room_roles = ["counsel"]
+evidence = "Copyright Office certificate of registration, or the filing receipt, in the company's name."
+sources = [
+  { title = "Copyright Act section 412, 17 U.S.C. 412", url = "https://uscode.house.gov/us/usc/t17/s412/" },
+]
+
+[[item]]
+id = "intellectual-property.dmca-agent"
+title = "Copyright Office designation of a DMCA agent"
+category = "intellectual-property"
+relationship = "ip-and-assets"
+stage = "first-financing"
+repeats = "Renew every three years."
+deadline = "37 CFR 201.38(c)(4): a designation \"will expire and become invalid three years after it is registered with the Office\" unless the service provider renews it by amending or resubmitting it."
+applies_when = "Only if the company runs a service that stores material users post."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "A service provider that stores user material designates an agent with the Copyright Office to receive notices of claimed infringement; an expired designation is invalid."
+provided_by = ["founder", "lawyer"]
+room_roles = ["counsel"]
+evidence = "Copyright Office confirmation of the designation, with its registration date."
+sources = [
+  { title = "Copyright Office rule on designation of agent, 37 CFR 201.38", url = "https://www.ecfr.gov/current/title-37/section-201.38" },
+]
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Equity
+# ---------------------------------------------------------------------------------------------------------------------
+
+[[item]]
+id = "equity.capitalization-table"
+title = "Capitalization table"
+category = "equity"
+relationship = "company-and-investors"
+stage = "formation"
+repeats = "After every issuance, grant, exercise, transfer or conversion."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "One list of who owns what, tied to signed documents; the first thing investors check."
+provided_by = ["founder", "lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Current table that ties to the ledger, every signed issuance and the fully diluted count."
+templates = [
+  "founders/capitalization-table.md",
+]
+sources = [
+  { title = "Delaware General Corporation Law sections 219 and 224", url = "https://delcode.delaware.gov/title8/c001/sc07/index.html" },
+  { title = "NVCA model stock purchase agreement (capitalization representation)", url = "https://nvca.org/model-legal-documents/" },
+  { title = "Colorado Revised Statutes section 7-116-101 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+]
+
+[[item]]
+id = "equity.stock-ledger"
+title = "Stock ledger with certificates or uncertificated share notices"
+category = "equity"
+relationship = "company-and-investors"
+stage = "formation"
+repeats = "After every issuance or transfer."
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "The stock ledger is the record of who may vote; certificates or notices must match it. A Delaware corporation prepares the list of stockholders entitled to vote \"no later than the tenth day before each meeting of stockholders\" (8 Del. C. 219(a), read 2026-11-07)."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Ledger entries with a certificate number or uncertificated share notice for every issuance."
+templates = [
+  "founders/stock-ledger.md",
+]
+sources = [
+  { title = "Delaware General Corporation Law sections 219 and 224", url = "https://delcode.delaware.gov/title8/c001/sc07/index.html" },
+  { title = "Delaware General Corporation Law sections 151(f) and 158", url = "https://delcode.delaware.gov/title8/c001/sc05/index.html" },
+  { title = "Colorado Revised Statutes section 7-116-101 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+]
+
+[[item]]
+id = "equity.member-ledger"
+title = "Member ledger: members, units and contributions"
+category = "equity"
+relationship = "company-and-investors"
+stage = "formation"
+repeats = "After every admission, issuance or transfer."
+entity_types = ["colorado-llc", "delaware-llc"]
+why = "State law gives members a right to see the member list and each member's contributions, so LLCs commonly keep them."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Current schedule of members with units, contributions and admission dates, matching the operating agreement."
+templates = [
+  "founders/member-ledger.md",
+]
+sources = [
+  { title = "Colorado Revised Statutes section 7-80-408 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+  { title = "Delaware Limited Liability Company Act section 18-305", url = "https://delcode.delaware.gov/title6/c018/sc03/index.html" },
+]
+
+[[item]]
+id = "equity.equity-incentive-plan"
+title = "Equity incentive plan"
+category = "equity"
+relationship = "company-and-people"
+stage = "first-hires"
+deadline = "For incentive stock options, stockholders approve the plan within 12 months before or after the board adopts it."
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Options need a written plan, and incentive stock options also need stockholder approval."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Plan as adopted, with the board consent and the stockholder consent approving it."
+sources = [
+  { title = "Treasury Regulation section 1.422-2, incentive stock options", url = "https://www.ecfr.gov/current/title-26/section-1.422-2" },
+  { title = "SEC Rule 701, 17 CFR 230.701", url = "https://www.ecfr.gov/current/title-17/section-230.701" },
+]
+
+[[item]]
+id = "equity.profits-interest-plan"
+title = "Unit incentive plan or profits interest grants"
+category = "equity"
+relationship = "company-and-people"
+stage = "first-hires"
+entity_types = ["colorado-llc", "delaware-llc"]
+why = "LLC equity for employees usually takes the form of profits interests, which follow their own IRS rules."
+provided_by = ["lawyer", "accountant"]
+room_roles = ["counsel", "investors"]
+evidence = "Plan or operating agreement terms, each signed grant, and the value threshold set at grant."
+sources = [
+  { title = "IRS Revenue Procedure 2001-43, profits interests", url = "https://www.irs.gov/pub/irs-drop/rp-01-43.pdf" },
+]
+
+[[item]]
+id = "equity.section-409a-valuation"
+title = "Section 409A valuation by an independent appraiser"
+category = "equity"
+relationship = "company-and-people"
+stage = "first-hires"
+repeats = "At least every 12 months, and after a financing or other material change."
+due = { kind = "after", from = ["equity.section-409a-valuation"], months = 12, pick = "latest", what = "the date of the latest valuation" }
+date_label = "Valuation date"
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Option exercise prices must be at least fair market value, and an independent appraisal no older than 12 months is presumed reasonable."
+provided_by = ["valuation-firm"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed valuation report with its effective date, and the board consent adopting it."
+sources = [
+  { title = "Treasury Regulation section 1.409A-1(b)(5)(iv)", url = "https://www.ecfr.gov/current/title-26/section-1.409A-1" },
+]
+
+[[item]]
+id = "equity.grant-documents"
+title = "Option grant notices and award agreements"
+category = "equity"
+relationship = "company-and-people"
+stage = "first-hires"
+repeats = "Every grant."
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Each grant needs board approval, a signed agreement and an exercise price at fair market value on the grant date."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Grant notice and option agreement signed by the holder and the company."
+sources = [
+  { title = "Delaware General Corporation Law section 157", url = "https://delcode.delaware.gov/title8/c001/sc05/index.html" },
+  { title = "Treasury Regulation section 1.409A-1(b)(5)", url = "https://www.ecfr.gov/current/title-26/section-1.409A-1" },
+]
+
+[[item]]
+id = "equity.board-consents-for-grants"
+title = "Board consents approving each equity grant"
+category = "equity"
+relationship = "company-and-people"
+stage = "first-hires"
+repeats = "Every grant."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "A grant never properly approved may be void and need ratification. A Delaware corporation can ratify under section 204, with a certificate of validation where a required filing is missing or needs changing, or ask the Court of Chancery to validate under section 205; most challenges to a ratification must be brought \"within 120 days from the later of the validation effective time or the time at which the notice required by this subsection is given\" (section 204(g), read 2026-11-07), but not a claim that section 204 wasn't followed, or by a person owed notice who didn't get it."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed consent listing the holder, number, price and vesting of each grant."
+title_by_entity = { colorado-llc = "Manager or member consents approving each unit grant", delaware-llc = "Manager or member consents approving each unit grant" }
+sources = [
+  { title = "Delaware General Corporation Law section 141(f)", url = "https://delcode.delaware.gov/title8/c001/sc04/index.html" },
+  { title = "Delaware General Corporation Law section 157", url = "https://delcode.delaware.gov/title8/c001/sc05/index.html" },
+  { title = "Delaware General Corporation Law sections 204 and 205", url = "https://delcode.delaware.gov/title8/c001/sc06/index.html" },
+  { title = "Delaware Limited Liability Company Act section 18-106(e)", url = "https://delcode.delaware.gov/title6/c018/sc01/index.html" },
+]
+
+[[item]]
+id = "equity.securities-exemption-for-grants"
+title = "Securities exemption records for equity grants (Rule 701)"
+category = "equity"
+relationship = "company-and-people"
+stage = "first-hires"
+repeats = "Track the 12-month totals with every grant."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Equity grants are securities offers; Rule 701 covers most of them, with extra disclosure once grants pass $10 million in 12 months."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Running totals of grants under Rule 701 and any disclosure delivered."
+templates = [
+  "founders/rule-701-record.md",
+]
+sources = [
+  { title = "SEC Rule 701, 17 CFR 230.701", url = "https://www.ecfr.gov/current/title-17/section-230.701" },
+  { title = "SEC: frequently asked questions about exempt offerings", url = "https://www.sec.gov/resources-small-businesses/exempt-offerings/frequently-asked-questions-about-exempt-offerings" },
+]
+
+[[item]]
+id = "equity.form-3921"
+title = "Form 3921 for incentive stock option exercises"
+category = "equity"
+relationship = "company-and-people"
+stage = "ongoing"
+repeats = "Every year."
+deadline = "Copy to the employee by January 31; to the IRS by February 28, or March 31 if filed electronically."
+applies_when = "Only in a year when someone exercises an incentive stock option."
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "The company must report each incentive stock option exercise to the employee and the IRS."
+provided_by = ["accountant"]
+room_roles = ["counsel"]
+evidence = "Filed forms and the employee copies for each exercise."
+sources = [
+  { title = "IRS: about Form 3921", url = "https://www.irs.gov/forms-pubs/about-form-3921" },
+]
+
+[[item]]
+id = "equity.qualified-small-business-stock-records"
+title = "Records supporting qualified small business stock (section 1202)"
+category = "equity"
+relationship = "founders-and-company"
+stage = "formation"
+repeats = "At each issuance, and every year."
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Founders and investors may exclude gain on a sale if the company can show it qualified when the stock was issued."
+provided_by = ["accountant"]
+room_roles = ["counsel", "investors"]
+evidence = "Records of gross assets at each issuance and of the active business test."
+sources = [
+  { title = "26 U.S.C. section 1202", url = "https://uscode.house.gov/us/usc/t26/s1202/" },
+]
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Financing
+# ---------------------------------------------------------------------------------------------------------------------
+
+[[item]]
+id = "financing.pitch-deck"
+title = "Pitch deck"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+repeats = "Each time the numbers or the plan change."
+note = "Before a term sheet, a short set is common: Y Combinator names a deck and a one or two page summary, and Andreessen Horowitz names five files and leaves legal documents out unless asked. One law firm guide expects its full list even at seed."
+date_label = "Date of this version"
+applies_when = "When the company raises money from investors."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Investors open it first, and many look no further."
+provided_by = ["founder"]
+room_roles = ["counsel", "investors"]
+evidence = "The current deck as a PDF, dated, with the numbers it states matching the model and the cap table."
+sources = [
+  { title = "Y Combinator: a guide to seed fundraising", url = "https://www.ycombinator.com/library/4A-a-guide-to-seed-fundraising" },
+  { title = "Andreessen Horowitz: the insider's guide to data rooms", url = "https://a16z.com/the-insiders-guide-to-data-rooms-what-to-know-before-you-raise/" },
+  { title = "White Star Capital: what makes a great data room", url = "https://atlas.whitestarcapital.com/guidance--best-practices/54vytRx5g6cuWLGJPLLt7w/what-makes-a-great-data-room/58ZbLzYSGQWrFktyoB52ig" },
+]
+
+[[item]]
+id = "financing.company-summary"
+title = "One or two page company summary"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+repeats = "With each new deck."
+date_label = "Date of this version"
+applies_when = "When the company raises money from investors."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "The short written version of the deck, for investors who read before they meet."
+provided_by = ["founder"]
+room_roles = ["counsel", "investors"]
+evidence = "A dated summary of one or two pages that matches the current deck."
+sources = [
+  { title = "Y Combinator: a guide to seed fundraising", url = "https://www.ycombinator.com/library/4A-a-guide-to-seed-fundraising" },
+  { title = "Klehr Harrison: building a data room that wins investor confidence", url = "https://klehr.com/publications/startup-evolution-a-year-long-journey-through-a-founders-toolkit-due-diligence-ready-building-a-data-room-that-wins-investor-confidence/" },
+]
+
+[[item]]
+id = "financing.financial-model"
+title = "Financial model with monthly profit and loss, burn and cash"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+repeats = "Every month, after the books close."
+note = "One investor guide asks for the model as a working spreadsheet, so an investor can run their own numbers. Guides also ask for actuals kept apart from projections, and Y Combinator warns against detailed financials at seed."
+date_label = "Last month of actuals"
+applies_when = "When the company raises money from investors."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Numbers that do not tie across the deck, the model and the books are a red flag investor guides name often."
+provided_by = ["founder"]
+room_roles = ["counsel", "investors"]
+evidence = "A working spreadsheet with monthly periods, each column marked actual or projected, and a cash balance that matches the bank."
+sources = [
+  { title = "Andreessen Horowitz: the insider's guide to data rooms", url = "https://a16z.com/the-insiders-guide-to-data-rooms-what-to-know-before-you-raise/" },
+  { title = "White Star Capital: what makes a great data room", url = "https://atlas.whitestarcapital.com/guidance--best-practices/54vytRx5g6cuWLGJPLLt7w/what-makes-a-great-data-room/58ZbLzYSGQWrFktyoB52ig" },
+  { title = "Klehr Harrison: building a data room that wins investor confidence", url = "https://klehr.com/publications/startup-evolution-a-year-long-journey-through-a-founders-toolkit-due-diligence-ready-building-a-data-room-that-wins-investor-confidence/" },
+]
+
+[[item]]
+id = "financing.use-of-funds"
+title = "Use of funds, milestones and runway"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+date_label = "Date of this version"
+applies_when = "When the company raises money from investors."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Investors weigh the plan for this money, often 12 to 18 months of milestones, more than long projections."
+provided_by = ["founder"]
+room_roles = ["counsel", "investors"]
+evidence = "A dated plan whose uses add up to the amount raised, with a runway that matches the burn in the model."
+sources = [
+  { title = "Andreessen Horowitz: the insider's guide to data rooms", url = "https://a16z.com/the-insiders-guide-to-data-rooms-what-to-know-before-you-raise/" },
+  { title = "Y Combinator: a guide to seed fundraising", url = "https://www.ycombinator.com/library/4A-a-guide-to-seed-fundraising" },
+  { title = "Klehr Harrison: building a data room that wins investor confidence", url = "https://klehr.com/publications/startup-evolution-a-year-long-journey-through-a-founders-toolkit-due-diligence-ready-building-a-data-room-that-wins-investor-confidence/" },
+]
+
+[[item]]
+id = "financing.metrics"
+title = "Usage, retention cohorts and unit economics"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+repeats = "Every month."
+date_label = "Last month covered"
+applies_when = "When the company raises money and has users or customers."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "They show the numbers behind traction."
+provided_by = ["founder"]
+room_roles = ["counsel", "investors"]
+evidence = "A dated spreadsheet with every monthly cohort since launch and the definitions each metric uses."
+sources = [
+  { title = "Andreessen Horowitz: the insider's guide to data rooms", url = "https://a16z.com/the-insiders-guide-to-data-rooms-what-to-know-before-you-raise/" },
+  { title = "White Star Capital: what makes a great data room", url = "https://atlas.whitestarcapital.com/guidance--best-practices/54vytRx5g6cuWLGJPLLt7w/what-makes-a-great-data-room/58ZbLzYSGQWrFktyoB52ig" },
+  { title = "Klehr Harrison: building a data room that wins investor confidence", url = "https://klehr.com/publications/startup-evolution-a-year-long-journey-through-a-founders-toolkit-due-diligence-ready-building-a-data-room-that-wins-investor-confidence/" },
+]
+
+[[item]]
+id = "financing.safe"
+title = "SAFE (simple agreement for future equity)"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+date_label = "Date of the sale"
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Y Combinator's post-money SAFE is the common seed instrument, and each one changes the fully diluted cap table."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed SAFE, the wire confirmation, and the cap table showing how it converts."
+sources = [
+  { title = "Y Combinator: SAFE financing documents", url = "https://www.ycombinator.com/safe" },
+]
+
+[[item]]
+id = "financing.side-letters"
+title = "Pro rata and other side letters"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Side letters grant rights the main documents do not show, and later investors ask for every one."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed letters, each listed against the instrument it changes."
+sources = [
+  { title = "Y Combinator: SAFE financing documents (pro rata side letter)", url = "https://www.ycombinator.com/safe" },
+  { title = "NVCA model legal documents", url = "https://nvca.org/model-legal-documents/" },
+]
+
+[[item]]
+id = "financing.convertible-note"
+title = "Convertible note purchase agreement and notes"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+deadline = "Track each note's maturity date."
+date_label = "Date of the sale"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "A loan that converts to equity; it carries interest and a maturity date, so it stays a debt until it converts."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed purchase agreement and notes, with principal, interest, maturity and conversion terms."
+sources = [
+  { title = "SEC Office of Investor Education and Advocacy: investor bulletin on SAFEs and convertible notes", url = "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-52" },
+]
+
+[[item]]
+id = "financing.financing-approvals"
+title = "Board and stockholder consents approving the financing"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+repeats = "Every financing."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Each financing needs approval by the board or managers, and often by the owners to amend the charter or operating agreement or to create new shares or units."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed consents, with the documents they approve attached."
+title_by_entity = { colorado-llc = "Manager and member consents approving the financing", delaware-llc = "Manager and member consents approving the financing" }
+sources = [
+  { title = "Delaware General Corporation Law section 141(f)", url = "https://delcode.delaware.gov/title8/c001/sc04/index.html" },
+  { title = "Delaware General Corporation Law section 228", url = "https://delcode.delaware.gov/title8/c001/sc07/index.html" },
+  { title = "Delaware General Corporation Law section 242", url = "https://delcode.delaware.gov/title8/c001/sc08/index.html" },
+]
+
+[[item]]
+id = "financing.investor-accreditation"
+title = "Investor accreditation questionnaires"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+repeats = "Every financing."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Rule 506(b) offerings usually rely on investors being accredited, and the questionnaire records why each one qualifies."
+provided_by = ["lawyer"]
+room_roles = ["counsel"]
+evidence = "A completed questionnaire from each investor."
+sources = [
+  { title = "SEC Rule 501(a), 17 CFR 230.501", url = "https://www.ecfr.gov/current/title-17/section-230.501" },
+  { title = "SEC: frequently asked questions about exempt offerings", url = "https://www.sec.gov/resources-small-businesses/exempt-offerings/frequently-asked-questions-about-exempt-offerings" },
+]
+
+
+[[item]]
+id = "financing.exemption-decision"
+title = "Record of the securities exemption decision"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Names the exemption the raise relies on and what can be said while it is open; each route has its own rules on who can buy and how they are found."
+provided_by = ["lawyer"]
+room_roles = ["counsel"]
+evidence = "A dated note naming the exemption, why it was chosen and who approved it, kept from before the first offer."
+sources = [
+  { title = "SEC Rule 506, 17 CFR 230.506", url = "https://www.ecfr.gov/current/title-17/section-230.506" },
+  { title = "SEC: what pathways are available to raise capital", url = "https://www.sec.gov/resources-small-businesses/smallbiz-essentials-what-pathways-are-available-raise-capital-investors" },
+]
+
+[[item]]
+id = "financing.solicitation-log"
+title = "Pitch and solicitation log"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+repeats = "From the first pitch until the raise closes."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Shows who was approached and how; a Rule 506(b) offering cannot use general solicitation."
+provided_by = ["founder", "lawyer"]
+room_roles = ["counsel"]
+evidence = "Dated list of each person pitched, how the contact began and what was sent."
+sources = [
+  { title = "SEC Rule 502(c), 17 CFR 230.502", url = "https://www.ecfr.gov/current/title-17/section-230.502" },
+  { title = "SEC: private placements under Rule 506(b)", url = "https://www.sec.gov/resources-small-businesses/exempt-offerings/private-placements-rule-506b" },
+]
+
+[[item]]
+id = "financing.accredited-verification-record"
+title = "Rule 506(c) verification record"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+applies_when = "Only if the raise uses general solicitation under Rule 506(c)."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Rule 506(c) allows general solicitation only when the company takes reasonable steps to verify that each buyer is accredited; a questionnaire alone is not enough."
+provided_by = ["lawyer", "accountant"]
+room_roles = ["counsel"]
+evidence = "For each buyer, the verification letter or the documents reviewed, with the date."
+sources = [
+  { title = "SEC Rule 506(c), 17 CFR 230.506", url = "https://www.ecfr.gov/current/title-17/section-230.506" },
+  { title = "SEC staff letter on verifying accredited investors, March 12, 2025", url = "https://www.sec.gov/rules-regulations/no-action-interpretive-exemptive-letters/division-corporation-finance-no-action/latham-watkins-503c-031225" },
+  { title = "SEC Release 33-9415, general solicitation under Rule 506(c)", url = "https://www.sec.gov/files/rules/final/2013/33-9415.pdf" },
+]
+
+[[item]]
+id = "financing.rule-502b-disclosure"
+title = "Rule 502(b) disclosure to non-accredited buyers"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+applies_when = "Only if a non-accredited buyer takes part in a Rule 506(b) offering."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Selling to a non-accredited buyer under Rule 506(b) requires registration-like disclosure before the sale."
+provided_by = ["lawyer", "accountant"]
+room_roles = ["counsel"]
+evidence = "The disclosure document, with the date each buyer received it."
+sources = [
+  { title = "SEC Rule 502(b), 17 CFR 230.502", url = "https://www.ecfr.gov/current/title-17/section-230.502" },
+]
+
+[[item]]
+id = "financing.demo-day-checklist"
+title = "Demo day checklist"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+repeats = "Every event."
+applies_when = "Only if the company pitches at a demo day or a similar event."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Rule 148 keeps an event with more than one company out of general solicitation only if a college, government, nonprofit, angel group, incubator or accelerator sponsors it; the sponsor gives no investment advice, takes no part in negotiations, charges only reasonable administrative fees and is not paid for introductions; advertising names no offering; the company shares limited facts; and online attendance is limited."
+provided_by = ["founder", "lawyer"]
+room_roles = ["counsel"]
+evidence = "The sponsor's description of the event, what the company said and the slides used."
+sources = [
+  { title = "SEC Rule 148, 17 CFR 230.148", url = "https://www.ecfr.gov/current/title-17/section-230.148" },
+]
+
+[[item]]
+id = "financing.testing-the-waters-record"
+title = "Testing-the-waters record"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+applies_when = "Only if the company gauges interest before choosing an exemption."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Rule 241 lets a company gauge interest before choosing an exemption, with required statements and limits on what follows."
+provided_by = ["founder", "lawyer"]
+room_roles = ["counsel"]
+evidence = "Each communication sent, with its required statements and its date."
+sources = [
+  { title = "SEC Rule 241, 17 CFR 230.241", url = "https://www.ecfr.gov/current/title-17/section-230.241" },
+]
+
+[[item]]
+id = "financing.finder-agreement"
+title = "Finder or placement agent agreement, with a licence lookup"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+applies_when = "Only if someone is paid to help with the raise."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "A person paid to sell securities generally has to be a registered broker-dealer; a contract with an unregistered broker can be void, and the pay is reported on Form D."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "The signed agreement and a dated record of the licence lookup."
+sources = [
+  { title = "Securities Exchange Act section 15(a), 15 U.S.C. 78o", url = "https://uscode.house.gov/us/usc/t15/s78o/" },
+  { title = "Securities Exchange Act section 29(b), 15 U.S.C. 78cc", url = "https://uscode.house.gov/us/usc/t15/s78cc/" },
+  { title = "Colorado Revised Statutes section 11-51-401 (title 11, 2026)", url = "https://olls.info/crs/crs2026-title-11.pdf" },
+  { title = "SEC: guide to broker-dealer registration", url = "https://www.sec.gov/about/divisions-offices/division-trading-markets/division-trading-markets-compliance-guides/guide-broker-dealer-registration" },
+]
+[[item]]
+id = "financing.form-d-and-state-notices"
+title = "Form D and state notice filings"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+repeats = "Every offering, with a yearly amendment while an offering stays open."
+deadline = "Form D within 15 days after the first sale; state notices by each state's own deadline."
+due = { kind = "after", from = ["financing.safe", "financing.convertible-note", "financing.preferred-stock-purchase-agreement"], days = 15, pick = "first-of-each", what = "the first sale" }
+note = "First sale is when the first investor is irrevocably committed, which can be when a SAFE is signed, even before the money arrives. Each offering has its own Form D, and the room can only tell offerings apart by kind of document."
+date_label = "Date filed"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Regulation D offerings file a Form D with the SEC, and Colorado and other states where investors live usually require a notice filing too. In Colorado, a Rule 506 issuer files a notification of exemption \"and pay an exemption fee to be determined and collected pursuant to section 11-51-707\" (C.R.S. 11-51-308(1)(p)). The securities commissioner may confirm that an exemption applies, and \"Any person making such a request shall pay an opinion fee\" (C.R.S. 11-51-705). Both read 2026-11-07."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "EDGAR filing confirmation and each state's filing confirmation."
+sources = [
+  { title = "SEC: filing a Form D notice", url = "https://www.sec.gov/resources-small-businesses/exempt-offerings/filing-form-d-notice" },
+  { title = "Colorado Division of Securities: exempt transactions", url = "https://securities.colorado.gov/exempt-transactions" },
+  { title = "Colorado Revised Statutes sections 11-51-308 and 11-51-705 (title 11, 2026)", url = "https://olls.info/crs/crs2026-title-11.htm" },
+]
+
+
+[[item]]
+id = "financing.edgar-access"
+title = "EDGAR access: Form ID and account administrators"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+repeats = "Every year, an account administrator confirms the account on EDGAR by the end of the quarter the company picks (Rule 10(d)(4))."
+deadline = "Well in advance of the first Form D (Rule 10, note 1). SEC staff take an average of two business days to review a Form ID, per its Form ID guide."
+note = "The person who submits Form ID first gets Login.gov credentials, using the email on Form ID. Form ID names two account administrators, or one for an individual or a single-member company (Rule 10(d)(2)). A notarized authenticating document goes with it as a PDF, and the notary can't be an account administrator. A missed yearly confirmation has a three-month grace period; after it, EDGAR deactivates the account and a new Form ID is needed."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Form D is filed on EDGAR, and access takes a notarized Form ID and SEC staff review, so it has to start before the 15-day clock."
+provided_by = ["founder", "lawyer"]
+room_roles = ["counsel"]
+evidence = "The SEC's acceptance of Form ID, the named account administrators, the notarized authenticating document kept on file, and each year's confirmation."
+sources = [
+  { title = "SEC Regulation S-T Rule 10, 17 CFR 232.10", url = "https://www.ecfr.gov/current/title-17/section-232.10" },
+  { title = "SEC: prepare and submit a Form ID application", url = "https://www.sec.gov/submit-filings/filer-support-resources/how-do-i-guides/prepare-submit-my-form-id-application" },
+  { title = "SEC: obtain Login.gov account credentials", url = "https://www.sec.gov/submit-filings/filer-support-resources/how-do-i-guides/obtain-logingov-individual-account-credentials" },
+  { title = "SEC: complete annual confirmation for an EDGAR account", url = "https://www.sec.gov/submit-filings/filer-support-resources/how-do-i-guides/complete-annual-confirmation-edgar-account" },
+]
+
+[[item]]
+id = "financing.state-limited-offering-notices"
+title = "State notices outside Rule 506: Delaware Form LOE and Colorado accredited notice"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+deadline = "Within 15 days after the first sale in that state."
+applies_when = "Only if the raise uses a state route outside Rule 506."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "These are state exemptions only, so a federal exemption is still needed. Delaware's Form LOE goes with a federal limited offering, and Colorado's notice with sales only to accredited investors."
+provided_by = ["lawyer"]
+room_roles = ["counsel"]
+evidence = "Filed notice and each state's confirmation."
+sources = [
+  { title = "Delaware Securities Act rules 502 and 503 (not checked: not read at source)", url = "https://regulations.delaware.gov/AdminCode/title6/Rules" },
+  { title = "Colorado Securities Rule 51-3.19, 3 CCR 704-1", url = "https://www.coloradosos.gov/CCR/GenerateRulePdf.do?ruleVersionId=12350&fileName=3%20CCR%20704-1" },
+]
+
+[[item]]
+id = "financing.regulation-cf-filing"
+title = "Regulation CF offering: Form C and Colorado notice"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+deadline = "Form C before the offering starts. The Colorado notice with Form C for a company based in Colorado; otherwise once residents reach 50 percent, within 30 days after the offering completes."
+applies_when = "Only if the raise uses Regulation CF."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "A Regulation CF raise goes through one registered broker or funding portal, with disclosure filed on Form C before the offering."
+provided_by = ["lawyer", "accountant"]
+room_roles = ["counsel"]
+evidence = "Filed Form C, the agreement with the broker or funding portal, and the Colorado notice when the principal place of business is in Colorado or its residents buy 50 percent or more."
+sources = [
+  { title = "SEC Regulation Crowdfunding, 17 CFR part 227", url = "https://www.ecfr.gov/current/title-17/chapter-II/part-227" },
+  { title = "Colorado Securities Rule 51-3.31, 3 CCR 704-1", url = "https://www.coloradosos.gov/CCR/GenerateRulePdf.do?ruleVersionId=12350&fileName=3%20CCR%20704-1" },
+]
+
+[[item]]
+id = "financing.regulation-a-filing"
+title = "Regulation A offering: Form 1-A and Colorado notice"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+deadline = "Colorado Tier 2 notice 21 days before a sale in Colorado."
+applies_when = "Only if the raise uses Regulation A."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Regulation A needs SEC review before sales start, and a Tier 2 offering also files a notice with Colorado."
+provided_by = ["lawyer", "accountant"]
+room_roles = ["counsel"]
+evidence = "SEC qualification of Form 1-A, and the Colorado Tier 2 notice if sold there."
+sources = [
+  { title = "SEC Rule 251, 17 CFR 230.251", url = "https://www.ecfr.gov/current/title-17/section-230.251" },
+  { title = "Colorado Securities Rule 51-3.13, 3 CCR 704-1", url = "https://www.coloradosos.gov/CCR/GenerateRulePdf.do?ruleVersionId=12350&fileName=3%20CCR%20704-1" },
+]
+
+[[item]]
+id = "financing.colorado-crowdfunding"
+title = "Colorado crowdfunding: Form CF-1 and disclosure document"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+deadline = "Notice 10 days before the offering; a quarterly report within 45 days after each quarter ends."
+applies_when = "Only if a Colorado entity raises under the Colorado crowdfunding exemption."
+entity_types = ["colorado-llc", "colorado-corporation"]
+why = "Colorado lets a company organized there raise up to $1 million in 12 months, or $2 million with audited statements, after a notice, with a disclosure document and escrow. Buyers must be Colorado residents or Colorado entities, a buyer who is not accredited is limited to $5,000 in 12 months, and at least 80 percent of the proceeds must be used in Colorado. The issuer files its notice \"not less than ten days before the commencement of an offering\". A quarterly report goes free to the owners, and posting it on the online intermediary's website counts if it is made available \"within forty-five days after the end of each fiscal quarter\" (C.R.S. 11-51-308.5(3)(a)(IV), (XIII), read 2026-11-07)."
+provided_by = ["lawyer", "accountant"]
+room_roles = ["counsel"]
+evidence = "Filed notice, the disclosure document, the escrow agreement and each quarterly report."
+sources = [
+  { title = "Colorado Revised Statutes section 11-51-308.5 (title 11, 2026)", url = "https://olls.info/crs/crs2026-title-11.pdf" },
+  { title = "Colorado Securities Rules 51-3.20 to 51-3.30, 3 CCR 704-1", url = "https://www.coloradosos.gov/CCR/GenerateRulePdf.do?ruleVersionId=12350&fileName=3%20CCR%20704-1" },
+]
+[[item]]
+id = "financing.bad-actor-certifications"
+title = "Bad actor certifications (Rule 506(d))"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+repeats = "Every Rule 506 offering."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Past violations by a covered person can disqualify a Rule 506 offering; the certifications show the check was done."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed questionnaires from directors, officers and holders of 20 percent or more of the voting equity."
+sources = [
+  { title = "SEC Rule 506(d), 17 CFR 230.506", url = "https://www.ecfr.gov/current/title-17/section-230.506" },
+  { title = "SEC: frequently asked questions about exempt offerings", url = "https://www.sec.gov/resources-small-businesses/exempt-offerings/frequently-asked-questions-about-exempt-offerings" },
+]
+
+[[item]]
+id = "financing.conversion-to-delaware-corporation"
+title = "Conversion to a Delaware corporation"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+applies_when = "Only if a Colorado entity or an LLC plans to raise venture money."
+entity_types = ["colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "The SAFE and the NVCA forms assume a corporation, and the NVCA forms assume Delaware law."
+provided_by = ["lawyer", "accountant"]
+room_roles = ["counsel", "investors"]
+evidence = "Plan of conversion, the filed certificates in each state involved, and the tax analysis."
+sources = [
+  { title = "Delaware General Corporation Law section 265", url = "https://delcode.delaware.gov/title8/c001/sc09/index.html" },
+  { title = "Colorado Revised Statutes section 7-90-201 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+  { title = "NVCA model legal documents", url = "https://nvca.org/model-legal-documents/" },
+  { title = "Delaware Limited Liability Company Act section 18-216", url = "https://delcode.delaware.gov/title6/c018/sc02/index.html" },
+]
+
+[[item]]
+id = "financing.llc-investor-admission"
+title = "Amended operating agreement admitting investors"
+category = "financing"
+relationship = "company-and-investors"
+stage = "first-financing"
+applies_when = "Only if an LLC takes investors without converting."
+entity_types = ["colorado-llc", "delaware-llc"]
+why = "New members come in through an amended operating agreement that sets their units, rights and tax allocations."
+provided_by = ["lawyer", "accountant"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed amended operating agreement, joinders, and the updated member ledger."
+sources = [
+  { title = "Colorado Revised Statutes section 7-80-108 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+  { title = "Delaware Limited Liability Company Act section 18-301", url = "https://delcode.delaware.gov/title6/c018/sc03/index.html" },
+]
+
+[[item]]
+id = "financing.term-sheet"
+title = "Term sheet"
+category = "financing"
+relationship = "company-and-investors"
+stage = "priced-round"
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Sets the economics and control terms that the closing documents must match."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed or accepted term sheet, usually based on the NVCA model."
+sources = [
+  { title = "NVCA model legal documents (term sheet)", url = "https://nvca.org/model-legal-documents/" },
+]
+
+[[item]]
+id = "financing.preferred-stock-purchase-agreement"
+title = "Preferred stock purchase agreement with disclosure schedule"
+category = "financing"
+relationship = "company-and-investors"
+stage = "priced-round"
+date_label = "Date of the sale"
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Holds the company's representations; the disclosure schedule lists every exception and must be accurate."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed agreement, schedule of purchasers and the disclosure schedule."
+sources = [
+  { title = "NVCA model legal documents (stock purchase agreement)", url = "https://nvca.org/model-legal-documents/" },
+]
+
+[[item]]
+id = "financing.restated-charter"
+title = "Amended and restated certificate of incorporation"
+category = "financing"
+relationship = "company-and-investors"
+stage = "priced-round"
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Creates the preferred stock and its rights, and takes effect only when filed. Delaware charges from $214 to file it; adding shares alone takes a certificate of amendment, also from $214, and a series the charter lets the board set takes a certificate of designations, $189 (8 Del. C. 151(g), 242, 245)."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Certified copy from the Secretary of State."
+title_by_entity = { colorado-corporation = "Amended and restated articles of incorporation" }
+sources = [
+  { title = "NVCA model legal documents (certificate of incorporation)", url = "https://nvca.org/model-legal-documents/" },
+  { title = "Delaware General Corporation Law sections 242 and 245", url = "https://delcode.delaware.gov/title8/c001/sc08/index.html" },
+  { title = "Delaware General Corporation Law section 151(g)", url = "https://delcode.delaware.gov/title8/c001/sc05/index.html" },
+  { title = "Delaware Division of Corporations: fee schedule, revised 2026-08-01", url = "https://corpfiles.delaware.gov/Fee_Schedule/AugustFee2026.pdf" },
+]
+
+[[item]]
+id = "financing.investors-rights-agreement"
+title = "Investors' rights agreement"
+category = "financing"
+relationship = "company-and-investors"
+stage = "priced-round"
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Sets information, registration and pro rata rights, including what the company must send investors and when."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Agreement signed by the company and every investor party."
+sources = [
+  { title = "NVCA model legal documents (investors' rights agreement)", url = "https://nvca.org/model-legal-documents/" },
+]
+
+[[item]]
+id = "financing.voting-agreement"
+title = "Voting agreement"
+category = "financing"
+relationship = "company-and-investors"
+stage = "priced-round"
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Fixes how holders vote on board seats and on approving a sale, including drag-along terms."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Agreement signed by the company, the founders and the investors."
+sources = [
+  { title = "NVCA model legal documents (voting agreement)", url = "https://nvca.org/model-legal-documents/" },
+]
+
+[[item]]
+id = "financing.right-of-first-refusal-and-co-sale"
+title = "Right of first refusal and co-sale agreement"
+category = "financing"
+relationship = "company-and-investors"
+stage = "priced-round"
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Gives the company and investors first refusal and co-sale rights when founders sell shares."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Agreement signed by the company, the founders and the investors."
+sources = [
+  { title = "NVCA model legal documents (right of first refusal and co-sale agreement)", url = "https://nvca.org/model-legal-documents/" },
+]
+
+[[item]]
+id = "financing.management-rights-letter"
+title = "Management rights letter"
+category = "financing"
+relationship = "company-and-investors"
+stage = "priced-round"
+applies_when = "Only if a venture fund asks for one."
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Gives a venture fund the management rights it needs for its own regulatory status."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Letter signed by the company and the fund."
+sources = [
+  { title = "NVCA model legal documents (management rights letter)", url = "https://nvca.org/model-legal-documents/" },
+]
+
+[[item]]
+id = "financing.director-indemnification-agreements"
+title = "Director indemnification agreements"
+category = "financing"
+relationship = "company-and-investors"
+stage = "priced-round"
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Investor-appointed directors usually ask for indemnification agreements before joining the board."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Agreement signed by the company and each director."
+sources = [
+  { title = "NVCA model legal documents (indemnification agreement)", url = "https://nvca.org/model-legal-documents/" },
+  { title = "Delaware General Corporation Law section 145", url = "https://delcode.delaware.gov/title8/c001/sc04/index.html" },
+]
+
+[[item]]
+id = "financing.closing-deliverables"
+title = "Closing certificates and legal opinion"
+category = "financing"
+relationship = "company-and-investors"
+stage = "priced-round"
+entity_types = ["delaware-c-corporation", "colorado-corporation"]
+why = "Investors close only against current good standing certificates, officer certificates and any agreed legal opinion."
+provided_by = ["lawyer", "registered-agent"]
+room_roles = ["counsel", "investors"]
+evidence = "Dated certificates, any legal opinion, and the signed closing checklist."
+sources = [
+  { title = "NVCA model legal documents (stock purchase agreement, model legal opinion)", url = "https://nvca.org/model-legal-documents/" },
+  { title = "Delaware Division of Corporations: order a good standing certificate", url = "https://corp.delaware.gov/directweb/" },
+]
+
+# ---------------------------------------------------------------------------------------------------------------------
+# People
+# ---------------------------------------------------------------------------------------------------------------------
+
+[[item]]
+id = "people.job-postings"
+title = "Job postings with pay range and benefits"
+category = "people"
+relationship = "company-and-people"
+stage = "first-hires"
+repeats = "Every posting."
+deadline = "C.R.S. 8-5-201, 2026, read 2026-11-13. The employer makes reasonable efforts to make each opening known to all employees \"on the same calendar day and prior to the date on which the employer makes a selection decision\" (subsection (1)). Then, \"within thirty calendar days after a candidate who is selected to fill a job opportunity begins working in the position,\" the employer makes reasonable efforts to tell the people who will work with that person regularly the name, the new job title and how to show interest in similar openings (subsection (3))."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Colorado's Equal Pay for Equal Work Act requires a pay range and a general description of benefits in each job posting."
+provided_by = ["founder"]
+room_roles = ["counsel"]
+evidence = "Saved copy of each posting as published."
+sources = [
+  { title = "Colorado Department of Labor and Employment: Equal Pay for Equal Work Act", url = "https://cdle.colorado.gov/dlss/labor-laws-by-topic/equal-pay-for-equal-work-act" },
+  { title = "Colorado Revised Statutes section 8-5-201 (title 8, 2026)", url = "https://olls.info/crs/crs2026-title-08.pdf" },
+]
+
+[[item]]
+id = "people.offer-letters"
+title = "Signed offer letters"
+category = "people"
+relationship = "company-and-people"
+stage = "first-hires"
+repeats = "Every hire."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Records pay, start date, at-will status and any promised equity; promised options still need board approval. Colorado: an employer keeps each personnel or employment record \"for at least five years after the later of\" the date it was made or received and the date of the personnel action it concerns or the final disposition of a discrimination charge, and keeps a designated repository of discrimination complaints (C.R.S. 24-34-408, read 2026-11-07)."
+provided_by = ["founder", "lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Offer letter signed by the employee."
+sources = [
+  { title = "Colorado Department of Labor and Employment: new employer checklist", url = "https://cdle.colorado.gov/employers/recruiting-hiring/new-employer-checklist" },
+  { title = "Colorado Department of Labor and Employment: wage and hour laws", url = "https://cdle.colorado.gov/dlss/labor-laws-by-topic/wage-and-hour-laws-including-paid-sick-leave" },
+  { title = "Colorado Revised Statutes section 24-34-408 (title 24, 2026)", url = "https://olls.info/crs/crs2026-title-24.htm" },
+]
+
+[[item]]
+id = "people.form-i-9"
+title = "Form I-9 for each employee"
+category = "people"
+relationship = "company-and-people"
+stage = "first-hires"
+repeats = "Every hire."
+deadline = "8 CFR 274a.2(b)(1), eCFR amended through 2026-10-14, read 2026-11-13. The employee completes section 1 \"at the time of hire\". The employer examines the documents and completes section 2 \"within three business days of the hire\". A job lasting less than three business days needs both at the time of hire."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Federal law requires every employer to verify each new employee's identity and work authorization."
+provided_by = ["founder", "payroll-provider"]
+room_roles = []
+evidence = "Completed form for each employee, kept apart from personnel files."
+sources = [
+  { title = "U.S. Citizenship and Immigration Services: Form I-9", url = "https://www.uscis.gov/i-9" },
+  { title = "8 CFR 274a.2, in the eCFR bulk data for title 8 on govinfo", url = "https://www.govinfo.gov/bulkdata/ECFR/title-8/ECFR-title8.xml" },
+]
+
+[[item]]
+id = "people.withholding-setup"
+title = "Form W-4 for each employee and a Colorado withholding account"
+category = "people"
+relationship = "company-and-people"
+stage = "first-hires"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Payroll needs each employee's Form W-4 and a Colorado wage withholding account before the first paycheck. Then the federal quarterly return: \"Form 941 must be filed by the last day of the month that follows the end of the quarter\" (IRS Publication 15, read 2026-11-07)."
+provided_by = ["payroll-provider", "accountant"]
+room_roles = []
+evidence = "Colorado withholding account number, and a Form W-4 on file for each employee."
+sources = [
+  { title = "IRS: about Form W-4", url = "https://www.irs.gov/forms-pubs/about-form-w-4" },
+  { title = "IRS: Publication 15, Employer's Tax Guide", url = "https://www.irs.gov/publications/p15" },
+  { title = "Colorado Department of Revenue: withholding accounts", url = "https://tax.colorado.gov/withholding-accounts" },
+]
+
+[[item]]
+id = "people.colorado-withholding-statements"
+title = "Annual Colorado wage statements and the DR 1093"
+category = "people"
+relationship = "company-and-people"
+stage = "ongoing"
+repeats = "Every year."
+deadline = "C.R.S. 39-22-604(6)(a): the annual statement for each employee \"shall be filed on or before the date established pursuant to section 6071 of the internal revenue code for filing similar federal statements.\" The Department of Revenue's DR 1093 page, for the Annual Transmittal of State W-2 Forms, points to January and a \"January 31 deadline.\""
+applies_when = "Once the company has paid wages to an employee who works in Colorado."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "An employer gives each employee, and the state, a statement of the pay and the Colorado tax withheld in the preceding calendar year; failing to file on time can bring a penalty of \"not less than five dollars nor more than fifty dollars.\""
+provided_by = ["payroll-provider", "accountant"]
+room_roles = []
+evidence = "The year's wage statements as filed with the Department of Revenue, and the DR 1093 confirmation."
+sources = [
+  { title = "Colorado Revised Statutes section 39-22-604 (title 39, 2026)", url = "https://olls.info/crs/crs2026-title-39.pdf" },
+  { title = "Colorado Department of Revenue: DR 1093, Annual Transmittal of State W-2 Forms", url = "https://tax.colorado.gov/DR1093" },
+]
+
+[[item]]
+id = "people.new-hire-reports"
+title = "Colorado new hire reports"
+category = "people"
+relationship = "company-and-people"
+stage = "first-hires"
+repeats = "Every hire or rehire."
+deadline = "C.R.S. 26-13-125(6), 2026, read 2026-11-13: an employer reports a newly hired employee \"within twenty calendar days after the date the employer hires the employee\". Or, at the employer's election, with the first regularly scheduled payroll after the hire, if that payroll comes after the twenty days. A hire for less than thirty days isn't reported (subsection (3))."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Colorado requires employers to report each new hire for child support enforcement and benefit checks."
+provided_by = ["payroll-provider", "founder"]
+room_roles = []
+evidence = "Submission confirmation for each new hire."
+sources = [
+  { title = "Colorado Child Support Services: new hire reporting", url = "https://childsupport.colorado.gov/new-hire-reporting" },
+  { title = "Colorado Department of Labor and Employment: new employer checklist", url = "https://cdle.colorado.gov/employers/recruiting-hiring/new-employer-checklist" },
+  { title = "Colorado Revised Statutes section 26-13-125 (title 26, 2026)", url = "https://olls.info/crs/crs2026-title-26.pdf" },
+]
+
+[[item]]
+id = "people.unemployment-insurance-account"
+title = "Colorado unemployment insurance employer account"
+category = "people"
+relationship = "company-and-people"
+stage = "first-hires"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Colorado employers must register and pay unemployment insurance premiums on covered wages."
+provided_by = ["payroll-provider", "accountant"]
+room_roles = ["counsel"]
+evidence = "Employer account number and the current premium rate notice."
+sources = [
+  { title = "Colorado Department of Labor and Employment: unemployment insurance premiums", url = "https://cdle.colorado.gov/ui/employers/requirements/premiums" },
+  { title = "Colorado Department of Labor and Employment: new employer checklist", url = "https://cdle.colorado.gov/employers/recruiting-hiring/new-employer-checklist" },
+]
+
+[[item]]
+id = "people.family-and-medical-leave-insurance"
+title = "Colorado paid family and medical leave insurance (FAMLI) account"
+category = "people"
+relationship = "company-and-people"
+stage = "first-hires"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Colorado's paid family and medical leave program requires premiums on wages and notice to employees."
+provided_by = ["payroll-provider", "founder"]
+room_roles = ["counsel"]
+evidence = "FAMLI employer account and the quarterly wage report confirmations."
+sources = [
+  { title = "Colorado FAMLI Division: employers", url = "https://famli.colorado.gov/employers" },
+]
+
+[[item]]
+id = "people.paid-sick-leave"
+title = "Paid sick leave policy"
+category = "people"
+relationship = "company-and-people"
+stage = "first-hires"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Colorado requires at least one hour of paid sick leave per 30 hours worked, up to 48 hours a year, and notice to employees."
+provided_by = ["founder", "lawyer"]
+room_roles = ["counsel"]
+evidence = "Written policy or handbook section, and the posted notice."
+sources = [
+  { title = "Colorado Department of Labor and Employment: INFO #6, Healthy Families and Workplaces Act", url = "https://cdle.colorado.gov/sites/cdle/files/info_%236_hfwa_summary_%26_overview_07.19.23.pdf" },
+  { title = "Colorado Department of Labor and Employment: wage and hour laws, including paid sick leave", url = "https://cdle.colorado.gov/dlss/labor-laws-by-topic/wage-and-hour-laws-including-paid-sick-leave" },
+]
+
+[[item]]
+id = "people.colorado-wage-rules"
+title = "Pay practices that meet Colorado wage rules"
+category = "people"
+relationship = "company-and-people"
+stage = "first-hires"
+repeats = "Every year, when the state publishes new orders."
+deadline = "C.R.S. 8-4-103 and 8-4-109, 2026, read 2026-11-13. Pay periods run no longer than one calendar month or thirty days, whichever is longer, with pay \"on regular paydays no later than ten days following the close of each pay period\", unless employer and employee agree on another period (8-4-103(1)(a)). On a discharge, earned wages are \"due and payable immediately\" (8-4-109(1)(a)). On a resignation, they are due \"upon the next regular payday\" (8-4-109(1)(b)). Wages not paid \"within fourteen days after a written demand is sent\" bring an automatic penalty: the greater of two times the unpaid amount or $1,000, or if willful three times or $3,000 (8-4-109(3)(b)). The director may waive it in the limited case 8-4-109(3.5) sets out."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Colorado sets its own minimum wage, overtime, breaks, exempt salary levels and final pay rules."
+provided_by = ["payroll-provider", "accountant", "founder"]
+room_roles = ["counsel"]
+evidence = "Each role's pay and exempt or nonexempt status checked against the current COMPS and pay calculation orders."
+sources = [
+  { title = "Colorado Department of Labor and Employment: wage and hour laws", url = "https://cdle.colorado.gov/dlss/labor-laws-by-topic/wage-and-hour-laws-including-paid-sick-leave" },
+  { title = "Colorado Department of Labor and Employment: 2026 pay calculation order", url = "https://cdle.colorado.gov/sites/cdle/files/adopted_2026_pay_calc_order_7_ccr_1103-14_12.8.25.pdf" },
+  { title = "Colorado Revised Statutes sections 8-4-103 and 8-4-109 (title 8, 2026)", url = "https://olls.info/crs/crs2026-title-08.pdf" },
+]
+
+[[item]]
+id = "people.workplace-posters"
+title = "Required federal and Colorado workplace posters"
+category = "people"
+relationship = "company-and-people"
+stage = "first-hires"
+repeats = "Every year, when posters are updated."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Federal and Colorado law require specific notices where employees will see them, including remote employees."
+provided_by = ["founder", "payroll-provider"]
+room_roles = ["counsel"]
+evidence = "Current posters displayed, or delivered electronically to remote staff."
+sources = [
+  { title = "Colorado Department of Labor and Employment: posters", url = "https://cdle.colorado.gov/posters" },
+]
+
+[[item]]
+id = "people.restrictive-covenants"
+title = "Noncompete and nonsolicit terms that meet Colorado law, with signed notice"
+category = "people"
+relationship = "company-and-people"
+stage = "first-hires"
+deadline = "C.R.S. 8-2-113(4)(a), 2026, read 2026-11-13: a permitted covenant is void unless its notice and terms go to a prospective worker \"before the worker accepts the employer's offer of employment\". For a current worker, they go \"at least fourteen days before the earlier of\" the covenant's effective date and the effective date of the new pay or terms given for it."
+applies_when = "Only if an agreement limits competing or soliciting customers."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Since August 2022 Colorado voids most noncompetes; one that may stand needs a pay threshold and a separate notice the worker signs."
+provided_by = ["lawyer"]
+room_roles = ["counsel"]
+evidence = "The covenant, plus the separate notice signed by the worker."
+sources = [
+  { title = "Colorado Revised Statutes section 8-2-113 (title 8, 2026)", url = "https://olls.info/crs/crs2026-title-08.pdf" },
+  { title = "Colorado General Assembly: HB22-1317, restrictive employment agreements", url = "https://leg.colorado.gov/bills/hb22-1317" },
+  { title = "Colorado Department of Labor and Employment: 2026 pay calculation order (highly compensated threshold)", url = "https://cdle.colorado.gov/sites/cdle/files/adopted_2026_pay_calc_order_7_ccr_1103-14_12.8.25.pdf" },
+]
+
+[[item]]
+id = "people.contractor-agreements"
+title = "Contractor agreements, with a classification check"
+category = "people"
+relationship = "company-and-people"
+stage = "first-hires"
+repeats = "Every contractor."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Misclassified workers bring back taxes and penalties, and Colorado applies its own test for unemployment insurance."
+provided_by = ["lawyer", "founder"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed agreement with scope, pay, confidentiality and IP assignment, and a note on why the worker is a contractor."
+sources = [
+  { title = "IRS: independent contractor or employee", url = "https://www.irs.gov/businesses/small-businesses-self-employed/independent-contractor-self-employed-or-employee" },
+  { title = "Colorado Department of Labor and Employment: worker misclassification", url = "https://cdle.colorado.gov/employers/audits/worker-misclassification-reporting-advisory-opinions" },
+]
+
+[[item]]
+id = "people.contractor-tax-forms"
+title = "Form W-9 from each contractor and Form 1099-NEC each year"
+category = "people"
+relationship = "company-and-people"
+stage = "first-hires"
+repeats = "Every year."
+deadline = "Form 1099-NEC to the contractor and the IRS by January 31: section 6071(c) requires filing it \"on or before January 31\" (IRS instructions, read 2026-11-07)."
+due = { kind = "yearly", month = 1, day = 31 }
+date_label = "Date filed"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "The company collects a Form W-9 before paying a contractor and reports payments above the IRS threshold each year."
+provided_by = ["accountant", "payroll-provider"]
+room_roles = []
+evidence = "A Form W-9 on file before the first payment, and the filed Forms 1099-NEC."
+sources = [
+  { title = "IRS: about Form 1099-NEC", url = "https://www.irs.gov/forms-pubs/about-form-1099-nec" },
+  { title = "IRS: instructions for Forms 1099-MISC and 1099-NEC", url = "https://www.irs.gov/instructions/i1099mec" },
+]
+
+[[item]]
+id = "people.advisor-agreements"
+title = "Advisor agreements"
+category = "people"
+relationship = "company-and-people"
+stage = "formation"
+repeats = "Every advisor."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Advisors often get equity; without a signed agreement the grant terms and IP ownership are unclear."
+provided_by = ["founder", "lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed agreement with vesting, confidentiality and IP assignment, and the board consent for the grant."
+sources = [
+  { title = "Founder Institute: Founder/Advisor Standard Template (FAST)", url = "https://fi.co/fast" },
+]
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Commercial
+# ---------------------------------------------------------------------------------------------------------------------
+
+[[item]]
+id = "commercial.nondisclosure-agreements"
+title = "Nondisclosure agreements"
+category = "commercial"
+relationship = "customers-vendors-and-partners"
+stage = "pre-formation"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Protect confidential information shared with partners, vendors and possible hires."
+provided_by = ["lawyer"]
+room_roles = ["counsel"]
+evidence = "Signed copies, with the other party and the end date noted."
+sources = [
+  { title = "Common Paper: mutual NDA standard", url = "https://commonpaper.com/standards/mutual-nda/" },
+]
+
+[[item]]
+id = "commercial.customer-terms"
+title = "Customer terms and signed customer contracts"
+category = "commercial"
+relationship = "customers-vendors-and-partners"
+stage = "formation"
+repeats = "Every negotiated contract or terms update."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Set price, liability limits, IP and data terms; investors review the largest customer contracts."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Current terms of service or master agreement, and every signed order form or negotiated contract."
+sources = [
+  { title = "Common Paper: cloud service agreement standard", url = "https://commonpaper.com/standards/cloud-service-agreement/" },
+  { title = "NVCA model stock purchase agreement (material agreements representation)", url = "https://nvca.org/model-legal-documents/" },
+]
+
+[[item]]
+id = "commercial.privacy-policy"
+title = "Privacy policy"
+category = "commercial"
+relationship = "customers-vendors-and-partners"
+stage = "formation"
+repeats = "Whenever data practices change."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "A site or app that collects personal data needs an accurate notice; misleading promises draw FTC action, and the Colorado Privacy Act adds duties above its thresholds."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Published policy with its effective date, and an archive of past versions."
+sources = [
+  { title = "Federal Trade Commission: protecting personal information, a guide for business", url = "https://www.ftc.gov/business-guidance/resources/protecting-personal-information-guide-business" },
+  { title = "Colorado Attorney General: Colorado Privacy Act", url = "https://coag.gov/resources/colorado-privacy-act/" },
+]
+
+[[item]]
+id = "commercial.data-processing-agreements"
+title = "Data processing agreements"
+category = "commercial"
+relationship = "customers-vendors-and-partners"
+stage = "formation"
+applies_when = "When the company processes personal data for customers, or vendors process personal data for the company."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "The Colorado Privacy Act and the EU GDPR require written contracts between controllers and processors."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed agreements with customers, and with each vendor that processes personal data."
+sources = [
+  { title = "Colorado Attorney General: Colorado Privacy Act", url = "https://coag.gov/resources/colorado-privacy-act/" },
+  { title = "Common Paper: data processing agreement standard", url = "https://commonpaper.com/standards/data-processing-agreement/" },
+  { title = "European Commission: standard contractual clauses", url = "https://commission.europa.eu/law/law-topic/data-protection/international-dimension-data-protection/standard-contractual-clauses-scc_en" },
+]
+
+[[item]]
+id = "commercial.vendor-agreements"
+title = "Key vendor and licence agreements"
+category = "commercial"
+relationship = "customers-vendors-and-partners"
+stage = "formation"
+repeats = "Review at each renewal."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Show what the company depends on and which terms bind it, such as change of control and exclusivity clauses."
+provided_by = ["founder"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed or accepted terms for each key vendor and licence, with renewal dates."
+sources = [
+  { title = "NVCA model stock purchase agreement (material agreements representation)", url = "https://nvca.org/model-legal-documents/" },
+  { title = "Common Paper: standard agreements", url = "https://commonpaper.com/standards/" },
+]
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Compliance and governance
+# ---------------------------------------------------------------------------------------------------------------------
+
+[[item]]
+id = "compliance-and-governance.registered-agent"
+title = "Registered agent appointment"
+category = "compliance-and-governance"
+relationship = "company-and-state"
+stage = "formation"
+repeats = "Keep current every year, in each state of formation and authority."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Delaware and Colorado require every entity to keep a registered agent; in Colorado, losing one leads to delinquency. In Delaware, when an agent resigns, a corporation or LLC that names no new one \"prior to the expiration of the period of 30 days after the filing\" of the resignation loses its charter, or its certificate of formation is canceled (8 Del. C. 136; 6 Del. C. 18-104, read 2026-11-07)."
+provided_by = ["registered-agent"]
+room_roles = ["counsel"]
+evidence = "Agent named on the state record, and the current service agreement."
+templates = [
+  "founders/colorado-corporation-articles.md",
+  "founders/delaware-corporation-certificate.md",
+  "founders/colorado-llc-articles.md",
+  "founders/delaware-llc-certificate.md",
+]
+sources = [
+  { title = "Delaware General Corporation Law sections 131, 132 and 136", url = "https://delcode.delaware.gov/title8/c001/sc03/index.html" },
+  { title = "Colorado Revised Statutes section 7-90-701 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+  { title = "Colorado Secretary of State: registered agent FAQ", url = "https://www.coloradosos.gov/pubs/business/FAQs/regAgent.html" },
+  { title = "Delaware Limited Liability Company Act section 18-104", url = "https://delcode.delaware.gov/title6/c018/sc01/index.html" },
+]
+
+[[item]]
+id = "compliance-and-governance.colorado-sales-tax-license"
+title = "Colorado sales tax license"
+category = "compliance-and-governance"
+relationship = "company-and-state"
+stage = "first-financing"
+repeats = "Renew every two years."
+deadline = "C.R.S. 39-26-103(1)(a): selling at retail without a license is unlawful, and the license is \"in force and effect until December 31 of the year following the year in which it is issued, unless sooner revoked.\" The fee is \"a fee of sixteen dollars\" with \"an additional fifty-dollar deposit\"; the licensee must renew on or before January 1 of the second year following the year in which the license is issued or renewed."
+applies_when = "Only if the company sells at retail in Colorado."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "A person must have the license before selling at retail; a retailer with two or more separate places of business in the state needs a license for each. Colorado's economic nexus rule reaches a seller with no place of business in the state. It is doing business there in a calendar year if its Colorado retail sales passed $100,000 the year before, or \"On and after the first day of the month after the ninetieth day after\" its sales in the current year \"exceed one hundred thousand dollars\" (C.R.S. 39-26-102(3)(c)(I), read 2026-11-07)."
+provided_by = ["founder", "accountant"]
+room_roles = []
+evidence = "The license issued by the Department of Revenue, with its expiry date."
+sources = [
+  { title = "Colorado Revised Statutes sections 39-26-102 and 39-26-103 (title 39, 2026)", url = "https://olls.info/crs/crs2026-title-39.pdf" },
+]
+
+[[item]]
+id = "compliance-and-governance.colorado-software-sales-tax"
+title = "Colorado sales and use tax on software from 2027"
+category = "compliance-and-governance"
+relationship = "company-and-state"
+stage = "first-financing"
+deadline = "House Bill 26-1223, section 9: sections 2 and 3 \"apply to the sale, storage, use, and consumption of tangible personal property on or after January 1, 2027.\" Section 2 amends C.R.S. 39-26-102(15)(c), the definition of tangible personal property that covers computer software."
+applies_when = "Only if the company sells, or buys for its own use, software in Colorado."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "The act, signed on 2026-06-04 as Session Law chapter 379, changes the definition that decides when software is taxed; read the act with a tax professional before pricing a Colorado sale."
+provided_by = ["accountant"]
+room_roles = []
+evidence = "The company's own tax analysis of its software sales and purchases for 2027."
+sources = [
+  { title = "Colorado General Assembly: House Bill 26-1223, final act", url = "https://leg.colorado.gov/bill_files/116933/download" },
+  { title = "Colorado General Assembly: House Bill 26-1223", url = "https://leg.colorado.gov/bills/hb26-1223" },
+]
+
+[[item]]
+id = "compliance-and-governance.colorado-periodic-report"
+title = "Colorado periodic report"
+category = "compliance-and-governance"
+relationship = "company-and-state"
+stage = "ongoing"
+repeats = "Every year."
+deadline = "C.R.S. 7-90-501(4)(c)(I): the first periodic report is due \"no later than the last day of the second calendar month following the first anniversary of the calendar month\" the formation document or statement of foreign entity authority became effective; \"thereafter, the periodic report shall be delivered to the secretary of state by each reporting entity annually.\" The Secretary of State says it can be filed \"two months prior to the Periodic Report month or two months after without any penalty.\""
+applies_when = "For a Delaware company, once it has authority to do business in Colorado."
+due = { kind = "report-window", months_before = 2, months_after = 2, entity_types = ["colorado-llc", "colorado-corporation"] }
+date_label = "Date filed"
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Every Colorado entity and authorized foreign entity files one each year; missing it makes the entity noncompliant, then delinquent. Fee schedule, revised July 1, 2024: \"Periodic Report\" $25.00; \"Periodic Report Late Filing Penalty\" $50.00; \"Statement Curing Delinquency\" $100.00."
+provided_by = ["registered-agent", "founder"]
+room_roles = ["counsel"]
+evidence = "Filing confirmation for each year's report."
+templates = [
+  "founders/colorado-periodic-report.md",
+]
+sources = [
+  { title = "Colorado Revised Statutes section 7-90-501 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+  { title = "Colorado Secretary of State: periodic reports FAQ", url = "https://www.coloradosos.gov/pubs/business/FAQs/reports.html" },
+  { title = "Colorado Secretary of State: delinquency FAQ", url = "https://www.coloradosos.gov/pubs/business/FAQs/delinquency.html" },
+  { title = "Colorado Secretary of State: business organizations fee schedule, revised July 1, 2024", url = "https://www.sos.state.co.us/pubs/info_center/fees/business.html" },
+]
+
+[[item]]
+id = "compliance-and-governance.delaware-franchise-tax"
+title = "Delaware annual report and franchise tax"
+category = "compliance-and-governance"
+relationship = "company-and-state"
+stage = "ongoing"
+repeats = "Every year."
+deadline = "March 1."
+due = { kind = "yearly", month = 3, day = 1 }
+date_label = "Date filed"
+entity_types = ["delaware-c-corporation"]
+why = "The annual report and tax are due every March 1 and filed online only, at $50.00 for the report, with a penalty of $200.00 plus 1.5% interest a month when late; a year unpaid or unfiled voids the charter until it is revived (8 Del. C. 510, 312). Delaware offers two ways to work out the tax, and they can give very different amounts."
+provided_by = ["accountant", "registered-agent"]
+room_roles = ["counsel", "investors"]
+evidence = "Filed annual report and payment receipt for each year."
+templates = [
+  "founders/delaware-franchise-tax.md",
+]
+sources = [
+  { title = "Delaware Division of Corporations: annual report and tax information", url = "https://corp.delaware.gov/frtax/" },
+  { title = "Delaware Division of Corporations: pay taxes and file annual reports", url = "https://corp.delaware.gov/paytaxes/" },
+  { title = "Delaware Code title 8 sections 502 and 510", url = "https://delcode.delaware.gov/title8/c005/index.html" },
+  { title = "Delaware General Corporation Law section 312", url = "https://delcode.delaware.gov/title8/c001/sc12/index.html" },
+]
+
+
+[[item]]
+id = "compliance-and-governance.delaware-llc-annual-tax"
+title = "Delaware LLC annual tax"
+category = "compliance-and-governance"
+relationship = "company-and-state"
+stage = "ongoing"
+repeats = "Every year."
+deadline = "June 1."
+due = { kind = "yearly", month = 6, day = 1 }
+date_label = "Date filed"
+entity_types = ["delaware-llc"]
+why = "Every Delaware LLC owes an annual tax \"in the amount of $400\", due \"on the first day of June following the close of the calendar year\" (6 Del. C. 18-1107(b), (c), read 2026-11-07). There is no annual report."
+provided_by = ["accountant", "registered-agent"]
+room_roles = ["counsel", "investors"]
+evidence = "Payment receipt for each year."
+templates = [
+  "founders/delaware-llc-annual-tax.md",
+]
+sources = [
+  { title = "Delaware Limited Liability Company Act section 18-1107", url = "https://delcode.delaware.gov/title6/c018/sc11/index.html" },
+  { title = "Delaware Division of Corporations: annual report and tax information", url = "https://corp.delaware.gov/frtax/" },
+]
+
+[[item]]
+id = "compliance-and-governance.holder-count"
+title = "Holder count against Section 12(g)"
+category = "compliance-and-governance"
+relationship = "company-and-investors"
+stage = "first-financing"
+repeats = "Each fiscal year end."
+deadline = "Within 120 days after the fiscal year end at which it crosses the line."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "A company with over $10 million in assets and one class of equity held of record by 2,000 persons, or 500 who are not accredited, has to register with the SEC. Holders from exempt employee plans are not counted."
+provided_by = ["founder", "lawyer"]
+room_roles = ["counsel"]
+evidence = "Dated count of holders of record of each class, by accredited status, at fiscal year end."
+sources = [
+  { title = "Securities Exchange Act section 12(g), 15 U.S.C. 78l", url = "https://uscode.house.gov/us/usc/t15/s78l/" },
+  { title = "SEC Rule 12g5-1, 17 CFR 240.12g5-1", url = "https://www.ecfr.gov/current/title-17/section-240.12g5-1" },
+]
+[[item]]
+id = "compliance-and-governance.minute-book"
+title = "Minute book: board and stockholder minutes and written consents"
+category = "compliance-and-governance"
+relationship = "company-and-state"
+stage = "formation"
+repeats = "Every board, stockholder or member action."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Signed minutes and consents prove the company approved what it did; gaps need ratification before a financing."
+provided_by = ["lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "Signed minutes and written consents, in date order."
+title_by_entity = { colorado-llc = "Manager and member minutes and written consents", delaware-llc = "Manager and member minutes and written consents" }
+sources = [
+  { title = "Delaware General Corporation Law section 141(f)", url = "https://delcode.delaware.gov/title8/c001/sc04/index.html" },
+  { title = "Delaware General Corporation Law sections 211 and 228", url = "https://delcode.delaware.gov/title8/c001/sc07/index.html" },
+  { title = "Colorado Revised Statutes sections 7-108-202 and 7-80-408 (title 7, 2026)", url = "https://olls.info/crs/crs2026-title-07.pdf" },
+]
+
+[[item]]
+id = "compliance-and-governance.good-standing-certificates"
+title = "Certificates of good standing"
+category = "compliance-and-governance"
+relationship = "company-and-state"
+stage = "first-financing"
+repeats = "Fresh copies for each closing."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Investors, lenders and buyers ask for current certificates from each state where the company is formed or authorized. A Delaware short-form good standing certificate costs $50.00."
+provided_by = ["registered-agent"]
+room_roles = ["counsel", "investors"]
+evidence = "Certificates dated within the window the closing requires."
+sources = [
+  { title = "Delaware Division of Corporations: order a good standing certificate", url = "https://corp.delaware.gov/directweb/" },
+  { title = "Colorado Secretary of State: certificate of good standing FAQ", url = "https://www.coloradosos.gov/pubs/business/FAQs/certGoodStanding.html" },
+  { title = "Delaware Division of Corporations: fee schedule, revised 2026-08-01", url = "https://corpfiles.delaware.gov/Fee_Schedule/AugustFee2026.pdf" },
+]
+
+[[item]]
+id = "compliance-and-governance.financial-records"
+title = "Books, bank reconciliations and financial statements"
+category = "compliance-and-governance"
+relationship = "company-and-state"
+stage = "formation"
+repeats = "Every month."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Records back every tax return and are the first financial request in diligence."
+provided_by = ["accountant", "founder"]
+room_roles = ["counsel", "investors"]
+evidence = "Monthly closed books, bank reconciliations and year-end statements."
+sources = [
+  { title = "IRS: recordkeeping", url = "https://www.irs.gov/businesses/small-businesses-self-employed/recordkeeping" },
+]
+
+[[item]]
+id = "compliance-and-governance.tax-returns"
+title = "Federal and state income tax returns"
+category = "compliance-and-governance"
+relationship = "company-and-state"
+stage = "ongoing"
+repeats = "Every year."
+deadline = "Form 1120 by the 15th day of the 4th month after the tax year ends; Form 1065 or 1120-S by the 15th day of the 3rd month. Form 7004 gives an automatic extension of time to file. It doesn't extend the time to pay. The IRS, read 2026-11-07: a corporation's estimated tax \"Installment payments are due by the 15th day of the 4th, 6th, 9th, and 12th months of the corporation's tax year\" (Publication 542). Partners and S corporation shareholders \"generally have to make estimated tax payments if they expect to owe tax of $1,000 or more\" (estimated taxes). A qualified small business can apply part of its research credit to payroll tax; the election \"must be made on or before the due date of the originally filed income tax return (including extensions)\" (Form 6765 instructions)."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "A corporation files Form 1120 and a multi-member LLC files Form 1065 with K-1s, with state returns alongside. Colorado, read 2026-11-07: a C corporation files its return \"on or before the fifteenth day of the fifth month following the close of the taxable year\" (C.R.S. 39-22-608(2)(b)) and pays estimated tax in \"four required installments for each taxable year\" (C.R.S. 39-22-606(4)(a)). Separately, the county assessor sends a personal property schedule, which the company signs and returns \"no later than the April 15 next following\" the assessment date (C.R.S. 39-5-108); personal property on a single schedule worth no more than a set amount is exempt (C.R.S. 39-3-119.5)."
+provided_by = ["accountant"]
+room_roles = ["counsel", "investors"]
+evidence = "Filed federal and state returns with acceptance confirmations."
+sources = [
+  { title = "IRS: business structures", url = "https://www.irs.gov/businesses/small-businesses-self-employed/business-structures" },
+  { title = "IRS: instructions for Form 1120", url = "https://www.irs.gov/instructions/i1120" },
+  { title = "IRS: Publication 542, Corporations", url = "https://www.irs.gov/publications/p542" },
+  { title = "IRS: estimated taxes", url = "https://www.irs.gov/businesses/small-businesses-self-employed/estimated-taxes" },
+  { title = "IRS: instructions for Form 6765", url = "https://www.irs.gov/instructions/i6765" },
+  { title = "IRS: instructions for Form 1065", url = "https://www.irs.gov/instructions/i1065" },
+  { title = "IRS: instructions for Form 1120-S", url = "https://www.irs.gov/instructions/i1120s" },
+  { title = "IRS: instructions for Form 7004", url = "https://www.irs.gov/instructions/i7004" },
+  { title = "Colorado Revised Statutes sections 39-3-119.5, 39-5-108, 39-22-606 and 39-22-608 (title 39, 2026)", url = "https://olls.info/crs/crs2026-title-39.htm" },
+]
+
+[[item]]
+id = "compliance-and-governance.workers-compensation-insurance"
+title = "Workers' compensation insurance"
+category = "compliance-and-governance"
+relationship = "company-and-people"
+stage = "first-hires"
+repeats = "Renew every year."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Colorado requires workers' compensation coverage from the first employee, full or part time."
+provided_by = ["insurance-broker"]
+room_roles = ["counsel", "investors"]
+evidence = "Current policy and certificate of insurance."
+sources = [
+  { title = "Colorado Division of Workers' Compensation: employers", url = "https://cdle.colorado.gov/dwc/employers" },
+]
+
+[[item]]
+id = "compliance-and-governance.general-liability-and-cyber-insurance"
+title = "General liability and cyber insurance"
+category = "compliance-and-governance"
+relationship = "customers-vendors-and-partners"
+stage = "formation"
+repeats = "Renew every year."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Customer contracts and leases often require proof of coverage, and a breach can cost more than a young company can absorb."
+provided_by = ["insurance-broker"]
+room_roles = ["counsel", "investors"]
+evidence = "Current policies and certificates of insurance."
+sources = [
+  { title = "U.S. Small Business Administration: get business insurance", url = "https://www.sba.gov/counseling/launch-your-business/#business-insurance" },
+]
+
+[[item]]
+id = "compliance-and-governance.directors-and-officers-insurance"
+title = "Directors and officers insurance"
+category = "compliance-and-governance"
+relationship = "company-and-investors"
+stage = "priced-round"
+repeats = "Renew every year."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Investor-appointed directors usually require it before joining the board."
+provided_by = ["insurance-broker"]
+room_roles = ["counsel", "investors"]
+evidence = "Current policy with its limits and the people it covers."
+sources = [
+  { title = "NVCA model legal documents (term sheet, indemnification agreement)", url = "https://nvca.org/model-legal-documents/" },
+  { title = "U.S. Small Business Administration: get business insurance", url = "https://www.sba.gov/counseling/launch-your-business/#business-insurance" },
+]
+
+[[item]]
+id = "compliance-and-governance.personal-information-policy"
+title = "Written policy for protecting and disposing of personal information"
+category = "compliance-and-governance"
+relationship = "company-and-state"
+stage = "formation"
+deadline = "Breach notices within 30 days after determining that a breach occurred."
+applies_when = "When the company keeps personal information about Colorado residents, including its own employees."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Colorado requires a written disposal policy, reasonable security, and breach notices within 30 days."
+provided_by = ["lawyer", "founder"]
+room_roles = ["counsel", "investors"]
+evidence = "Written disposal and security policy, and an incident response plan."
+sources = [
+  { title = "Colorado Attorney General: data protection laws", url = "https://coag.gov/resources/data-protection-laws/" },
+  { title = "Federal Trade Commission: protecting personal information, a guide for business", url = "https://www.ftc.gov/business-guidance/resources/protecting-personal-information-guide-business" },
+]
+
+[[item]]
+id = "compliance-and-governance.disputes-and-claims-list"
+title = "List of disputes, claims and government inquiries"
+category = "compliance-and-governance"
+relationship = "disputes-and-regulators"
+stage = "first-financing"
+repeats = "Keep current."
+entity_types = ["delaware-c-corporation", "colorado-llc", "colorado-corporation", "delaware-llc"]
+why = "Investors ask about every dispute, claim and inquiry, and each matter can become its own case room."
+provided_by = ["founder", "lawyer"]
+room_roles = ["counsel", "investors"]
+evidence = "A list with parties, status and amounts; privileged analysis stays in counsel's room."
+sources = [
+  { title = "NVCA model stock purchase agreement (litigation representation)", url = "https://nvca.org/model-legal-documents/" },
+]
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Due-diligence data-room index for investors
+#
+# Every item whose room_roles include "investors" sits in exactly one folder, and no other item does.
+# ---------------------------------------------------------------------------------------------------------------------
+
+[diligence]
+title = "Due-diligence data-room index"
+note = "Folders an investor room opens with. Privileged folders never join it; documents with personal data (Forms I-9, W-4, W-9, new hire reports) are owner only."
+sources = [
+  { title = "NVCA model stock purchase agreement (the representations investors diligence)", url = "https://nvca.org/model-legal-documents/" },
+]
+
+[[diligence.folder]]
+number = 1
+title = "Corporate records"
+items = [
+  "formation.formation-document",
+  "formation.colorado-articles-clauses",
+  "formation.bylaws",
+  "formation.operating-agreement",
+  "formation.incorporator-action",
+  "formation.organizational-consent",
+  "formation.initial-stockholder-consent",
+  "formation.foreign-qualification",
+  "compliance-and-governance.minute-book",
+  "compliance-and-governance.good-standing-certificates",
+]
+
+[[diligence.folder]]
+number = 2
+title = "Founders"
+items = [
+  "founders.stock-purchase-agreement",
+  "founders.stock-exemption-record",
+  "founders.section-83b-election",
+  "founders.vesting-schedule",
+]
+
+[[diligence.folder]]
+number = 3
+title = "Capitalization and equity"
+items = [
+  "equity.capitalization-table",
+  "equity.stock-ledger",
+  "equity.member-ledger",
+  "equity.equity-incentive-plan",
+  "equity.profits-interest-plan",
+  "equity.section-409a-valuation",
+  "equity.grant-documents",
+  "equity.board-consents-for-grants",
+  "equity.securities-exemption-for-grants",
+  "equity.qualified-small-business-stock-records",
+]
+
+[[diligence.folder]]
+number = 4
+title = "Raise and financings"
+items = [
+  "financing.pitch-deck",
+  "financing.company-summary",
+  "financing.financial-model",
+  "financing.use-of-funds",
+  "financing.metrics",
+  "financing.safe",
+  "financing.side-letters",
+  "financing.convertible-note",
+  "financing.financing-approvals",
+  "financing.form-d-and-state-notices",
+  "financing.bad-actor-certifications",
+  "financing.finder-agreement",
+  "financing.conversion-to-delaware-corporation",
+  "financing.llc-investor-admission",
+  "financing.term-sheet",
+  "financing.preferred-stock-purchase-agreement",
+  "financing.restated-charter",
+  "financing.investors-rights-agreement",
+  "financing.voting-agreement",
+  "financing.right-of-first-refusal-and-co-sale",
+  "financing.management-rights-letter",
+  "financing.director-indemnification-agreements",
+  "financing.closing-deliverables",
+]
+
+[[diligence.folder]]
+number = 5
+title = "Intellectual property"
+items = [
+  "intellectual-property.founder-technology-assignment",
+  "intellectual-property.founder-invention-assignment",
+  "intellectual-property.employee-invention-assignment",
+  "intellectual-property.contractor-ip-assignment",
+  "intellectual-property.trademark-registration",
+  "intellectual-property.domain-names",
+  "intellectual-property.open-source-inventory",
+  "intellectual-property.patent-filings",
+  "intellectual-property.patent-assignment-recording",
+]
+
+[[diligence.folder]]
+number = 6
+title = "People"
+items = [
+  "people.offer-letters",
+  "people.contractor-agreements",
+  "people.advisor-agreements",
+]
+
+[[diligence.folder]]
+number = 7
+title = "Customers, vendors and privacy"
+items = [
+  "commercial.customer-terms",
+  "commercial.vendor-agreements",
+  "commercial.privacy-policy",
+  "commercial.data-processing-agreements",
+  "compliance-and-governance.personal-information-policy",
+]
+
+[[diligence.folder]]
+number = 8
+title = "Finance and tax"
+items = [
+  "formation.employer-identification-number",
+  "formation.tax-classification-election",
+  "compliance-and-governance.financial-records",
+  "compliance-and-governance.tax-returns",
+  "compliance-and-governance.delaware-franchise-tax",
+  "compliance-and-governance.delaware-llc-annual-tax",
+]
+
+[[diligence.folder]]
+number = 9
+title = "Insurance"
+items = [
+  "compliance-and-governance.workers-compensation-insurance",
+  "compliance-and-governance.general-liability-and-cyber-insurance",
+  "compliance-and-governance.directors-and-officers-insurance",
+]
+
+[[diligence.folder]]
+number = 10
+title = "Disputes and regulators"
+items = [
+  "compliance-and-governance.disputes-and-claims-list",
+]

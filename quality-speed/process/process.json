@@ -1,0 +1,13 @@
+{
+ "version": 1,
+ "comment_purpose": "The Maps tab's ideal state, in place of Git Crafter's process.json (its sources include a host the clone's case-pattern scan matches).",
+ "repo_url": "https://github.com/Colorado-Startups/legallas/blob/main",
+ "ideals": {
+  "build": {
+   "ideal": "A process is a map of at most six steps where quality, speed and consumption are decided, each scored by one Quality metric.",
+   "sources": [
+    {"title": "Claude Code: best practices", "url": "https://code.claude.com/docs/en/best-practices", "date": "2026-11-04"}
+   ]
+  }
+ }
+}

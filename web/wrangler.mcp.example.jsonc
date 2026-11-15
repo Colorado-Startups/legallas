@@ -1,0 +1,171 @@
+// legallas-mcp: the read-only remote MCP server for counsel's Harvey, Microsoft Copilot and Claude (README.md, "The MCP server").
+// A separate Worker from the room (wrangler.jsonc): its own deploy and blast radius, the same D1, R2 and AI Search.
+// Deploy with `npm run mcp:deploy` only after its Cloudflare resources and Access application exist.
+//
+// The example a new room starts from: copy it to wrangler.mcp.jsonc, then fill in the server's own hostname, Access
+// team, D1 database ID, KV namespace ID and alert addresses (the fields marked below); the /privacy and /terms pages
+// and the shared Copilot registration stay off until the room sets them. Everything else is the product's setting.
+// mcp/config.test.ts holds this file and a room's own wrangler.mcp.jsonc to the same rules, and keeps them equal
+// apart from those fields.
+//
+// What a room's build fixes goes in a top-level "define" here too, as wrangler.example.jsonc says. A room offering its own
+// Copilot agent adds "build": { "command": "node --import ./scripts/room-preload.ts connect/copilot/mcp-tools.ts --room" }.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "legallas-mcp",
+  // mcp/entry-pro.ts: the full product, the core server (mcp/index.ts) with pro's tools and pages. A room may fill in
+  // mcp/index.ts to run the core server alone.
+  "main": "mcp/entry-pro.ts",
+  "compatibility_date": "2026-09-30",
+  // global_fetch_strictly_public: required by workers-oauth-provider to fetch Client ID Metadata Documents.
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // Stack traces in Workers Logs and Issues map back to the TypeScript source; the map is never served.
+  "upload_source_maps": true,
+
+  "workers_dev": false,
+  "preview_urls": false,
+  // The server's own hostname, under the room's, on a zone in the same Cloudflare account.
+  "routes": [{ "pattern": "mcp.room.example.com", "custom_domain": true }],
+
+  // Daily at 09:17 UTC: revoke the AI connections of people no longer in `members`, and purge expired OAuth
+  // records (mcp/sweep.ts). Removal already stops every tool call; this stops token refreshes too. Then delete
+  // the production smoke's registrations once a day old (mcp/smoke-clients.ts), and apply the room's retention
+  // settings below (worker/data-retention.ts).
+  "triggers": { "crons": ["17 9 * * *"] },
+
+  // TEAM_DOMAIN and ACCESS_AUD gate /authorize, /connections and /admin/* (the path-scoped Access app "Legallas AI
+  // connect (sign-in)"). ACCESS_AUD is a Worker secret, not a var: `wrangler secret put ACCESS_AUD -c
+  // wrangler.mcp.jsonc` (gitleaks reads a 64-hex AUD as a key). Unset, those paths deny everyone (fail closed).
+  // ALLOW_DEV_IDENTITY must never appear here: it belongs in .dev.vars only (worker/config.test.ts enforces this).
+  // CONTROL_PREFIX is a secret (wrangler secret put CONTROL_PREFIX -c wrangler.mcp.jsonc): it names the matter.
+  "vars": {
+    "TEAM_DOMAIN": "",
+    // "1": /authorize, /connections and /admin/* refuse a sign-in whose Access token shows no second factor
+    // (worker/mfa.ts). Set it the same in wrangler.jsonc. Rollback: "0" and deploy.
+    "REQUIRE_MFA": "0",
+    // 3,000 calls per member per UTC day (D20): a full pull of a room is about 1,500 reads.
+    "DAILY_TOOL_CAP": "3000",
+    "ALERTS_ENABLED": "1",
+    // The zone alert emails show next to UTC, set the same as in wrangler.jsonc.
+    "TIME_ZONE": "America/Denver",
+    "MCP_REDIRECT_ALLOW": "",
+    // "1" once the room's owner has approved the /privacy and /terms wording (decision D7); until then they are off.
+    "POLICIES_PUBLISHED": "0",
+    // "1": Harvey and Copilot Studio register themselves. Guarded by the redirect allowlist,
+    // size limits, REGISTER_LIMIT below and a 30-day expiry for registrations left unused.
+    "DCR_ENABLED": "1",
+    // "0": an /mcp request from an unlisted browser Origin is logged, not refused. Set "1" once the first Copilot
+    // and Harvey sessions show what they send (none of the three AIs is expected to send one).
+    "MCP_ORIGIN_ENFORCE": "0",
+    // "zdr": zero retention only (mcp/retention.ts). claude.ai and Microsoft are refused; any other app connects once
+    // its client id is in AI_ZDR_CLIENTS, after the owner confirms its setup keeps nothing. "": any allowed AI.
+    "AI_POLICY": "",
+    "AI_ZDR_CLIENTS": "",
+    // "1": lists legallas_search_law (mcp/tools/search-law.ts), public law from the law library's own bucket and
+    // instance. Needs the LAW and LAW_SEARCH bindings below. Rollback: "0" and deploy (the five tools stay).
+    "LAW_LIBRARY": "1",
+    // "1": the instructions ask a connected AI for every option and a recommendation (worker/recommend.ts, issue #19).
+    // Set it on both Workers together. Rollback: "0".
+    "RECOMMEND": "0",
+    // "1": the consent page offers "propose", and a connection whose member ticks it lists legallas_propose_draft
+    // (mcp/tools/propose.ts), the one tool that writes: a pending proposal for that member to approve in the room, nothing
+    // else. Set it on both Workers together. "0": the read-only tools only.
+    "PROPOSALS_ENABLED": "0",
+    // "1", with PROPOSALS_ENABLED: a connection that may propose also lists legallas_propose_checklist, a change to whether
+    // a checklist item applies, for the owner to approve in the room. Set it the same as in wrangler.jsonc.
+    "CHECKLIST_ENABLED": "0",
+    // "1": members may check a person or company in public records before a deal (worker/public-records.ts). A check
+    // sends the name out of the room only after the member approves it on the room's /checks/ page. "0", the default,
+    // keeps it off, so a room turns it on by choice. Set the three settings the same in wrangler.jsonc and
+    // wrangler.mcp.jsonc.
+    "PUBLIC_RECORDS": "0",
+    // The room owner's contact email, sent to the SEC in the User-Agent header as its fair-access rules require of
+    // automated tools. "": EDGAR is linked for the member to search, never searched by the room. CourtListener needs
+    // the secret COURTLISTENER_TOKEN (the owner's own API token); unset, CourtListener is linked too.
+    "PUBLIC_RECORDS_CONTACT": "",
+    // "1": an investor invited to a deal room (`npm run room`) may connect their own AI, read-only and scoped to their
+    // rooms, never privileged (worker/rooms.ts, worker/privilege.ts). Invitations exist only where the room has deal rooms
+    // on, so this follows wrangler.jsonc's ROOMS_ENABLED. Rollback: "0" and deploy; the daily sweep revokes guests' grants.
+    "ROOMS_ENABLED": "1",
+    // The shared Teams Developer Portal registration ID ("Any Microsoft 365 organization", in a test tenant)
+    // that GET /connect/legallas-agent.zip builds the Legallas agent with. Not a secret: every ZIP carries it. "":
+    // /connect keeps the per-firm registration form and the download is a 404 page (mcp/copilot-package.ts).
+    "COPILOT_REFERENCE_ID": "",
+    // Retention (README.md, "Retention and close-out"), applied by the daily cron. "" or "0" keeps everything, as
+    // before; a value that isn't a whole number keeps everything and logs retention.setting_invalid. A legal hold that
+    // is on stops every purge. RETAIN_SIGNINS_DAYS: days to keep sign-in records (email, IP, browser, country), at
+    // least 30, because the owner's routine sign-in check reads 30 days back. RETAIN_AUDIT_DAYS_AFTER_CLOSE: days to
+    // keep the audit log after `npm run close-out -- --revoke` closes the matter; each run then saves a chained copy of
+    // up to 10,000 of the oldest rows to retention/audit-log/ in the files bucket and removes them.
+    "RETAIN_SIGNINS_DAYS": "",
+    "RETAIN_AUDIT_DAYS_AFTER_CLOSE": ""
+  },
+
+  // Per client IP (mcp/gates.ts). /token is higher because each AI provider's servers share a few egress IPs.
+  // namespace_id is any account-unique number; 1001 to 1003 and 1005 are this Worker's, 1004 the room's ASK_LIMIT.
+  "ratelimits": [
+    { "name": "REGISTER_LIMIT", "namespace_id": "1001", "simple": { "limit": 10, "period": 60 } },
+    { "name": "TOKEN_LIMIT", "namespace_id": "1002", "simple": { "limit": 120, "period": 60 } },
+    { "name": "PACKAGE_LIMIT", "namespace_id": "1003", "simple": { "limit": 10, "period": 60 } },
+    // Per member email, not IP (worker/burst.ts): tool calls a minute, before the daily cap (DAILY_TOOL_CAP).
+    { "name": "TOOL_LIMIT", "namespace_id": "1005", "simple": { "limit": 60, "period": 60 } }
+  ],
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "legallas",
+      // The room's D1 database (wrangler.jsonc).
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // INDEX: page text for legallas_read_pages. FILES: meta/matter.json, the binder's manifest and visual-ai side files,
+  // and original files for legallas_get_file: bytes go only to Claude, as embedded results, each audited (D3, D7). The
+  // cron writes one thing to FILES: the audit log's purged rows, under retention/audit-log/, which no tool reads.
+  // LAW: the law library's catalog.json only (which law may be cited).
+  "r2_buckets": [
+    { "binding": "FILES", "bucket_name": "legallas-files" },
+    { "binding": "INDEX", "bucket_name": "legallas-index" },
+    { "binding": "LAW", "bucket_name": "legallas-law" }
+  ],
+
+  // SEARCH: the record. LAW_SEARCH: the law library's own instance (legallas_search_law), never the record's.
+  "ai_search": [
+    { "binding": "SEARCH", "instance_name": "legallas", "remote": true },
+    { "binding": "LAW_SEARCH", "instance_name": "legallas-law", "remote": true }
+  ],
+
+  // OAuth clients, grants and token hashes (workers-oauth-provider requires the name OAUTH_KV).
+  // From `npx wrangler kv namespace create legallas-mcp-oauth`.
+  "kv_namespaces": [{ "binding": "OAUTH_KV", "id": "REPLACE_WITH_KV_NAMESPACE_ID" }],
+
+  // New-connection alerts (mcp/alert.ts): only from the room's sender address to the owner's, like the room's binding.
+  "send_email": [
+    {
+      "name": "EMAIL",
+      "destination_address": "owner@example.com",
+      "allowed_sender_addresses": ["room@example.com"]
+    }
+  ],
+
+  // Error logs only: invocation logs record request URLs and traces can record keys.
+  // Workers Issues groups exceptions, 5xx and console.error lines. This Worker's paths (/mcp, /token,
+  // /authorize) carry no case content, so Issues is on here and off in the room (T19, approved 2026-10-03).
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "logs": { "enabled": true, "invocation_logs": false },
+    "traces": { "enabled": false },
+    "issues": { "enabled": true }
+  },
+
+  // A cost guard: no request may burn more than 5 s of CPU (the Paid default is 30 s).
+  // Waiting on I/O is not CPU.
+  "limits": { "cpu_ms": 5000 },
+
+  // A different port from the room (8789) so both can run at once. The host keeps the dev identity working and the
+  // port in request URLs; set MCP_DEV_ORIGIN=http://localhost:8790 in .dev.vars so discovery names this origin.
+  "dev": { "port": 8790, "host": "localhost:8790" }
+}

@@ -1,0 +1,4 @@
+[
+  {"id": "nightly", "runner": "linux", "cadence": "nightly", "collector": "collect/main.ts", "args": ["nightly"], "install": true},
+  {"id": "docs", "runner": "linux", "cadence": "daily", "collector": "collect/docs.ts"}
+]

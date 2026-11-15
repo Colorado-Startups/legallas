@@ -1,0 +1,48 @@
+{
+  "measured_at": "2026-11-02T04:38:11Z",
+  "commit": "c37b9168fc83441187c64ce7ec3c549e6a9fad3a",
+  "readings": [
+    {
+      "id": "change_failure_rate",
+      "value": null,
+      "samples": 0,
+      "no_events": false
+    },
+    {
+      "id": "rework_rate",
+      "value": 17.14,
+      "samples": 35,
+      "no_events": false
+    },
+    {
+      "id": "merges_tied_to_issue",
+      "value": 3.13,
+      "samples": 32,
+      "no_events": false
+    },
+    {
+      "id": "failure_drill",
+      "value": 1,
+      "samples": 1,
+      "no_events": false
+    },
+    {
+      "id": "change_frequency",
+      "value": 7,
+      "samples": 1,
+      "no_events": false
+    },
+    {
+      "id": "lead_time_p50",
+      "value": 0.272,
+      "samples": 35,
+      "no_events": false
+    },
+    {
+      "id": "recovery_time_p50",
+      "value": 0.12,
+      "samples": 5,
+      "no_events": false
+    }
+  ]
+}

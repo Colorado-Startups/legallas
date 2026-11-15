@@ -1,0 +1,525 @@
+/*
+  Track pages: the told vs filed pair, the step head and the control panels (scripts/viz/control.ts). Page-scoped
+  classes only (track-*), built from tokens; the frame, tooltip and side shapes come from scripts/viz/charts.css and
+  are composed, never restyled. A tie's state is its dash and the words on its line, never its color alone.
+  Light only; no literal colors.
+*/
+
+/* Told vs filed: two cards side by side, stacked on a phone */
+.track-contrast {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.track-contrast__side {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  min-width: 0;
+  padding: var(--space-4);
+  background: var(--surface);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+}
+
+.track-contrast__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.track-contrast__heading {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-18);
+  font-weight: 600;
+}
+
+.track-contrast__date,
+.track-contrast__speaker {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+
+.track-contrast__quote {
+  margin: 0;
+  padding-left: var(--space-3);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1.5;
+  border-left: 2px solid var(--forest);
+  quotes: '\201C' '\201D';
+}
+
+.track-contrast__quote::before {
+  content: open-quote;
+}
+
+.track-contrast__quote::after {
+  content: close-quote;
+}
+
+/* Step head: where in the story, the step as a sentence, who ran it, what changed */
+.track-step-head {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.track-step-head__where {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+
+.track-step-head__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-21);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.track-step-head__run {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.track-step-head__label {
+  color: var(--ink-2);
+}
+
+.track-step-head__none {
+  color: var(--ink-2);
+}
+
+.track-step-head__changes {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.track-step-head__changes ul {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding-left: var(--space-5);
+  font-size: var(--text-14);
+}
+
+.track-control-mount {
+  min-width: 0;
+}
+
+.track-control-failed {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+/* Legend: the four line states, brought forward, not formed yet, and the sides drawn */
+.track-control__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+  padding: 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  list-style: none;
+}
+
+.track-control__key {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.track-control__sample {
+  flex: none;
+  overflow: visible;
+}
+
+.track-control__swatch {
+  flex: none;
+  width: 20px;
+  height: 12px;
+  background: var(--surface);
+  border: var(--hairline) solid var(--border);
+  border-radius: 2px;
+}
+
+.track-control__swatch[data-focus] {
+  background: var(--forest-tint);
+  border: 2px solid var(--forest);
+}
+
+.track-control__swatch[data-later] {
+  border-style: dashed;
+}
+
+/* The picture: lines underneath, nodes and the words on the lines above, all placed by custom properties */
+.track-control[data-mode='picture'] {
+  position: relative;
+  height: var(--h);
+}
+
+.track-control__lines {
+  position: absolute;
+  inset: 0 auto auto 0;
+  overflow: visible;
+}
+
+.track-control__line {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 1.5;
+}
+
+.track-control__line[data-state='claimed'] {
+  stroke-dasharray: 8 5;
+}
+
+.track-control__line[data-state='alleged'] {
+  stroke-dasharray: 3 4;
+}
+
+.track-control__line[data-state='denied'] {
+  stroke-dasharray: 0.5 4.5;
+  stroke-linecap: round;
+  stroke-width: 2.5;
+}
+
+.track-control__head {
+  fill: var(--ink-2);
+}
+
+.track-control__line[data-near] {
+  stroke: var(--forest);
+  stroke-width: 2;
+}
+
+.track-control__head[data-near] {
+  fill: var(--forest);
+}
+
+/* A leader joins words that sit off their line to it: a thin solid line and a dot where it meets the line */
+.track-control__leader {
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 1;
+}
+
+.track-control__anchor {
+  fill: var(--ink-3);
+}
+
+.track-control__leader[data-near] {
+  stroke: var(--forest);
+}
+
+.track-control__anchor[data-near] {
+  fill: var(--forest);
+}
+
+.track-control__labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.track-control__node[data-mode='picture'],
+.track-control__tie[data-mode='picture'] {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  width: var(--w);
+  height: var(--h);
+}
+
+.track-control__node {
+  --shape-size: 14px;
+
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0 var(--space-2);
+  align-items: center;
+  padding: var(--space-1) var(--space-2);
+  background: var(--surface);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+}
+
+.track-control__node > svg {
+  grid-row: 1 / span 2;
+}
+
+.track-control__name {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: var(--text-13);
+  font-weight: 600;
+  line-height: 1.25;
+  text-wrap: balance;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.track-control__note {
+  color: var(--ink-2);
+  font-size: var(--text-12);
+}
+
+.track-control__note:empty {
+  display: none;
+}
+
+.track-control__node[data-focus] {
+  background: var(--forest-tint);
+  border: 2px solid var(--forest);
+}
+
+.track-control__node[data-later] {
+  border-style: dashed;
+}
+
+/* The words on a line: a pill on the line, one Tab stop for all of them (arrows move) */
+.track-control__tie {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  padding: 1px var(--space-1);
+  color: var(--ink);
+  font-size: var(--text-12);
+  line-height: 1.25;
+  text-align: center;
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.track-control__tie[data-near] {
+  border-color: var(--forest);
+}
+
+.track-control__tie[data-state='claimed'],
+.track-control__tie[data-state='alleged'] {
+  border-style: dashed;
+}
+
+.track-control__tie[data-state='denied'] {
+  border-style: dotted;
+}
+
+.track-control__tie:hover {
+  background: var(--panel);
+}
+
+.track-control__tie:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.track-control__words,
+.track-control__later {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+}
+
+.track-control__later {
+  color: var(--ink-2);
+  font-size: var(--text-12);
+}
+
+/* Short words, when the full words have no room: the tooltip, the label's name and the table keep them */
+.track-control__tie[data-short] .track-control__words {
+  -webkit-line-clamp: 2;
+}
+
+.track-control__tie[data-short] .track-control__later {
+  -webkit-line-clamp: 1;
+}
+
+.track-control__empty {
+  position: relative;
+  margin: 0;
+  color: var(--ink-2);
+}
+
+/* The list, below 600px: each node with its ties under it */
+.track-control[data-mode='list'] {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.track-control__row {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.track-control__row-title {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.track-control__card {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.track-control__node[data-mode='list'] {
+  min-height: var(--target-min);
+}
+
+.track-control__out {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0 0 0 var(--space-5);
+  list-style: none;
+}
+
+.track-control__out[hidden] {
+  display: none;
+}
+
+.track-control__tie[data-mode='list'] {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-items: start;
+  min-height: var(--target-min);
+  padding: var(--space-1) var(--space-2);
+  text-align: left;
+}
+
+.track-control__tie-text {
+  display: grid;
+  min-width: 0;
+}
+
+.track-control__to {
+  font-weight: 600;
+}
+
+/* The pinned sources for one tie */
+.track-control__detail {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--surface);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+}
+
+.track-control__detail[hidden] {
+  display: none;
+}
+
+.track-control__detail-head {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.track-control__detail-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.track-control__statements {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.track-control__statement {
+  display: grid;
+  gap: var(--space-1);
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--rule);
+}
+
+.track-control__statement[data-held='false'] {
+  border-left-style: dotted;
+}
+
+.track-control__statement-facts,
+.track-control__statement-note {
+  margin: 0;
+  font-size: var(--text-13);
+}
+
+.track-control__statement-note {
+  color: var(--ink-2);
+}
+
+@media (max-width: 48rem) {
+  .track-contrast {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .track-step-head__title {
+    font-size: var(--text-18);
+  }
+}
+
+@media (forced-colors: active) {
+  .track-control__line,
+  .track-control__line[data-near] {
+    stroke: CanvasText;
+  }
+
+  .track-control__leader,
+  .track-control__leader[data-near] {
+    stroke: CanvasText;
+  }
+
+  .track-control__head,
+  .track-control__head[data-near],
+  .track-control__anchor,
+  .track-control__anchor[data-near] {
+    fill: CanvasText;
+  }
+
+  .track-control__node,
+  .track-control__tie,
+  .track-control__swatch {
+    border-color: CanvasText;
+  }
+}
+
+@media print {
+  .track-control__detail {
+    display: none;
+  }
+
+  /* Paper has no tooltip or Table toggle: a tie's words print whole, the box growing to hold them. */
+  .track-control__tie {
+    height: auto;
+    min-height: var(--h);
+  }
+
+  .track-control__words,
+  .track-control__later {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+  }
+
+  .track-contrast,
+  .track-control {
+    break-inside: avoid;
+  }
+}

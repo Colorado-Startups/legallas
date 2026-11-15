@@ -1,0 +1,662 @@
+{
+  "about": "The fixed question set. Each answer must be stated in `doc`, proved by `truth` against the code (comments stripped, unless a truth says `comments: true`), and no doc or config comment may say what `conflicts` matches. An agent answers from the docs alone; `accept` patterns must all match its answer and no `reject` pattern may. `entry` is where a reader starts: CLAUDE.md for an agent, README.md for a person. This file is pinned in inputs.lock.json: changing it needs a change entry there with the reviewer's sign-off.",
+  "version": 3,
+  "questions": [
+    {
+      "id": "q01",
+      "audience": "agent",
+      "question": "Which npm command fills a local room with the fictional test data, and from which folder do you run it?",
+      "accept": [
+        "npm run dev:seed",
+        "\\bweb\\b"
+      ],
+      "doc": {
+        "path": "web/README.md",
+        "pattern": "npm run dev:seed"
+      },
+      "truth": [
+        {
+          "kind": "script",
+          "name": "dev:seed"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q02",
+      "audience": "agent",
+      "question": "What is the fictional test fixture called, and what is its control prefix?",
+      "accept": [
+        "Doe v\\.? Harbor Labs",
+        "\\bDOE\\b"
+      ],
+      "doc": {
+        "path": "CLAUDE.md",
+        "pattern": "Doe v\\.\\s+Harbor Labs, control prefix `DOE`"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": "web/scripts/dev-seed.ts",
+          "pattern": "matterTitle: 'Doe v\\. Harbor Labs"
+        },
+        {
+          "kind": "grep",
+          "path": "web/scripts/dev-seed.ts",
+          "pattern": "controlPrefix: 'DOE'"
+        }
+      ],
+      "conflicts": [
+        "Doe v\\.\\s+Roe room",
+        "fixture \\(Doe v\\.\\s+Roe"
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q03",
+      "audience": "agent",
+      "question": "Which three checks are required before a pull request can merge?",
+      "accept": [
+        "ci-ok",
+        "\\bdco\\b",
+        "claude-review"
+      ],
+      "doc": {
+        "path": "CLAUDE.md",
+        "pattern": "`ci-ok`, `dco`, `claude-review`"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": ".github/workflows/ci.yml",
+          "pattern": "^  ci-ok:"
+        },
+        {
+          "kind": "grep",
+          "path": ".github/workflows/dco.yml",
+          "pattern": "^  dco:"
+        },
+        {
+          "kind": "grep",
+          "path": ".github/workflows/claude-review.yml",
+          "pattern": "^  claude-review:"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q04",
+      "audience": "agent",
+      "question": "Which file defines the tools the remote MCP server offers?",
+      "accept": [
+        "(web/)?mcp/contract\\.ts"
+      ],
+      "doc": {
+        "path": "CLAUDE.md",
+        "pattern": "`contract.ts`"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": "web/mcp/contract.ts",
+          "pattern": "^\\s+'legallas_search',$"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q05",
+      "audience": "agent",
+      "question": "Which file holds the rules the claude-review check applies, and from which branch is it read?",
+      "accept": [
+        "REVIEW\\.md",
+        "\\bmain\\b"
+      ],
+      "doc": {
+        "path": "REVIEW.md",
+        "pattern": "read from\\s+`main`"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": ".github/workflows/claude-review.yml",
+          "pattern": "git show origin/main:REVIEW\\.md"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q06",
+      "audience": "agent",
+      "question": "How do you move CI off Blacksmith runners at once?",
+      "accept": [
+        "CI_RUNNER",
+        "ubuntu-latest"
+      ],
+      "doc": {
+        "path": "CLAUDE.md",
+        "pattern": "`CI_RUNNER` repository variable to `\"ubuntu-latest\"`"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": ".github/workflows/ci.yml",
+          "pattern": "vars\\.CI_RUNNER"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q07",
+      "audience": "agent",
+      "question": "Which script decides between Blacksmith and GitHub-hosted runners?",
+      "accept": [
+        "build_minutes_guard\\.py"
+      ],
+      "doc": {
+        "path": "CLAUDE.md",
+        "pattern": "build_minutes_guard\\.py"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": ".github/workflows/ci.yml",
+          "pattern": "run: python3 \\.github/scripts/build_minutes_guard\\.py$"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q08",
+      "audience": "agent",
+      "question": "On a laptop, how do you run one web test file, and which kind of test should you leave to CI?",
+      "accept": [
+        "node --test",
+        "(npm package|ERR_MODULE_NOT_FOUND)"
+      ],
+      "doc": {
+        "path": "CLAUDE.md",
+        "pattern": "node --test worker/source-kind\\.test\\.ts"
+      },
+      "truth": [
+        {
+          "kind": "file",
+          "path": "web/worker/source-kind.test.ts"
+        },
+        {
+          "kind": "count",
+          "path": "web/worker/source-kind.test.ts",
+          "pattern": "^import .* from '(?!node:|\\.)",
+          "equals": 0
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q09",
+      "audience": "agent",
+      "question": "How do you rebuild the Microsoft 365 Copilot package's generated tool file, and why is it never edited by hand?",
+      "accept": [
+        "connect/copilot/mcp-tools\\.ts",
+        "(Base64|base64|pattern scan)"
+      ],
+      "doc": {
+        "path": "CLAUDE.md",
+        "pattern": "Base64 hides text"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": "web/connect/copilot/mcp-tools.ts",
+          "pattern": "writeFileSync"
+        },
+        {
+          "kind": "grep",
+          "path": "web/connect/copilot/package-data.ts",
+          "pattern": "toString\\('base64'\\)"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q10",
+      "audience": "agent",
+      "question": "Which file must change to raise a Workers AI or AI Search spend limit?",
+      "accept": [
+        "(worker/)?budget\\.ts"
+      ],
+      "doc": {
+        "path": "web/README.md",
+        "pattern": "only in `worker/budget\\.ts`"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": "web/worker/budget.ts",
+          "pattern": "^export const NEURON_DAILY_BUDGET = "
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q11",
+      "audience": "agent",
+      "question": "Which entry files turn on the pro features, for the room and for the MCP server?",
+      "accept": [
+        "worker/entry-pro\\.ts",
+        "mcp/entry-pro\\.ts"
+      ],
+      "doc": {
+        "path": "CLAUDE.md",
+        "pattern": "`worker/entry-pro\\.ts`"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": "web/worker/entry-pro.ts",
+          "pattern": "^export \\{ LegallasResearch"
+        },
+        {
+          "kind": "grep",
+          "path": "web/mcp/entry-pro.ts",
+          "pattern": "^export \\{ default \\} from './index\\.ts';"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q12",
+      "audience": "agent",
+      "question": "Which setting lets a member's AI propose drafts, and what value turns it on?",
+      "accept": [
+        "PROPOSALS_ENABLED",
+        "(to|=|is|of|as)\\s*[\"'`]?1\\b"
+      ],
+      "doc": {
+        "path": "web/README.md",
+        "pattern": "`PROPOSALS_ENABLED` set to `\"1\"`"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": "web/worker/proposals.ts",
+          "pattern": "env\\.PROPOSALS_ENABLED === '1'"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q13",
+      "audience": "agent",
+      "question": "Where is the default law pack's list of units kept?",
+      "accept": [
+        "default-pack-units\\.ts"
+      ],
+      "doc": {
+        "path": "web/README.md",
+        "pattern": "scripts/law/default-pack-units\\.ts"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": "web/scripts/law/default-pack-units.ts",
+          "pattern": "^export const DEFAULT_PACK_UNITS"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q14",
+      "audience": "agent",
+      "question": "Which workflow is the release gate for a change to Ask or retrieval?",
+      "accept": [
+        "replica-eval(\\.yml)?"
+      ],
+      "doc": {
+        "path": "web/README.md",
+        "pattern": "replica-eval\\.yml"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": ".github/workflows/replica-eval.yml",
+          "pattern": "npm run eval:ask-replica"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q15",
+      "audience": "agent",
+      "question": "What must every commit carry to pass the dco check?",
+      "accept": [
+        "Signed-off-by"
+      ],
+      "doc": {
+        "path": "CONTRIBUTING.md",
+        "pattern": "Signed-off-by"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": ".github/workflows/dco.yml",
+          "pattern": "Signed-off-by"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q16",
+      "audience": "agent",
+      "question": "Why does the workflow lint accept the xcode-27 runner label?",
+      "accept": [
+        "preview"
+      ],
+      "doc": {
+        "path": ".github/workflows/ci.yml",
+        "pattern": "xcode-27.*preview"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": ".github/actionlint.yaml",
+          "pattern": "^\\s+- xcode-27$"
+        },
+        {
+          "kind": "grep",
+          "path": ".github/workflows/ci.yml",
+          "pattern": "runs-on: xcode-27"
+        }
+      ],
+      "conflicts": [
+        "Runner labels actionlint does not know \\(see CONTRIBUTING\\.md\\)"
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q17",
+      "audience": "person",
+      "question": "Which model does Ask run by default, and where?",
+      "accept": [
+        "gpt-oss-120b",
+        "Workers AI"
+      ],
+      "doc": {
+        "path": "web/README.md",
+        "pattern": "gpt-oss-120b on Workers AI"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": "web/wrangler.example.jsonc",
+          "pattern": "\"LEGALLAS_MODEL\": \"@cf/openai/gpt-oss-120b\""
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q18",
+      "audience": "person",
+      "question": "What does a room do when no Cloudflare Access team or audience is set?",
+      "accept": [
+        "refuses every request|refuse(s)? (all|every)"
+      ],
+      "doc": {
+        "path": "SECURITY.md",
+        "pattern": "refuses every request"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": "web/worker/auth.ts",
+          "pattern": "if \\(!teamDomain \\|\\| audiences\\.length === 0\\) return null;"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q19",
+      "audience": "person",
+      "question": "Which AI tools have a setup guide for connecting to a room?",
+      "accept": [
+        "Claude",
+        "Copilot",
+        "Harvey"
+      ],
+      "doc": {
+        "path": "web/connect/README.md",
+        "pattern": "Claude, Microsoft 365 Copilot or Harvey"
+      },
+      "truth": [
+        {
+          "kind": "file",
+          "path": "web/connect/claude-ai.md"
+        },
+        {
+          "kind": "file",
+          "path": "web/connect/copilot.md"
+        },
+        {
+          "kind": "file",
+          "path": "web/connect/harvey.md"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q20",
+      "audience": "person",
+      "question": "How many items are on the baseline company checklist?",
+      "accept": [
+        "\\b{doc}\\b"
+      ],
+      "doc": {
+        "path": "docs/checklist/README.md",
+        "pattern": "\\| Items \\| (\\d+)"
+      },
+      "truth": [
+        {
+          "kind": "count_as_doc",
+          "path": "docs/checklist/baseline.toml",
+          "pattern": "^\\[\\[item\\]\\]$"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q21",
+      "audience": "person",
+      "question": "What turns on deal rooms for invited guests?",
+      "accept": [
+        "ROOMS_ENABLED"
+      ],
+      "doc": {
+        "path": "SECURITY.md",
+        "pattern": "`ROOMS_ENABLED` is \"1\""
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": "web/worker/rooms.ts",
+          "pattern": "env\\.ROOMS_ENABLED === '1'"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q22",
+      "audience": "person",
+      "question": "Which tool does CI use to scan for secrets?",
+      "accept": [
+        "gitleaks"
+      ],
+      "doc": {
+        "path": "SECURITY.md",
+        "pattern": "gitleaks"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": ".github/scripts/secret-scan.sh",
+          "pattern": "^exec \"\\$gitleaks\" git "
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q23",
+      "audience": "person",
+      "question": "Which settings files does a room need that are never committed?",
+      "accept": [
+        "wrangler\\.jsonc",
+        "wrangler\\.mcp\\.jsonc",
+        "legallas\\.config\\.json"
+      ],
+      "doc": {
+        "path": "CLAUDE.md",
+        "pattern": "`web/wrangler\\.jsonc`, `web/wrangler\\.mcp\\.jsonc`,\\s*`web/legallas\\.config\\.json`\\) are never committed"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": ".gitignore",
+          "pattern": "^web/wrangler\\.jsonc$"
+        },
+        {
+          "kind": "grep",
+          "path": ".gitignore",
+          "pattern": "^web/wrangler\\.mcp\\.jsonc$"
+        },
+        {
+          "kind": "grep",
+          "path": ".gitignore",
+          "pattern": "^web/legallas\\.config\\.json$"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q24",
+      "audience": "person",
+      "question": "Which command lists every law unit with its source, without downloading anything?",
+      "accept": [
+        "npm run law -- --list"
+      ],
+      "doc": {
+        "path": "web/README.md",
+        "pattern": "npm run law -- --list"
+      },
+      "truth": [
+        {
+          "kind": "script",
+          "name": "law"
+        },
+        {
+          "kind": "grep",
+          "path": "web/scripts/law/cli.ts",
+          "pattern": "'--list'"
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)"
+      ]
+    },
+    {
+      "id": "q25",
+      "audience": "agent",
+      "question": "A pull request that edits the review workflow fails its own review by design. Who merges such a change, and where is that written?",
+      "accept": [
+        "owner",
+        "CONTRIBUTING\\.md"
+      ],
+      "doc": {
+        "path": "CONTRIBUTING.md",
+        "pattern": "owner.{0,80}merge|merge.{0,80}owner"
+      },
+      "truth": [
+        {
+          "kind": "grep",
+          "path": ".github/workflows/claude-review.yml",
+          "pattern": "CONTRIBUTING\\.md explains how the owner merges",
+          "comments": true
+        }
+      ],
+      "reject": [
+        "docs do not say",
+        "not (stated|documented|mentioned)",
+        "(does not|doesn't|do not|don't) (explain|say|cover|mention)",
+        "nowhere"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "page": "ai-connectors", "signoff_comment": 6644657755,
+  "metrics": [
+    {"id": "unsupported_ai_refused", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 3, "max_age_hours": 48, "min_samples": 9, "goal_source": "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization"},
+    {"id": "supported_ais_connecting", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 50, "goal": 100, "weight": 3, "max_age_hours": 48, "min_samples": 4, "goal_source": "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization"},
+    {"id": "setup_steps_worst_ai", "lens": "speed", "unit": "count", "direction": "lower", "floor": 20, "goal": 7, "weight": 2, "max_age_hours": 48, "min_samples": 4, "goal_source": "https://learn.microsoft.com/en-us/style-guide/procedures-instructions/writing-step-by-step-instructions"},
+    {"id": "lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 10, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"},
+    {"id": "tool_list_tokens", "lens": "consumption", "unit": "tokens", "direction": "lower", "floor": 20000, "goal": 10000, "weight": 3, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool"}
+  ],
+  "changes": [
+    {"date": "2026-11-05", "metric": "lane_minutes", "field": "added", "from": null, "to": "lane_minutes", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6646878118},
+    {"date": "2026-11-05", "metric": "tool_list_tokens", "field": "added", "from": null, "to": "tool_list_tokens", "reason": "added_toward_ideal", "issue": 645}
+  ]
+}

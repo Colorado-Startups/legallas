@@ -1,0 +1,52 @@
+---
+// The page guide (plan PR 5b; DESIGN.md sections 7 and 8): the full Legallas in a band under the header, with one
+// plain sentence about the page and two or three orders that open Ask with a question filled in (never sent).
+// Room.astro renders it when a page passes `guide`; /ask has the companion itself.
+//
+// The rig's stills are plain images, so he shows without script; Rive plays over them when motion is allowed.
+// src/scripts/guide.ts fills names from the matter, wires the orders and reactions (guide-bus.ts) and records his
+// state on the band. Below 48rem the small Legallas stands in and no still is fetched (they load lazily).
+// Decorative: aria-hidden; the briefing is the text.
+import '../styles/companion.css';
+import '../styles/guide.css';
+import LegallasGlyph from './LegallasGlyph.astro';
+import LegallasStills from './LegallasStills.astro';
+import { briefingFor, guideValues, type GuidePage } from '../scripts/guide-copy.ts';
+
+interface Props {
+  page: GuidePage;
+}
+const { page } = Astro.props;
+// The generic text, shown until the matter fills in names (and kept when it never does).
+const { brief, orders } = briefingFor(page, guideValues(null));
+---
+
+<aside class="guide-band" aria-label="Guide" data-guide={page} data-case-only>
+  <div class="c-guide">
+    {/* Two art slots (DESIGN.md section 7): the bust in its arched window, or below 48rem the small Legallas. */}
+    <div class="c-guide__art companion-art guide-band__bust" data-guide-art aria-hidden="true"><LegallasStills width={88} /></div>
+    <span class="c-guide__art guide-band__glyph" aria-hidden="true"><LegallasGlyph size={40} /></span>
+    <p class="c-guide__brief" data-guide-brief>{brief}</p>
+    <ul class="c-guide__orders" aria-label="Ask" data-guide-orders>
+      {
+        orders.map((order) => (
+          <li>
+            <button type="button" class="c-button c-guide__order" data-guide-question={order.question}>
+              {order.label}
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+    {/* Under the bust, as on the Ask page; hidden below 48rem, where nothing moves. Bordered, with a pause mark, so
+        it reads as a control; its accessible name says what it quiets ("Quiet motion"). */}
+    <button type="button" class="c-button guide-band__quiet" data-guide-quiet aria-pressed="false">
+      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+        <path d="M6 4v8M10 4v8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+      </svg>
+      <span>Quiet<span class="u-vh"> motion</span></span>
+    </button>
+  </div>
+</aside>
+
+<script src="../scripts/guide.ts"></script>

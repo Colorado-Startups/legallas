@@ -1,0 +1,14 @@
+{
+  "name": "quality-speed",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "description": "Type check only. The site itself has no dependencies.",
+  "scripts": {
+    "check": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "typescript": "6.0.3"
+  }
+}

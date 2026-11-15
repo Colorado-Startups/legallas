@@ -1,0 +1,68 @@
+/*
+  Claims & Proof (card P4): Money in the record, the charts' layout and the cited ledger. The charts themselves
+  are styled by scripts/viz/charts.css (card F5b).
+*/
+
+/* Money in the record */
+.claims-money {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  padding-top: var(--space-5);
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.claims-money__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: baseline;
+}
+
+.claims-money__head h2 {
+  margin: 0;
+}
+
+.claims-money__lead {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.claims-money__charts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+}
+
+@media (min-width: 64rem) {
+  .claims-money__charts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.claims-money__chart {
+  min-width: 0;
+}
+
+/* The charts sit on the page ground, so their label halos and mark rings take it. */
+.claims-money__chart > .viz {
+  --chart-ground: var(--paper);
+}
+
+.claims-ledger {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.claims-ledger__title {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.claims-ledger__cites {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}

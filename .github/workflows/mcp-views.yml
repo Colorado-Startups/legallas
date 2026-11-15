@@ -1,0 +1,92 @@
+# The room views (web/mcp/apps/: board, timeline, grid as MCP Apps) on GitHub-hosted Linux, whenever they, the chart
+# kit or the tools they draw from change:
+#
+# | Step            | Runs                                | Gives                                                  |
+# |-----------------|-------------------------------------|--------------------------------------------------------|
+# | Bundle          | node mcp/apps/build.ts              | views.generated.ts, rebuilt from the views and the kit |
+# | Copilot package | node connect/copilot/mcp-tools.ts   | the pinned tool list, which names the views            |
+# | Shots           | node mcp/apps/shoot.ts              | each view in headless Chrome, offline, on the DOE fixture |
+#
+# Bundling and the shots need npm packages and a browser, so they never run on a laptop. When a generated file comes
+# out different from the commit, the run fails and the artifact holds the files to commit, under generated/:
+#
+#   gh run download <run id> -R Colorado-Startups/legallas -n mcp-views
+#
+# report.json beside the PNGs lists each shot's requests (none allowed), script errors and tool calls. Not a required
+# check. It runs the pull request's own code, so it holds no secret and no write scope.
+name: Views
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/mcp-views.yml
+      - web/mcp/apps/**
+      - web/src/scripts/viz/**
+      - web/src/styles/tokens.css
+      - web/mcp/server.ts
+      - web/mcp/contract.ts
+      - web/mcp/tools/**
+      - web/connect/copilot/**
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: mcp-views-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  views:
+    # Branches of this repo only.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Private HOME
+        run: |
+          mkdir -p "$RUNNER_TEMP/home"
+          echo "HOME=$RUNNER_TEMP/home" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # No install scripts, as in ci.yml: esbuild's API finds the binary its platform package ships.
+      - name: Web install
+        working-directory: web
+        run: npm ci --ignore-scripts
+      - name: Bundle the views
+        working-directory: web
+        run: node mcp/apps/build.ts
+      - name: Copilot package
+        working-directory: web
+        run: node connect/copilot/mcp-tools.ts
+      # As in quality-speed-screens.yml: Chrome's sandbox needs user namespaces, and the VM serves one job.
+      - name: Let Chrome use its sandbox
+        run: |
+          if [ -f /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+      - name: Shoot the views
+        working-directory: web
+        run: node mcp/apps/shoot.ts --out "$RUNNER_TEMP/views" --chrome "$(command -v google-chrome)"
+      - name: Generated files
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/views/generated"
+          changed="$(git status --porcelain -- web/mcp/apps/views.generated.ts web/connect/copilot | awk '{print $2}')"
+          if [ -n "$changed" ]; then
+            while IFS= read -r file; do cp --parents "$file" "$RUNNER_TEMP/views/generated/"; done <<< "$changed"
+            echo "::error title=Generated files changed::Commit these from the mcp-views artifact (generated/): ${changed//$'\n'/ }"
+            exit 1
+          fi
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: mcp-views
+          path: ${{ runner.temp }}/views
+          if-no-files-found: warn
+          retention-days: 14

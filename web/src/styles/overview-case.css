@@ -1,0 +1,173 @@
+/*
+  Card P1b (Overview, case picture). Page classes for the Overview's case blocks: the violations over time (period
+  bands and the ribbon). Built from tokens only (DESIGN.md); composes the c-* blocks and never restyles them.
+*/
+
+.ov-band {
+  margin-block: var(--space-6);
+}
+
+/* Right under the case header, whose brass rule already closes the map: no second rule. */
+.ov-case + .ov-band > .ov-block {
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* ---- block frame ---- */
+
+.ov-block {
+  min-width: 0;
+  padding-top: var(--space-5);
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.ov-block__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  align-items: baseline;
+  margin-bottom: var(--space-4);
+}
+
+.ov-block__title {
+  margin: 0;
+}
+
+.ov-block__count {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+}
+
+.ov-block__count:empty { display: none; }
+
+.ov-block__tools {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  margin-left: auto;
+}
+
+.ov-block__open {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+  color: var(--forest);
+  font-size: var(--text-14);
+}
+
+.ov-block__open:hover { color: var(--forest-hover); }
+
+.ov-blank { max-width: none; margin: 0; }
+
+/* ---- violations over time: period bands on a year scale, then the ribbon ---- */
+
+.ov-phases {
+  display: grid;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+/* One grid for the axis and every row: mark, title, the scale, the dates. */
+.ov-phases__axis,
+.ov-phase {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(8rem, 14rem) minmax(0, 1fr) 11rem;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.ov-phases__axis {
+  grid-template-columns: 1.5rem minmax(8rem, 14rem) repeat(var(--ov-years, 4), minmax(0, 1fr)) 11rem;
+  column-gap: 0;
+}
+
+.ov-phases__year {
+  padding-left: var(--space-1);
+  color: var(--ink-3);
+  font-size: var(--text-12);
+  border-left: var(--hairline) solid var(--rule);
+}
+
+.ov-phases__year:first-child {
+  grid-column: 3;
+}
+
+.ov-phases__list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ov-phase__title {
+  min-width: 0;
+  color: var(--ink);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+}
+
+.ov-phase__track {
+  position: relative;
+  display: block;
+  height: 0.875rem;
+  background: var(--panel);
+  border-radius: var(--radius-chip);
+}
+
+.ov-phase__band {
+  position: absolute;
+  inset: 0 auto 0 var(--ov-from, 0%);
+  width: calc(var(--ov-to, 100%) - var(--ov-from, 0%));
+  min-width: 2px;
+  background: var(--forest-tint);
+  border: var(--hairline) solid var(--forest);
+  border-radius: var(--radius-chip);
+}
+
+.ov-phase__dates {
+  color: var(--ink-2);
+  font-size: var(--text-12);
+}
+
+/* ---- narrow ---- */
+
+@media (max-width: 48rem) {
+  /* Mark and title on one line, the scale and the dates under them. */
+  .ov-phases__axis {
+    grid-template-columns: repeat(var(--ov-years, 4), minmax(0, 1fr));
+  }
+
+  .ov-phases__year:first-child {
+    grid-column: auto;
+  }
+
+  .ov-phase {
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    row-gap: var(--space-1);
+  }
+
+  .ov-phase__track,
+  .ov-phase__dates {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (forced-colors: active) {
+  .ov-phase__track {
+    border: var(--hairline) solid CanvasText;
+  }
+
+  .ov-phase__band {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+}
+
+@media print {
+  .ov-block__toggle {
+    display: none;
+  }
+}

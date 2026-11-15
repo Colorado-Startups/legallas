@@ -1,0 +1,12 @@
+# Blank issues are off, so every issue goes through a form. Ideas start in Discussions.
+blank_issues_enabled: false
+contact_links:
+  - name: Feature or improvement
+    url: https://github.com/Colorado-Startups/legallas/discussions/categories/ideas
+    about: Start in Discussions; a maintainer turns an accepted idea into a card on the Legallas Project board.
+  - name: Question
+    url: https://github.com/Colorado-Startups/legallas/discussions/categories/q-a
+    about: Ask about running it locally, the code or how contributions work.
+  - name: Security vulnerability or leaked case data
+    url: https://github.com/Colorado-Startups/legallas/security/advisories/new
+    about: Report it privately. Do not open a public issue.

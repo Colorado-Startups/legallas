@@ -1,0 +1,24 @@
+{
+  "page": "templates",
+  "signoff_comment": 6648987440,
+  "metrics": [
+    { "id": "coverage", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 4, "max_age_hours": 48, "min_samples": 129, "goal_source": "https://github.com/seriesseed/equity" },
+    { "id": "right_to_ship", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 2, "max_age_hours": 48, "min_samples": 53, "goal_source": "https://creativecommons.org/publicdomain/zero/1.0/legalcode" },
+    { "id": "fields_work", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 2, "max_age_hours": 48, "min_samples": 50, "goal_source": "https://www.w3.org/TR/WCAG22/" },
+    { "id": "wording", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 2, "max_age_hours": 48, "min_samples": 53, "goal_source": "https://www.anthropic.com/legal/aup" },
+    { "id": "fill_ms_p95", "lens": "speed", "unit": "ms", "direction": "lower", "floor": 1000, "goal": 100, "weight": 1, "max_age_hours": 48, "min_samples": 53, "goal_source": "https://web.dev/articles/rail" },
+    { "id": "lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 30, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" },
+    { "id": "template_part_tokens_max", "lens": "consumption", "unit": "tokens", "direction": "lower", "floor": 25000, "goal": 10000, "weight": 3, "max_age_hours": 48, "min_samples": 69, "goal_source": "https://code.claude.com/docs/en/mcp" }
+  ],
+  "changes": [
+    { "date": "2026-11-05", "metric": "template_tokens_p95", "field": "added", "from": null, "to": "template_tokens_p95", "reason": "added_toward_ideal", "issue": 645 },
+    { "date": "2026-11-13", "metric": "coverage", "field": "min_samples", "from": 128, "to": 129, "reason": "wrong_basis", "issue": 978 },
+    { "date": "2026-11-13", "metric": "right_to_ship", "field": "min_samples", "from": 34, "to": 53, "reason": "wrong_basis", "issue": 978 },
+    { "date": "2026-11-13", "metric": "fields_work", "field": "min_samples", "from": 33, "to": 50, "reason": "wrong_basis", "issue": 978 },
+    { "date": "2026-11-13", "metric": "wording", "field": "min_samples", "from": 34, "to": 53, "reason": "wrong_basis", "issue": 978 },
+    { "date": "2026-11-13", "metric": "fill_ms_p95", "field": "min_samples", "from": 34, "to": 53, "reason": "wrong_basis", "issue": 978 },
+    { "date": "2026-11-13", "metric": "template_tokens_p95", "field": "min_samples", "from": 34, "to": 53, "reason": "wrong_basis", "issue": 978 },
+    { "date": "2026-11-13", "metric": "template_tokens_p95", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 986 },
+    { "date": "2026-11-13", "metric": "template_part_tokens_max", "field": "added", "from": null, "to": "template_part_tokens_max", "reason": "added_toward_ideal", "issue": 986 }
+  ]
+}

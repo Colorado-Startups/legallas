@@ -1,0 +1,827 @@
+/*
+  The complaint brief (/complaint/, src/scripts/brief/): one page a lawyer new to the matter reads top to bottom.
+  Page-scoped classes only (brief-*), built from tokens; the c-* blocks (c-cite, c-chip, c-mark, c-meter, c-fog,
+  c-select, c-stat, c-button) and the chart frame (scripts/viz/charts.css) are composed, never restyled. Light
+  only; no literal colors. Dynamic sizes arrive as custom properties (--steps, --cols, --share).
+*/
+
+.brief {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  padding-top: var(--space-5);
+}
+
+.brief-loading {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.brief-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-7);
+  min-width: 0;
+}
+
+.brief-section {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+  padding-top: var(--space-5);
+  border-top: var(--hairline) solid var(--rule);
+  scroll-margin-top: var(--space-6);
+}
+
+.brief-head + .brief-section {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.brief-section__title {
+  margin: 0;
+}
+
+.brief-section__intro {
+  max-width: var(--measure);
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.brief-section__body {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.brief-section__body > h3 {
+  margin: 0;
+}
+
+/* A card that opens its cite on a click anywhere (brief/dom.ts cardOpens) */
+.brief-opens {
+  cursor: pointer;
+}
+
+/* Head: what the page is, the caption, the forum, the theory in one line, the two actions */
+.brief-head {
+  display: grid;
+  gap: var(--space-2);
+  padding-bottom: var(--space-5);
+  border-bottom: var(--hairline) solid var(--brass-rule);
+}
+
+.brief-head__kicker,
+.brief-head__forum {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.brief-head__title {
+  margin: 0;
+}
+
+.brief-head__line {
+  max-width: 44rem;
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-21);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.brief-head__against {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin: var(--space-2) 0 0;
+}
+
+.brief-head__against > .t-label {
+  color: var(--ink-2);
+}
+
+.brief-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+}
+
+/* A violation: its title, its summary, then what was said against what was filed */
+.brief-violation__title {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.brief-violation__summary {
+  max-width: var(--measure);
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1.625;
+}
+
+.brief-violation__pair:empty {
+  display: none;
+}
+
+/* Who's who: cards grouped by pleaded role (by side when none is pleaded) */
+.brief-cast__group {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.brief-cast__heading {
+  margin: var(--space-2) 0 0;
+  color: var(--ink-2);
+}
+
+.brief-cast__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.brief-cast__card {
+  display: grid;
+  gap: var(--space-1);
+  align-content: start;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.brief-cast__name {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  font-weight: 600;
+  line-height: 1.375;
+}
+
+.brief-cast__term {
+  color: var(--ink-2);
+  font-weight: 400;
+}
+
+.brief-cast__role {
+  margin: 0;
+}
+
+.brief-cast__via {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+  margin: 0;
+  color: var(--ink-2);
+}
+
+/* Who held what: the two-moment switch over the control panels */
+.brief-own__switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.brief-own__tab {
+  min-height: var(--target-min);
+  padding: var(--space-2) var(--space-3);
+  color: var(--ink-2);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  background: var(--surface);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.brief-own__tab:hover {
+  color: var(--ink);
+  background: var(--panel);
+}
+
+.brief-own__tab[aria-selected='true'] {
+  color: var(--ink);
+  background: var(--forest-tint);
+  border-color: var(--forest);
+}
+
+.brief-own__panel {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.brief-own__step {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-18);
+  font-weight: 600;
+  line-height: 1.333;
+}
+
+.brief-own__run {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin: 0;
+}
+
+.brief-own__label,
+.brief-own__none {
+  color: var(--ink-2);
+}
+
+/* The dated steps: a horizontal timeline, numbered on its rule */
+.brief-steps {
+  --steps: 6;
+  --step-gap: var(--space-4);
+
+  display: grid;
+  grid-template-columns: repeat(var(--steps), minmax(0, 1fr));
+  gap: var(--space-5) var(--step-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.brief-step {
+  position: relative;
+  display: grid;
+  gap: var(--space-1);
+  align-content: start;
+  min-width: 0;
+  padding-top: var(--space-6);
+}
+
+.brief-step::before {
+  position: absolute;
+  top: 11px;
+  right: calc(-1 * var(--step-gap));
+  left: 0;
+  border-top: 2px solid var(--forest);
+  content: '';
+}
+
+.brief-step:last-child::before {
+  right: 0;
+}
+
+.brief-step__n {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  color: var(--forest);
+  font-size: var(--text-12);
+  font-weight: 600;
+  line-height: 21px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  background: var(--paper);
+  border: 1.5px solid var(--forest);
+  border-radius: 50%;
+}
+
+.brief-step__date {
+  color: var(--ink-2);
+  font-size: var(--text-12);
+}
+
+.brief-step__label {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  font-weight: 600;
+  line-height: 1.375;
+  text-wrap: pretty;
+}
+
+.brief-step__note {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-14);
+  line-height: 1.43;
+}
+
+.brief-step__cite {
+  margin: var(--space-1) 0 0;
+}
+
+/* Money: one bar per dollar figure, grouped, every bar labelled with its amount and cite */
+.brief-money__group {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.brief-money__group + .brief-money__group {
+  margin-top: var(--space-4);
+}
+
+.brief-money__group-title {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.brief-money {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.brief-money__row {
+  --reserve: 15rem;
+
+  display: grid;
+  grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+  gap: var(--space-1) var(--space-4);
+  align-items: center;
+}
+
+.brief-money__label {
+  margin: 0;
+  font-size: var(--text-14);
+}
+
+.brief-money__track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  align-items: center;
+  min-width: 0;
+  margin: 0;
+}
+
+.brief-money__bar {
+  flex: none;
+  width: max(2px, calc((100% - var(--reserve)) * var(--share)));
+  height: 20px;
+  background: var(--enc-company);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  print-color-adjust: exact;
+}
+
+.brief-money__value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.brief-money__note {
+  grid-column: 2;
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.brief-money__tiles {
+  --tiles: 4;
+
+  max-width: calc(var(--tiles) * 17rem + (var(--tiles) - 1) * var(--space-4));
+  margin-top: var(--space-4);
+}
+
+/* The claims map: a row per count, its elements across, each with its proof ring */
+.brief-map__meter {
+  margin: 0;
+}
+
+.brief-map__legend {
+  margin: 0;
+}
+
+.brief-map {
+  --cols: 3;
+
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.brief-map__count {
+  display: grid;
+  grid-template-columns: minmax(11rem, 15rem) minmax(0, 1fr);
+  gap: var(--space-3) var(--space-5);
+  padding-top: var(--space-4);
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.brief-map__count:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.brief-map__head {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+}
+
+.brief-map__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-18);
+  font-weight: 600;
+  line-height: 1.333;
+}
+
+.brief-map__line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  align-items: center;
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.brief-map__basis,
+.brief-map__none {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.brief-map__cells {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.brief-map__cell {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+  min-width: 0;
+  padding: var(--space-3);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.brief-map__cell.brief-opens:hover {
+  border-color: var(--forest);
+}
+
+.brief-map__proof {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+
+.brief-map__text {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1.375;
+}
+
+.brief-map__n {
+  margin-right: var(--space-2);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+}
+
+.brief-map__note {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.brief-map__cite {
+  margin: 0;
+}
+
+/* Hurdles and key exhibits: cards, four to a row on a wide screen */
+.brief-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.brief-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-4);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.brief-card.brief-opens:hover {
+  border-color: var(--forest);
+}
+
+.brief-card__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-18);
+  font-weight: 600;
+  line-height: 1.333;
+}
+
+.brief-card__text {
+  margin: 0;
+}
+
+.brief-card__cites {
+  margin: 0;
+}
+
+.brief-exhibit {
+  grid-template-rows: auto 1fr;
+}
+
+.brief-exhibit__head {
+  display: grid;
+  gap: var(--space-1);
+  justify-items: start;
+}
+
+.brief-exhibit__cite {
+  margin: 0;
+}
+
+.brief-exhibit__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-2);
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.brief-exhibit__proves {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1.5;
+}
+
+/* Dates to confirm: one row each */
+.brief-dates {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.brief-dates__row {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: var(--space-1) var(--space-4);
+  align-items: baseline;
+  padding: var(--space-3) var(--space-1);
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.brief-dates__date {
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.brief-dates__text {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  align-items: baseline;
+  max-width: 52rem;
+  margin: 0;
+}
+
+/* Drafts */
+.brief-drafts {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 52rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.brief-drafts__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.brief-drafts__name {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: baseline;
+  margin: 0;
+}
+
+.brief-drafts__label {
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  font-weight: 600;
+}
+
+.brief-drafts__control {
+  color: var(--ink-2);
+}
+
+.brief-drafts__actions {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+/* The full outline is for paper: it prints after the brief and is not shown on screen. */
+.brief-outline {
+  display: none;
+}
+
+/* Foot: the prior case and the provenance line */
+.brief-foot {
+  display: grid;
+  gap: var(--space-2);
+  padding-top: var(--space-4);
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.brief-foot__prior {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: var(--target-min);
+}
+
+@media (max-width: 64rem) {
+  .brief-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .brief-step:nth-child(3n)::before {
+    right: 0;
+  }
+
+  .brief-map__count {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .brief-map__cells {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  }
+}
+
+@media (max-width: 60rem) {
+  .brief-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 36rem) {
+  .brief-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 48rem) {
+  .brief-head__line {
+    font-size: var(--text-18);
+  }
+
+  .brief-steps {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--space-5);
+  }
+
+  .brief-step {
+    padding-top: 0;
+    padding-left: var(--space-6);
+  }
+
+  .brief-step::before {
+    top: 24px;
+    right: auto;
+    bottom: calc(-1 * var(--space-5));
+    left: 11px;
+    border-top: 0;
+    border-left: 2px solid var(--forest);
+  }
+
+  .brief-step:last-child::before {
+    display: none;
+  }
+
+  .brief-money__row {
+    --reserve: 6.5rem;
+
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .brief-money__note {
+    grid-column: 1;
+  }
+
+  .brief-dates__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (forced-colors: active) {
+  .brief-own__tab[aria-selected='true'] {
+    border: 2px solid CanvasText;
+  }
+
+  .brief-step::before {
+    border-color: CanvasText;
+  }
+
+  .brief-step__n {
+    color: CanvasText;
+    border-color: CanvasText;
+  }
+
+  .brief-money__bar {
+    background: CanvasText;
+    forced-color-adjust: none;
+  }
+
+  /* The fog's haze drops out and its dashed outline sits under the border, so the gap cell keeps a dashed edge. */
+  .brief-map__cell.c-fog[data-state='gap'] {
+    border-style: dashed;
+  }
+}
+
+@media print {
+  .brief-loading,
+  .brief-head__actions,
+  .brief-own__switch,
+  .brief-foot__prior {
+    display: none;
+  }
+
+  .brief-body {
+    gap: var(--space-5);
+  }
+
+  .brief-section {
+    padding-top: var(--space-3);
+  }
+
+  .brief-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .brief-step:nth-child(3n)::before {
+    right: 0;
+  }
+
+  .brief-step,
+  .brief-card,
+  .brief-cast__card,
+  .brief-map__cell,
+  .brief-money__row,
+  .brief-dates__row,
+  .brief-drafts__row {
+    break-inside: avoid;
+  }
+
+  .brief-map__count {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .brief-outline {
+    display: grid;
+    break-before: page;
+  }
+}

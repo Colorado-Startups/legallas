@@ -1,0 +1,13 @@
+{
+  "ideal": "Founders, counsel and investors find every record they may see in seconds, trust every cite, and see nothing missing, from forming through raising to dispute.",
+  "sources": [
+    { "title": "SEC: data delivery standards", "url": "https://www.sec.gov/files/sec-dds-aug-2026.pdf", "date": "2026-08-01" },
+    { "title": "IRS Form 15620, Section 83(b) Election", "url": "https://www.irs.gov/pub/irs-pdf/f15620.pdf", "date": "2025-08-08" },
+    { "title": "web.dev: Web Vitals", "url": "https://web.dev/articles/vitals", "date": "2024-10-31" },
+    { "title": "Y Combinator: a guide to seed fundraising", "url": "https://www.ycombinator.com/library/4A-a-guide-to-seed-fundraising", "date": "2020-06-09" },
+    { "title": "Nielsen Norman Group: response times", "url": "https://www.nngroup.com/articles/response-times-3-important-limits/", "date": "1993-01-01" }
+  ],
+  "quality": "Records present and dated, deadlines flagged, numbers that tie, hashes that match, and founder files kept from guests.",
+  "speed": "A document or cited page drawn in 2.5 seconds, a filter in 1 second, and a first document in 3 steps.",
+  "consumption": "Few tokens per search, AI Search inside its free queries, small pages, and lab lanes that take minutes."
+}

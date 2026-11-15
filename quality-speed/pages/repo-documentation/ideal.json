@@ -1,0 +1,10 @@
+{
+  "ideal": "A visitor reads the front door in two minutes, mostly tables and diagrams, every claim and link true, and GitHub set up right.",
+  "sources": [
+    { "title": "GitHub Docs: About the repository README file", "url": "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes", "date": "2026-11-09" },
+    { "title": "Google documentation guide: Documentation best practices", "url": "https://google.github.io/styleguide/docguide/best_practices.html", "date": "2026-10-23" }
+  ],
+  "quality": "README, licence, contributing and security files present, visual and true; About box, properties and Activity as the settings say.",
+  "speed": "The README read in two minutes.",
+  "consumption": "The README costs an AI reader few tokens, and the daily lane runs in five minutes."
+}

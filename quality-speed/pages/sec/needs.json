@@ -1,0 +1,689 @@
+{
+ "needs": [
+  {
+   "id": "raise-exemption-choice",
+   "path": "startup-raises",
+   "need": "Choose Rule 506(b), 506(c) or 4(a)(2) alone",
+   "source": "https://www.ecfr.gov/current/title-17/section-230.506",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "unit:us-securities-act",
+    "template:raise/offering-record"
+   ]
+  },
+  {
+   "id": "raise-506b-limits",
+   "path": "startup-raises",
+   "need": "Rule 506(b): no solicitation, 35 non-accredited",
+   "source": "https://www.sec.gov/resources-small-businesses/exempt-offerings/private-placements-rule-506b",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "template:raise/offering-record"
+   ]
+  },
+  {
+   "id": "raise-506c-verification",
+   "path": "startup-raises",
+   "need": "Rule 506(c): verify every buyer is accredited",
+   "source": "https://www.ecfr.gov/current/title-17/section-230.506",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "unit:us-sec-staff-guidance",
+    "template:raise/offering-record"
+   ],
+   "flags": [
+    {
+     "kind": "deadline",
+     "text": "within the prior three months"
+    }
+   ]
+  },
+  {
+   "id": "raise-accredited",
+   "path": "startup-raises",
+   "need": "Who is an accredited investor",
+   "source": "https://www.sec.gov/resources-small-businesses/capital-raising-building-blocks/accredited-investors",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "template:investors/angels/accredited-investor",
+    "item:financing.investor-accreditation"
+   ]
+  },
+  {
+   "id": "raise-integration",
+   "path": "startup-raises",
+   "need": "When two rounds count as one, Rule 152",
+   "source": "https://www.ecfr.gov/current/title-17/section-230.152",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "template:raise/offering-record"
+   ]
+  },
+  {
+   "id": "raise-form-d-deadline",
+   "path": "startup-raises",
+   "need": "Form D within 15 days of the first sale",
+   "source": "https://www.sec.gov/resources-small-businesses/exempt-offerings/filing-form-d-notice",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "unit:us-sec-parts-232-239",
+    "unit:us-sec-form-d",
+    "item:financing.form-d-and-state-notices",
+    "template:raise/offering-record",
+    "template:investors/funds/form-d-and-colorado-notice"
+   ],
+   "flags": [
+    {
+     "kind": "deadline",
+     "text": "within 15 days after the first sale"
+    },
+    {
+     "kind": "deadline",
+     "text": "irrevocably contractually committed"
+    }
+   ]
+  },
+  {
+   "id": "raise-form-d-amendments",
+   "path": "startup-raises",
+   "need": "Amend Form D yearly while the offering runs",
+   "source": "https://www.ecfr.gov/current/title-17/section-230.503",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "unit:us-sec-form-d",
+    "item:financing.form-d-and-state-notices",
+    "template:raise/offering-record",
+    "template:investors/funds/form-d-and-colorado-notice"
+   ],
+   "flags": [
+    {
+     "kind": "deadline",
+     "text": "anniversary of the"
+    }
+   ]
+  },
+  {
+   "id": "raise-form-d-filing",
+   "path": "startup-raises",
+   "need": "File Form D on EDGAR, signed, with no fee",
+   "source": "https://www.sec.gov/files/formd.pdf",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "unit:us-sec-parts-232-239",
+    "unit:us-sec-form-d",
+    "template:raise/offering-record",
+    "template:investors/funds/form-d-and-colorado-notice"
+   ]
+  },
+  {
+   "id": "raise-edgar-access",
+   "path": "startup-raises",
+   "need": "Get EDGAR access through Form ID first",
+   "source": "https://www.sec.gov/submit-filings/filer-support-resources/how-do-i-guides/prepare-submit-my-form-id-application",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-parts-232-239",
+    "item:financing.edgar-access",
+    "template:raise/offering-record",
+    "template:investors/funds/form-d-and-colorado-notice"
+   ],
+   "flags": [
+    {
+     "kind": "deadline",
+     "text": "well in advance"
+    }
+   ]
+  },
+  {
+   "id": "raise-bad-actor",
+   "path": "startup-raises",
+   "need": "Check covered persons for bad actor events",
+   "source": "https://www.sec.gov/resources-small-businesses/small-business-compliance-guides/disqualification-felons-other-bad-actors-rule-506-offerings-related-disclosure-requirements",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "item:financing.bad-actor-certifications",
+    "template:raise/bad-actor-questionnaire"
+   ]
+  },
+  {
+   "id": "raise-state-preemption",
+   "path": "startup-raises",
+   "need": "States keep notice filings and fees for 506",
+   "source": "https://uscode.house.gov/us/usc/t15/s77r/",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-securities-act",
+    "item:financing.form-d-and-state-notices"
+   ]
+  },
+  {
+   "id": "raise-demo-days",
+   "path": "startup-raises",
+   "need": "What a founder may say at a demo day",
+   "source": "https://www.ecfr.gov/current/title-17/section-230.148",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "template:raise/offering-record"
+   ]
+  },
+  {
+   "id": "raise-finders",
+   "path": "startup-raises",
+   "need": "A paid finder may need broker registration",
+   "source": "https://uscode.house.gov/us/usc/t15/s78o/",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-exchange-act",
+    "template:raise/offering-record"
+   ]
+  },
+  {
+   "id": "angels-accredited-status",
+   "path": "angels-invest",
+   "need": "Which accredited category an angel fits",
+   "source": "https://www.ecfr.gov/current/title-17/section-230.501",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "template:investors/angels/accredited-investor"
+   ]
+  },
+  {
+   "id": "angels-506c-verification",
+   "path": "angels-invest",
+   "need": "What a 506(c) issuer may ask an angel for",
+   "source": "https://www.ecfr.gov/current/title-17/section-230.506",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "unit:us-sec-staff-guidance",
+    "template:investors/angels/accredited-investor"
+   ],
+   "flags": [
+    {
+     "kind": "deadline",
+     "text": "within the prior three months"
+    }
+   ]
+  },
+  {
+   "id": "angels-restricted-securities",
+   "path": "angels-invest",
+   "need": "Rule 144: a year before an angel can resell",
+   "source": "https://www.ecfr.gov/current/title-17/section-230.144",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "template:investors/angels/before-you-invest"
+   ],
+   "flags": [
+    {
+     "kind": "deadline",
+     "text": "a minimum of one year"
+    }
+   ]
+  },
+  {
+   "id": "angels-spv-exclusion",
+   "path": "angels-invest",
+   "need": "An SPV's 3(c)(1) exclusion: 100 owners",
+   "source": "https://uscode.house.gov/us/usc/t15/s80a-3/",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-ica",
+    "template:investors/groups/how-members-invest"
+   ]
+  },
+  {
+   "id": "angels-spv-lead-adviser",
+   "path": "angels-invest",
+   "need": "A paid SPV lead and the VC fund exemption",
+   "source": "https://www.ecfr.gov/current/title-17/section-275.203(l)-1",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-advisers-act",
+    "unit:us-sec-part-275",
+    "template:investors/groups/how-members-invest"
+   ]
+  },
+  {
+   "id": "groups-demo-days",
+   "path": "angels-create-groups",
+   "need": "Rule 148 demo days and the angel group test",
+   "source": "https://www.ecfr.gov/current/title-17/section-230.148",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "template:investors/groups/deal-screening"
+   ]
+  },
+  {
+   "id": "groups-broker-risk",
+   "path": "angels-create-groups",
+   "need": "A paid manager and broker registration",
+   "source": "https://uscode.house.gov/us/usc/t15/s77d/",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-securities-act",
+    "unit:us-exchange-act",
+    "template:investors/groups/how-members-invest"
+   ]
+  },
+  {
+   "id": "groups-vehicle-form-d",
+   "path": "angels-create-groups",
+   "need": "Each pooled vehicle files its own Form D",
+   "source": "https://www.sec.gov/resources-small-businesses/exempt-offerings/filing-form-d-notice",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "unit:us-sec-form-d",
+    "template:investors/groups/how-members-invest",
+    "template:investors/groups/manager-annual-duties"
+   ],
+   "flags": [
+    {
+     "kind": "deadline",
+     "text": "within 15 days after"
+    }
+   ]
+  },
+  {
+   "id": "groups-manager-era",
+   "path": "angels-create-groups",
+   "need": "A paid manager's Form ADV as an exempt adviser",
+   "source": "https://www.sec.gov/files/formadv-instructions.pdf",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "template:investors/groups/manager-annual-duties"
+   ],
+   "flags": [
+    {
+     "kind": "deadline",
+     "text": "within 60 days"
+    },
+    {
+     "kind": "deadline",
+     "text": "within 90 days after"
+    }
+   ]
+  },
+  {
+   "id": "funds-offering",
+   "path": "vcs-invest",
+   "need": "The fund's own Rule 506 offering and Form D",
+   "source": "https://www.sec.gov/resources-small-businesses/exempt-offerings/filing-form-d-notice",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "unit:us-sec-parts-232-239",
+    "unit:us-sec-form-d",
+    "template:investors/funds/regulation-d",
+    "template:investors/funds/form-d-and-colorado-notice"
+   ],
+   "flags": [
+    {
+     "kind": "deadline",
+     "text": "within 15 days after"
+    }
+   ]
+  },
+  {
+   "id": "funds-form-d-amendment",
+   "path": "vcs-invest",
+   "need": "The fund's yearly Form D amendment",
+   "source": "https://www.ecfr.gov/current/title-17/section-230.503",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-230",
+    "unit:us-sec-form-d",
+    "template:investors/funds/form-d-and-colorado-notice"
+   ],
+   "flags": [
+    {
+     "kind": "deadline",
+     "text": "anniversary of the"
+    }
+   ]
+  },
+  {
+   "id": "funds-edgar-access",
+   "path": "vcs-invest",
+   "need": "The fund's EDGAR access through Form ID",
+   "source": "https://www.ecfr.gov/current/title-17/section-232.10",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-parts-232-239",
+    "template:investors/funds/form-d-and-colorado-notice"
+   ]
+  },
+  {
+   "id": "funds-vc-adviser",
+   "path": "vcs-invest",
+   "need": "The venture capital fund adviser exemption",
+   "source": "https://www.ecfr.gov/current/title-17/section-275.203(l)-1",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-advisers-act",
+    "unit:us-sec-part-275",
+    "template:investors/funds/exempt-reporting-adviser"
+   ]
+  },
+  {
+   "id": "funds-private-fund-adviser",
+   "path": "vcs-invest",
+   "need": "The private fund adviser exemption, $150M",
+   "source": "https://www.ecfr.gov/current/title-17/section-275.203(m)-1",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-275",
+    "template:investors/funds/exempt-reporting-adviser"
+   ]
+  },
+  {
+   "id": "funds-era-reporting",
+   "path": "vcs-invest",
+   "need": "Exempt reporting adviser filings on Form ADV",
+   "source": "https://www.sec.gov/files/formadv-instructions.pdf",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-sec-part-279",
+    "template:investors/funds/exempt-reporting-adviser",
+    "template:investors/funds/compliance-calendar"
+   ],
+   "flags": [
+    {
+     "kind": "deadline",
+     "text": "within 60 days"
+    },
+    {
+     "kind": "deadline",
+     "text": "within 90 days after"
+    }
+   ]
+  },
+  {
+   "id": "funds-ica-exclusions",
+   "path": "vcs-invest",
+   "need": "3(c)(1) or 3(c)(7), and the $12M venture cap",
+   "source": "https://www.ecfr.gov/current/title-17/section-270.3c-7",
+   "checked": "2026-11-02",
+   "covered_by": [
+    "unit:us-ica",
+    "unit:us-sec-part-270",
+    "template:investors/funds/investment-company-act"
+   ]
+  }
+ ],
+ "questions": [
+  {
+   "id": "sec-raise-advertise-506c",
+   "question": "We want to announce our seed round publicly: LinkedIn posts, our website, maybe a podcast. Which Regulation D exemption lets a startup use that kind of general solicitation?",
+   "expect": [
+    "17 C.F.R. § 230.506(c)",
+    "17 C.F.R. § 230.504(b)(1)"
+   ],
+   "mustNot": [
+    "506\\(b\\)\\s+(allows|permits|lets)\\s+(you\\s+to\\s+)?(general\\s+solicitation|advertis)"
+   ]
+  },
+  {
+   "id": "sec-raise-506b-nonaccredited-limit",
+   "question": "If we raise under Rule 506(b), how many non-accredited investors can we let into the round?",
+   "expect": [
+    "17 C.F.R. § 230.506(b)(2)(i)"
+   ],
+   "mustNot": [
+    "\\b(25|50|99|100)\\s+non-?accredited"
+   ]
+  },
+  {
+   "id": "sec-raise-506c-checkbox",
+   "question": "We're doing a 506(c) raise. Is it enough for each investor to tick a box on the subscription agreement saying they're accredited?",
+   "expect": [
+    "17 C.F.R. § 230.506(c)(2)(ii)"
+   ],
+   "mustNot": [
+    "(tick(ing)?|check(ing)?)\\s+(a|the)\\s+box\\s+(alone\\s+)?(is|would\\s+be)\\s+(enough|sufficient)(?!\\s+only)"
+   ]
+  },
+  {
+   "id": "sec-raise-accredited-income",
+   "question": "What income does an individual need to count as an accredited investor on income alone?",
+   "expect": [
+    "17 C.F.R. § 230.501(a)(6)"
+   ],
+   "mustNot": [
+    "\\$\\s?(150|250),000"
+   ]
+  },
+  {
+   "id": "sec-raise-form-d-deadline",
+   "question": "We just took the first check in our round. How long do we have to file our Form D with the SEC?",
+   "expect": [
+    "17 C.F.R. § 230.503(a)(1)",
+    "17 C.F.R. § 239.500(a)(1)"
+   ],
+   "mustNot": [
+    "\\b(10|30|45|60|90)\\s+(calendar\\s+)?days\\s+(after|of|from)\\s+(the\\s+)?(first|initial)\\s+(sale|close|closing|check)"
+   ]
+  },
+  {
+   "id": "sec-raise-form-d-first-sale-date",
+   "question": "Our first investor signed a binding subscription agreement on the 3rd, but the wire won't arrive until the 20th. For the Form D deadline, which date is the first sale?",
+   "expect": [
+    "SEC CFI, Securities Act Rules, Question 257.02"
+   ],
+   "mustNot": [
+    "(clock|deadline|period)\\s+(starts|begins|runs)\\s+(when|once|on the date)\\s+the\\s+(wire|money|funds|payment)\\s+(arrives|lands|is received)"
+   ]
+  },
+  {
+   "id": "sec-raise-form-d-amend-more-investors",
+   "question": "Since we filed our Form D, a few more accredited investors have come in, so the amount sold and the number of investors have both gone up. Do we have to file a Form D amendment right away because of that?",
+   "expect": [
+    "17 C.F.R. § 230.503(a)(3)(ii)",
+    "17 C.F.R. § 239.500(a)(3)(ii)"
+   ]
+  },
+  {
+   "id": "sec-raise-missed-form-d",
+   "question": "We forgot to file our Form D and the deadline passed months ago. Have we lost the Rule 506(b) exemption for the round?",
+   "expect": [
+    "SEC CFI, Securities Act Rules, Question 257.07",
+    "SEC CFI, Securities Act Rules, Question 257.08",
+    "17 C.F.R. § 230.507"
+   ]
+  },
+  {
+   "id": "sec-raise-edgar-form-id",
+   "question": "We've never filed anything with the SEC. What do we have to do before we can submit a Form D on EDGAR?",
+   "expect": [
+    "17 C.F.R. § 232.10(b)",
+    "17 C.F.R. § 239.63"
+   ]
+  },
+  {
+   "id": "sec-raise-bad-actor-director",
+   "question": "One of our directors was convicted eight years ago of a felony connected with selling securities. Does that knock out our Rule 506 exemption?",
+   "expect": [
+    "17 C.F.R. § 230.506(d)(1)(i)"
+   ]
+  },
+  {
+   "id": "sec-raise-state-notice",
+   "question": "Our round relies on Rule 506(b). Can a state make us register the offering there, or can it only ask for a notice filing and a fee?",
+   "expect": [
+    "15 U.S.C. § 77r(b)(4)(F)",
+    "15 U.S.C. § 77r(c)(2)"
+   ]
+  },
+  {
+   "id": "sec-raise-demo-day",
+   "question": "I'm pitching at a university-run demo day with several other startups. What am I allowed to say about our current round without it counting as general solicitation?",
+   "expect": [
+    "17 C.F.R. § 230.148(a)(3)"
+   ]
+  },
+  {
+   "id": "sec-raise-finder-fee",
+   "question": "Someone offered to introduce us to investors in exchange for 5% of whatever they invest. Which federal provisions decide whether that person must register as a broker-dealer?",
+   "expect": [
+    "15 U.S.C. § 78o(a)(1)",
+    "15 U.S.C. § 78c(a)(4)"
+   ]
+  },
+  {
+   "id": "sec-angel-net-worth-home",
+   "question": "I'm an angel investor. Does the value of my house count toward the $1 million net worth test for accredited investor status?",
+   "expect": [
+    "17 C.F.R. § 230.501(a)(5)(i)"
+   ]
+  },
+  {
+   "id": "sec-angel-506c-statement-age",
+   "question": "A startup raising under 506(c) wants to check my net worth from my bank and brokerage statements. How recent do those statements have to be?",
+   "expect": [
+    "17 C.F.R. § 230.506(c)(2)(ii)(B)"
+   ],
+   "mustNot": [
+    "within\\s+(the\\s+)?(prior|past|last)\\s+(six|6|twelve|12)\\s+months"
+   ]
+  },
+  {
+   "id": "sec-angel-506c-high-minimum",
+   "question": "A founder raising under 506(c) says that because I'm writing a large minimum check, she doesn't need my tax returns or a letter from my accountant. Does the SEC staff accept that?",
+   "expect": [
+    "SEC CFI, Securities Act Rules, Question 256.36",
+    "SEC CFI, Securities Act Rules, Question 256.35"
+   ]
+  },
+  {
+   "id": "sec-angel-rule-144-holding",
+   "question": "I bought preferred stock in a private startup's Regulation D round. How long do I have to hold it before I can resell under Rule 144?",
+   "expect": [
+    "17 C.F.R. § 230.144(d)(1)(ii)"
+   ]
+  },
+  {
+   "id": "sec-angel-spv-investor-cap",
+   "question": "I'm putting together a $25 million SPV to invest in one startup, and it will rely on section 3(c)(1). What's the most investors it can have?",
+   "expect": [
+    "15 U.S.C. § 80a-3(c)(1)"
+   ],
+   "mustNot": [
+    "(your|this|the)\\s+SPV\\s+(can|could|may)\\s+have\\s+(up\\s+to\\s+)?250"
+   ]
+  },
+  {
+   "id": "sec-angel-spv-lead-vc-exemption",
+   "question": "I lead SPVs that buy shares directly from startups and I take carry. Which rule defines the 'venture capital fund' I'd have to advise exclusively to stay exempt from SEC investment adviser registration?",
+   "expect": [
+    "17 C.F.R. § 275.203(l)-1"
+   ]
+  },
+  {
+   "id": "sec-group-virtual-demo-day",
+   "question": "Our angel group's demo day will also be streamed online. Who can we let join virtually and still keep the presenting startups inside the SEC's demo-day rule?",
+   "expect": [
+    "17 C.F.R. § 230.148(a)(4)"
+   ]
+  },
+  {
+   "id": "sec-group-angel-group-definition",
+   "question": "What does our group have to look like to count as an 'angel investor group' under the SEC's demo-day rule?",
+   "expect": [
+    "17 C.F.R. § 230.148(a)(5)"
+   ]
+  },
+  {
+   "id": "sec-group-platform-success-fee",
+   "question": "Our angel group runs an online platform where members see and join Rule 506 deals. If the group's manager takes a success fee on each deal that closes through it, can we still use the statutory carve-out from broker-dealer registration for those platforms?",
+   "expect": [
+    "15 U.S.C. § 77d(c)(2)(A)"
+   ]
+  },
+  {
+   "id": "sec-group-spv-own-form-d",
+   "question": "For each deal, our angel group forms a new LLC that sells interests to members under Rule 506(b) and then invests in the startup. Does each LLC have to file its own Form D?",
+   "expect": [
+    "17 C.F.R. § 230.503(a)(1)",
+    "17 C.F.R. § 239.500(a)(1)"
+   ]
+  },
+  {
+   "id": "sec-group-manager-first-adv",
+   "question": "Our group's management company is paid to run our pooled vehicles and relies on the venture capital fund adviser exemption. How soon after it starts relying on the exemption does it have to file its first Form ADV?",
+   "expect": [
+    "Form ADV, General Instructions"
+   ],
+   "mustNot": [
+    "\\b(10|15|30|45|90|120)\\s+days\\s+(of|after)\\s+(relying|starting|first\\s+relying)"
+   ]
+  },
+  {
+   "id": "sec-fund-bad-actor-manager",
+   "question": "We're raising our first venture fund under Rule 506(b). Does the bad actor check cover our management company and its principals, or only the fund entity itself?",
+   "expect": [
+    "17 C.F.R. § 230.506(d)(1)"
+   ]
+  },
+  {
+   "id": "sec-fund-form-d-anniversary",
+   "question": "Our fund filed its Form D after the first close, and we'll keep admitting LPs for about 18 more months. Do we have to file again even if nothing material changes, and if so when?",
+   "expect": [
+    "17 C.F.R. § 230.503(a)(3)(iii)",
+    "17 C.F.R. § 239.500(a)(3)(iii)"
+   ],
+   "mustNot": [
+    "within\\s+\\d+\\s+days\\s+(after|of)\\s+(the\\s+|each\\s+)?anniversary"
+   ]
+  },
+  {
+   "id": "sec-fund-era-brochure",
+   "question": "We file with the SEC as an exempt reporting adviser to our venture funds. Do we have to prepare a Form ADV Part 2 brochure?",
+   "expect": [
+    "Form ADV, General Instructions"
+   ]
+  },
+  {
+   "id": "sec-fund-vc-adviser-basket",
+   "question": "To stay inside the venture capital fund adviser exemption, how much of a fund's capital can go into non-qualifying investments, like buying shares from existing shareholders?",
+   "expect": [
+    "17 C.F.R. § 275.203(l)-1(a)(2)"
+   ],
+   "mustNot": [
+    "\\b(25|30|40)\\s?(%|percent)"
+   ]
+  },
+  {
+   "id": "sec-fund-private-fund-adviser-cap",
+   "question": "We advise a few private funds, but one is a buyout fund, so the venture exemption doesn't fit. What's the asset ceiling for the private fund adviser exemption?",
+   "expect": [
+    "17 C.F.R. § 275.203(m)-1(a)(2)",
+    "15 U.S.C. § 80b-3(m)(1)"
+   ]
+  },
+  {
+   "id": "sec-fund-qualifying-vc-250",
+   "question": "Our first fund will be about $11 million in capital contributions and uncalled commitments, meets the SEC's venture capital fund definition, and we'd like up to 200 LPs, most of whom aren't qualified purchasers. Can it still rely on section 3(c)(1)?",
+   "expect": [
+    "15 U.S.C. § 80a-3(c)(1)",
+    "17 C.F.R. § 270.3c-7"
+   ],
+   "mustNot": [
+    "(can(not|'t)|may\\s+not|is\\s+not\\s+able\\s+to)\\s+(use|rely\\s+on|have)\\s+(the\\s+)?250"
+   ]
+  }
+ ]
+}

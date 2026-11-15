@@ -1,0 +1,12 @@
+---
+// Card F8. The room's mark (src/scripts/brand.ts: the Legallas seal for this room, else the neutral one), the one
+// canonical mark (R32), drawn in a single ink. Every part takes currentColor, so the container sets the color
+// (LegallasEmpty's c-empty__glyph is --ink-3). Decorative; put the name in text beside it.
+import '../styles/legallas-mark.css';
+import { markSvg } from '../scripts/brand.ts';
+
+// The mark's root class is "seal" (door.css styles it on the front door); add our own hook beside it.
+const svg = markSvg(false).replace('<svg class="seal"', '<svg class="seal legallas-mark"');
+---
+
+<Fragment set:html={svg} />

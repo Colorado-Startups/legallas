@@ -1,0 +1,54 @@
+---
+// The discussion on one file (card P6). Drop it into any page and give it the document id:
+//
+//   <CommentThread documentId={id} />                    when the id is known at build time, or
+//   <CommentThread />  then  el.dataset.documentId = id  from a page script (the doc page reads ?id=).
+//
+// src/scripts/comments.ts loads the thread whenever data-document-id is set or changes. Comments are
+// plain text and are always rendered as text nodes. Several threads on one page are fine.
+import '../styles/comments.css';
+import LegallasEmpty from './LegallasEmpty.astro';
+
+interface Props {
+  documentId?: string;
+  /** Heading level for "Discussion", so the panel fits the page outline. */
+  level?: 2 | 3;
+}
+
+const { documentId, level = 2 } = Astro.props;
+const Heading = `h${level}` as 'h2' | 'h3';
+---
+
+<section class="doc-discuss" data-comment-thread data-document-id={documentId} aria-label="Discussion">
+  <div class="doc-discuss-head">
+    <Heading class="doc-discuss-title">Discussion</Heading>
+    <p class="doc-discuss-count" data-comments-count></p>
+  </div>
+
+  <p class="doc-discuss-status" data-comments-status role="status"></p>
+
+  <ol class="doc-discuss-list" data-comments-list hidden></ol>
+  <div data-comments-empty hidden>
+    <LegallasEmpty title="No discussion on this document yet." level={3} />
+  </div>
+
+  <details class="doc-discuss-resolved" data-comments-resolved hidden>
+    <summary data-comments-resolved-label></summary>
+    <ol class="doc-discuss-list" data-comments-resolved-list></ol>
+  </details>
+
+  <form class="doc-discuss-form" data-comments-form hidden novalidate>
+    <div class="doc-discuss-label">
+      <span data-comments-label>New comment</span>
+      <button type="button" class="c-button c-button--quiet" data-comments-clear hidden>Clear page</button>
+    </div>
+    <textarea class="c-input" name="body" rows="3" placeholder="Add a comment" aria-label="New comment" data-comments-input></textarea>
+    <div class="doc-discuss-row">
+      <p class="doc-discuss-hint">Everyone in the room can see comments. <span data-comments-remaining></span></p>
+      <button type="submit" class="c-button c-button--primary">Comment</button>
+    </div>
+    <p class="doc-discuss-error" data-comments-error role="alert" hidden></p>
+  </form>
+</section>
+
+<script src="../scripts/comments.ts"></script>

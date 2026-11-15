@@ -1,0 +1,373 @@
+/*
+  The strategy-game layer (DESIGN.md sections 3, 7 and 8; 2026-10-02): violation mark, objective card, proof
+  meter, selection brackets, gap fog, dossier card and the guide band. Calm, not loud: these encode state and
+  record facts; there are no scores, levels or entrance motion. Forced colors live in components.css.
+*/
+
+/*
+  Violation mark: the letter plus a shape, never color alone. A shield, B octagon, C pennant; any other letter a
+  tab. The letter is the element's text, so it reads aloud and prints.
+*/
+.c-mark {
+  --mark-size: 24px;
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--mark-size);
+  height: var(--mark-size);
+  background: var(--forest);
+  color: var(--on-forest);
+  font-family: var(--font-sans);
+  font-size: var(--text-13);
+  font-weight: 600;
+  line-height: 1;
+  clip-path: polygon(25% 0, 100% 0, 100% 100%, 0 100%, 0 25%);
+  print-color-adjust: exact;
+}
+
+.c-mark--large {
+  --mark-size: 36px;
+
+  font-size: var(--text-18);
+}
+
+.c-mark[data-mark='A'] {
+  padding-bottom: calc(var(--mark-size) * 0.18);
+  clip-path: polygon(0 0, 100% 0, 100% 60%, 50% 100%, 0 60%);
+}
+
+.c-mark[data-mark='B'] {
+  clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+}
+
+.c-mark[data-mark='C'] {
+  padding-right: calc(var(--mark-size) * 0.14);
+  clip-path: polygon(0 0, 100% 0, 76% 50%, 100% 100%, 0 100%);
+}
+
+/* Objective card: one violation or track. Mark, title, one-sentence summary, then a meta row (chips, meter). */
+.c-objective {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-2) var(--space-3);
+  align-content: start;
+  padding: var(--space-4);
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+a.c-objective:hover,
+button.c-objective:hover {
+  border-color: var(--forest);
+  text-decoration: none;
+}
+
+button.c-objective {
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.c-objective__mark {
+  grid-row: 1 / span 2;
+}
+
+.c-objective__title {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--text-18);
+  font-weight: 600;
+  line-height: 1.5rem;
+  text-wrap: balance;
+}
+
+.c-objective__summary {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+}
+
+.c-objective__meta {
+  display: flex;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  padding-top: var(--space-3);
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+  border-top: var(--hairline) solid var(--rule);
+}
+
+@media (max-width: 48rem) {
+  .c-objective {
+    padding: var(--space-3);
+  }
+
+  .c-objective__mark {
+    grid-row: auto;
+  }
+
+  .c-objective__summary {
+    grid-column: 1 / -1;
+  }
+}
+
+/*
+  Proof meter: one pip per element to prove, in proof order. Direct and corroborating pips are filled forest,
+  circumstantial is a hollow forest pip, a gap a dashed --ink-3 pip. Never red to green; the label says the count
+  in words ("Proof secured 9 of 12"), and the pips are aria-hidden.
+*/
+.c-meter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+  min-width: 0;
+}
+
+.c-meter__pips {
+  display: flex;
+  flex: 1 1 8rem;
+  gap: 2px;
+  max-width: 16rem;
+  min-width: 0;
+}
+
+.c-meter__pip {
+  flex: 1 1 0;
+  min-width: 3px;
+  max-width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--forest);
+  border-radius: 1px;
+  print-color-adjust: exact;
+}
+
+.c-meter__pip[data-strength='direct'],
+.c-meter__pip[data-strength='corroborating'] {
+  background: var(--forest);
+}
+
+.c-meter__pip[data-strength='gap'] {
+  border-style: dashed;
+  border-color: var(--ink-3);
+}
+
+.c-meter__label {
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/*
+  Selection: brass corner brackets on whatever is selected, checked (a radio) or pressed, drawn by ::after (the
+  block owns it), plus a 2px lift under no-preference only. For HTML boxes; an SVG mark draws its own selected state.
+*/
+.c-select {
+  --bracket: 10px;
+  --bracket-w: 2px;
+
+  position: relative;
+}
+
+.c-select[aria-selected='true']::after,
+.c-select[aria-checked='true']::after,
+.c-select[aria-pressed='true']::after {
+  position: absolute;
+  inset: -4px;
+  content: '';
+  pointer-events: none;
+  background:
+    linear-gradient(var(--brass-mark) 0 0) top left / var(--bracket) var(--bracket-w),
+    linear-gradient(var(--brass-mark) 0 0) top left / var(--bracket-w) var(--bracket),
+    linear-gradient(var(--brass-mark) 0 0) top right / var(--bracket) var(--bracket-w),
+    linear-gradient(var(--brass-mark) 0 0) top right / var(--bracket-w) var(--bracket),
+    linear-gradient(var(--brass-mark) 0 0) bottom left / var(--bracket) var(--bracket-w),
+    linear-gradient(var(--brass-mark) 0 0) bottom left / var(--bracket-w) var(--bracket),
+    linear-gradient(var(--brass-mark) 0 0) bottom right / var(--bracket) var(--bracket-w),
+    linear-gradient(var(--brass-mark) 0 0) bottom right / var(--bracket-w) var(--bracket);
+  background-repeat: no-repeat;
+  print-color-adjust: exact;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .c-select {
+    transition: transform var(--dur-1) var(--ease);
+  }
+
+  .c-select[aria-selected='true'],
+  .c-select[aria-checked='true'],
+  .c-select[aria-pressed='true'] {
+    transform: translateY(-2px);
+  }
+}
+
+/*
+  Fog: a gap row in the proof checklist. A light paper haze and a dashed edge; the text on it stays plain, and
+  the haze never covers a cell's evidence (the cite chips sit above it like any other content).
+*/
+.c-fog[data-state='gap'] {
+  background: var(--fog-haze);
+  outline: var(--hairline) dashed var(--ink-3);
+  outline-offset: -1px;
+}
+
+.c-fog[data-state='gap']:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Dossier: a compact card for one person or entity that leads with counts, then the record. */
+.c-dossier {
+  --shape-size: 20px;
+
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.c-dossier__head {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  min-width: 0;
+}
+
+.c-dossier__name {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--text-18);
+  font-weight: 600;
+  line-height: 1.5rem;
+}
+
+.c-dossier__role {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+}
+
+.c-dossier__counts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) 0 0;
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.c-dossier__count {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+}
+
+.c-dossier__value {
+  order: 2;
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--text-21);
+  font-weight: 600;
+  line-height: 1.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.c-dossier__label {
+  order: 1;
+  color: var(--ink-2);
+  font-size: var(--text-12);
+  line-height: 1rem;
+}
+
+/*
+  Guide band: Legallas as the page guide, under the header on every page but Ask. An art slot (the companion's
+  arched window, 88px wide; the 40px small Legallas below 48rem), one briefing sentence, and a row of orders
+  (questions for Ask).
+*/
+.c-guide {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.c-guide__art {
+  grid-row: 1 / span 2;
+  width: 88px;
+  aspect-ratio: 240 / 280;
+  overflow: hidden;
+}
+
+.c-guide__art > svg,
+.c-guide__art > canvas,
+.c-guide__art > picture,
+.c-guide__art > picture > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.c-guide__brief {
+  margin: 0;
+  max-width: var(--measure);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1.5rem;
+}
+
+.c-guide__orders {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* An order is a c-button that may wrap: questions are longer than a verb. */
+.c-guide__order {
+  height: auto;
+  min-height: 2rem;
+  padding-block: var(--space-1);
+  text-align: left;
+  white-space: normal;
+}
+
+@media (max-width: 48rem) {
+  .c-guide {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: var(--space-2) var(--space-3);
+    align-items: start;
+  }
+
+  /* The small Legallas at 40px (c-glyph) stands in for the companion: a round window, so a square slot. */
+  .c-guide__art {
+    grid-row: auto;
+    width: 40px;
+    aspect-ratio: 1;
+  }
+
+  .c-guide__orders {
+    grid-column: 1 / -1;
+  }
+}

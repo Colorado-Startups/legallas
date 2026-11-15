@@ -1,0 +1,100 @@
+---
+// The Overview. First, for a member who may connect one, Step 1: connect your own AI (components/ConnectFirst.astro),
+// one line once it is connected.
+// The case header is the campaign map: the caption from the matter, the defined terms behind a
+// Glossary disclosure and one objective card per track (scripts/overview-news-case.ts, overview-map.ts). Then the
+// violations over time (overview-case-ribbon.ts), "Since your last visit" as one row of counts and Key documents.
+// The case header and the ribbon are the litigation pack's, through slots/case-header-slot.ts and
+// slots/OverviewCaseSlot.astro; a room without the pack shows the plain heading and the rest.
+// The frame is static; scripts fill it from /api/matter,
+// /api/documents, /api/comments and /api/uploads.
+// A room with no matter (worker/room-shape.ts) gets CompanyHome.astro instead of the data-case-only parts.
+import ConnectFirst from '../components/ConnectFirst.astro';
+import Room from '../layouts/Room.astro';
+import '../styles/overview-news.css';
+import '../styles/overview-news-reserve.css';
+import OverviewCaseSlot from '../slots/OverviewCaseSlot.astro';
+import CompanyHome from '../components/CompanyHome.astro';
+
+const columns = [
+  { key: 'docs', count: 'new documents', label: 'New documents', more: true },
+  { key: 'discussions', count: 'open discussions', label: 'Open discussions', more: true },
+  { key: 'counsel', count: 'from counsel', label: 'From counsel', more: false },
+] as const;
+---
+
+<Room title="Overview" guide="overview">
+  <ConnectFirst />
+
+  <header class="c-case ov-case" data-overview-caption aria-busy="true" data-case-only>
+    <p class="c-case__court ov-case__court" data-ov-court hidden></p>
+    <h1 class="c-case__caption" data-ov-caption>Overview</h1>
+    <p class="ov-case__note" data-ov-case-note hidden></p>
+    {/* The page's own load (overview-news.ts). Visually hidden: the frame below already reads "Loading.". */}
+    <p class="u-vh" data-ov-loading data-load-pending role="status">Loading the overview.</p>
+    <p class="ov-case__note" data-ov-failed data-load-failed hidden>The overview did not load; reload the page to try again.</p>
+    <details class="ov-glossary" data-ov-glossary hidden>
+      <summary class="ov-glossary__summary">Glossary</summary>
+      <dl class="ov-terms" data-ov-terms></dl>
+    </details>
+    <div class="ov-map" data-ov-map hidden></div>
+  </header>
+
+  <div class="ov-band" data-overview-ribbon data-case-only></div>
+
+  <section class="ov-news" data-overview-news aria-labelledby="ov-since-title" aria-busy="true" data-case-only>
+    <div class="ov-section">
+      <h2 class="t-h2 ov-section__title" id="ov-since-title">
+        Since your last visit <span class="ov-section__aside" data-ov-since></span>
+      </h2>
+      <div class="ov-counts">
+        {
+          columns.map((c) => (
+            <button
+              type="button"
+              class="ov-count"
+              aria-expanded="false"
+              aria-controls={`ov-col-${c.key}`}
+              data-ov-tab={c.key}
+              data-needs={c.key === 'discussions' ? 'readComments' : undefined}
+            >
+              <span class="u-num ov-count__n" data-ov-count>0</span>
+              <span class="ov-count__label">{c.count}</span>
+            </button>
+          ))
+        }
+      </div>
+      {
+        columns.map((c) => (
+          <section class="ov-column" id={`ov-col-${c.key}`} aria-labelledby={`ov-col-${c.key}-title`} data-ov-column={c.key} data-needs={c.key === 'discussions' ? 'readComments' : undefined} hidden>
+            <h3 class="u-vh" id={`ov-col-${c.key}-title`}>{c.label}</h3>
+            <ul class="ov-list" data-ov-list>
+              <li class="ov-loading">Loading.</li>
+            </ul>
+            {c.more && <a class="ov-more" href="/documents/" data-ov-more hidden />}
+            {c.key === 'counsel' && <a class="ov-more" href="/documents/" data-needs="upload">Send to client</a>}
+          </section>
+        ))
+      }
+    </div>
+
+    <section class="ov-section" data-ov-key aria-labelledby="ov-key-title">
+      <h2 class="t-h2 ov-section__title" id="ov-key-title">
+        Key documents <span class="ov-section__aside" data-ov-key-count></span>
+      </h2>
+      <ul class="ov-keys" data-ov-list>
+        <li class="ov-loading">Loading.</li>
+      </ul>
+      <a class="ov-more ov-more--key" href="/documents/" data-ov-more hidden></a>
+    </section>
+  </section>
+
+  <p class="c-provenance" data-case-only>
+    Prepared by the client from the record with AI assistance. Every entry cites its source; verify before relying on it.
+  </p>
+
+  <CompanyHome />
+</Room>
+
+<script src="../scripts/overview-news.ts"></script>
+<OverviewCaseSlot />

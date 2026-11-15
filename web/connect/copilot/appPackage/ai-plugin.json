@@ -1,0 +1,79 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/copilot/plugin/v2.4/schema.json",
+  "schema_version": "v2.4",
+  "name_for_human": "Legallas room",
+  "namespace": "legallas",
+  "description_for_human": "Read-only search, page text, visuals, comment threads and file facts from a Legallas room.",
+  "description_for_model": "Read-only tools for a private Legallas room (formation, fundraising or litigation): search passages, the case overview, the document list, one document's facts, full page text, the visual binder, a document's comment threads, an original file's facts, the room's law library of public law, and the template library. Use them whenever the user asks about the room's record, its documents, visuals or comments, what a document says, the law the room holds, or a template to fill.",
+  "privacy_policy_url": "https://mcp.room.example.com/privacy",
+  "legal_info_url": "https://mcp.room.example.com/terms",
+  "functions": [
+    {
+      "name": "legallas_search",
+      "description": "Search every document in the counsel room by meaning and keywords. Returns passages with the document id, control number, title, folder, page and a link to that page in the room. When more passages matched than fit, pass next_cursor with the same query and limit for the rest (each call searches again). To read whole pages, use legallas_read_pages with an id from these results."
+    },
+    {
+      "name": "legallas_case_overview",
+      "description": "The case picture the room publishes: the tracks counsel is preparing and the violations they rest on, with points to prove and their proof, grouped per violation, and for a track with a brief its theory, cast, hurdles, dates to confirm, key exhibits, drafts and counts; then parties, people, chronology of events, the claims of the pleading (when the summary has a priorCase, that pleading closed and its claims are history), and money facts, each with citations to documents and pages (control number, page and room link). Start with section \"summary\", then page through a section with its cursor. An entry too long for one page comes in parts sharing its id (part, parts): join their lists in order, and merge a list item marked continues into the item before it."
+    },
+    {
+      "name": "legallas_list_documents",
+      "description": "List documents in the counsel room, up to 100 per page, with id, control number, title, folder, type, page count, Key flag, room link and designations: privileged, and where known the document date, document type, from and to. With since, only documents added or changed since then. When more remain, pass next_cursor to get the next page. Use legallas_search to find documents by content instead."
+    },
+    {
+      "name": "legallas_get_document",
+      "description": "Details of one document: control number, title, folder, type, page count, dates, Key flag, room link and designations (privileged, and where known the document date, document type, from, to and a summary). Does not return its text; use legallas_read_pages for that."
+    },
+    {
+      "name": "legallas_read_pages",
+      "description": "Read the text of pages from one document, at most 20 pages or about 60,000 characters per call, each page labelled with its number and room link. When more remains, the result says which page to continue from (next). A single page longer than the limit comes back cut and marked truncated; pass next_cursor with the same id to read the rest of it."
+    },
+    {
+      "name": "legallas_view_visual",
+      "description": "The visual binder made to explain the matter: charts, timelines and one-idea pages grouped into tabs. With no id, its tabs and pages (each with id, slug, control number and room link). With an id or slug, the text the page shows (headings, labels, table cells and chart labels) and its room link, and an image of the page where the client takes images. When more remains, the result gives a cursor to continue."
+    },
+    {
+      "name": "legallas_get_comments",
+      "description": "Comment threads on one document from the counsel room's members: each thread's first comment and its replies, with author, time, page, whether the thread is resolved, and room links. Pass page for only the threads about one page. When more remain, the result gives a cursor for the next threads."
+    },
+    {
+      "name": "legallas_get_file",
+      "description": "The original file of one document. Small PNG, JPEG and WebP images come back as the image itself where the app supports it; otherwise, PDFs and larger files included, the result gives the file details, page count and room link, and legallas_read_pages reads its text. Visual binder pages point to legallas_view_visual."
+    },
+    {
+      "name": "legallas_template",
+      "description": "Lists the template library; with a path, returns that template a part at a time."
+    },
+    {
+      "name": "legallas_search_law",
+      "description": "Search the law library: the public statutes, rules and opinions this room chose to hold. Public law, separate from the case documents. Returns passages with the canonical citation, the official source link, the date retrieved and the track; an opinion passage also says which writing it is from (the opinion of the court, a concurrence or a dissent) and its author. Only the opinion of the court states the holding. With list: true and no query, lists what the library holds, one row per unit, paged with next_cursor."
+    }
+  ],
+  "runtimes": [
+    {
+      "type": "RemoteMCPServer",
+      "auth": {
+        "type": "OAuthPluginVault",
+        "reference_id": "${{LEGALLAS_OAUTH_REFERENCE_ID}}"
+      },
+      "spec": {
+        "url": "https://mcp.room.example.com/mcp",
+        "mcp_tool_description": {
+          "file": "mcp-tools.json"
+        }
+      },
+      "run_for_functions": [
+        "legallas_search",
+        "legallas_case_overview",
+        "legallas_list_documents",
+        "legallas_get_document",
+        "legallas_read_pages",
+        "legallas_view_visual",
+        "legallas_get_comments",
+        "legallas_get_file",
+        "legallas_template",
+        "legallas_search_law"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+---
+// The company checklist's card on a company room's Overview (CompanyHome.astro). It starts hidden and shows itself only when
+// /api/checklist/summary answers, so with the room's CHECKLIST_ENABLED off it's as if it weren't here. The Worker usually
+// draws it before the page leaves (worker/overview-checklist.ts, data-shaped="server"); then the script has nothing to do.
+import '../styles/checklist.css';
+---
+
+<section class="cl-card" data-checklist-card hidden aria-labelledby="cl-card-title">
+  <h2 id="cl-card-title" class="t-h2" data-checklist-card-title>Company checklist</h2>
+  <p class="t-small cl-company" data-checklist-card-company></p>
+  <ul class="cl-stages" data-checklist-card-stages></ul>
+  <ul class="cl-dates" data-checklist-card-dates></ul>
+  <a class="c-button cl-card__link" href="/checklist/">See the checklist</a>
+  <p class="t-caption" data-checklist-card-notice></p>
+</section>
+
+<script>
+  // One line for every other room: only a room with no matter loads the card, and only when the Worker didn't draw it.
+  const drawn = document.querySelector<HTMLElement>('[data-checklist-card]')?.dataset.shaped === 'server';
+  if (document.documentElement.dataset.roomShape === 'company' && !drawn) void import('../scripts/checklist-card.ts');
+</script>

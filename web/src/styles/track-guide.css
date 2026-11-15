@@ -1,0 +1,240 @@
+/*
+  The Complaint guide and Filing guide (track pages, src/scripts/track-guide.ts): seven numbered parts in complaint
+  order, read like a draft. Page-scoped classes only (track-guide*), built from tokens; c-mark, c-chip and c-cite
+  are composed, never restyled. Light only; no literal colors. "Print guide" prints the head and this section only
+  (track.css); here it is laid out for paper.
+*/
+
+.track-guide {
+  display: grid;
+  gap: var(--space-4);
+  padding-top: var(--space-5);
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.track-guide__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.track-guide__head > h2 {
+  margin: 0;
+}
+
+.track-guide__body {
+  display: grid;
+  gap: var(--space-6);
+  max-width: 60rem;
+}
+
+.track-guide__intro {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.track-guide__part {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.track-guide__title {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.track-guide__kicker {
+  color: var(--ink-2);
+}
+
+.track-guide__forum {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.track-guide__label {
+  margin: var(--space-2) 0 0;
+  color: var(--ink-2);
+}
+
+.track-guide__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.track-guide__list > li {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) 0;
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.track-guide__line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  align-items: baseline;
+  margin: 0;
+}
+
+.track-guide__detail {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.track-guide__name {
+  font-weight: 600;
+}
+
+/* A party in sentences: the name in bold, the role and its ties, then the cites */
+.track-guide__sentence {
+  margin: 0;
+}
+
+.track-guide__sentence > .track-cites {
+  display: inline-flex;
+  margin-left: var(--space-2);
+  vertical-align: baseline;
+}
+
+/* Facts: numbered, serif, like the allegations they draft */
+.track-guide__facts {
+  display: grid;
+  margin: 0;
+  padding: 0 0 0 var(--space-6);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1.625;
+}
+
+.track-guide__fact {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-1) var(--space-2);
+  align-items: baseline;
+  padding: var(--space-2) 0;
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.track-guide__fact::marker {
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+}
+
+.track-guide__marks {
+  display: flex;
+  gap: var(--space-1);
+  align-self: center;
+}
+
+.track-guide__marks .c-mark {
+  --mark-size: 18px;
+
+  font-size: var(--text-12);
+}
+
+.track-guide__when {
+  font-weight: 600;
+}
+
+.track-guide__fact .track-guide__detail {
+  grid-column: 2;
+  font-family: var(--font-sans);
+}
+
+/* Points to prove: grouped by violation, each group linking to its checklist */
+.track-guide__group {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin: var(--space-2) 0 0;
+}
+
+.track-guide__point {
+  grid-template-columns: 11rem minmax(0, 1fr);
+  align-items: baseline;
+}
+
+.track-guide__strength {
+  color: var(--ink-2);
+}
+
+.track-guide__point[data-strength='gap'] .track-guide__strength {
+  font-style: italic;
+}
+
+.track-guide__point-text {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.track-guide__authority {
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+}
+
+/* Key exhibits: control number, date, what it is, the pages cited */
+.track-guide__exhibit {
+  grid-template-columns: 8.5rem 6.5rem minmax(0, 1fr);
+  align-items: baseline;
+}
+
+.track-guide__date {
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.track-guide__what {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-2);
+  min-width: 0;
+}
+
+.track-guide__type {
+  font-weight: 600;
+}
+
+.track-guide__pages {
+  color: var(--ink-2);
+}
+
+.track-guide__gap .c-mark {
+  --mark-size: 18px;
+
+  font-size: var(--text-12);
+}
+
+@media (max-width: 48rem) {
+  .track-guide__facts {
+    padding-left: var(--space-5);
+  }
+
+  .track-guide__point,
+  .track-guide__exhibit {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1);
+  }
+}
+
+@media print {
+  .track-guide__body {
+    max-width: none;
+  }
+
+  .track-guide__list > li,
+  .track-guide__fact {
+    break-inside: avoid;
+  }
+
+  .track-guide__title {
+    break-after: avoid;
+  }
+}

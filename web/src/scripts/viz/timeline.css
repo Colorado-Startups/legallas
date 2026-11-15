@@ -1,0 +1,432 @@
+/* Card F5a (timeline viz). Tokens only (web/DESIGN.md): marks take the --enc-* mark colors, text takes the ink
+   tokens, so light and dark come from tokens.css with nothing to flip here. No literal colors. */
+
+.tl {
+  --tl-ground: var(--surface);
+  margin: 0;
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  background: var(--tl-ground);
+  border: var(--hairline, 1px) solid var(--rule);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-14);
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.tl[data-mode='ribbon'] {
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+
+.tl [hidden] {
+  display: none !important;
+}
+
+/* ---- toolbar and legend ---- */
+
+.tl-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}
+
+.tl-tool {
+  min-height: var(--target-min);
+}
+
+.tl-tool[aria-disabled='true'] {
+  color: var(--ink-3);
+  cursor: default;
+}
+
+.tl-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-13);
+}
+
+.tl-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* ---- plot ---- */
+
+.tl-stage {
+  position: relative;
+  min-width: 0;
+}
+
+.tl-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  user-select: none;
+}
+
+.tl-grid {
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+
+.tl-axis {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.tl-lane-rule {
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+
+.tl-tick {
+  fill: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  font-variant-numeric: tabular-nums;
+}
+
+.tl-lane-label {
+  fill: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-13);
+  font-weight: 600;
+}
+
+.tl-label {
+  fill: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-13);
+}
+
+/* ---- encoding: shape backs color everywhere ---- */
+
+:is(.tl-shape, .tl-band, .tl-band-cap, .tl-mini-mark)[data-side='client'] { --tl-c: var(--enc-client); }
+:is(.tl-shape, .tl-band, .tl-band-cap, .tl-mini-mark)[data-side='defendant'] { --tl-c: var(--enc-defendant); }
+:is(.tl-shape, .tl-band, .tl-band-cap, .tl-mini-mark)[data-side='nominal'] { --tl-c: var(--enc-company); }
+:is(.tl-shape, .tl-band, .tl-band-cap, .tl-mini-mark)[data-side='court'] { --tl-c: var(--enc-court); }
+:is(.tl-shape, .tl-band, .tl-band-cap, .tl-mini-mark)[data-side='third'] { --tl-c: var(--enc-third); }
+:is(.tl-shape, .tl-band, .tl-band-cap, .tl-mini-mark)[data-side='filing'] { --tl-c: var(--enc-filing); }
+
+.tl-shape {
+  fill: var(--tl-c);
+  overflow: visible;
+}
+
+/* A filing hides what is behind it; one class more than .c-shape so it wins whatever the stylesheet order. */
+.tl .tl-shape[data-side='filing'] {
+  fill: var(--tl-ground);
+  stroke: var(--tl-c);
+  stroke-width: 1.5;
+}
+
+.tl-icon {
+  flex: none;
+  vertical-align: middle;
+}
+
+/* Marks in the plot carry a 2px ground ring so overlaps stay legible (DESIGN.md section 3). */
+.tl-event .tl-shape:not([data-side='filing']) > * {
+  stroke: var(--tl-ground);
+  stroke-width: 2;
+  paint-order: stroke;
+  vector-effect: non-scaling-stroke;
+}
+
+.tl-event .tl-shape[data-side='filing'] > * {
+  vector-effect: non-scaling-stroke;
+}
+
+/* A month or year date: a whisker across the span it could fall in, the shape at its middle. */
+.tl-band {
+  stroke: var(--tl-c);
+  stroke-width: 2;
+  stroke-opacity: 0.5;
+  stroke-linecap: round;
+}
+
+.tl-band-cap {
+  stroke: var(--tl-c);
+  stroke-width: 1.5;
+}
+
+/* ---- violation periods: a light field behind the lanes, a brass rule at the start, the violation mark (the
+   c-mark shapes, drawn in SVG) above the lanes. The mark names the period, so the field needs no color of its
+   own (DESIGN.md section 3). ---- */
+
+.tl-period {
+  fill: var(--panel);
+  fill-opacity: 0.55;
+}
+
+.tl-period-edge {
+  stroke: var(--brass-rule);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.tl-letter polygon {
+  fill: var(--forest);
+}
+
+.tl-letter text {
+  fill: var(--on-forest);
+  font-family: var(--font-sans);
+  font-size: var(--text-12);
+  font-weight: 600;
+}
+
+/* ---- event states ---- */
+
+.tl-event {
+  cursor: pointer;
+  outline: none;
+}
+
+.tl-hit {
+  fill: transparent;
+  pointer-events: all;
+}
+
+.tl-focus {
+  fill: none;
+  stroke: none;
+}
+
+.tl-event:hover .tl-focus {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+/* The focus ring replaces the outline the browser would draw around the whole group. */
+.tl-event:focus-visible .tl-focus {
+  stroke: var(--focus);
+  stroke-width: 2;
+}
+
+.tl-event:hover .tl-label,
+.tl-event:focus-visible .tl-label {
+  text-decoration: underline;
+}
+
+.tl-selected {
+  fill: var(--forest-tint);
+  stroke: var(--forest);
+  stroke-width: 1.5;
+}
+
+/* ---- tooltip ---- */
+
+.tl-tip {
+  position: absolute;
+  left: var(--tl-tip-x, 0);
+  top: var(--tl-tip-y, 0);
+  z-index: 2;
+  max-width: 20rem;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-overlay);
+  pointer-events: none;
+}
+
+.tl-tip p {
+  margin: 0;
+}
+
+.tl-tip__date {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+}
+
+.tl-tip__title {
+  margin-top: var(--space-1);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  font-weight: 600;
+  line-height: 1.375;
+  text-wrap: balance;
+}
+
+.tl-tip__actors {
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+
+.tl-tip .tl-tip__meta {
+  margin-top: var(--space-1);
+  color: var(--ink-3);
+  font-size: var(--text-12);
+}
+
+/* ---- minimap ---- */
+
+.tl-mini-host {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--rule);
+}
+
+.tl-mini {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+}
+
+.tl-mini[data-grip='move'] { cursor: grab; }
+.tl-mini[data-grip='start'],
+.tl-mini[data-grip='end'],
+.tl-mini[data-dragging='start'],
+.tl-mini[data-dragging='end'] { cursor: ew-resize; }
+.tl-mini[data-dragging='move'] { cursor: grabbing; }
+
+.tl-mini-mark {
+  stroke: var(--tl-c);
+  stroke-width: 1;
+}
+
+.tl-mini-shade {
+  fill: var(--panel);
+  fill-opacity: 0.75;
+}
+
+.tl-mini-window {
+  fill: none;
+  stroke: var(--forest);
+  stroke-width: 1.5;
+}
+
+.tl-mini-handle {
+  fill: var(--forest);
+}
+
+.tl-mini-thumb {
+  outline: none;
+}
+
+.tl-mini-thumb:focus-visible .tl-mini-window {
+  stroke: var(--focus);
+  stroke-width: 2;
+}
+
+/* ---- table twin ---- */
+
+/* Below this the wrap scrolls sideways (c-table-wrap) rather than crushing titles to a word a line. */
+.tl-table {
+  min-width: 44rem;
+}
+
+.tl-table__title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tl-table__open {
+  min-height: var(--target-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--forest);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tl-table__open:hover {
+  color: var(--forest-hover);
+  text-decoration: underline;
+}
+
+.tl-table__open:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.tl-table__empty {
+  color: var(--ink-2);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tl-focus,
+  .tl-mini-window {
+    transition: stroke var(--dur-1) var(--ease);
+  }
+}
+
+@media (forced-colors: active) {
+  .tl-shape,
+  .tl-mini-mark,
+  .tl-band,
+  .tl-band-cap {
+    --tl-c: CanvasText;
+    --tl-ground: Canvas;
+  }
+
+  .tl-tick,
+  .tl-label,
+  .tl-lane-label,
+  .tl-letter polygon {
+    fill: CanvasText;
+  }
+
+  .tl-letter text {
+    fill: Canvas;
+  }
+
+  .tl-period {
+    fill: none;
+  }
+
+  .tl-period-edge {
+    stroke: CanvasText;
+  }
+
+  .tl-event:focus-visible .tl-focus,
+  .tl-mini-thumb:focus-visible .tl-mini-window {
+    stroke: Highlight;
+  }
+
+  .tl-selected {
+    fill: Canvas;
+    stroke: Highlight;
+  }
+
+  .tl-mini-window,
+  .tl-mini-handle {
+    stroke: CanvasText;
+  }
+}
+
+/* Print the table, not the interactive chart: it holds every event and survives black and white. */
+@media print {
+  .tl-toolbar,
+  .tl-stage,
+  .tl-mini-host,
+  .tl-tip {
+    display: none !important;
+  }
+
+  .tl .tl-table-host[hidden] {
+    display: block !important;
+  }
+}

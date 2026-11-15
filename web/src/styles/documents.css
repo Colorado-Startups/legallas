@@ -1,0 +1,451 @@
+/*
+  /documents/, the table half (card P5a; web/DESIGN.md section 7, mockup web/design/documents). Page classes are
+  docs-*, built from tokens and composed with the c-* blocks; no literal colors. The intake half (card P5b) styles
+  [data-docs-intake] in documents-intake.css. Phone, forced colors and print are in documents-narrow.css,
+  imported after this file.
+*/
+
+.docs-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3) var(--space-5);
+  align-items: start;
+  margin-bottom: var(--space-5);
+}
+
+/* The intake's buttons sit beside the title; its upload queue and From counsel list run full width below. */
+.docs-intake {
+  display: contents;
+}
+
+.docs-intake > :not(:first-child) {
+  grid-column: 1 / -1;
+}
+
+.docs-head {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.docs-head h1 {
+  margin: 0;
+}
+
+.docs-tally {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+}
+
+/* All documents and the Binder: two tabs under the title. Links, not a tablist: each is its own page. */
+.docs-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+
+.docs-tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+  padding: 0 var(--space-3);
+  color: var(--ink-2);
+  font-size: var(--text-14);
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+
+.docs-tabs__tab:hover {
+  color: var(--forest);
+  text-decoration: none;
+}
+
+.docs-tabs__tab[aria-current='page'] {
+  color: var(--forest);
+  font-weight: 600;
+  border-bottom-color: var(--forest);
+}
+
+.docs-guide-slot:empty,
+.docs-heatmap:empty {
+  display: none;
+}
+
+.docs-layout {
+  display: grid;
+  grid-template-columns: 13rem minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+/* Wide screens: the table runs on into the right margin, as in the mockup, so nine columns fit. */
+@media (min-width: 82rem) {
+  .docs-layout {
+    width: calc(100% + min(16rem, max(0px, (100vw - 1rem - 100%) / 2 - var(--gutter))));
+  }
+}
+
+/* Sidebar: the data-room index, then the facets. */
+.docs-side {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.docs-side__label,
+.docs-facet__legend {
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  color: var(--ink-2);
+}
+
+.docs-index__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-index__list--sub .docs-index__link {
+  padding-left: var(--space-5);
+}
+
+.docs-index__link {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  align-items: baseline;
+  min-height: 2rem;
+  padding: var(--space-1) var(--space-2);
+  color: var(--ink);
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+  text-decoration: none;
+  border-radius: var(--radius);
+}
+
+.docs-index__link:hover {
+  background: var(--panel);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.docs-index__link[aria-current='true'] {
+  background: var(--forest-tint);
+  font-weight: 600;
+  box-shadow: inset 2px 0 0 var(--forest);
+}
+
+.docs-index__num {
+  color: var(--brass-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+  font-variant-numeric: tabular-nums;
+}
+
+.docs-index__label {
+  overflow-wrap: anywhere;
+}
+
+.docs-index__count {
+  color: var(--ink-3);
+  font-size: var(--text-13);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --ink-3 on --forest-tint is 4.37:1; the current folder's count takes --ink-2 to keep 4.5:1. */
+.docs-index__link[aria-current='true'] .docs-index__count {
+  color: var(--ink-2);
+}
+
+/* Tools: scope chip, the `/` filter, the Bates note. */
+.docs-main {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.docs-tools {
+  display: grid;
+  grid-template-columns: minmax(16rem, 24rem) minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.docs-tools:has(.docs-heatmap:empty) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/*
+  Layout shift (R89): the heatmap draws after the table is up, and its height pushed the table down. Once the
+  table's tools show, a heatmap still drawing (aria-busy, documents-intake-heat.ts) holds a drawn heatmap's height
+  and its column, so both arrive in the same frame. 22rem is the fixture's nine years; the script swaps in this
+  browser's last drawn height. Before that the slot stays out of the layout, as it always was.
+*/
+.docs-tools:has(.docs-tools__find:not([hidden])) .docs-heatmap[aria-busy='true'] {
+  display: block;
+  min-height: var(--docs-heat-reserve, 22rem);
+}
+
+@media (width > 64rem) {
+  .docs-tools:has(.docs-tools__find:not([hidden])):has(.docs-heatmap[aria-busy='true']) {
+    grid-template-columns: minmax(16rem, 24rem) minmax(0, 1fr);
+  }
+}
+
+.docs-tools__find {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.docs-folder {
+  display: none;
+}
+
+.docs-scope {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin: 0;
+}
+
+.docs-filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.docs-filter__icon {
+  position: absolute;
+  left: var(--space-3);
+  width: 16px;
+  height: 16px;
+  color: var(--ink-2);
+  pointer-events: none;
+}
+
+.docs-filter__input {
+  padding-left: calc(var(--space-3) + 16px + var(--space-2));
+  padding-right: calc(var(--space-3) + 1.5rem);
+}
+
+.docs-filter__kbd {
+  position: absolute;
+  right: var(--space-3);
+  color: var(--ink-2);
+  pointer-events: none;
+}
+
+/* `/` works only while focus is in the work area (R80), so its hint shows only then. */
+.docs-main:not(:focus-within) .docs-filter__kbd {
+  display: none;
+}
+
+.docs-note {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: var(--text-12);
+  line-height: 1rem;
+}
+
+.docs-guide {
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.docs-guide__summary {
+  min-height: var(--target-min);
+  padding: var(--space-2) var(--space-3);
+  color: var(--forest);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.docs-guide__body {
+  max-height: 24rem;
+  overflow: auto;
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+/* The table. Header cells hold a sort button; the row is the hit target for opening. */
+.docs-table-wrap {
+  max-height: calc(100vh - 8rem);
+  overflow: auto;
+}
+
+.docs-th--pages,
+.docs-cell--pages {
+  text-align: right;
+}
+
+.docs-th[data-sort] {
+  padding: 0 var(--space-3);
+}
+
+.docs-sort {
+  min-height: var(--row-h);
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  border: 0;
+  cursor: pointer;
+}
+
+.docs-sort:hover {
+  color: var(--forest);
+}
+
+.docs-row {
+  cursor: pointer;
+}
+
+.docs-row:focus {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.docs-open {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.docs-open:hover {
+  color: var(--forest);
+  text-decoration: underline;
+}
+
+.docs-open[data-unnumbered] {
+  color: var(--ink-3);
+  font-family: var(--font-sans);
+}
+
+.docs-cell--date,
+.docs-cell--type,
+.docs-cell--parties,
+.docs-cell--privilege {
+  white-space: nowrap;
+}
+
+.docs-cell--key {
+  padding-block: 0;
+}
+
+.docs-none {
+  color: var(--ink-3);
+}
+
+.docs-key {
+  width: 2rem;
+  padding: 0;
+  color: var(--ink-3);
+}
+
+.docs-key__badge {
+  width: 16px;
+  height: 16px;
+}
+
+.docs-key[aria-pressed='true'] {
+  background: transparent;
+  color: var(--brass-mark);
+  border-color: transparent;
+}
+
+.docs-key[aria-pressed='false'] .docs-key__badge {
+  opacity: 0.45;
+}
+
+.docs-key[aria-pressed='false']:hover .docs-key__badge {
+  opacity: 1;
+}
+
+.docs-cell--summary {
+  width: 100%;
+  min-width: 12rem;
+  max-width: 0;
+}
+
+.docs-summary-line {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.docs-summary,
+.docs-clip {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.docs-summary {
+  color: var(--ink);
+}
+
+.docs-clip {
+  display: block;
+  max-width: 10.5rem;
+}
+
+.docs-clip--type {
+  max-width: 7.5rem;
+}
+
+.docs-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.docs-keys {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.docs-status,
+.docs-keys {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+}
+
+.docs-empty {
+  margin-block: var(--space-4);
+}
+
+/* Below 64rem the sidebar stacks above the table. */
+@media (max-width: 64rem) {
+  .docs-layout,
+  .docs-tools {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .docs-facets {
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  }
+}
+
+/* A room with no matter has no intake heatmap beside the filter (worker/room-shape.ts). */
+[data-room-shape='company'] .docs-tools {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* The columns a company room leaves out: the case room's own and any with nothing in it (documents-table-company.ts). */
+[data-docs-hide~='control'] :is(.docs-th--control, .docs-cell--control),
+[data-docs-hide~='date'] :is(.docs-th--date, .docs-cell--date),
+[data-docs-hide~='parties'] :is(.docs-th--parties, .docs-cell--parties),
+[data-docs-hide~='pages'] :is(.docs-th--pages, .docs-cell--pages),
+[data-docs-hide~='privilege'] :is(.docs-th--privilege, .docs-cell--privilege),
+[data-docs-hide~='bates'] :is(.docs-th--bates, .docs-cell--bates) {
+  display: none;
+}

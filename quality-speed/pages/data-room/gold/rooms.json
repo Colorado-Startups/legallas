@@ -1,0 +1,48 @@
+{
+  "forming": {
+    "label": "Forming",
+    "folders": ["12-Formation", "13-Founders", "14-Intellectual-Property", "15-Commercial", "16-Finance-Insurance"],
+    "existing": [
+      "01-Corporate-Records/Bylaws__20110609__Harbor-Labs.pdf",
+      "01-Corporate-Records/Card-Policy__20110711__Harbor-Labs.pdf",
+      "01-Corporate-Records/Conversion-Schedule__20110602__Harbor-Labs.pdf",
+      "01-Corporate-Records/Stock-Agreement__20110607__Harbor-Labs.pdf",
+      "06-Cap-Table/Wire__20110613__Acme-Bank.pdf",
+      "11-Wage-Claim/Offer-Letter__20110606__Jane-Doe.pdf"
+    ],
+    "files": ["22-Founder-Only/Form-W4__20110801__Holly-Hire.pdf"],
+    "guestFolders": []
+  },
+  "raising-angel": {
+    "label": "Raising from angels and groups",
+    "folders": ["12-Formation", "13-Founders", "14-Intellectual-Property", "15-Commercial", "16-Finance-Insurance", "20-Investor-Room-Angels", "20-Investor-Room-Angels-Private"],
+    "existing": [
+      "01-Corporate-Records/Bylaws__20110609__Harbor-Labs.pdf",
+      "01-Corporate-Records/Conversion-Schedule__20110602__Harbor-Labs.pdf",
+      "01-Corporate-Records/Stock-Agreement__20110607__Harbor-Labs.pdf",
+      "11-Wage-Claim/Offer-Letter__20110606__Jane-Doe.pdf"
+    ],
+    "guestFolders": ["14-Intellectual-Property", "20-Investor-Room-Angels"]
+  },
+  "raising-vc": {
+    "label": "Raising from VCs",
+    "folders": ["12-Formation", "13-Founders", "14-Intellectual-Property", "15-Commercial", "16-Finance-Insurance", "20-Investor-Room-Angels", "21-Investor-Room-VC", "21-Investor-Room-VC-Drafts", "22-Founder-Only"],
+    "existing": [
+      "01-Corporate-Records/Bylaws__20110609__Harbor-Labs.pdf",
+      "01-Corporate-Records/Card-Policy__20110711__Harbor-Labs.pdf",
+      "01-Corporate-Records/Conversion-Schedule__20110602__Harbor-Labs.pdf",
+      "01-Corporate-Records/Stock-Agreement__20110607__Harbor-Labs.pdf",
+      "03-Investor-Agreements/Investor-Rights-Agreement__20110621__Alder-Peak.pdf",
+      "03-Investor-Agreements/Voting-Agreement__20110621__Alder-Peak.pdf",
+      "06-Cap-Table/Wire__20110613__Acme-Bank.pdf",
+      "11-Wage-Claim/Offer-Letter__20110606__Jane-Doe.pdf"
+    ],
+    "guestFolders": ["01-Corporate-Records", "03-Investor-Agreements", "12-Formation", "13-Founders", "14-Intellectual-Property", "15-Commercial", "16-Finance-Insurance", "20-Investor-Room-Angels", "21-Investor-Room-VC"]
+  },
+  "dispute": {
+    "label": "Dispute",
+    "folders": "all",
+    "existing": "all",
+    "guestFolders": []
+  }
+}

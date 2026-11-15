@@ -1,0 +1,29 @@
+---
+// A founder template as a readable page (/template/?path=founders/<file>.md): the checklist's template links open here, behind
+// the room's gate, with the template notices (docs/legal/product-notices.md, A5) and the file itself to download and edit.
+// src/scripts/template-page.ts fetches the file the room serves under /templates/ and renders it as Markdown, raw HTML off.
+import Room from '../layouts/Room.astro';
+import { BASELINE } from '../../worker/checklist-baseline.ts';
+import '../styles/checklist.css';
+import '../styles/markdown-body.css';
+---
+
+<Room title="Template">
+  <section class="cl" data-template aria-labelledby="tp-title">
+    <h1 id="tp-title" class="t-h1" data-template-title>Template</h1>
+    <p class="t-caption" data-template-status role="status">Loading the template.</p>
+
+    <div data-template-view hidden>
+      <div class="t-small cl-notice">
+        <p>{BASELINE.template_card_notice}</p>
+        <p>{BASELINE.notice}</p>
+      </div>
+      <p class="t-caption" data-template-facts></p>
+      <p class="t-caption">{BASELINE.template_licence_notice}</p>
+      <p class="cl-tools"><a class="c-button" data-template-download href="/checklist/">Download the file to edit</a></p>
+      <div class="markdown-body markdown-body--shifted" data-md></div>
+    </div>
+  </section>
+</Room>
+
+<script src="../scripts/template-page.ts"></script>

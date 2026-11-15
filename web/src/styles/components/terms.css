@@ -1,0 +1,133 @@
+/*
+  Defined term (c-term, __word, __pop; DESIGN.md sections 7, 9 and 11): the first use of a manifest term on a page
+  wears a dotted underline and opens its definition on hover, focus and tap (terms-popover.ts). The word stays in
+  the line's own type and color; its hit area grows to --target-min without moving the line. The popover is an
+  overlay: --surface, a --border edge, --shadow-overlay. Tokens only.
+*/
+
+.c-term {
+  position: relative;
+  display: inline;
+}
+
+.c-term__word {
+  position: relative;
+  display: inline;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: var(--radius-chip);
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  text-decoration: underline dotted var(--ink-3);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  cursor: help;
+}
+
+/* The hit area: at least --target-min square around the word, laid over the line, never changing it. */
+.c-term__word::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, var(--target-min));
+  height: max(100%, var(--target-min));
+  transform: translate(-50%, -50%);
+  content: '';
+}
+
+.c-term__word:hover {
+  color: var(--forest);
+  text-decoration-color: var(--forest);
+}
+
+/* Open: the word takes forest (the popover sets its own ink). */
+.c-term[data-state='open'] {
+  color: var(--forest);
+}
+
+.c-term__pop {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  z-index: var(--z-toast);
+  display: block;
+  width: max-content;
+  max-width: min(20rem, calc(100vw - var(--space-4)));
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-overlay);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-13);
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.125rem;
+  text-align: left;
+  text-transform: none;
+  white-space: normal;
+  translate: var(--term-shift, 0px) 0;
+}
+
+.c-term__pop[hidden] {
+  display: none;
+}
+
+/* Bridges the gap between word and popover, so the pointer can move onto the definition without closing it. */
+.c-term__pop::before {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: var(--space-1);
+  content: '';
+}
+
+.c-term__pop[data-place='above'] {
+  top: auto;
+  bottom: calc(100% + var(--space-1));
+}
+
+.c-term__pop[data-place='above']::before {
+  top: 100%;
+  bottom: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .c-term__pop {
+    transition: opacity var(--dur-1) var(--ease);
+  }
+
+  @starting-style {
+    .c-term__pop {
+      opacity: 0;
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  .c-term__word {
+    text-decoration-color: CanvasText;
+  }
+
+  .c-term__pop {
+    background: Canvas;
+    border-color: CanvasText;
+    color: CanvasText;
+  }
+}
+
+@media print {
+  .c-term__word {
+    text-decoration: none;
+  }
+
+  .c-term__pop {
+    display: none;
+  }
+}

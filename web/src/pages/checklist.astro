@@ -1,0 +1,53 @@
+---
+// The company checklist (docs/checklist/, worker/checklist.ts): every document startups commonly keep, what's in place, what's
+// missing, what's due, and exactly where each one lives. The data comes from /api/checklist, which answers 404 while the
+// room's CHECKLIST_ENABLED is off.
+import Room from '../layouts/Room.astro';
+import '../styles/checklist.css';
+---
+
+<Room title="Company checklist">
+  <section class="cl" aria-labelledby="cl-title">
+    <h1 id="cl-title" class="t-h1">Company checklist</h1>
+
+    <div class="t-small cl-notice" data-checklist-notice hidden></div>
+    <p class="t-caption" data-checklist-status role="status">Loading the checklist.</p>
+
+    <div data-checklist-view hidden>
+      <div class="cl-top">
+        <section aria-labelledby="cl-progress-title">
+          <h2 id="cl-progress-title" class="t-h2" data-checklist-forming></h2>
+          <p class="t-small cl-company" data-checklist-company></p>
+          <details class="t-small cl-company-edit" data-checklist-company-edit hidden>
+            <summary>Change the company's facts</summary>
+            <div data-checklist-company-form></div>
+          </details>
+          <ul class="cl-stages" data-checklist-stages></ul>
+        </section>
+        <section aria-labelledby="cl-dates-title">
+          <h2 id="cl-dates-title" class="t-h2">Dates</h2>
+          <p class="t-caption">Calendar days from dates in this room. A weekend or legal holiday may move a last day later.</p>
+          <ul class="cl-dates" data-checklist-dates></ul>
+          <p class="t-small" data-checklist-no-dates hidden>No dates yet. They appear as documents are matched.</p>
+        </section>
+      </div>
+
+      <p class="cl-tools"><a class="c-button" href="/api/checklist/questions" download>Questions for your lawyer</a></p>
+      <nav class="cl-tools" aria-label="Which items show" data-checklist-filters></nav>
+      <nav class="cl-tools" aria-label="How items are grouped" data-checklist-grouping></nav>
+      <details class="cl-key t-small">
+        <summary>What each status means</summary>
+        <dl data-checklist-key></dl>
+      </details>
+      <div data-checklist-groups></div>
+      <p class="t-small" data-checklist-none hidden>No items with that status.</p>
+    </div>
+
+    <section class="c-empty" data-checklist-off hidden>
+      <p class="c-empty__text">The company checklist is off in this room.</p>
+      <a class="c-button" href="/">Overview</a>
+    </section>
+  </section>
+</Room>
+
+<script src="../scripts/checklist.ts"></script>

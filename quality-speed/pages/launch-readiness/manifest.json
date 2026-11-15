@@ -1,0 +1,10 @@
+{
+  "page": "launch-readiness",
+  "signoff_comment": 6648985046,
+  "metrics": [
+    { "id": "conditions_met", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 3, "max_age_hours": 48, "min_samples": 29, "goal_source": "https://opensource.guide/starting-a-project/" },
+    { "id": "days_to_clear", "lens": "speed", "unit": "days", "direction": "lower", "floor": 365, "goal": 30, "weight": 1, "max_age_hours": 48, "min_samples": 29, "goal_source": "https://cloud.google.com/devops/state-of-devops" },
+    { "id": "lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 30, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" }
+  ],
+  "changes": []
+}

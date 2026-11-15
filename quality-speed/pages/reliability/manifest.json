@@ -1,0 +1,21 @@
+{
+  "page": "reliability",
+  "signoff_comment": 6571476067,
+  "metrics": [
+    { "id": "open_bugs_critical_high", "lens": "quality", "unit": "count", "direction": "lower", "floor": 10, "goal": 0, "weight": 5, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://sre.google/sre-book/testing-reliability/" },
+    { "id": "bugs_found_first", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 3, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "detection_drill", "goal_source": "https://sre.google/sre-book/testing-reliability/" },
+    { "id": "reopened_bugs_90d", "lens": "quality", "unit": "count", "direction": "lower", "floor": 5, "goal": 0, "weight": 3, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://sre.google/sre-book/testing-reliability/" },
+    { "id": "failed_main_runs_with_issue", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 3, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "detection_drill", "goal_source": "https://sre.google/sre-book/postmortem-culture/" },
+    { "id": "risky_areas_reviewed_in_time", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 3, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://handbook.gitlab.com/handbook/engineering/devops/runner/environments/" },
+    { "id": "fixes_with_test", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 2, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "detection_drill", "goal_source": "https://sre.google/sre-book/testing-reliability/" },
+    { "id": "detection_drill", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+    { "id": "time_to_find_p90", "lens": "speed", "unit": "days", "direction": "lower", "floor": 90, "goal": 14, "weight": 1, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "detection_drill", "goal_source": "https://handbook.gitlab.com/handbook/engineering/devops/runner/environments/" },
+    { "id": "time_to_fix_high_p90", "lens": "speed", "unit": "hours", "direction": "lower", "floor": 168, "goal": 24, "weight": 3, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "detection_drill", "goal_source": "https://cloud.google.com/devops/state-of-devops" },
+    { "id": "time_to_fix_other_p90", "lens": "speed", "unit": "days", "direction": "lower", "floor": 30, "goal": 7, "weight": 1, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "detection_drill", "goal_source": "https://cloud.google.com/devops/state-of-devops" },
+    { "id": "error_to_issue_p90", "lens": "speed", "unit": "hours", "direction": "lower", "floor": 72, "goal": 24, "weight": 2, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "detection_drill", "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" },
+    { "id": "failed_main_run_minutes_90d", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 100, "goal": 0, "weight": 1, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "detection_drill", "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" }
+  ],
+  "changes": [
+    { "date": "2026-11-04", "metric": "failed_main_run_minutes_90d", "field": "added", "from": null, "to": "failed_main_run_minutes_90d", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6644460563 }
+  ]
+}

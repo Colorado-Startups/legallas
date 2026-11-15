@@ -1,0 +1,268 @@
+/*
+  Ask turns and answer blocks (card P7), shared by the Ask page and the drawer; imported by chat-render.ts.
+  Composes c-claim, c-callout and c-cite (DESIGN.md 7, Answer blocks) from tokens only.
+*/
+
+/* Turns */
+.ask-log {
+  display: grid;
+  gap: var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ask-log:empty {
+  display: none;
+}
+
+.ask-turn {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.ask-turn__q {
+  justify-self: end;
+  max-width: min(100%, 52ch);
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  background: var(--forest-tint);
+  color: var(--ink);
+  font-size: var(--text-16);
+  line-height: 1.5rem;
+  border-radius: var(--radius);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ask-turn__a {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ask-turn[data-state='pending'] .ask-turn__a:empty::before {
+  color: var(--ink-3);
+  font-family: var(--font-serif);
+  font-style: italic;
+  content: 'Reading the record.';
+}
+
+.ask-turn[data-state='failed'] .ask-turn__a {
+  padding-left: var(--space-3);
+  border-left: 2px dashed var(--border);
+}
+
+.ask-turn__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  padding-top: var(--space-3);
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.ask-turn__count {
+  color: var(--ink-2);
+}
+
+/* Answer blocks. The tag column matches the mockup: label left, serif claim right. */
+.ask-claim {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  gap: var(--space-3);
+}
+
+.ask-claim__tag {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  padding-top: 0.125rem;
+}
+
+.ask-claim__mark {
+  display: inline-block;
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 1.5px solid var(--forest);
+  border-radius: 50%;
+}
+
+[data-kind='fact'] > .ask-claim__mark,
+[data-kind='fact'] > .ask-claim__tag > .ask-claim__mark {
+  background: var(--forest);
+}
+
+[data-kind='inference'] > .ask-claim__mark,
+[data-kind='inference'] > .ask-claim__tag > .ask-claim__mark {
+  width: auto;
+  height: auto;
+  color: var(--ink-2);
+  font-family: var(--font-serif);
+  font-size: var(--text-21);
+  font-style: normal;
+  line-height: 0.75;
+  border: 0;
+  border-radius: 0;
+}
+
+/* Law claims carry a section mark, drawn like the inference mark. */
+[data-kind='law'] > .ask-claim__tag > .ask-claim__mark {
+  width: auto;
+  height: auto;
+  color: var(--brass-text);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1;
+  border: 0;
+  border-radius: 0;
+}
+
+/* Cites stay upright inside an italic inference. */
+.ask-claim__text .c-cite {
+  font-style: normal;
+}
+
+.ask-answer__p,
+.ask-answer__list {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1.625rem;
+}
+
+.ask-answer__list {
+  padding-left: var(--space-5);
+}
+
+.ask-answer__h {
+  margin: var(--space-4) 0 var(--space-2);
+  font-family: var(--font-serif);
+  font-size: var(--text-18);
+  font-weight: 600;
+  line-height: 1.75rem;
+}
+
+.ask-answer__p {
+  white-space: pre-line;
+}
+
+.ask-note {
+  color: var(--ink-3);
+  font-family: var(--font-sans);
+  font-size: var(--text-13);
+  font-style: italic;
+}
+
+.ask-callout__title {
+  margin: 0 0 var(--space-1);
+  color: var(--oxblood);
+  font-weight: 600;
+}
+
+.ask-callout__text,
+.ask-callout__lead {
+  margin: 0 0 var(--space-2);
+}
+
+.ask-callout p {
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+}
+
+/* An answer the model stopped at max_tokens: the dashed edge of a failed turn, under the text that did arrive. */
+.ask-cut {
+  margin: 0;
+  padding-left: var(--space-3);
+  color: var(--ink-2);
+  border-left: 2px dashed var(--border);
+}
+
+/* The Law group (T21): public law from the law library, apart from the record, with its notice. */
+.ask-law {
+  background: var(--surface);
+  border-color: var(--brass-rule);
+}
+
+.ask-law__notice {
+  color: var(--ink-2);
+  font-weight: 400;
+}
+
+.ask-law-cite::after {
+  content: ' \2197';
+}
+
+/* A deadline the answer names (card 11.5): a brass edge, so it reads before the answer. */
+.ask-deadline {
+  background: var(--surface);
+  border-color: var(--brass-rule);
+  border-left-width: 3px;
+}
+
+.ask-deadline__name {
+  font-weight: 600;
+}
+
+/* Every source an answer used, each marked checked or not checked (card 11.5). */
+.ask-sources {
+  display: grid;
+  gap: var(--space-1);
+  padding-top: var(--space-3);
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.ask-sources__h {
+  margin: var(--space-2) 0 0;
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.ask-sources__list {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ask-sources__name {
+  color: var(--ink-2);
+  font-size: var(--text-14);
+}
+
+.ask-sources__track {
+  color: var(--slate);
+}
+
+.ask-sources__check {
+  color: var(--ink-2);
+}
+
+/* Legend */
+.ask-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+  padding: 0;
+  color: var(--ink-2);
+  list-style: none;
+}
+
+/* Space after the mark only: "Fact: stated in a cited document" keeps its colon against the label. */
+.ask-legend__item {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.ask-legend__item > .ask-claim__mark {
+  margin-right: var(--space-2);
+}
+
+@media (max-width: 48rem) {
+  .ask-claim {
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+}

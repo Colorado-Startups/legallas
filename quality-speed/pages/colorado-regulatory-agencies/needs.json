@@ -1,0 +1,313 @@
+{
+  "needs": [
+    {
+      "id": "securities-act",
+      "path": "startup-forms",
+      "need": "Colorado Securities Act, the whole act",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act"]
+    },
+    {
+      "id": "securities-rules",
+      "path": "startup-raises",
+      "need": "Rules under the Securities Act, 3 CCR 704-1",
+      "source": "https://www.coloradosos.gov/CCR/DisplayRule.do?action=ruleinfo&ruleId=2207",
+      "checked": null,
+      "covered_by": ["unit:co-securities-rules"]
+    },
+    {
+      "id": "securities-equity-is-security",
+      "path": "startup-forms",
+      "need": "Founder equity and notes are securities",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act", "template:founders/colorado-llc-operating-agreement"]
+    },
+    {
+      "id": "securities-founder-stock",
+      "path": "startup-forms",
+      "need": "Founder stock: no public offering, no registration",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act", "item:founders.stock-exemption-record", "template:founders/initial-board-consent"]
+    },
+    {
+      "id": "securities-small-offering",
+      "path": "startup-forms",
+      "need": "Small offering: 20 offerees, 10 buyers a year",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act"]
+    },
+    {
+      "id": "securities-preorganization",
+      "path": "startup-forms",
+      "need": "Before forming: up to 25 subscribers, no payment",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act"]
+    },
+    {
+      "id": "securities-equity-grants",
+      "path": "startup-forms",
+      "need": "Employee equity: Colorado's benefit plan exemption",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act"]
+    },
+    {
+      "id": "securities-rule-506-notice",
+      "path": "startup-raises",
+      "need": "Rule 506 round: Colorado's notice and exemption fee",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act", "unit:co-securities-rules", "item:financing.form-d-and-state-notices", "template:raise/colorado-securities-filings"],
+      "flags": [{ "kind": "fee", "text": "pay an exemption fee" }]
+    },
+    {
+      "id": "securities-missed-notice",
+      "path": "startup-raises",
+      "need": "A missed notice alone gives no refund claim",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act"]
+    },
+    {
+      "id": "securities-crowdfunding",
+      "path": "startup-raises",
+      "need": "Colorado crowdfunding: limits, notice, quarterly reports",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act", "unit:co-securities-rules", "item:financing.colorado-crowdfunding", "template:raise/colorado-securities-filings"],
+      "flags": [
+        { "kind": "deadline", "text": "not less than ten days before the commencement of an offering" },
+        { "kind": "deadline", "text": "within forty-five days after the end of each fiscal quarter" }
+      ]
+    },
+    {
+      "id": "securities-finders",
+      "path": "startup-raises",
+      "need": "Paying a finder: Colorado's sales licence",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act", "item:financing.finder-agreement", "template:investors/angels/what-each-side-checks"]
+    },
+    {
+      "id": "securities-insiders-selling",
+      "path": "startup-raises",
+      "need": "Founders selling company stock: when no licence",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act"]
+    },
+    {
+      "id": "securities-interpretive-opinion",
+      "path": "startup-raises",
+      "need": "Ask the commissioner to confirm an exemption",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act", "item:financing.form-d-and-state-notices", "template:raise/colorado-securities-filings"],
+      "flags": [{ "kind": "fee", "text": "pay an opinion fee" }]
+    },
+    {
+      "id": "securities-angel-claims",
+      "path": "angels-invest",
+      "need": "An angel's Colorado claims and their time limits",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act", "template:investors/angels/before-you-invest"],
+      "flags": [
+        { "kind": "deadline", "text": "two years after the contract of sale" },
+        { "kind": "deadline", "text": "three years after the discovery of the facts" },
+        { "kind": "deadline", "text": "five years after the purchase or sale" }
+      ]
+    },
+    {
+      "id": "securities-rescission-offer",
+      "path": "angels-invest",
+      "need": "A rescission offer bars the claim",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act"]
+    },
+    {
+      "id": "securities-group-manager",
+      "path": "angels-create-groups",
+      "need": "A paid group manager: Colorado licence or exemption",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act", "unit:co-securities-rules", "template:investors/groups/how-members-invest"]
+    },
+    {
+      "id": "securities-fund-adviser",
+      "path": "vcs-invest",
+      "need": "Fund adviser: Colorado licence or exemption",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act", "unit:co-securities-rules", "template:investors/funds/exempt-reporting-adviser"]
+    },
+    {
+      "id": "securities-covered-adviser",
+      "path": "vcs-invest",
+      "need": "SEC-registered adviser: Colorado's yearly notice",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act", "template:investors/funds/exempt-reporting-adviser"],
+      "flags": [{ "kind": "deadline", "text": "until December 31 of each year" }]
+    },
+    {
+      "id": "securities-fund-notice",
+      "path": "vcs-invest",
+      "need": "The fund's own Colorado notice and fee",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act", "unit:co-securities-rules", "template:investors/funds/form-d-and-colorado-notice"],
+      "flags": [{ "kind": "fee", "text": "pay an exemption fee" }]
+    },
+    {
+      "id": "securities-insider-fraud",
+      "path": "fights",
+      "need": "Fraud in a founder or insider share sale",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act", "template:investors/fights/when-it-happens"],
+      "flags": [{ "kind": "deadline", "text": "three years after the discovery of the facts" }]
+    },
+    {
+      "id": "securities-enforcement",
+      "path": "fights",
+      "need": "The commissioner's orders and investigations",
+      "source": "https://olls.info/crs/crs2026-title-11.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-securities-act"]
+    },
+    {
+      "id": "civil-rights-employers",
+      "path": "startup-forms",
+      "need": "Discrimination law reaches every employer",
+      "source": "https://olls.info/crs/crs2026-title-24.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-anti-discrimination"]
+    },
+    {
+      "id": "civil-rights-nondisclosure",
+      "path": "startup-forms",
+      "need": "Nondisclosure terms about discrimination",
+      "source": "https://olls.info/crs/crs2026-title-24.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-anti-discrimination", "template:founders/invention-assignment", "template:founders/founders-agreement"]
+    },
+    {
+      "id": "civil-rights-records",
+      "path": "startup-forms",
+      "need": "Personnel records and a complaint repository",
+      "source": "https://olls.info/crs/crs2026-title-24.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-anti-discrimination", "item:people.offer-letters"],
+      "flags": [{ "kind": "deadline", "text": "for at least five years after the later of" }]
+    },
+    {
+      "id": "civil-rights-charge",
+      "path": "fights",
+      "need": "Discrimination charge: the filing deadline",
+      "source": "https://olls.info/crs/crs2026-title-24.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-anti-discrimination", "template:investors/fights/when-it-happens"],
+      "flags": [{ "kind": "deadline", "text": "within three hundred days after" }]
+    },
+    {
+      "id": "civil-rights-charge-first",
+      "path": "fights",
+      "need": "A discrimination charge comes before court",
+      "source": "https://olls.info/crs/crs2026-title-24.htm",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:co-anti-discrimination", "template:investors/fights/when-it-happens"],
+      "flags": [{ "kind": "deadline", "text": "within ninety days after the date upon which the jurisdiction of the commission ceased" }]
+    }
+  ],
+  "questions": [
+    {
+      "id": "colorado-regulatory-agencies-securities-regulator",
+      "question": "Which Colorado state office enforces the Colorado Securities Act, and which department is it part of?",
+      "expect": ["C.R.S. § 11-51-701", "C.R.S. § 11-51-703"]
+    },
+    {
+      "id": "colorado-regulatory-agencies-small-offering",
+      "question": "Without relying on federal Rule 506, how many people in Colorado can our startup offer stock to, and how many can buy, in a year under Colorado's own limited offering exemption?",
+      "expect": ["C.R.S. § 11-51-308"]
+    },
+    {
+      "id": "colorado-regulatory-agencies-missed-notice",
+      "question": "We raised a Rule 506(b) round that included several Colorado investors and never made Colorado's notice filing. Can those investors demand their money back only because the notice was missed?",
+      "expect": ["C.R.S. § 11-51-604"]
+    },
+    {
+      "id": "colorado-regulatory-agencies-crowdfunding-limits",
+      "question": "Our Colorado LLC wants to raise money from Colorado residents under the state's own crowdfunding exemption. What is the most we can raise in 12 months, and how much can an investor who isn't accredited put in?",
+      "expect": ["C.R.S. § 11-51-308.5"]
+    },
+    {
+      "id": "colorado-regulatory-agencies-crowdfunding-notice",
+      "question": "How far ahead of starting a Colorado crowdfunding offering does the company have to make its notice filing with the securities commissioner?",
+      "expect": ["C.R.S. § 11-51-308.5"]
+    },
+    {
+      "id": "colorado-regulatory-agencies-finder-licence",
+      "question": "Our startup wants to pay a friend 5% of whatever she brings in from angel investors in Colorado. Does Colorado require her to hold a license to do that?",
+      "expect": ["C.R.S. § 11-51-401"]
+    },
+    {
+      "id": "colorado-regulatory-agencies-unregistered-sale-deadline",
+      "question": "Two and a half years ago I bought shares as an angel in a sale that was neither registered nor exempt, from a seller who wasn't licensed. Can I still sue for my money back under the Colorado Securities Act?",
+      "expect": ["C.R.S. § 11-51-604"]
+    },
+    {
+      "id": "colorado-regulatory-agencies-fraud-deadline",
+      "question": "Last month an angel learned that a founder lied about revenue when selling him shares four years ago. How long does he have to bring a Colorado securities fraud claim?",
+      "expect": ["C.R.S. § 11-51-604"]
+    },
+    {
+      "id": "colorado-regulatory-agencies-no-office-adviser",
+      "question": "An investment adviser with no place of business in Colorado has had four Colorado clients, none of them institutions, over the past 12 months. Does it need a Colorado license?",
+      "expect": ["C.R.S. § 11-51-402"]
+    },
+    {
+      "id": "colorado-regulatory-agencies-covered-adviser-notice",
+      "question": "Our venture fund's management company is registered with the SEC as an investment adviser and has an office in Denver. What does it file with Colorado, and when does that filing run out?",
+      "expect": ["C.R.S. § 11-51-403", "C.R.S. § 11-51-401"]
+    },
+    {
+      "id": "colorado-regulatory-agencies-small-employer",
+      "question": "We're a three-person startup in Colorado. Does Colorado's employment discrimination law apply to us, or only to larger employers?",
+      "expect": ["C.R.S. § 24-34-401", "C.R.S. § 24-34-402"],
+      "mustNot": ["only (?:applies|apply) to employers with (?:at least )?(?:15|fifteen|20|twenty)"]
+    },
+    {
+      "id": "colorado-regulatory-agencies-charge-deadline",
+      "question": "A former employee says we let her go because of her age. How long does she have to file a charge with the Colorado Civil Rights Commission?",
+      "expect": ["C.R.S. § 24-34-403"],
+      "mustNot": ["(?:within|has|have) (?:six|6) months"]
+    },
+    {
+      "id": "colorado-regulatory-agencies-nondisclosure",
+      "question": "Can a Colorado separation agreement stop a departing employee from talking about the harassment complaint she made?",
+      "expect": ["C.R.S. § 24-34-407"]
+    },
+    {
+      "id": "colorado-regulatory-agencies-personnel-records",
+      "question": "How long does a Colorado employer have to keep job applications and records of employee complaints?",
+      "expect": ["C.R.S. § 24-34-408"]
+    },
+    {
+      "id": "colorado-regulatory-agencies-rescission-offer",
+      "question": "We sold shares to a Colorado angel without a valid exemption. If we offer in writing to buy them back with interest before she sues, does that stop her claim under the Colorado Securities Act?",
+      "expect": ["C.R.S. § 11-51-604"]
+    },
+    {
+      "id": "colorado-regulatory-agencies-charge-first",
+      "question": "Can a former employee in Colorado sue us for discrimination in state court without first filing a charge with the Colorado Civil Rights Division?",
+      "expect": ["C.R.S. § 24-34-306"]
+    }
+  ]
+}

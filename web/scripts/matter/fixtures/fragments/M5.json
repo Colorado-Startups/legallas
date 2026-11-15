@@ -1,0 +1,11 @@
+{
+  "card": "M5",
+  "docs": {
+    "06-Cap-Table/Bank_Statement_BS__20120730__Harbor-Labs__July.pdf": {
+      "date": "2012-07-30", "type": "Bank statement", "from": ["org-harbor"], "to": ["p-doe"], "summary": "July statement.", "privileged": false
+    },
+    "01-Corporate-Records/Stock_Agreement_SA__20110607__Harbor-Labs__Countersigned.pdf": {
+      "date": "2011-02-03", "type": "Should not win", "from": ["p-doe", "p-roe"], "to": [], "summary": "Should not win either.", "privileged": false
+    }
+  }
+}

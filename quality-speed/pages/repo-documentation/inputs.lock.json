@@ -1,0 +1,19 @@
+{
+  "about": "Pins the page's score-setting inputs. inputs.test.ts fails when a pinned file changes unless the change is recorded here: date, file, from and to (the sha256 before and after), a reason, the issue or pull request, and signoff_comment, the id of the independent reviewer's comment. Re-pinned on the rename to repo-documentation: inputs.json gained the front door's fields. questions.json stays here because the Code page's checks read it.",
+  "pins": {
+    "not-in-tree.json": "ebac960bb43de829f69f152a7ae15ce72d5e896f8be5e1cbac000c9c67afb163",
+    "inputs.json": "c83a21e4ddeb34d624b31b26340b032525f9653dccb78d4307895139c3963013",
+    "questions.json": "69df2388ef0eff01b39168fe96a9393413b6f1794a948c98ff8868f9cae81cbf"
+  },
+  "changes": [
+    {
+      "date": "2026-11-15",
+      "file": "not-in-tree.json",
+      "from": "f2e8839a0762384891c29497566fa91d48c2770018d6fdf57f28370deab853e9",
+      "to": "ebac960bb43de829f69f152a7ae15ce72d5e896f8be5e1cbac000c9c67afb163",
+      "reason": "The private repository's name leaves the tree before the public launch",
+      "issue": 1023,
+      "signoff_comment": 6898472474
+    }
+  ]
+}

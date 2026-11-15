@@ -1,0 +1,93 @@
+---
+// Prior case, once Claims & Proof (card P4). The counts as pleaded in the closed complaint, kept for
+// reference: each element against the documents that prove them, the gaps, and Money in the record. Not in the nav;
+// the track pages link here from their foot. The shell is static; src/scripts/claims.ts fills it from GET
+// /api/matter. Every view has a text twin: By count and Table read without the grid, and every chart has a table.
+import Room from '../../layouts/Room.astro';
+import '../../styles/claims.css';
+import '../../styles/claims-proof.css';
+import '../../styles/claims-money.css';
+import '../../scripts/viz/charts.css';
+import { priorCaseLabel, priorStatus } from '../../../worker/room-settings.ts';
+
+const legend = [
+  { strength: 'direct', label: 'Direct' },
+  { strength: 'corroborating', label: 'Corroborating' },
+  { strength: 'circumstantial', label: 'Circumstantial' },
+  { strength: 'gap', label: 'Gap: no proof in the record yet' },
+] as const;
+---
+
+<Room title={priorCaseLabel} guide="claims">
+  <div class="claims">
+    <header class="claims-head">
+      <div class="claims-head__text">
+        <h1 class="t-h1 claims-head__title">{priorCaseLabel}</h1>
+        <p class="claims-head__lead" data-claims-lead>The counts as pleaded in the {priorStatus} complaint, kept for reference.</p>
+        <p class="claims-head__tally" data-claims-tally></p>
+      </div>
+      <div class="claims-views" role="group" aria-label="View" data-claims-ready hidden>
+        <button type="button" class="c-button claims-views__button" data-claims-view="matrix" aria-pressed="true">Matrix</button>
+        <button type="button" class="c-button claims-views__button" data-claims-view="count" aria-pressed="false">By count</button>
+        <button type="button" class="c-button claims-views__button" data-claims-view="table" aria-pressed="false">Table</button>
+      </div>
+    </header>
+
+    <p class="claims-loading" data-claims-loading data-load-pending role="status">Loading the claims.</p>
+
+    <div class="c-empty" data-claims-empty hidden>
+      <p class="c-empty__text">The claims chart has not been built yet.</p>
+    </div>
+    <div class="c-empty" data-claims-error data-load-failed hidden>
+      <p class="c-empty__text">The claims did not load; reload the page to try again.</p>
+    </div>
+
+    <div class="claims-body" data-claims-ready hidden>
+      <ul class="claims-legend" aria-label="Proof strength">
+        {
+          legend.map((item) => (
+            <li class="claims-legend__item">
+              <svg class="viz-ring" data-strength={item.strength} viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+                <circle class="c-proof__ring" cx="12" cy="12" r="10" />
+                {(item.strength === 'direct' || item.strength === 'corroborating') && <circle class="c-proof__ring" cx="12" cy="12" r="6" />}
+                {item.strength === 'direct' && <circle class="c-proof__core" cx="12" cy="12" r="2.5" />}
+              </svg>
+              <span>{item.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <section class="claims-layout claims-panel--matrix" data-claims-panel="matrix" aria-label="Matrix">
+        <div class="claims-layout__grid" data-claims-matrix></div>
+        <aside class="claims-layout__aside" aria-label="Selected proof and gaps">
+          <section class="claims-detail" data-claims-detail aria-live="polite"></section>
+          <section class="claims-gaps" data-claims-gaps></section>
+        </aside>
+      </section>
+      <section class="claims-panel--count" data-claims-panel="count" aria-label="By count" hidden>
+        <div data-claims-bycount></div>
+      </section>
+      <section class="claims-panel--table" data-claims-panel="table" aria-label="Table" hidden>
+        <div data-claims-table></div>
+      </section>
+
+      <section class="claims-money" data-claims-money-section aria-labelledby="claims-money-title" hidden>
+        <div class="claims-money__head">
+          <h2 class="t-h2" id="claims-money-title">Money in the record</h2>
+          <p class="claims-money__lead">
+            Money paid, money committed and figures a statement reports are shown apart and never added together.
+          </p>
+        </div>
+        <div data-claims-money></div>
+      </section>
+
+      <p class="c-provenance">
+        Prepared by the client from the record with AI assistance. Every entry cites its source; verify before relying
+        on it.
+      </p>
+    </div>
+  </div>
+</Room>
+
+<script src="../../scripts/claims.ts"></script>

@@ -1,0 +1,636 @@
+/*
+  Card F5b (Charts viz). Styles for every chart in src/scripts/viz/. Marks take the --enc-* tokens through
+  data-side (web/DESIGN.md section 3); text takes ink tokens, never a mark color. No literal colors, and light
+  only (R67): every color comes from the tokens; forced colors are handled below. Pages import this file next to
+  the chart scripts they use.
+*/
+
+/*
+  --chart-ground is the color the chart sits on: label halos and mark rings use it so they read as gaps, not
+  outlines. It defaults to --paper (a chart placed on the page); a page that sets a chart on a card sets it to
+  var(--surface). The force graph draws its own --surface ground and sets it itself.
+*/
+.viz { --chart-ground: var(--paper); }
+
+/* The frame: title, Chart / Table toggle, plot, table twin, tooltip */
+.viz {
+  position: relative;
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+}
+.viz__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.viz__title { color: var(--ink-2); }
+.viz__caption { margin: 0; color: var(--ink-3); }
+.viz__plot { position: relative; min-width: 0; }
+.viz__plot,
+.viz__table { max-width: 100%; }
+.viz-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  font-family: var(--font-sans);
+}
+.viz__tip {
+  position: absolute;
+  top: var(--tip-y, 0);
+  left: var(--tip-x, 0);
+  z-index: 5;
+  max-width: 18rem;
+  padding: var(--space-2) var(--space-3);
+  pointer-events: none;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-overlay);
+  font-size: var(--text-13);
+}
+.viz__tip-head { margin: 0 0 var(--space-1); color: var(--ink-2); }
+.viz__tip-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+.viz__tip-value { font-variant-numeric: tabular-nums; }
+.viz__tip-label { color: var(--ink-2); }
+
+/* Side colors: one custom property per mark, read by fill, stroke or background below */
+:is(.viz-mark, .viz-flow__link, .viz__key, .viz-force__group)[data-side="client"] { --viz-side: var(--enc-client); }
+:is(.viz-mark, .viz-flow__link, .viz__key, .viz-force__group)[data-side="defendant"] { --viz-side: var(--enc-defendant); }
+:is(.viz-mark, .viz-flow__link, .viz__key, .viz-force__group)[data-side="nominal"] { --viz-side: var(--enc-company); }
+:is(.viz-mark, .viz-flow__link, .viz__key, .viz-force__group)[data-side="court"] { --viz-side: var(--enc-court); }
+:is(.viz-mark, .viz-flow__link, .viz__key, .viz-force__group)[data-side="third"] { --viz-side: var(--enc-third); }
+:is(.viz-mark, .viz-flow__link, .viz__key, .viz-force__group)[data-side="filing"] { --viz-side: var(--enc-filing); }
+:is(.viz-mark, .viz-flow__link, .viz__key, .viz-force__group)[data-side="none"] { --viz-side: var(--ink-3); }
+
+/* Scoped to this file's frame, so the timeline's own viz-mark shapes (F5a) keep their fills and sizes. */
+.viz .viz-mark { flex: none; fill: var(--viz-side); }
+.viz .viz-mark[data-side="filing"],
+.viz .viz-mark[data-side="none"] {
+  fill: none;
+  stroke: var(--viz-side);
+  stroke-width: 1.5;
+}
+.viz__key {
+  flex: none;
+  width: 12px;
+  height: 2px;
+  background: var(--viz-side);
+}
+
+/* Axes, labels, legend */
+.viz-grid,
+.viz-baseline {
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+.viz-grid { stroke: var(--rule); }
+.viz-baseline { stroke: var(--border); }
+.viz-axis,
+.viz-cat,
+.viz-value {
+  font-size: var(--text-12);
+  font-variant-numeric: tabular-nums;
+}
+.viz-axis { fill: var(--ink-3); }
+.viz-cat { fill: var(--ink-2); }
+.viz-value { fill: var(--ink); font-weight: 500; }
+.viz-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+.viz-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Hit areas: bigger than the mark, invisible until focused or pressed */
+.viz-hit,
+.viz-flow__link,
+.viz-force__node { cursor: default; outline: none; }
+.viz-hit[role="button"],
+.viz-flow__link[role="button"],
+.viz-force__node { cursor: pointer; }
+.viz-hit__area {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 2;
+}
+.viz-hit:focus-visible .viz-hit__area,
+.viz-force__node:focus-visible .viz-hit__area { stroke: var(--focus); }
+.viz-hit:hover .viz-bar,
+.viz-hit:focus-visible .viz-bar { opacity: 0.82; }
+
+/* Flow */
+.viz-flow__link {
+  fill: none;
+  stroke: var(--viz-side);
+  stroke-opacity: 0.28;
+}
+.viz-flow__link:hover,
+.viz-flow__link:focus-visible { stroke-opacity: 0.6; }
+.viz-flow__link:focus-visible { outline: 2px solid var(--focus); }
+.viz-flow__label {
+  fill: var(--ink);
+  font-size: var(--text-12);
+  stroke: var(--chart-ground);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+.viz-flow__amount { fill: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+/* Force graph */
+.viz-force {
+  --chart-ground: var(--surface);
+  overflow: hidden;
+  cursor: grab;
+  touch-action: pan-y;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+.viz-force[data-state="panning"] { cursor: grabbing; }
+.viz-force__edge { stroke: var(--rule); stroke-width: 1; }
+.viz-force__edge[data-kind="link"] { stroke: var(--border); }
+.viz-force__edge[data-near] { stroke: var(--ink-2); stroke-width: 1.5; }
+.viz-force .viz-mark > * {
+  stroke: var(--chart-ground);
+  stroke-width: 2;
+  paint-order: stroke;
+}
+.viz-force__label {
+  fill: var(--ink);
+  font-size: var(--text-12);
+  stroke: var(--chart-ground);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  paint-order: stroke;
+  pointer-events: none;
+}
+.viz-force__node[data-kind="org"] .viz-force__label { font-weight: 600; }
+/* Names that would collide (or pass the Overview's cap) show only on hover or focus; ties of the chosen node are planned first (R65, R74, R81). */
+.viz-force__node[data-label="off"]:not(:hover, :focus-visible) .viz-force__label { display: none; }
+.viz-force__node[aria-pressed="true"] .viz-hit__area { stroke: var(--forest); }
+.viz-force[data-focus] .viz-force__node:not([data-near]),
+.viz-force[data-focus] .viz-force__edge:not([data-near]),
+.viz-force[data-focus] .viz-force__money-edge:not([data-near]) { opacity: 0.28; }
+.viz-force [data-off] { display: none; }
+
+/* People-page layers (R46): money edges, org hulls, labels on the chosen node's ties */
+.viz-force__money-line { stroke-opacity: 0.55; stroke-linecap: round; }
+.viz-force__money-edge[data-series="promises"] .viz-force__money-line { stroke-dasharray: 6 5; }
+.viz-force__money-head { stroke: var(--chart-ground); stroke-width: 1; paint-order: stroke; }
+.viz-force__group-box {
+  fill: var(--viz-side);
+  fill-opacity: 0.04;
+  stroke: var(--border);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+.viz-force__group-caption {
+  fill: var(--ink-3);
+  font-size: var(--text-12);
+  stroke: var(--chart-ground);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+.viz-force__edge-label {
+  fill: var(--ink-2);
+  font-size: var(--text-12);
+  stroke: var(--chart-ground);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  paint-order: stroke;
+  pointer-events: none;
+}
+.viz-legend__line {
+  flex: none;
+  width: 20px;
+  border-top: 3px solid var(--ink-2);
+}
+.viz-legend__line[data-series="promises"] { border-top-style: dashed; }
+.viz-zoom {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 1;
+  display: flex;
+  gap: var(--space-1);
+}
+.viz-zoom__button {
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Heatmap: one neutral ramp, --forest-tint to --forest; the encoding colors mean parties only (R54). */
+.viz-heat {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 2px;
+  table-layout: fixed;
+}
+.viz-heat__corner,
+.viz-heat__year { width: 3.25rem; }
+.viz-heat__month {
+  color: var(--ink-3);
+  font-size: var(--text-12);
+  font-weight: 400;
+  text-align: center;
+}
+.viz-heat__short { display: none; }
+.viz-heat[data-compact="true"] .viz-heat__long { display: none; }
+.viz-heat[data-compact="true"] .viz-heat__short { display: inline; }
+.viz-heat[data-compact="true"] .viz-heat__corner,
+.viz-heat[data-compact="true"] .viz-heat__year { width: 2rem; }
+/*
+  Month buttons stay at least --target-min wide (WCAG 2.5.8): a narrow grid scrolls sideways instead of shrinking.
+  A 2rem year column ("2026" at 12px) lets all twelve months fit a 390px phone without scrolling.
+*/
+.viz-heat[data-compact="true"] { min-width: calc(2rem + 12 * (var(--target-min) + 1px) + 13 * 2px); }
+.viz__plot:has(> .viz-heat) { overflow-x: auto; }
+.viz-heat__more { margin: 0 0 var(--space-1); color: var(--ink-3); }
+.viz-heat__year {
+  color: var(--ink-2);
+  font-size: var(--text-12);
+  font-weight: 400;
+  text-align: left;
+}
+.viz-heat__td { padding: 0; }
+.viz-heat__cell,
+.viz-heat__swatch {
+  display: block;
+  border: 0;
+  border-radius: var(--radius-chip);
+  background: var(--viz-heat);
+}
+.viz-heat__cell {
+  width: 100%;
+  min-height: var(--target-min);
+  padding: 0;
+}
+.viz-heat__swatch { width: 12px; height: 12px; }
+span.viz-heat__cell { box-shadow: inset 0 0 0 1px var(--rule); }
+button.viz-heat__cell { cursor: pointer; }
+button.viz-heat__cell:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+button.viz-heat__cell:hover { box-shadow: inset 0 0 0 1px var(--ink-2); }
+button.viz-heat__cell[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--ink); }
+:is(.viz-heat__cell, .viz-heat__swatch)[data-level="0"] { --viz-heat: var(--panel); }
+:is(.viz-heat__cell, .viz-heat__swatch)[data-level="1"] { --viz-heat: var(--forest-tint); }
+:is(.viz-heat__cell, .viz-heat__swatch)[data-level="2"] { --viz-heat: color-mix(in oklab, var(--forest) 34%, var(--forest-tint)); }
+:is(.viz-heat__cell, .viz-heat__swatch)[data-level="3"] { --viz-heat: color-mix(in oklab, var(--forest) 67%, var(--forest-tint)); }
+:is(.viz-heat__cell, .viz-heat__swatch)[data-level="4"] { --viz-heat: var(--forest); }
+.viz-heat__legend { margin-top: var(--space-2); }
+
+/* Proof rings and the claims grid */
+/* Rings are F1's c-proof__ring and __core in currentColor; outside a c-proof cell they take these colors. */
+.viz-ring {
+  flex: none;
+  fill: none;
+  color: var(--forest);
+}
+.viz-ring[data-strength="gap"] { color: var(--ink-3); }
+.viz-ring[data-strength="gap"] circle { stroke-dasharray: 2.5 2.5; }
+.viz-matrix {
+  border-collapse: collapse;
+  font-size: var(--text-14);
+}
+.viz-matrix :is(th, td) {
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--rule);
+  vertical-align: middle;
+}
+.viz-matrix thead th {
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  border-bottom-color: var(--border);
+  font-weight: 600;
+  text-align: left;
+}
+.viz-matrix__element {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 14rem;
+  max-width: 22rem;
+  background: var(--surface);
+  font-weight: 400;
+  text-align: left;
+}
+.viz-matrix[data-compact="true"] .viz-matrix__element { min-width: 9rem; }
+.viz-matrix[data-compact="true"] .viz-matrix__authority { display: none; }
+.viz-matrix__text { display: block; color: var(--ink); }
+.viz-matrix__authority { display: block; color: var(--ink-3); }
+.viz-matrix__doc { font-size: var(--text-12); white-space: nowrap; }
+.viz-matrix__count th {
+  background: var(--panel);
+  text-align: left;
+}
+.viz-matrix__best {
+  white-space: nowrap;
+  color: var(--ink-2);
+}
+.viz-matrix__best > * { vertical-align: middle; }
+.viz-matrix__best > span { margin-left: var(--space-1); }
+.viz-matrix__cell { text-align: center; }
+
+/* Stat tiles and sparklines */
+.viz-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--space-4);
+}
+/* c-stat orders label, value, note (1, 2, 3); the sparkline sits between the value and the note. */
+.viz-tile__spark { order: 3; }
+.viz-spark { display: block; overflow: visible; }
+.viz-spark__line {
+  fill: none;
+  stroke: var(--enc-court);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.viz-spark__end {
+  fill: var(--forest);
+  stroke: var(--chart-ground, var(--surface));
+  stroke-width: 2;
+  paint-order: stroke;
+}
+
+/*
+  Structure tree (viz/tree.ts, workstream S2). Every entity is a hex tile in --surface with a --border edge; the
+  side's own shape sits inside it, so color never stands alone. Defendant-side tiles add an oxblood corner flag
+  and the words "Defendant side". In focus: a forest edge on --forest-tint. Chosen: brass corner brackets.
+*/
+.viz-tree { overflow: visible; }
+.viz-tree__edge {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1;
+}
+.viz-tree__hex {
+  fill: var(--surface);
+  stroke: var(--border);
+  stroke-width: 1.25;
+}
+.viz-tree__hex--stack { fill: var(--panel); }
+.viz-tree__tile[data-highlight] .viz-tree__hex,
+.viz-tree__hex--focus {
+  fill: var(--forest-tint);
+  stroke: var(--forest);
+  stroke-width: 2.5;
+}
+.viz-tree__flag {
+  fill: var(--oxblood);
+  stroke: var(--oxblood);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+}
+.viz-tree__line {
+  font-size: var(--text-12);
+  fill: var(--ink);
+  stroke: var(--chart-ground);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+.viz-tree__name { font-weight: 600; }
+.viz-tree__group .viz-tree__name { font-weight: 500; }
+.viz-tree__hint { fill: var(--forest); text-decoration: underline; }
+.viz-tree__date {
+  fill: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+}
+.viz-tree__word {
+  fill: var(--oxblood);
+  font-size: var(--text-12);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.viz-tree__brackets {
+  fill: none;
+  stroke: var(--brass-mark);
+  stroke-width: 2;
+  stroke-linecap: square;
+  visibility: hidden;
+}
+.viz-tree__tile[aria-pressed="true"] .viz-tree__brackets { visibility: visible; }
+.viz-tree__tile:hover .viz-tree__hex,
+.viz-tree__group:hover .viz-tree__hex { stroke: var(--ink-2); }
+.viz-tree__move {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+}
+.viz-tree__move-head { fill: var(--ink); }
+.viz-tree__move-label {
+  font-size: var(--text-12);
+  font-weight: 500;
+  fill: var(--ink);
+  stroke: var(--chart-ground);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+.viz-tree__token {
+  fill: var(--brass-mark);
+  stroke: var(--chart-ground);
+  stroke-width: 1.5;
+}
+.viz-tree__key { flex: none; overflow: visible; }
+.viz-tree__key .viz-tree__move { stroke-dasharray: 4 3; }
+.viz-tree__folds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.viz-tree__folds:empty { display: none; }
+.viz-tree__empty { margin: var(--space-4) 0; color: var(--ink-3); }
+
+/*
+  By date picture (viz/story.ts, Entities & People ?view=dates). One row per date down a ruled spine: the date in
+  ISO mono on the left, the milestones (a step under its violation's letter mark, the suit under the filing square)
+  and the entities formed that day on the right. Tiles: a plain --border edge; the chosen entity a 2px forest edge
+  on --forest-tint; with one violation chosen, a parent drawn only for context is quiet with a dashed --ink-3 edge
+  and the words "Parent only". Shape backs the side; letters and words back every state.
+*/
+.viz-story {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.viz-story__row {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2);
+  border-top: var(--hairline) solid var(--rule);
+}
+.viz-story__row:first-child { border-top: 0; }
+.viz-story__when {
+  padding-top: 4px;
+}
+.viz-story__date {
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+}
+.viz-story__row[data-undated] .viz-story__date { font-family: var(--font-sans); }
+.viz-story__what {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.viz-story__event {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--text-13);
+  font-weight: 600;
+  padding-top: 1px;
+}
+.viz-story__event > .viz-mark { flex: none; }
+.viz-story__badge { --mark-size: 18px; font-size: var(--text-12); }
+.viz-story__tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.viz-story__cell { display: grid; }
+.viz-story__tile {
+  display: grid;
+  gap: 2px;
+  align-content: start;
+  min-height: var(--target-min);
+  padding: var(--space-2) var(--space-3);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-13);
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.viz-story__tile:hover { border-color: var(--ink-2); }
+.viz-story__tile[data-state="context"] {
+  color: var(--ink-2);
+  background: transparent;
+  border-style: dashed;
+  border-color: var(--ink-3);
+}
+.viz-story__tile[aria-pressed="true"] {
+  background: var(--forest-tint);
+  border: 2px solid var(--forest);
+  padding: calc(var(--space-2) - 1px) calc(var(--space-3) - 1px);
+}
+.viz-story__name {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.viz-story__name > .viz-mark { flex: none; align-self: center; }
+.viz-story__under,
+.viz-story__context { color: var(--ink-2); font-size: var(--text-12); }
+.viz-story__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  align-items: center;
+}
+.viz-story__foot:empty { display: none; }
+.viz-story__side {
+  color: var(--oxblood);
+  font-size: var(--text-12);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+/* The table twin's Formed column: an ISO date in mono that never breaks at its hyphens. */
+.viz-story-frame .viz__table tbody > tr > :nth-child(2) {
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  white-space: nowrap;
+}
+.viz-story__swatch {
+  flex: none;
+  width: 16px;
+  height: 12px;
+  background: transparent;
+  border: 1px dashed var(--ink-3);
+  border-radius: 3px;
+}
+@media (max-width: 40rem) {
+  .viz-story__row { grid-template-columns: minmax(0, 1fr); gap: var(--space-1); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .viz-flow__link,
+  .viz-bar,
+  .viz-force__node,
+  .viz-force__edge { transition: opacity var(--dur-1) var(--ease), stroke-opacity var(--dur-1) var(--ease); }
+  .viz-tree__tile { transition: transform var(--dur-1) var(--ease); }
+  .viz-tree__tile[aria-pressed="true"] { transform: translateY(-2px); }
+  .viz-story__tile { transition: background-color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease); }
+}
+
+@media (forced-colors: active) {
+  .viz .viz-mark { fill: CanvasText; }
+  .viz-flow__link,
+  .viz-force__edge,
+  .viz-force__group-box { fill: none; stroke: CanvasText; }
+  .viz-ring { color: CanvasText; }
+  .viz__key { background: CanvasText; }
+  .viz-heat__cell,
+  .viz-heat__swatch { border: 1px solid CanvasText; }
+  .viz-heat__cell[data-level="0"] { border-style: dashed; }
+  .viz-tree__edge,
+  .viz-tree__hex,
+  .viz-tree__move,
+  .viz-tree__brackets { stroke: CanvasText; }
+  .viz-tree__hex { fill: Canvas; }
+  .viz-tree__tile[data-highlight] .viz-tree__hex { stroke: Highlight; }
+  .viz-tree__flag,
+  .viz-tree__move-head,
+  .viz-tree__token { fill: CanvasText; stroke: CanvasText; }
+  .viz-tree__line,
+  .viz-tree__move-label { fill: CanvasText; stroke: Canvas; }
+  .viz-story__tile,
+  .viz-story__swatch { border-color: CanvasText; }
+  .viz-story__tile[aria-pressed="true"] { border-color: Highlight; }
+}
+
+@media print {
+  .viz-tree__folds,
+  .viz__toggle,
+  .viz-zoom,
+  .viz__tip { display: none; }
+}

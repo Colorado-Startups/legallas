@@ -1,0 +1,7 @@
+// Copy to Signing.xcconfig (gitignored) to sign Legallas.app with your Apple
+// Development identity. Sign in to Xcode (Settings > Accounts) first so it can
+// create the certificate; `bash LegallasApp/Scripts/install-app.sh` then prints the
+// team ID it finds in your keychain if this file is missing.
+
+DEVELOPMENT_TEAM = ABCDE12345
+CODE_SIGN_IDENTITY = Apple Development

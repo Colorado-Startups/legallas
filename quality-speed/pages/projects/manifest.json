@@ -1,0 +1,98 @@
+{
+  "page": "projects",
+  "signoff_comment": 6643842664,
+  "metrics": [
+    {
+      "id": "in_progress",
+      "lens": "quality",
+      "unit": "count",
+      "direction": "lower",
+      "floor": 15,
+      "goal": 3,
+      "weight": 1,
+      "max_age_hours": 48,
+      "min_samples": 1,
+      "goal_source": "https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/best-practices-for-projects"
+    },
+    {
+      "id": "done_with_pr",
+      "lens": "quality",
+      "unit": "percent",
+      "direction": "higher",
+      "floor": 50,
+      "goal": 100,
+      "weight": 2,
+      "max_age_hours": 48,
+      "min_samples": 5,
+      "goal_source": "https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue"
+    },
+    {
+      "id": "cards_ready",
+      "lens": "quality",
+      "unit": "percent",
+      "direction": "higher",
+      "floor": 50,
+      "goal": 100,
+      "weight": 1,
+      "max_age_hours": 48,
+      "min_samples": 5,
+      "goal_source": "https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/best-practices-for-projects"
+    },
+    {
+      "id": "oldest_active_hours",
+      "lens": "speed",
+      "unit": "hours",
+      "direction": "lower",
+      "floor": 336,
+      "goal": 72,
+      "weight": 1,
+      "max_age_hours": 48,
+      "min_samples": 1,
+      "goal_source": "https://kanbanguides.org/the-kanban-guide/2025.5/"
+    },
+    {
+      "id": "views_correct",
+      "lens": "quality",
+      "unit": "percent",
+      "direction": "higher",
+      "floor": 0,
+      "goal": 100,
+      "weight": 1,
+      "max_age_hours": 48,
+      "min_samples": 3,
+      "goal_source": "https://docs.github.com/en/issues/planning-and-tracking-with-projects/customizing-views-in-your-project/customizing-a-view"
+    },
+    {
+      "id": "status_matches_state",
+      "lens": "quality",
+      "unit": "percent",
+      "direction": "higher",
+      "floor": 50,
+      "goal": 100,
+      "weight": 1,
+      "max_age_hours": 48,
+      "min_samples": 5,
+      "goal_source": "https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/using-the-built-in-automations"
+    },
+    {
+      "id": "lane_minutes",
+      "lens": "consumption",
+      "unit": "minutes",
+      "direction": "lower",
+      "floor": 30,
+      "goal": 5,
+      "weight": 1,
+      "max_age_hours": 48,
+      "min_samples": 1,
+      "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"
+    }
+  ],
+  "changes": [
+    {"date": "2026-11-05", "metric": "lane_minutes", "field": "added", "from": null, "to": "lane_minutes", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6648066229},
+    {"date": "2026-11-06", "metric": "cycle_hours_p90", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 846},
+    {"date": "2026-11-06", "metric": "cards_ready", "field": "added", "from": null, "to": "cards_ready", "reason": "added_toward_ideal", "issue": 846},
+    {"date": "2026-11-06", "metric": "oldest_active_hours", "field": "added", "from": null, "to": "oldest_active_hours", "reason": "added_toward_ideal", "issue": 846},
+    {"date": "2026-11-09", "metric": "views_correct", "field": "added", "from": null, "to": "views_correct", "reason": "added_toward_ideal", "issue": 962},
+    {"date": "2026-11-09", "metric": "status_matches_state", "field": "added", "from": null, "to": "status_matches_state", "reason": "added_toward_ideal", "issue": 962}
+  ]
+}

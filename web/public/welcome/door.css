@@ -1,0 +1,367 @@
+/*
+  Front door styles: /welcome/, /welcome/denied/, /welcome/away/ and the Worker's 403 page.
+  Served without sign-in, so this file stands alone: no imports from the room's stylesheets.
+  Tokens follow the Chambers green spec (design overhaul plan); once its tokens land in src/styles,
+  keep these values in step. Brass is for hairlines and rings only, never text.
+*/
+
+@font-face {
+  font-family: 'Source Serif 4 Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 900;
+  src: url('/welcome/fonts/source-serif-4-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/welcome/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+:root {
+  color-scheme: light;
+  --paper: #faf7f0;
+  --surface: #fffdf8;
+  --ink: #1a1f1c;
+  --ink-2: #4a524d;
+  --ink-3: #666d68;
+  --forest: #1f3a2e;
+  --forest-hover: #2e5a45;
+  --on-forest: #faf7f0;
+  --brass: #a98b4f;
+  --rule: #d9cfbb;
+  --focus: #1f5fa8;
+  --glow: rgb(169 139 79 / 0%);
+  --vignette: rgb(26 31 28 / 5%);
+  --font-serif: 'Source Serif 4 Variable', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  display: grid;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 2rem 1rem;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 34%, var(--glow), transparent 22rem),
+    radial-gradient(ellipse at 50% 40%, transparent 55%, var(--vignette)),
+    var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The column */
+.door {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 28rem;
+  text-align: center;
+}
+
+.door-eyebrow {
+  margin: 1.75rem 0 0.25rem;
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+  font-variant-caps: all-small-caps;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.door-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 9vw, 3.25rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.door-title-small {
+  font-size: clamp(1.625rem, 6vw, 2.125rem);
+  text-wrap: balance;
+}
+
+.door-lede {
+  margin: 0.75rem 0 0;
+  color: var(--ink-2);
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+}
+
+.door-rule {
+  width: 4rem;
+  height: 1px;
+  margin: 1.75rem 0;
+  border: 0;
+  background: var(--brass);
+}
+
+/* The one button */
+.door-button {
+  display: inline-flex;
+  min-width: 12rem;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.5rem;
+  border-radius: 4px;
+  background: var(--forest);
+  color: var(--on-forest);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  transition: background-color 160ms ease;
+}
+
+.door-button:hover {
+  background: var(--forest-hover);
+}
+
+.door-button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.door-help {
+  max-width: 24rem;
+  margin: 1.5rem 0 0;
+  color: var(--ink-2);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.door-help strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.door-footer {
+  margin: 2.5rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-3);
+  font-size: 0.75rem;
+  letter-spacing: 0.01em;
+}
+
+/* The numbered sign-in steps on /welcome/: a left-aligned list inside the centered column */
+.door-steps {
+  max-width: 24rem;
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+  color: var(--ink-2);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  text-align: left;
+}
+
+.door-steps li + li {
+  margin-top: 0.75rem;
+}
+
+.door-steps li::marker {
+  color: var(--forest);
+  font-weight: 600;
+}
+
+.door-steps strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* The room's mark (markup from the brand pack's mark.ts, else worker/mark.ts; the arrow and ripple are the Legallas seal's) */
+.seal {
+  display: block;
+  width: 6rem;
+  height: 6rem;
+  overflow: visible;
+}
+
+.door-compact .seal {
+  width: 4rem;
+  height: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+.seal-ring {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 0.9;
+}
+
+.seal-ripple {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 0.6;
+  opacity: 0;
+}
+
+.seal-dot,
+.seal-head,
+.seal-leaf {
+  fill: var(--forest);
+}
+
+.seal-shaft {
+  fill: none;
+  stroke: var(--ink);
+  stroke-linecap: round;
+  stroke-width: 1.4;
+}
+
+.seal-arrow,
+.seal-arrow-body,
+.seal-ripple {
+  transform-box: view-box;
+  transform-origin: 24px 24px;
+}
+
+/* Arrival: rings draw, the arrow flies in and lands, then the words rise. Under 2 seconds, once. */
+@media (prefers-reduced-motion: no-preference) {
+  /* backwards, not both: once drawn, the dash pattern goes away, so no seam shows where a ring starts. */
+  .seal-animated .seal-ring {
+    animation: seal-draw 800ms var(--ease-out) backwards;
+  }
+
+  .seal-animated .seal-ring-2 {
+    animation-delay: 120ms;
+  }
+
+  .seal-animated .seal-ring-3 {
+    animation-delay: 240ms;
+  }
+
+  /* Two groups, so the flight (translate) and the landing (rotate) never fight over transform. */
+  .seal-animated .seal-arrow {
+    animation: seal-fly 400ms var(--ease-out) 800ms both;
+  }
+
+  .seal-animated .seal-arrow-body {
+    animation: seal-land 260ms ease-out 1200ms both;
+  }
+
+  .seal-animated .seal-ripple {
+    animation: seal-ripple 700ms ease-out 1200ms;
+  }
+
+  .seal-animated .seal-dot {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: seal-dot 300ms var(--ease-out) 1200ms both;
+  }
+
+  .door-animated .door-rise {
+    animation: door-rise 400ms var(--ease-out) 1300ms both;
+  }
+
+  .door-animated .door-rise-late {
+    animation-delay: 1400ms;
+  }
+}
+
+@keyframes seal-draw {
+  from {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes seal-fly {
+  from {
+    opacity: 0;
+    transform: translateX(-34px);
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes seal-land {
+  0% {
+    transform: rotate(0deg);
+  }
+  35% {
+    transform: rotate(-1.5deg);
+  }
+  70% {
+    transform: rotate(0.8deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes seal-ripple {
+  from {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(3.4);
+  }
+}
+
+@keyframes seal-dot {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes door-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

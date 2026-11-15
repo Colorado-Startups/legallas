@@ -1,0 +1,12 @@
+{
+  "page": "mac-app", "signoff_comment": 6643540262,
+  "metrics": [
+    { "id": "swift_jobs_passing", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 50, "goal": 100, "weight": 2, "max_age_hours": 48, "min_samples": 7, "goal_source": "https://docs.cloud.google.com/architecture/devops/devops-tech-continuous-integration" },
+    { "id": "app_bundle_verified", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://developer.apple.com/documentation/security/app-sandbox" },
+    { "id": "swift_job_minutes_p50", "lens": "speed", "unit": "minutes", "direction": "lower", "floor": 30, "goal": 10, "weight": 1, "max_age_hours": 48, "min_samples": 7, "goal_source": "https://docs.cloud.google.com/architecture/devops/devops-tech-continuous-integration" },
+    { "id": "lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 10, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" }
+  ],
+  "changes": [
+    {"date": "2026-11-05", "metric": "lane_minutes", "field": "added", "from": null, "to": "lane_minutes", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6646875294}
+  ]
+}

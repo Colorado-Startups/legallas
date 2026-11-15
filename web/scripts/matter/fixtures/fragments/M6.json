@@ -1,0 +1,33 @@
+{
+  "card": "M6",
+  "violations": [
+    {
+      "id": "v-0001", "mark": "A", "title": "Board vote told as unanimous",
+      "summary": "Roe wrote in May 2012 that the board voted unanimously; the minutes record 2 to 1.",
+      "period": { "from": "2012-05", "to": null }, "actors": ["p-roe"], "entities": ["org-harbor"], "events": ["ev-0001"], "money": ["m-0001"],
+      "steps": [
+        { "id": "st-0001", "date": "2012-05-07", "label": "Meeting plan email sent", "entities": ["org-harbor"], "moves": [],
+          "cites": [{ "path": "04-Letters/Email_EML__20120507__Mark-Moe__Meeting-Plan.pdf", "page": 1 }] }
+      ],
+      "figures": [
+        { "id": "fig-0001", "label": "Share purchase balance", "value": 1763420, "unit": "usd", "limit": null, "note": null,
+          "cites": [{ "path": "06-Cap-Table/Bank_Statement_BS__20120730__Harbor-Labs__July.pdf", "page": 2 }] }
+      ],
+      "cites": [{ "path": "04-Letters/Email_EML__20120507__Mark-Moe__Meeting-Plan.pdf", "page": 1 }]
+    }
+  ],
+  "tracks": [
+    {
+      "id": "tr-0000", "kind": "regulator", "title": "Regulator filing", "forum": "State Labor Department",
+      "against": ["p-roe"], "violations": ["v-0001"], "points": []
+    },
+    {
+      "id": "tr-0001", "kind": "complaint", "title": "Current complaint", "forum": "District Court, Example County",
+      "against": ["p-roe", "org-harbor"], "violations": ["v-0001"],
+      "points": [
+        { "id": "pt-0001", "violation": "v-0001", "text": "The stock agreement binds the company.", "authority": null,
+          "proof": [{ "cite": { "path": "01-Corporate-Records/Stock_Agreement_SA__20110607__Harbor-Labs__Countersigned.pdf", "page": 4 }, "strength": "corroborating", "note": null }] }
+      ]
+    }
+  ]
+}

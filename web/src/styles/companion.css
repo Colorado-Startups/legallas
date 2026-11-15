@@ -1,0 +1,50 @@
+/*
+  The companion's window (DESIGN.md section 8), shared by the Ask page and the page guide: the rig's stills (240:280,
+  LegallasStills.astro, one per state, one shown) in an arched paper window, and the Rive canvas (companion-rive.ts)
+  lying exactly over them. While the rig shows, the stills are hidden. The width is the page's to set; the arch
+  follows it. Tokens only.
+*/
+
+.companion-art {
+  position: relative;
+  aspect-ratio: 240 / 280;
+  overflow: hidden;
+  background: var(--panel);
+  border: var(--hairline) solid var(--rule);
+  border-radius: 50% 50% var(--radius) var(--radius) / 43% 43% var(--radius) var(--radius);
+}
+
+.companion-art:empty {
+  display: none;
+}
+
+.companion-art > svg,
+.companion-art > canvas,
+.companion-art > picture,
+.companion-art > picture > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.companion-art > picture > img {
+  object-fit: contain;
+}
+
+.companion-art > canvas {
+  position: absolute;
+  inset: 0;
+}
+
+/* One still at a time (companion-rive.ts unhides the next once it has loaded), and none under the rig. Specific
+   enough to win over the display rules above and game.css's .c-guide__art > picture. */
+.companion-art > picture[hidden],
+.companion-art[data-renderer='rive'] > picture {
+  display: none;
+}
+
+@media (forced-colors: active) {
+  .companion-art {
+    border-color: CanvasText;
+  }
+}

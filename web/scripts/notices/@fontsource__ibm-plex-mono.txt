@@ -1,0 +1,4 @@
+IBM Plex Mono, upstream copyright (github.com/IBM/plex):
+Copyright © 2017 IBM Corp. with Reserved Font Name "Plex"
+
+Visual pages embed subsets of it, which are Modified Versions under the licence below and carry the name Binder Mono.

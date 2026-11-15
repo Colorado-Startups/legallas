@@ -1,0 +1,10 @@
+{
+  "ideal": "Customers never hit a bug: reviews and failed runs find bugs first, each goes into an issue, and each is fixed fast and stays fixed.",
+  "sources": [
+    { "title": "Martin Fowler: Continuous Integration", "url": "https://martinfowler.com/articles/continuousIntegration.html", "date": "2024-01-18" },
+    { "title": "NIST SP 800-53 Rev. 5: Security and Privacy Controls", "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final", "date": "2020-12-10" }
+  ],
+  "quality": "No open critical or high bug, nothing reopened, every failed run in an issue, and every fix with a test.",
+  "speed": "Bugs found within two weeks of landing, high ones fixed within a day, and every error in an issue within a day.",
+  "consumption": "No runner minutes lost to failed runs on main in 90 days."
+}

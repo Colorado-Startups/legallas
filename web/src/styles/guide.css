@@ -1,0 +1,60 @@
+/*
+  The page guide band (LegallasGuide.astro): composes the c-guide block (DESIGN.md section 7, components/game.css)
+  inside the page width, with the Quiet switch under the bust. Two art slots: the bust in the companion's arched window
+  (companion.css), or below 48rem the small Legallas at 40px, where nothing moves and Quiet is hidden.
+  No transitions; the bust is a still portrait until the rig returns (plan PR-L2). Tokens only.
+*/
+
+.guide-band {
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* A fixed box for the 88px portrait (240:280), so the band never changes height while the image loads. */
+.guide-band__bust {
+  width: 88px;
+  height: calc(88px * 280 / 240);
+  flex: none;
+}
+
+.guide-band__glyph {
+  display: none;
+}
+
+.guide-band__quiet {
+  grid-column: 1;
+  justify-self: center;
+  color: var(--ink-2);
+}
+
+/* A brand pack with no stills leaves the bust's window empty, and companion.css hides it. Without this the sentence and
+   the orders fall into the 88px art column, a word a line (#211). The band then takes one column, and Quiet goes too,
+   since nothing moves: guide.ts never mounts the rig in a hidden window. */
+@media not all and (max-width: 48rem) {
+  .c-guide:has(> .guide-band__bust:empty) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .c-guide:has(> .guide-band__bust:empty) > .guide-band__quiet {
+    display: none;
+  }
+}
+
+@media (max-width: 48rem) {
+  .guide-band__bust,
+  .guide-band__quiet {
+    display: none;
+  }
+
+  .guide-band__glyph {
+    display: inline-flex;
+  }
+}
+
+@media print {
+  .guide-band {
+    display: none;
+  }
+}

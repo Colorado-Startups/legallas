@@ -1,0 +1,33 @@
+{
+  "ideal": "Every change lands as a small pull request or stack layer, passes checks and one Review: MERGE on few tokens, and queues under 10 minutes.",
+  "sources": [
+    {
+      "title": "Claude Code: Best practices",
+      "url": "https://code.claude.com/docs/en/best-practices",
+      "date": "2026-11-04"
+    },
+    {
+      "title": "GitHub Docs: About protected branches",
+      "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches",
+      "date": "2026-11-03"
+    },
+    {
+      "title": "How the Claude Code team does code review",
+      "url": "https://claude.dev/blog/solving-code-review-at-anthropic",
+      "date": "2026-10-15"
+    },
+    {
+      "title": "GitHub Changelog: Stacked pull requests generally available",
+      "url": "https://github.blog/changelog/2026-10-06-stacked-pull-requests-generally-available/",
+      "date": "2026-10-06"
+    },
+    {
+      "title": "GitHub Docs: Creating a pull request template for your repository",
+      "url": "https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/creating-a-pull-request-template-for-your-repository",
+      "date": "2026-08-21"
+    }
+  ],
+  "quality": "Gates held at the merged head, green first, no Blocking finding, small or stacked, the template filled, never reworked.",
+  "speed": "Merged within the hour at the median, a verdict within minutes, the final push merged in minutes, the queue under 10.",
+  "consumption": "Few review tokens and few runner minutes per merge, in the queue and the lane."
+}

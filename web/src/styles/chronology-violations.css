@@ -1,0 +1,128 @@
+/*
+  Card P2 (Chronology page): the violation layer. The violation chips (All, A, B, C) and the Litigation chip above
+  the filters, the lane bar's j and k hint, and the panel's violation list. Tokens only, light only (web/DESIGN.md).
+  A violation is named by its letter mark, never by color alone (section 3).
+*/
+
+/* ---- the chips: one violation at a time, then Litigation ---- */
+
+.chron-marks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+  margin-top: calc(-1 * var(--space-2));
+}
+
+.chron-marks__group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.chron-vchip {
+  --shape-size: 12px;
+
+  gap: var(--space-2);
+  min-width: 0;
+  max-width: 18rem;
+  height: 2rem;
+  padding: 0 var(--space-3);
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  font-weight: 400;
+  border-radius: var(--radius-chip);
+}
+
+/* A violation chip is a radio (aria-checked); Litigation is a toggle (aria-pressed). */
+.chron-vchip[aria-checked='true'],
+.chron-vchip[aria-pressed='true'] {
+  background: var(--forest-tint);
+  color: var(--forest);
+  border-color: var(--forest);
+}
+
+.chron-vchip__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chron-vchip__count {
+  color: var(--ink-3);
+  font-size: var(--text-12);
+}
+
+.chron-vchip:has(> .c-mark) {
+  padding-left: var(--space-1);
+}
+
+/* ---- the lane bar: lane modes, then the j and k hint ---- */
+
+.chron-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chron-keys {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: var(--text-12);
+}
+
+/* The keys need a keyboard and work only in the chart's and table's area (R80): no hint on phones. */
+@media (max-width: 47.99rem) {
+  .chron-keys {
+    display: none;
+  }
+
+  /* A definite width, so a chip can shrink to it and cut its title. */
+  .chron-marks__group {
+    width: 100%;
+  }
+
+  .chron-vchip {
+    max-width: 100%;
+  }
+}
+
+/* ---- the panel's violations: letter, then the title, wrapping ---- */
+
+.chron-chips--violations {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.chron-vtag {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+}
+
+.chron-vtag .c-mark {
+  margin-top: -2px;
+}
+
+/* ---- print: the active-filter chips already name the violation; the chips themselves do not print ---- */
+
+@media print {
+  .chron-marks,
+  .chron-keys {
+    display: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .chron-vchip[aria-checked='true'],
+  .chron-vchip[aria-pressed='true'] {
+    border-width: 2px;
+  }
+}

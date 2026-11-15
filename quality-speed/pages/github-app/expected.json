@@ -1,0 +1,17 @@
+{
+  "about": "The org's GitHub App and the permissions it should hold, no more and no fewer. collect.ts compares them with what GitHub lists for the App every day. A permission is added or removed by a reviewed pull request.",
+  "reviewed": "2026-11-05",
+  "app": "legallas-automation",
+  "permissions": {
+    "actions": "read",
+    "administration": "write",
+    "contents": "read",
+    "dependabot_secrets": "read",
+    "metadata": "read",
+    "organization_administration": "read",
+    "organization_hooks": "read",
+    "organization_projects": "write",
+    "repository_hooks": "read",
+    "secrets": "read"
+  }
+}

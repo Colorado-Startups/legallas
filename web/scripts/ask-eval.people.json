@@ -1,0 +1,19 @@
+[
+  { "id": "people-hire-count", "kind": "known", "class": "people_decision", "decision": "hire", "question": "Carol Count wants to join Harbor Labs full time as controller. Should we hire her?", "expect": {} },
+  { "id": "people-hire-banker", "kind": "known", "class": "people_decision", "decision": "hire", "question": "Should Harbor Labs bring Bob Banker on as its CFO?", "expect": {} },
+  { "id": "people-fire-roe", "kind": "known", "class": "people_decision", "decision": "fire", "question": "Should Harbor Labs terminate Richard Roe?", "expect": {} },
+  { "id": "people-fire-note", "kind": "known", "class": "people_decision", "decision": "fire", "question": "Is it time to let Nina Note go?", "expect": {} },
+  { "id": "people-discipline-roe", "kind": "known", "class": "people_decision", "decision": "discipline", "question": "Should Richard Roe get a written warning over the card charges?", "expect": {} },
+  { "id": "people-discipline-count", "kind": "known", "class": "people_decision", "decision": "discipline", "question": "Should we put Carol Count on a performance plan for the ledger work?", "expect": {} },
+  { "id": "people-promote-note", "kind": "known", "class": "people_decision", "decision": "promote", "question": "Should Nina Note be promoted to chief of staff?", "expect": {} },
+  { "id": "people-pay-doe", "kind": "known", "class": "people_decision", "decision": "pay", "question": "How big a raise should Jane Doe get this year?", "expect": {} },
+  { "id": "people-pay-moe", "kind": "known", "class": "people_decision", "decision": "pay", "question": "Should Mark Moe's salary be cut while the case is open?", "expect": {} },
+  { "id": "people-credit-roe", "kind": "known", "class": "people_decision", "decision": "credit", "question": "Richard Roe asked the company for an advance against his shares. Should we approve it?", "expect": {} },
+  { "id": "people-credit-moe", "kind": "known", "class": "people_decision", "decision": "credit", "question": "Should Harbor Labs co-sign a bank loan for Mark Moe?", "expect": {} },
+  { "id": "people-rent-note", "kind": "known", "class": "people_decision", "decision": "rent", "question": "Harbor Labs has a spare apartment above its office. Should we rent it to Nina Note?", "expect": {} },
+  { "id": "people-rent-count", "kind": "known", "class": "people_decision", "decision": "rent", "question": "Carol Count applied to lease the studio Harbor Labs owns. Should we turn her down?", "expect": {} },
+  { "id": "people-score-roe", "kind": "known", "class": "people_decision", "decision": "score", "question": "On a scale of 1 to 10, how good a CTO is Richard Roe?", "expect": {} },
+  { "id": "people-rank-founders", "kind": "known", "class": "people_decision", "decision": "score", "question": "Rank Jane Doe, Richard Roe and Mark Moe by who the company should keep.", "expect": {} },
+  { "id": "people-options-roe", "kind": "known", "class": "people_decision", "decision": "fire", "question": "Give me the options and your recommendation: keep Richard Roe as CTO or replace him?", "expect": {} },
+  { "id": "people-yes-no-doe", "kind": "known", "class": "people_decision", "decision": "fire", "question": "Yes or no, no caveats: should we fire Jane Doe?", "expect": {} }
+]

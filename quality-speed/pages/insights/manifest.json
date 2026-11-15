@@ -1,0 +1,106 @@
+{
+  "page": "insights",
+  "signoff_comment": 6643841137,
+  "metrics": [
+    {
+      "id": "change_failure_rate",
+      "lens": "quality",
+      "unit": "percent",
+      "direction": "lower",
+      "floor": 40,
+      "goal": 5,
+      "weight": 3,
+      "max_age_hours": 48,
+      "min_samples": 20,
+      "goal_source": "https://cloud.google.com/devops/state-of-devops"
+    },
+    {
+      "id": "rework_rate",
+      "lens": "quality",
+      "unit": "percent",
+      "direction": "lower",
+      "floor": 40,
+      "goal": 5,
+      "weight": 2,
+      "max_age_hours": 48,
+      "min_samples": 20,
+      "goal_source": "https://cloud.google.com/devops/state-of-devops"
+    },
+    {
+      "id": "merges_tied_to_issue",
+      "lens": "quality",
+      "unit": "percent",
+      "direction": "higher",
+      "floor": 50,
+      "goal": 90,
+      "weight": 2,
+      "max_age_hours": 48,
+      "min_samples": 10,
+      "goal_source": "https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue"
+    },
+    {
+      "id": "failure_drill",
+      "lens": "quality",
+      "unit": "pass",
+      "direction": "higher",
+      "floor": 0,
+      "goal": 1,
+      "weight": 1,
+      "max_age_hours": 48,
+      "min_samples": 1,
+      "goal_source": "https://cloud.google.com/devops/state-of-devops"
+    },
+    {
+      "id": "change_frequency",
+      "lens": "speed",
+      "unit": "per_week",
+      "direction": "higher",
+      "floor": 1,
+      "goal": 5,
+      "weight": 2,
+      "max_age_hours": 48,
+      "min_samples": 7,
+      "goal_source": "https://cloud.google.com/devops/state-of-devops"
+    },
+    {
+      "id": "lead_time_p50",
+      "lens": "speed",
+      "unit": "hours",
+      "direction": "lower",
+      "floor": 168,
+      "goal": 24,
+      "weight": 2,
+      "max_age_hours": 48,
+      "min_samples": 10,
+      "goal_source": "https://cloud.google.com/devops/state-of-devops"
+    },
+    {
+      "id": "recovery_time_p50",
+      "lens": "speed",
+      "unit": "hours",
+      "direction": "lower",
+      "floor": 24,
+      "goal": 1,
+      "weight": 1,
+      "max_age_hours": 48,
+      "min_samples": 1,
+      "coverage_metric": "failure_drill",
+      "goal_source": "https://cloud.google.com/devops/state-of-devops"
+    },
+    {
+      "id": "lane_minutes",
+      "lens": "consumption",
+      "unit": "minutes",
+      "direction": "lower",
+      "floor": 10,
+      "goal": 5,
+      "weight": 1,
+      "max_age_hours": 48,
+      "min_samples": 1,
+      "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"
+    }
+  ],
+  "changes": [
+    {"date": "2026-11-05", "metric": "lane_minutes", "field": "added", "from": null, "to": "lane_minutes", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6648064525}
+  ]
+}

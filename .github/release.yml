@@ -1,0 +1,23 @@
+# Release note sections for `gh release create --generate-notes` (tags web-v*, apple-v*, mcp-v*).
+changelog:
+  exclude:
+    labels: [skip-changelog]
+  categories:
+    - title: Breaking changes
+      labels: [breaking]
+    - title: Security
+      labels: [security]
+    - title: Counsel room (web)
+      labels: ['area:web']
+    - title: Mac and iPhone app
+      labels: ['area:apple']
+    - title: MCP server
+      labels: ['area:mcp']
+    - title: Shared Swift package
+      labels: ['area:kit']
+    - title: Dependencies
+      labels: [dependencies]
+    - title: Infrastructure and docs
+      labels: ['area:infra', documentation]
+    - title: Other changes
+      labels: ['*']

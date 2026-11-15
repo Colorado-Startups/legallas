@@ -1,0 +1,37 @@
+/*
+  Layout shift on load (Q3, R89). The Overview's top half is drawn empty ("Overview", "Loading.") and filled once
+  /api/matter and the feeds answer, which used to push everything below it down. While each part is aria-busy it
+  holds the height it takes once filled: defaults are the fixture's filled heights per width, and for the case
+  header overview-news-case.ts swaps in this browser's last filled height (--ov-case-reserve). Released on fill.
+*/
+.ov-case[aria-busy='true'] {
+  min-height: var(--ov-case-reserve, 54rem);
+}
+
+/* The court line sits above the caption, so its one-line slot is held too. */
+.ov-case[aria-busy='true'] .ov-case__court[hidden] {
+  display: block !important;
+  height: 1.25rem;
+  visibility: hidden;
+}
+
+/* Since your last visit is a static row of counts whose lists open on demand; only the Key cards wait. */
+.ov-news[aria-busy='true'] .ov-keys {
+  min-height: 8.125rem;
+}
+
+@media (max-width: 64rem) {
+  .ov-case[aria-busy='true'] {
+    min-height: var(--ov-case-reserve, 54.125rem);
+  }
+}
+
+@media (max-width: 48rem) {
+  .ov-case[aria-busy='true'] {
+    min-height: var(--ov-case-reserve, 105.25rem);
+  }
+
+  .ov-news[aria-busy='true'] .ov-keys {
+    min-height: 12.25rem;
+  }
+}

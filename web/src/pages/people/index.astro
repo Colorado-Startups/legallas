@@ -1,0 +1,102 @@
+---
+// Card P3 (People). Entities & People: the entity structure (the default view), the people and organizations
+// placed by side in a force graph with side filter chips, and a table, with a profile drawer for the chosen
+// party, and the entities by date formed with violation chips. The shell is static; people.ts fills it from GET
+// /api/matter. ?p=<id> opens a profile; ?view=graph, ?view=table and ?view=dates open those views, ?v=<id> one
+// violation on the By date view.
+import Room from '../../layouts/Room.astro';
+import '../../styles/people.css';
+
+const sides = [
+  ['client', 'Client side'],
+  ['defendant', 'Defendants'],
+  ['nominal', 'Company and nominal parties'],
+  ['court', 'Court'],
+  ['third', 'Third parties'],
+] as const;
+
+const shapes: Record<(typeof sides)[number][0], string> = {
+  client: '<circle cx="8" cy="8" r="6"/>',
+  defendant: '<path d="M8 1.5 14.5 8 8 14.5 1.5 8Z"/>',
+  nominal: '<path d="M8 1.5 13.6 4.75v6.5L8 14.5 2.4 11.25v-6.5Z"/>',
+  court: '<rect x="2.5" y="2.5" width="11" height="11"/>',
+  third: '<path d="M8 2 14.5 13.5h-13Z"/>',
+};
+---
+
+<Room title="Entities & People" guide="people">
+  <div class="people" data-people hidden>
+    <header class="people-head">
+      <div class="people-head__text">
+        <h1 class="t-h1 people-head__title">Entities &amp; People</h1>
+        <p class="people-head__summary" data-people-summary></p>
+      </div>
+      <div class="people-tools">
+        <label class="u-vh" for="people-find">Find a person or entity</label>
+        <input
+          id="people-find"
+          class="c-input people-find"
+          type="search"
+          placeholder="Find a person or entity"
+          autocomplete="off"
+          spellcheck="false"
+          data-people-find
+        />
+        <div class="people-views" role="group" aria-label="View">
+          <button type="button" class="c-button" aria-pressed="true" data-people-view="structure">Structure</button>
+          <button type="button" class="c-button" aria-pressed="false" data-people-view="graph">Graph</button>
+          <button type="button" class="c-button" aria-pressed="false" data-people-view="table">Table</button>
+          <button type="button" class="c-button" aria-pressed="false" data-people-view="dates">By date</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="people-filters">
+      <div class="people-sides" role="group" aria-label="Sides shown">
+        {
+          sides.map(([side, label]) => (
+            <button type="button" class="c-button people-side" aria-pressed="true" data-people-side={side}>
+              <svg class="c-shape" data-side={side} viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" focusable="false" set:html={shapes[side]} />
+              <span data-people-side-label>{label}</span>
+            </button>
+          ))
+        }
+      </div>
+      <p class="people-legend">Larger marks are organizations. A heavy line is money in the record.</p>
+      <p class="people-count" data-people-count role="status"></p>
+    </div>
+
+    <div class="people-body">
+      <div class="people-main">
+        <div class="people-structure" data-people-structure></div>
+        <div class="people-graph" data-people-graph></div>
+        <div class="people-tablewrap" data-people-table hidden></div>
+        <div class="people-dates" data-people-dates hidden>
+          <div class="people-vchips" role="group" aria-label="Violation" data-people-vchips hidden>
+            <button type="button" class="c-button people-vchip c-select" aria-pressed="true" data-people-v="">All</button>
+          </div>
+          <div data-people-dates-picture></div>
+        </div>
+      </div>
+      <aside class="people-profile" data-people-profile aria-labelledby="people-profile-name" hidden></aside>
+    </div>
+
+    <p class="c-provenance">
+      Prepared by the client from the record with AI assistance. Every entry cites its source; verify before relying
+      on it.
+    </p>
+  </div>
+
+  <div class="people-empty" data-people-empty hidden>
+    <h1 class="t-h1">Entities &amp; People</h1>
+    <div class="c-empty">
+      <p class="c-empty__text">The entities and people in the record have not been published yet.</p>
+    </div>
+  </div>
+  <p class="people-status" data-people-loading data-load-pending role="status">Loading the entities and people in the record.</p>
+  <p class="people-status" data-people-status data-load-failed role="status" hidden>
+    The entities and people did not load; reload the page to try again.
+  </p>
+</Room>
+
+<script src="../../scripts/people.ts"></script>

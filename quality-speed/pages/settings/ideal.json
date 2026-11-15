@@ -1,0 +1,28 @@
+{
+  "ideal": "Every setting that guards the repository reads at its safest working value, proven by a daily read, and any drift is fixed within two days.",
+  "sources": [
+    {
+      "title": "GitHub Docs: Available rules for rulesets",
+      "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets",
+      "date": "2026-11-03"
+    },
+    {
+      "title": "GitHub Docs: Setting up budgets to control spending on metered products",
+      "url": "https://docs.github.com/en/billing/how-tos/set-up-budgets",
+      "date": "2026-10-28"
+    },
+    {
+      "title": "GitHub Docs: Secure use reference",
+      "url": "https://docs.github.com/en/actions/reference/security/secure-use",
+      "date": "2026-10-12"
+    },
+    {
+      "title": "GitHub Docs: Events that trigger workflows",
+      "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows",
+      "date": "2026-09-21"
+    }
+  ],
+  "quality": "No setting drifts from the expected file, every gate and stop budget holds, and a planted drift is always caught.",
+  "speed": "A complete read at least daily, and a drift fixed within 48 hours of being flagged.",
+  "consumption": "The daily read makes only the closed list of reads it needs, on one short job."
+}

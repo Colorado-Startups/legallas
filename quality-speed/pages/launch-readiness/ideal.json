@@ -1,0 +1,18 @@
+{
+  "ideal": "Every condition to sell is met by a merged change, and the rest closes within a month.",
+  "sources": [
+    {
+      "title": "Open Source Guides: Starting an Open Source Project",
+      "url": "https://opensource.guide/starting-a-project/",
+      "date": "2026-02-12"
+    },
+    {
+      "title": "Google Cloud: Using the Four Keys to measure your DevOps performance",
+      "url": "https://cloud.google.com/blog/products/devops-sre/using-the-four-keys-to-measure-your-devops-performance",
+      "date": "2020-09-22"
+    }
+  ],
+  "quality": "Every scored condition met with a merged change or a completed issue.",
+  "speed": "The conditions still open close within a month at the pace of the last four weeks.",
+  "consumption": "The daily lane finishes in about five minutes or less."
+}

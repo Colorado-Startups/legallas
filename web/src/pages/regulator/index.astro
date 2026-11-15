@@ -1,0 +1,35 @@
+---
+// The regulator filings (PR 3, track pages): one tab per track of kind 'regulator' (?track=<id>), each read top
+// to bottom on the same shell as /complaint/. The page label comes from the gitignored matter config
+// (regulatorLabel), so the source names no agency; src/scripts/track.ts fills the rest from GET /api/matter.
+import Room from '../../layouts/Room.astro';
+import LegallasEmpty from '../../components/LegallasEmpty.astro';
+import '../../styles/track.css';
+import '../../styles/track-control.css';
+import '../../styles/track-guide.css';
+import '../../scripts/viz/charts.css';
+import { roomConfig } from '../../scripts/room-config.ts';
+import { priorCaseLabel } from '../../../worker/room-settings.ts';
+
+// Read the way Room.astro reads it for the nav, so the page and its nav item always agree.
+const label = roomConfig?.regulatorLabel?.trim() || 'Regulator';
+---
+
+<Room title={label} guide="regulator">
+  <div class="track" data-track-page="regulator">
+    <p class="track-loading" data-track-loading data-load-pending role="status">Loading the filings.</p>
+    <div data-track-empty hidden><LegallasEmpty title="No regulator filing is in the record yet." level={1} /></div>
+    <div data-track-error data-load-failed hidden><LegallasEmpty title="The filings did not load; reload the page to try again." level={1} /></div>
+    <div class="track-tabs" role="tablist" aria-label={`${label} filings`} data-track-tabs hidden></div>
+    <article class="track-body" id="track-root" data-track-root data-track-ready hidden></article>
+    <footer class="track-foot" data-track-ready hidden>
+      <a class="track-foot__prior" href="/claims/">{priorCaseLabel}</a>
+      <p class="c-provenance">
+        Prepared by the client from the record with AI assistance. Every entry cites its source; verify before relying
+        on it.
+      </p>
+    </footer>
+  </div>
+</Room>
+
+<script src="../../scripts/track.ts"></script>

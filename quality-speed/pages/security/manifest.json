@@ -1,0 +1,23 @@
+{
+  "page": "security",
+  "signoff_comment": 6571555046,
+  "metrics": [
+    { "id": "alerts_critical_high_open", "lens": "quality", "unit": "count", "direction": "lower", "floor": 4, "goal": 0, "weight": 5, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://www.bestpractices.dev/en/criteria" },
+    { "id": "alerts_medium_low_open", "lens": "quality", "unit": "count", "direction": "lower", "floor": 4, "goal": 0, "weight": 2, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://www.bestpractices.dev/en/criteria" },
+    { "id": "osv_vulnerabilities_open", "lens": "quality", "unit": "count", "direction": "lower", "floor": 8, "goal": 0, "weight": 3, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://www.bestpractices.dev/en/criteria" },
+    { "id": "sast_findings_open", "lens": "quality", "unit": "count", "direction": "lower", "floor": 42, "goal": 0, "weight": 3, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://csrc.nist.gov/projects/ssdf" },
+    { "id": "scorecard_checks_at_goal", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 3, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://github.com/ossf/scorecard/blob/main/docs/checks.md" },
+    { "id": "secrets_in_history", "lens": "quality", "unit": "count", "direction": "lower", "floor": 1, "goal": 0, "weight": 5, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://cwe.mitre.org/data/definitions/798.html" },
+    { "id": "forbidden_paths_in_history", "lens": "quality", "unit": "count", "direction": "lower", "floor": 1, "goal": 0, "weight": 5, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://cwe.mitre.org/data/definitions/540.html" },
+    { "id": "case_paths_ignored", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 2, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://cwe.mitre.org/data/definitions/540.html" },
+    { "id": "secret_scan_gate_coverage", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 90, "goal": 100, "weight": 3, "max_age_hours": 48, "min_samples": 20, "goal_source": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html" },
+    { "id": "key_age_max_days", "lens": "quality", "unit": "days", "direction": "lower", "floor": 180, "goal": 90, "weight": 2, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html" },
+    { "id": "scanner_drills_passing", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 3, "max_age_hours": 48, "min_samples": 4, "goal_source": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final" },
+    { "id": "time_to_fix_critical_high_hours", "lens": "speed", "unit": "hours", "direction": "lower", "floor": 336, "goal": 72, "weight": 3, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "scanner_drills_passing", "goal_source": "https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk" },
+    { "id": "time_to_fix_medium_low_hours", "lens": "speed", "unit": "hours", "direction": "lower", "floor": 1440, "goal": 336, "weight": 2, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "scanner_drills_passing", "goal_source": "https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk" },
+    { "id": "scan_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 10, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" }
+  ],
+  "changes": [
+    { "date": "2026-11-04", "metric": "scan_minutes", "field": "added", "from": null, "to": "scan_minutes", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6644398233 }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.30/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.30",
+  "version": "1.5.0",
+  "id": "8d3f0a52-7c1e-4b6a-9e24-5f1c0b7a2d91",
+  "developer": {
+    "name": "Legallas",
+    "websiteUrl": "https://example.com",
+    "privacyUrl": "https://mcp.room.example.com/privacy",
+    "termsOfUseUrl": "https://mcp.room.example.com/terms"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "Legallas",
+    "full": "Legallas counsel room"
+  },
+  "description": {
+    "short": "Search and read a Legallas room's record, read-only, with six kits.",
+    "full": "Connects Microsoft 365 Copilot to a Legallas room (formation, fundraising or litigation) through its read-only MCP server. Copilot can search the record, read document facts and page text, the visuals, comment threads and original files' facts, search the room's law library, and cite each passage by control number and page with a link back to the room. Six kits come with it: matter board, review grid, cite check, chronology, entity-choice matrix and deviation board. Each member signs in with their own room email code; the connection sees only what that member already sees in the room and ends after 30 days."
+  },
+  "accentColor": "#1F3A2E",
+  "copilotAgents": {
+    "declarativeAgents": [
+      {
+        "id": "legallasCounselRoom",
+        "file": "declarativeAgent.json"
+      }
+    ]
+  },
+  "validDomains": []
+}

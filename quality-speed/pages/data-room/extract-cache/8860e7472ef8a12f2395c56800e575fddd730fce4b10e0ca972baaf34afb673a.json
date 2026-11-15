@@ -1,0 +1,11 @@
+{
+ "version": 3,
+ "sha256": "8860e7472ef8a12f2395c56800e575fddd730fce4b10e0ca972baaf34afb673a",
+ "pages": [
+  {
+   "n": 1,
+   "ocr": false,
+   "text": "HARBOR LABS SAMPLE RECORD. Fictional: every name, date and number is invented.\nPage 1 of 1\nAcme Bank, N.A. business account confirmation\nAccount holder: Harbor Labs, LLC. Account type: business checking, account ending\n4417.\nOpened: February 21, 2011, with an opening deposit of $5,000.\nAuthorized signers: Jane Doe and Richard Roe. Either signer may act alone up to\n$5,000. Above that, both must sign.\nMonthly service fee: $17.25."
+  }
+ ]
+}

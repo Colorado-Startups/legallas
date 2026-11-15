@@ -1,0 +1,25 @@
+---
+// Where Cloudflare Access sends someone who signs in but fails a non-identity rule; for this room that
+// is a country requirement (the custom non-identity deny URL of both the room's app and the AI
+// sign-in app on mcp.room). Access judges the country by the browser's IP, so a VPN or firm network that
+// exits abroad looks like travel.
+import Door from '../../../layouts/Door.astro';
+import DoorSeal from '../../../components/DoorSeal.astro';
+import { names } from '../../../scripts/room-config.ts';
+---
+
+<Door title={names.instanceName} compact>
+  <DoorSeal />
+  <h1 class="door-title door-title-small">Sign-in works only from the United States.</h1>
+  <p class="door-lede">
+    A VPN or a company network that connects through another country looks the same as being abroad. Turn the VPN
+    off, or connect from a United States network, then try again.
+  </p>
+  <p class="door-lede">
+    The same rule applies when you connect an AI tool to the room: close this window and start again from your AI
+    tool once you are on a United States connection.
+  </p>
+  <p class="door-lede">If you are traveling, ask the person who invited you for a temporary exception.</p>
+  <hr class="door-rule" />
+  <a class="door-button" href="/welcome/">Back</a>
+</Door>

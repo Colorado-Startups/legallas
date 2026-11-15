@@ -1,0 +1,30 @@
+{
+  "page": "agents",
+  "signoff_comment": 6643852261,
+  "metrics": [
+    {"id": "sessions_merged", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 50, "goal": 90, "weight": 3, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "session_drill", "goal_source": "https://docs.github.com/en/copilot/tutorials/cloud-agent/get-the-best-results"},
+    {"id": "session_drill", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://sre.google/sre-book/testing-reliability/"},
+    {"id": "session_to_pr_p50", "lens": "speed", "unit": "minutes", "direction": "lower", "floor": 60, "goal": 15, "weight": 1, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "session_drill", "goal_source": "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/troubleshoot-cloud-agent"},
+    {"id": "minutes_per_merged_change", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 60, "goal": 20, "weight": 2, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "session_drill", "goal_source": "https://docs.github.com/en/billing/concepts/product-billing/github-actions"},
+    {"id": "automation_runs_useful", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 50, "goal": 90, "weight": 2, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "session_drill", "goal_source": "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/create-automations"},
+    {"id": "automation_credit_limit_set", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 1, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "session_drill", "goal_source": "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/create-automations"},
+    {"id": "env_setup_success", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 50, "goal": 100, "weight": 1, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "session_drill", "goal_source": "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/customize-the-agent-environment"},
+    {"id": "env_setup_seconds_p50", "lens": "speed", "unit": "seconds", "direction": "lower", "floor": 600, "goal": 120, "weight": 1, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "session_drill", "goal_source": "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/customize-the-agent-environment"},
+    {"id": "lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 30, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"}
+  ],
+  "changes": [
+    {"date": "2026-11-05", "metric": "lane_minutes", "field": "added", "from": null, "to": "lane_minutes", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6646897281},
+    {"date": "2026-11-06", "metric": "fence_proven", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 670, "signoff_comment": 6679479557},
+    {"date": "2026-11-06", "metric": "rule_clean", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 670, "signoff_comment": 6679479557},
+    {"date": "2026-11-06", "metric": "instruction_broken", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 670, "signoff_comment": 6679479557},
+    {"date": "2026-11-06", "metric": "first_commit_to_merge_p90", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 670, "signoff_comment": 6679479557},
+    {"date": "2026-11-06", "metric": "sessions_merged", "field": "added", "from": null, "to": "sessions_merged", "reason": "added_toward_ideal", "issue": 670, "signoff_comment": 6679479557},
+    {"date": "2026-11-06", "metric": "session_drill", "field": "added", "from": null, "to": "session_drill", "reason": "added_toward_ideal", "issue": 670, "signoff_comment": 6679479557},
+    {"date": "2026-11-06", "metric": "session_to_pr_p50", "field": "added", "from": null, "to": "session_to_pr_p50", "reason": "added_toward_ideal", "issue": 670, "signoff_comment": 6679479557},
+    {"date": "2026-11-06", "metric": "minutes_per_merged_change", "field": "added", "from": null, "to": "minutes_per_merged_change", "reason": "added_toward_ideal", "issue": 670, "signoff_comment": 6679479557},
+    {"date": "2026-11-09", "metric": "automation_runs_useful", "field": "added", "from": null, "to": "automation_runs_useful", "reason": "added_toward_ideal", "issue": 963},
+    {"date": "2026-11-09", "metric": "automation_credit_limit_set", "field": "added", "from": null, "to": "automation_credit_limit_set", "reason": "added_toward_ideal", "issue": 963},
+    {"date": "2026-11-09", "metric": "env_setup_success", "field": "added", "from": null, "to": "env_setup_success", "reason": "added_toward_ideal", "issue": 963},
+    {"date": "2026-11-09", "metric": "env_setup_seconds_p50", "field": "added", "from": null, "to": "env_setup_seconds_p50", "reason": "added_toward_ideal", "issue": 963}
+  ]
+}

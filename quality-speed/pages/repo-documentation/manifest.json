@@ -1,0 +1,41 @@
+{
+  "page": "repo-documentation",
+  "signoff_comment": 6644370193,
+  "metrics": [
+    {"id": "readme_visual_share", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 30, "goal": 80, "weight": 2, "max_age_hours": 48, "min_samples": 10, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/repo-documentation/PLAN.md#goals"},
+    {"id": "front_door_dead_names", "lens": "quality", "unit": "count", "direction": "lower", "floor": 5, "goal": 0, "weight": 2, "max_age_hours": 48, "min_samples": 3, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/repo-documentation/PLAN.md#goals"},
+    {"id": "front_door_broken_links", "lens": "quality", "unit": "count", "direction": "lower", "floor": 5, "goal": 0, "weight": 2, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://www.w3.org/Provider/Style/URI"},
+    {"id": "dead_external_links", "lens": "quality", "unit": "count", "direction": "lower", "floor": 3, "goal": 0, "weight": 1, "max_age_hours": 192, "min_samples": 1, "goal_source": "https://www.w3.org/Provider/Style/URI"},
+    {"id": "community_files_ok", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 2, "max_age_hours": 48, "min_samples": 2, "goal_source": "https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file"},
+    {"id": "license_detected", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository"},
+    {"id": "about_box_set", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 1, "max_age_hours": 48, "min_samples": 3, "goal_source": "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/classifying-your-repository-with-topics"},
+    {"id": "main_via_pr", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 90, "goal": 100, "weight": 2, "max_age_hours": 48, "min_samples": 50, "goal_source": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets"},
+    {"id": "custom_properties_set", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://docs.github.com/en/organizations/managing-organization-settings/managing-custom-properties-for-repositories-in-your-organization"},
+    {"id": "readme_reading_minutes", "lens": "speed", "unit": "minutes", "direction": "lower", "floor": 10, "goal": 2, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://doi.org/10.1016/j.jml.2019.104047"},
+    {"id": "lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 10, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"},
+    {"id": "readme_tokens", "lens": "consumption", "unit": "tokens", "direction": "lower", "floor": 4000, "goal": 1000, "weight": 2, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/repo-documentation/PLAN.md#goals"}
+  ],
+  "changes": [
+    {"date": "2026-11-05", "metric": "lane_minutes", "field": "added", "from": null, "to": "lane_minutes", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6646893056},
+    {"date": "2026-11-09", "metric": "questions_true", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 953},
+    {"date": "2026-11-09", "metric": "start_tokens", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 953},
+    {"date": "2026-11-09", "metric": "dead_names", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 953},
+    {"date": "2026-11-09", "metric": "broken_internal_links", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 953},
+    {"date": "2026-11-09", "metric": "public_symbols_documented", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 953},
+    {"date": "2026-11-09", "metric": "long_sentence_share", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 953},
+    {"date": "2026-11-09", "metric": "lag_drill", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 953},
+    {"date": "2026-11-09", "metric": "reading_minutes_p90", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 953},
+    {"date": "2026-11-09", "metric": "doc_lag_hours_p90", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 953},
+    {"date": "2026-11-09", "metric": "dead_external_links", "field": "min_samples", "from": 100, "to": 1, "reason": "wrong_basis", "issue": 953},
+    {"date": "2026-11-09", "metric": "readme_visual_share", "field": "added", "from": null, "to": "readme_visual_share", "reason": "added_toward_ideal", "issue": 953},
+    {"date": "2026-11-09", "metric": "front_door_dead_names", "field": "added", "from": null, "to": "front_door_dead_names", "reason": "added_toward_ideal", "issue": 953},
+    {"date": "2026-11-09", "metric": "front_door_broken_links", "field": "added", "from": null, "to": "front_door_broken_links", "reason": "added_toward_ideal", "issue": 953},
+    {"date": "2026-11-09", "metric": "community_files_ok", "field": "added", "from": null, "to": "community_files_ok", "reason": "added_toward_ideal", "issue": 953},
+    {"date": "2026-11-09", "metric": "license_detected", "field": "added", "from": null, "to": "license_detected", "reason": "added_toward_ideal", "issue": 953},
+    {"date": "2026-11-09", "metric": "about_box_set", "field": "added", "from": null, "to": "about_box_set", "reason": "added_toward_ideal", "issue": 953},
+    {"date": "2026-11-09", "metric": "main_via_pr", "field": "added", "from": null, "to": "main_via_pr", "reason": "added_toward_ideal", "issue": 953},
+    {"date": "2026-11-09", "metric": "custom_properties_set", "field": "added", "from": null, "to": "custom_properties_set", "reason": "added_toward_ideal", "issue": 953},
+    {"date": "2026-11-09", "metric": "readme_reading_minutes", "field": "added", "from": null, "to": "readme_reading_minutes", "reason": "added_toward_ideal", "issue": 953},
+    {"date": "2026-11-09", "metric": "readme_tokens", "field": "added", "from": null, "to": "readme_tokens", "reason": "added_toward_ideal", "issue": 953}
+  ]
+}

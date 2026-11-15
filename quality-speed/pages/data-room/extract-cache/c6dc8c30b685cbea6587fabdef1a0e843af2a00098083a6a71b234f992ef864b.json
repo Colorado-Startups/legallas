@@ -1,0 +1,16 @@
+{
+ "version": 3,
+ "sha256": "c6dc8c30b685cbea6587fabdef1a0e843af2a00098083a6a71b234f992ef864b",
+ "pages": [
+  {
+   "n": 1,
+   "ocr": false,
+   "text": "HARBOR LABS SAMPLE RECORD. Fictional: every name, date and number is invented.\nPage 1 of 2\nElection under Section 83(b) of the Internal Revenue Code\nTaxpayer: Jane Doe, 100 Example Street, Example City, Colorado. Taxpayer number\nmasked in this sample.\nProperty: 613,240 shares of common stock of Harbor Labs, Inc.\nDate of transfer: June 7, 2011. Taxable year: 2011.\nRestrictions: the shares are subject to the company's repurchase right in the Stock\nAgreement.\nFair market value at transfer: $0.0125 per share, $7,665.50 in total.\nAmount paid: $7,665.50. Amount included in gross income: $0.00.\nSigned under penalties of perjury by Jane Doe on June 19, 2011."
+  },
+  {
+   "n": 2,
+   "ocr": false,
+   "text": "HARBOR LABS SAMPLE RECORD. Fictional: every name, date and number is invented.\nPage 2 of 2\nProof of mailing\nCertified mail receipt: mailed June 20, 2011 to the Internal Revenue Service in\nOgden, Utah.\nThe thirtieth day after the June 7, 2011 transfer is July 7, 2011.\nA copy was given to the company on June 21, 2011 and is kept with the stock records."
+  }
+ ]
+}

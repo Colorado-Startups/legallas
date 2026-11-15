@@ -1,0 +1,18 @@
+{
+  "ideal": "Claude sessions run start to finish with no owner clicks: every tool they need is pre-allowed and declared in one checked file.",
+  "sources": [
+    {
+      "title": "Claude Code Docs: Configure permissions",
+      "url": "https://code.claude.com/docs/en/permissions",
+      "date": "2026-11-06"
+    },
+    {
+      "title": "Claude Code Docs: Settings files and precedence",
+      "url": "https://code.claude.com/docs/en/settings",
+      "date": "2026-11-04"
+    }
+  ],
+  "quality": "Every repo row in expected.json is met, no deny or ask rule takes an allowed tool back, and every deny rule stays.",
+  "speed": "A row found short is fixed within a day.",
+  "consumption": "The checked-in Claude files add few tokens to every session, and this page's CI lane runs in 5 minutes or less."
+}

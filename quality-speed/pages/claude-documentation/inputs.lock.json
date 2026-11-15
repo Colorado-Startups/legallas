@@ -1,0 +1,17 @@
+{
+  "about": "Pins questions.json, which sets questions_true. page.test.ts fails when it changes unless the change is recorded here: date, file, from and to (the sha256 before and after), a reason, the issue or pull request, and signoff_comment, the independent reviewer's comment id. The pin carries over unchanged from the Documentation page's lock, with the file.",
+  "pins": {
+    "questions.json": "60add265eccff6a7732ee4d7ca5da83005bfea4418b5353a32dbc74d53dac400"
+  },
+  "changes": [
+    {
+      "date": "2026-11-10",
+      "file": "questions.json",
+      "from": "69df2388ef0eff01b39168fe96a9393413b6f1794a948c98ff8868f9cae81cbf",
+      "to": "60add265eccff6a7732ee4d7ca5da83005bfea4418b5353a32dbc74d53dac400",
+      "reason": "q03, q05 and q25 read claude-review.yml and REVIEW.md, deleted in #555; they now ask the merge rule CLAUDE.md states. q22's truth matches secret-scan.sh after #716",
+      "issue": 555,
+      "signoff_comment": 6835218944
+    }
+  ]
+}

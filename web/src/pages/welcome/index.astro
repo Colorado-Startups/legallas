@@ -1,0 +1,34 @@
+---
+// The front door: the one designed page a visitor sees before signing in. "Sign in" goes to /, which
+// Cloudflare Access intercepts; after sign-in Access returns the visitor to /, where the first thing a
+// member sees is how to connect their own AI. Public by design (see worker/public.ts and "Front door" in
+// README.md), so it names no matter and no party. The steps are styled by .door-steps in door.css, because
+// Door.astro pages carry no <style> block.
+import Door from '../../layouts/Door.astro';
+import DoorSeal from '../../components/DoorSeal.astro';
+import { names } from '../../scripts/room-config.ts';
+---
+
+<Door title={names.instanceName} animated>
+  <DoorSeal animated />
+  <p class="door-eyebrow door-rise" data-case-only>Counsel room</p>
+  <p class="door-eyebrow door-rise" data-company-only hidden>Private room</p>
+  <h1 class="door-title door-rise">{names.instanceName}</h1>
+  <p class="door-lede door-rise">Private. By invitation only.</p>
+  <hr class="door-rule door-rise" />
+  <a class="door-button door-rise door-rise-late" href="/">Sign in</a>
+  <h2 class="door-eyebrow door-rise door-rise-late" id="steps-title">Sign in, then connect your own AI</h2>
+  <ol class="door-steps door-rise door-rise-late" aria-labelledby="steps-title">
+    <li>
+      Choose <strong>Sign in</strong>. Under <strong>Email</strong>, type the exact address your invitation was sent
+      to, then choose <strong>Send&nbsp;login&nbsp;code</strong>. Ignore the Cloudflare button; it is for the room's
+      owner.
+    </li>
+    <li>Enter the code Cloudflare emails you from noreply@notify.cloudflare.com. It works once, for 10&nbsp;minutes.</li>
+    <li>
+      Connect your own AI: Claude, Microsoft 365 Copilot (Outlook, Teams, Word) or Harvey. The room shows you how on
+      its first page.
+    </li>
+  </ol>
+  <p class="door-footer door-rise door-rise-late">Protected by Cloudflare Access. Every sign-in is logged.</p>
+</Door>

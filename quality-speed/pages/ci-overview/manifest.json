@@ -1,0 +1,16 @@
+{
+  "page": "ci-overview",
+  "signoff_comment": 6644233023,
+  "metrics": [
+    { "id": "gates_intact", "lens": "quality", "unit": "count", "direction": "higher", "floor": 7, "goal": 8, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets" },
+    { "id": "pushes_per_merge", "lens": "quality", "unit": "ratio", "direction": "lower", "floor": 6, "goal": 2, "weight": 1, "max_age_hours": 48, "min_samples": 10, "goal_source": "https://docs.cloud.google.com/architecture/devops/devops-tech-continuous-integration" },
+    { "id": "reviews_per_merge", "lens": "quality", "unit": "ratio", "direction": "lower", "floor": 4, "goal": 1.2, "weight": 1, "max_age_hours": 48, "min_samples": 10, "goal_source": "https://docs.cloud.google.com/architecture/devops/devops-tech-continuous-integration" },
+    { "id": "repeat_runs_per_merge", "lens": "quality", "unit": "ratio", "direction": "lower", "floor": 1, "goal": 0, "weight": 1, "max_age_hours": 48, "min_samples": 10, "goal_source": "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows" },
+    { "id": "final_push_to_merge_p50", "lens": "speed", "unit": "minutes", "direction": "lower", "floor": 20, "goal": 3, "weight": 1, "max_age_hours": 48, "min_samples": 10, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" },
+    { "id": "lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 10, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" }
+  ],
+  "changes": [
+    {"date": "2026-11-05", "metric": "lane_minutes", "field": "added", "from": null, "to": "lane_minutes", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6646873642},
+    {"date": "2026-11-05", "metric": "gates_intact", "field": "critical", "from": true, "to": false, "reason": "wrong_basis", "issue": 645}
+  ]
+}

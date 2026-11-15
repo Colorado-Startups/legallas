@@ -1,0 +1,11 @@
+{
+  "ideal": "Every workflow proven, locked and timed out; every push answered within 10 minutes; caches and runners healthy; included minutes never run out.",
+  "sources": [
+    { "title": "GitHub Docs: Actions metrics", "url": "https://docs.github.com/en/actions/concepts/metrics", "date": "2026-11-09" },
+    { "title": "GitHub Docs: Secure use reference", "url": "https://docs.github.com/en/actions/reference/security/secure-use", "date": "2026-11-09" },
+    { "title": "Martin Fowler: Continuous Integration", "url": "https://martinfowler.com/articles/continuousIntegration.html", "date": "2024-01-18" }
+  ],
+  "quality": "Every gate intact and ran, no flaky, repeated or deleted runs, every action pinned, and the App's token jobs pass.",
+  "speed": "Push to all green within ten minutes, jobs start within 30 seconds, and no one job takes more than half of that.",
+  "consumption": "Under 17 billed runner minutes per merged pull request, and Blacksmith under 1,900 minutes in 31 days."
+}

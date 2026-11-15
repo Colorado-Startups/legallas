@@ -1,0 +1,330 @@
+{
+  "needs": [
+    {
+      "id": "corp-report-and-tax-due",
+      "path": "startup-forms",
+      "need": "Annual report and franchise tax, by March 1",
+      "source": "https://delcode.delaware.gov/title8/c005/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-franchise-tax", "item:compliance-and-governance.delaware-franchise-tax", "template:founders/delaware-corporation-certificate"],
+      "flags": [{ "kind": "deadline", "text": "on or before March 1" }]
+    },
+    {
+      "id": "corp-report-fee",
+      "path": "startup-forms",
+      "need": "Annual report fee: $50, or $25 if exempt",
+      "source": "https://delcode.delaware.gov/title8/c001/sc18/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-dgcl", "template:founders/entity-comparison"],
+      "flags": [{ "kind": "fee", "text": "a fee of $50" }]
+    },
+    {
+      "id": "corp-two-methods",
+      "path": "startup-forms",
+      "need": "The tax is the lesser of two methods",
+      "source": "https://delcode.delaware.gov/title8/c005/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-franchise-tax", "template:founders/entity-comparison", "template:founders/delaware-corporation-certificate"]
+    },
+    {
+      "id": "corp-authorized-shares-rates",
+      "path": "startup-forms",
+      "need": "Authorized shares method: from $175",
+      "source": "https://delcode.delaware.gov/title8/c005/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-franchise-tax", "template:founders/entity-comparison"],
+      "flags": [{ "kind": "fee", "text": "does not exceed 5,000 shares, $175" }]
+    },
+    {
+      "id": "corp-apvc-rates",
+      "path": "startup-forms",
+      "need": "Assumed par value method: $400 per $1 million",
+      "source": "https://delcode.delaware.gov/title8/c005/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-franchise-tax", "template:founders/entity-comparison"],
+      "flags": [{ "kind": "fee", "text": "add $400 for each $1,000,000" }]
+    },
+    {
+      "id": "corp-min-max",
+      "path": "startup-forms",
+      "need": "Minimums $175 and $400, maximum $200,000",
+      "source": "https://delcode.delaware.gov/title8/c005/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-franchise-tax", "template:founders/entity-comparison"],
+      "flags": [{ "kind": "fee", "text": "more than $200,000" }]
+    },
+    {
+      "id": "corp-method-gap",
+      "path": "startup-forms",
+      "need": "Report issued shares and assets, or pay on shares",
+      "source": "https://delcode.delaware.gov/title8/c005/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-franchise-tax", "template:founders/entity-comparison", "template:founders/delaware-corporation-certificate"]
+    },
+    {
+      "id": "corp-gross-assets",
+      "path": "startup-forms",
+      "need": "Total assets come from Form 1120, Schedule L",
+      "source": "https://delcode.delaware.gov/title8/c005/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-franchise-tax", "template:founders/entity-comparison"]
+    },
+    {
+      "id": "corp-late-penalty",
+      "path": "startup-forms",
+      "need": "Late: $200 added, and interest each month",
+      "source": "https://delcode.delaware.gov/title8/c005/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-franchise-tax", "template:founders/delaware-corporation-certificate"],
+      "flags": [{ "kind": "fee", "text": "the sum of $200" }]
+    },
+    {
+      "id": "corp-refund",
+      "path": "startup-forms",
+      "need": "Refund claims, by March 1 of the second year",
+      "source": "https://delcode.delaware.gov/title8/c005/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-franchise-tax", "template:founders/delaware-corporation-certificate"],
+      "flags": [{ "kind": "deadline", "text": "March 1 of the second calendar year" }]
+    },
+    {
+      "id": "no-income-tax-without-delaware-business",
+      "path": "startup-forms",
+      "need": "No income tax with only a statutory office there",
+      "source": "https://delcode.delaware.gov/title30/c019/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-corporate-income-tax", "template:founders/entity-comparison"]
+    },
+    {
+      "id": "founder-llc-annual-tax",
+      "path": "startup-forms",
+      "need": "A Delaware LLC: $400 a year, by June 1",
+      "source": "https://delcode.delaware.gov/title6/c018/sc11/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-llc-act", "item:compliance-and-governance.delaware-llc-annual-tax"],
+      "flags": [
+        { "kind": "deadline", "text": "the first day of June" },
+        { "kind": "fee", "text": "in the amount of $400" }
+      ]
+    },
+    {
+      "id": "corp-quarterly-estimates",
+      "path": "startup-raises",
+      "need": "Estimates once the tax reaches $5,000",
+      "source": "https://delcode.delaware.gov/title8/c005/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-franchise-tax", "template:founders/delaware-corporation-certificate"],
+      "flags": [{ "kind": "deadline", "text": "on June 1 of the current year" }]
+    },
+    {
+      "id": "corp-no-good-standing",
+      "path": "startup-raises",
+      "need": "No good standing certificate while tax is unpaid",
+      "source": "https://delcode.delaware.gov/title8/c005/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-franchise-tax"]
+    },
+    {
+      "id": "corp-prorating",
+      "path": "startup-raises",
+      "need": "Authorized shares changed mid-year: tax prorated",
+      "source": "https://delcode.delaware.gov/title8/c005/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-franchise-tax"]
+    },
+    {
+      "id": "spv-annual-tax",
+      "path": "angels-invest",
+      "need": "An SPV LLC or LP: $400 a year, by June 1",
+      "source": "https://delcode.delaware.gov/title6/c018/sc11/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-llc-act", "unit:de-lp-act"]
+    },
+    {
+      "id": "group-llc-tax",
+      "path": "angels-create-groups",
+      "need": "The group's LLC: $400 a year, by June 1",
+      "source": "https://delcode.delaware.gov/title6/c018/sc11/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-llc-act", "template:investors/groups/manager-annual-duties"],
+      "flags": [
+        { "kind": "deadline", "text": "the first day of June" },
+        { "kind": "fee", "text": "in the amount of $400" }
+      ]
+    },
+    {
+      "id": "registered-series",
+      "path": "angels-create-groups",
+      "need": "Each registered series: $100 a year",
+      "source": "https://delcode.delaware.gov/title6/c018/sc11/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-llc-act", "template:investors/groups/manager-annual-duties"],
+      "flags": [{ "kind": "fee", "text": "$100 per registered series" }]
+    },
+    {
+      "id": "llc-late",
+      "path": "angels-create-groups",
+      "need": "Late LLC tax: $200 added, good standing lost",
+      "source": "https://delcode.delaware.gov/title6/c018/sc11/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-llc-act", "template:investors/groups/manager-annual-duties"],
+      "flags": [{ "kind": "fee", "text": "the sum of $200" }]
+    },
+    {
+      "id": "fund-annual-tax",
+      "path": "vcs-invest",
+      "need": "Fund, GP and manager: $400 a year, by June 1",
+      "source": "https://delcode.delaware.gov/title6/c017/sc11/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-lp-act", "unit:de-llc-act", "template:investors/funds/compliance-calendar"],
+      "flags": [
+        { "kind": "deadline", "text": "on June 1 following the close of the calendar year" },
+        { "kind": "fee", "text": "in the amount of $400" }
+      ]
+    },
+    {
+      "id": "lp-late",
+      "path": "vcs-invest",
+      "need": "Late LP tax: $200 added, good standing lost",
+      "source": "https://delcode.delaware.gov/title6/c017/sc11/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-lp-act", "template:investors/funds/compliance-calendar"],
+      "flags": [{ "kind": "fee", "text": "the sum of $200" }]
+    },
+    {
+      "id": "corp-void-charter",
+      "path": "fights",
+      "need": "A year unpaid: the charter is void",
+      "source": "https://delcode.delaware.gov/title8/c005/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-franchise-tax"]
+    },
+    {
+      "id": "revival",
+      "path": "fights",
+      "need": "Revival: pay the back tax, or 3 times the tax",
+      "source": "https://delcode.delaware.gov/title8/c001/sc12/index.html",
+      "checked": "2026-11-05",
+      "covered_by": ["unit:de-dgcl", "unit:de-llc-act", "unit:de-lp-act"]
+    }
+  ],
+  "questions": [
+    {
+      "id": "delaware-tax-law-corp-report-and-tax-due",
+      "question": "We formed our Delaware C-corp last May. When are the first annual franchise tax report and payment due?",
+      "expect": ["8 Del. C. § 502", "8 Del. C. § 504"]
+    },
+    {
+      "id": "delaware-tax-law-corp-report-fee",
+      "question": "Apart from the franchise tax itself, does Delaware charge a separate fee just for filing our corporation's annual report? We're an ordinary for-profit startup, not a nonprofit.",
+      "expect": ["8 Del. C. § 391"]
+    },
+    {
+      "id": "delaware-tax-law-corp-two-methods",
+      "question": "My cofounder says Delaware franchise tax is based only on how many shares we've authorized. Is there another way to calculate it, and which result do we actually pay?",
+      "expect": ["8 Del. C. § 503"],
+      "mustNot": ["authorized shares (method )?is the only (method|way)"]
+    },
+    {
+      "id": "delaware-tax-law-corp-authorized-shares-rates",
+      "question": "Our Delaware corporation has 8,000 authorized shares. Counting by authorized shares, what's the franchise tax, and how much would it rise if we authorized 50,000 shares instead?",
+      "expect": ["8 Del. C. § 503"]
+    },
+    {
+      "id": "delaware-tax-law-corp-apvc-rates",
+      "question": "We have 4,000,000 issued shares and about $600,000 in total assets. How does Delaware's asset-based franchise tax calculation turn those numbers into a tax amount?",
+      "expect": ["8 Del. C. § 503"]
+    },
+    {
+      "id": "delaware-tax-law-corp-min-max",
+      "question": "As an angel I keep hearing different numbers. What's the smallest and the largest franchise tax a Delaware corporation can owe in a year, and is there a higher cap for very big companies?",
+      "expect": ["8 Del. C. § 503"],
+      "mustNot": ["\\$180,000"]
+    },
+    {
+      "id": "delaware-tax-law-corp-method-gap",
+      "question": "We authorized 10,000,000 shares when we incorporated and Delaware's notice says we owe over $85,000. We've raised only a small pre-seed. Is that bill right, or can it come down?",
+      "expect": ["8 Del. C. § 503"],
+      "mustNot": ["authorized shares (method )?is the only (method|way)"]
+    },
+    {
+      "id": "delaware-tax-law-corp-gross-assets",
+      "question": "For the Delaware franchise tax calculation that uses our assets, which total assets figure counts? Our bookkeeper has a balance sheet, a cap table and last year's federal return.",
+      "expect": ["8 Del. C. § 503"]
+    },
+    {
+      "id": "delaware-tax-law-corp-quarterly-estimates",
+      "question": "After our Series A, our Delaware franchise tax came to about $12,000. A board member says we must prepay part of next year's. What installments are due, and on what dates?",
+      "expect": ["8 Del. C. § 504"],
+      "mustNot": ["April 15"]
+    },
+    {
+      "id": "delaware-tax-law-corp-late-penalty",
+      "question": "We filed our Delaware corporation's annual report and paid the franchise tax about six weeks late. What extra charges does Delaware add on top of the tax itself?",
+      "expect": ["8 Del. C. § 502", "8 Del. C. § 504"]
+    },
+    {
+      "id": "delaware-tax-law-corp-no-good-standing",
+      "question": "Our lead investor's counsel wants a Delaware certificate of good standing before the round closes, but we never paid last year's franchise tax. Can the State still issue one?",
+      "expect": ["8 Del. C. § 502"]
+    },
+    {
+      "id": "delaware-tax-law-corp-void-charter",
+      "question": "Our startup went dormant and nobody paid Delaware franchise tax or filed reports for two years. What happens to the corporation, and is it risky for us to keep signing contracts in its name?",
+      "expect": ["8 Del. C. § 510", "8 Del. C. § 513"],
+      "mustNot": ["after (3|three) (unpaid )?years"]
+    },
+    {
+      "id": "delaware-tax-law-revival",
+      "question": "Our seed-stage Delaware corporation went void about six years ago after we stopped paying franchise tax. An acquirer now wants it back in good standing. Can it be revived, and what would that cost?",
+      "expect": ["8 Del. C. § 312", "6 Del. C. § 18-1109", "6 Del. C. § 17-1111"],
+      "mustNot": ["(cannot|can't|can ?not) be (revived|reinstated)(?! (until|unless|without|before))", "must (re-?incorporate|form a new (corporation|company|entity))"]
+    },
+    {
+      "id": "delaware-tax-law-corp-prorating",
+      "question": "We incorporated in Delaware in September, then doubled our authorized shares in November. Is the first year's franchise tax a full year's worth, and how does the share increase count?",
+      "expect": ["8 Del. C. § 503"],
+      "mustNot": ["corporations?[^.]{0,40}(not|never) prorated"]
+    },
+    {
+      "id": "delaware-tax-law-corp-refund",
+      "question": "We paid nearly $40,000 on the share-count method for last year before learning the other method would have been a few hundred dollars. Is it too late to get money back, and by when?",
+      "expect": ["8 Del. C. § 505"],
+      "mustNot": ["\\bnon-?refundable\\b"]
+    },
+    {
+      "id": "delaware-tax-law-group-llc-tax",
+      "question": "I'm forming a Delaware LLC to hold our angel group's next deal. What does Delaware charge it each year, and when is that due?",
+      "expect": ["6 Del. C. § 18-1107"],
+      "mustNot": ["(?<!from )\\$300 (a|per) year"]
+    },
+    {
+      "id": "delaware-tax-law-llc-late",
+      "question": "Our SPV is a Delaware LLC and it missed its state tax payment last June and again this June. What penalties build up, and when does Delaware cancel the LLC?",
+      "expect": ["6 Del. C. § 18-1107", "6 Del. C. § 18-1108"],
+      "mustNot": ["(cancell?ed|void) after (1|one) year"]
+    },
+    {
+      "id": "delaware-tax-law-registered-series",
+      "question": "Our angel group puts each deal into a new registered series of one Delaware LLC. What does each series owe Delaware every year, and what if a payment is late?",
+      "expect": ["6 Del. C. § 18-1107"],
+      "mustNot": ["\\$400 (per|for each|each|a) (registered )?series"]
+    },
+    {
+      "id": "delaware-tax-law-fund-annual-tax",
+      "question": "We're forming a Delaware limited partnership for our first venture fund, plus a series for co-invests. What yearly tax does the partnership owe Delaware, and by what date?",
+      "expect": ["6 Del. C. § 17-1109"],
+      "mustNot": ["(?<!from )\\$300 (a|per) year", "due (on|by) March 1"]
+    },
+    {
+      "id": "delaware-tax-law-lp-late",
+      "question": "Our fund is a Delaware limited partnership and we forgot its state tax payment this June. What does Delaware add for paying late, and what else happens until we pay?",
+      "expect": ["6 Del. C. § 17-1109"]
+    },
+    {
+      "id": "delaware-tax-law-no-income-tax-without-delaware-business",
+      "question": "Our C-corp is incorporated in Delaware, but our 12 employees and only office are in Ohio and Delaware is just our registered agent's address. Do we owe Delaware corporate income tax?",
+      "expect": ["30 Del. C. § 1902"]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "page": "testing",
+  "signoff_comment": 6644115542,
+  "metrics": [
+    { "id": "risks_proven", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 8, "max_age_hours": 192, "min_samples": 8, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" },
+    { "id": "risk_mutation_score", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 60, "goal": 80, "weight": 8, "max_age_hours": 192, "min_samples": 745, "goal_source": "https://stryker-mutator.io/docs/stryker-js/configuration/" },
+    { "id": "flaky_tests", "lens": "quality", "unit": "count", "direction": "lower", "floor": 5, "goal": 0, "weight": 3, "max_age_hours": 192, "min_samples": 3, "goal_source": "https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html" },
+    { "id": "web_test_step_p50", "lens": "speed", "unit": "seconds", "direction": "lower", "floor": 300, "goal": 60, "weight": 1, "max_age_hours": 192, "min_samples": 20, "goal_source": "https://bazel.build/reference/test-encyclopedia" },
+    { "id": "web_test_step_p95", "lens": "speed", "unit": "seconds", "direction": "lower", "floor": 300, "goal": 60, "weight": 1, "max_age_hours": 192, "min_samples": 20, "goal_source": "https://bazel.build/reference/test-encyclopedia" },
+    { "id": "lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 30, "goal": 5, "weight": 1, "max_age_hours": 192, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" },
+    { "id": "suite_cpu_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 10, "goal": 2, "weight": 3, "max_age_hours": 192, "min_samples": 3, "goal_source": "https://bazel.build/reference/test-encyclopedia" }
+  ],
+  "changes": [
+    {"date": "2026-11-05", "metric": "lane_minutes", "field": "added", "from": null, "to": "lane_minutes", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6646867578},
+    {"date": "2026-11-05", "metric": "risks_proven", "field": "critical", "from": true, "to": false, "reason": "wrong_basis", "issue": 645},
+    {"date": "2026-11-05", "metric": "suite_cpu_minutes", "field": "added", "from": null, "to": "suite_cpu_minutes", "reason": "added_toward_ideal", "issue": 645}
+  ]
+}

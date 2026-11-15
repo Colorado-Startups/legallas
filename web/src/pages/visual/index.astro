@@ -1,0 +1,70 @@
+---
+// /visual/?v=<slug>: one page of the binder at a time (card P8). Everything below is filled in by
+// scripts/visual-viewer.ts from /api/visuals; the visual itself runs in a script-only sandbox.
+import Room from '../../layouts/Room.astro';
+import LegallasEmpty from '../../components/LegallasEmpty.astro';
+import VisualIcons from '../../components/VisualIcons.astro';
+// D2's fletched pager arrows (currentColor). The viewer clones them from the template below.
+import arrowPrev from '@brand/brand/arrow-prev.svg?raw';
+import arrowNext from '@brand/brand/arrow-next.svg?raw';
+import '../../styles/viewer.css';
+---
+
+<Room title="Binder" guide="visual">
+  <VisualIcons />
+  <div class="binder-viewer" data-viewer data-accent="forest">
+    <div data-viewer-ready hidden>
+      <nav class="binder-crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="/documents/">Documents</a></li>
+          <li><a href="/binder/">Binder</a></li>
+          <li><a data-crumb-section href="/binder/"></a></li>
+        </ol>
+      </nav>
+
+      <header class="binder-viewer__head">
+        <p class="binder-viewer__kicker" data-viewer-kicker></p>
+        <h1 class="t-h2" data-viewer-title></h1>
+        <p class="binder-viewer__summary" data-viewer-summary hidden></p>
+      </header>
+
+      <nav class="binder-chips" aria-label="Pages in this tab">
+        <ol data-viewer-chips></ol>
+      </nav>
+
+      <div class="binder-stage" data-viewer-stage>
+        <div class="binder-stage__bar">
+          <span class="binder-stage__hint">Arrow keys turn the pages.</span>
+          <button type="button" class="c-button c-button--quiet" data-viewer-fullscreen hidden>Full screen</button>
+        </div>
+        <iframe data-viewer-frame sandbox="allow-scripts" referrerpolicy="no-referrer" title="Visual"></iframe>
+      </div>
+
+      <div class="binder-out" data-viewer-out role="status" hidden>
+        <span>This link leaves the room:</span>
+        <a data-viewer-out-link href="/" target="_blank" rel="noopener noreferrer"></a>
+        <button type="button" class="c-button" data-viewer-out-close>Dismiss</button>
+      </div>
+
+      <div class="binder-out" data-viewer-note role="status" hidden>
+        <span data-viewer-note-text></span>
+        <button type="button" class="c-button" data-viewer-note-close>Dismiss</button>
+      </div>
+
+      <nav class="binder-turns" aria-label="Previous and next page" data-viewer-turns></nav>
+      <template data-viewer-arrows>
+        <span class="binder-turn__arrow" data-arrow="prev" aria-hidden="true"><Fragment set:html={arrowPrev} /></span>
+        <span class="binder-turn__arrow" data-arrow="next" aria-hidden="true"><Fragment set:html={arrowNext} /></span>
+      </template>
+      <p class="u-vh" aria-live="polite" data-viewer-status></p>
+    </div>
+
+    <div data-viewer-missing hidden>
+      <LegallasEmpty title="That binder page is not in the room." level={1}>
+        <a class="c-button" href="/binder/">Back to the binder</a>
+      </LegallasEmpty>
+    </div>
+  </div>
+</Room>
+
+<script src="../../scripts/visual-viewer.ts"></script>

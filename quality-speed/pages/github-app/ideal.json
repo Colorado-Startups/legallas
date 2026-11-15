@@ -1,0 +1,28 @@
+{
+  "ideal": "Legallas Automation holds exactly the permissions its workflows use, and every job that mints its token passes, fast and on few CI minutes.",
+  "sources": [
+    {
+      "title": "GitHub Docs: Choosing permissions for a GitHub App",
+      "url": "https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/choosing-permissions-for-a-github-app",
+      "date": "2026-11-04"
+    },
+    {
+      "title": "GitHub Docs: Actions runner pricing",
+      "url": "https://docs.github.com/en/billing/reference/actions-runner-pricing",
+      "date": "2026-10-28"
+    },
+    {
+      "title": "GitHub Docs: Best practices for creating a GitHub App",
+      "url": "https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/best-practices-for-creating-a-github-app",
+      "date": "2026-10-07"
+    },
+    {
+      "title": "Martin Fowler: Continuous Integration",
+      "url": "https://martinfowler.com/articles/continuousIntegration.html",
+      "date": "2024-01-18"
+    }
+  ],
+  "quality": "No permission beyond the expected list and none missing, and every job that mints the App's token in 30 days succeeds.",
+  "speed": "The median job that mints the App's token ends within a minute, the least GitHub bills.",
+  "consumption": "This page's CI lane runs in 5 minutes or less."
+}

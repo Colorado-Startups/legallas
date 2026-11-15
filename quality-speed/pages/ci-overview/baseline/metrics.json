@@ -1,0 +1,62 @@
+[
+  {
+    "id": "gates_intact",
+    "page": "ci-overview",
+    "value": 7,
+    "status": "ok",
+    "stage": "lab",
+    "measured_at": "2026-11-02T04:56:00Z",
+    "source_url": "https://github.com/Colorado-Startups/legallas/commit/6cba3013144291b1026f6892b376c4e6ba2e3e73",
+    "sample_size": 1
+  },
+  {
+    "id": "ci_usd_per_merge",
+    "page": "ci-overview",
+    "value": 0.232,
+    "status": "ok",
+    "stage": "lab",
+    "measured_at": "2026-11-02T04:56:00Z",
+    "source_url": "https://github.com/Colorado-Startups/legallas/commit/6cba3013144291b1026f6892b376c4e6ba2e3e73",
+    "sample_size": 38
+  },
+  {
+    "id": "pushes_per_merge",
+    "page": "ci-overview",
+    "value": 3.211,
+    "status": "ok",
+    "stage": "lab",
+    "measured_at": "2026-11-02T04:56:00Z",
+    "source_url": "https://github.com/Colorado-Startups/legallas/commit/6cba3013144291b1026f6892b376c4e6ba2e3e73",
+    "sample_size": 38
+  },
+  {
+    "id": "reviews_per_merge",
+    "page": "ci-overview",
+    "value": 2.737,
+    "status": "ok",
+    "stage": "lab",
+    "measured_at": "2026-11-02T04:56:00Z",
+    "source_url": "https://github.com/Colorado-Startups/legallas/commit/6cba3013144291b1026f6892b376c4e6ba2e3e73",
+    "sample_size": 38
+  },
+  {
+    "id": "repeat_runs_per_merge",
+    "page": "ci-overview",
+    "value": 0.789,
+    "status": "ok",
+    "stage": "lab",
+    "measured_at": "2026-11-02T04:56:00Z",
+    "source_url": "https://github.com/Colorado-Startups/legallas/commit/6cba3013144291b1026f6892b376c4e6ba2e3e73",
+    "sample_size": 38
+  },
+  {
+    "id": "final_push_to_merge_p50",
+    "page": "ci-overview",
+    "value": 4.02,
+    "status": "ok",
+    "stage": "lab",
+    "measured_at": "2026-11-02T04:56:00Z",
+    "source_url": "https://github.com/Colorado-Startups/legallas/commit/6cba3013144291b1026f6892b376c4e6ba2e3e73",
+    "sample_size": 38
+  }
+]

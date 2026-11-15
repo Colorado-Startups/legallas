@@ -1,0 +1,500 @@
+/*
+  The room views (mcp/apps/): board, timeline and grid, inside an AI's frame or the binder's. Every color is a room
+  token (src/styles/tokens.css, inlined by mcp/apps/build.ts without its font imports, so the system fonts in each
+  token's stack stand in). Light only, like the room (the owner, 2026-10-02): in a dark AI the view reads as a card.
+*/
+html {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: var(--text-14) / 1.45 var(--font-sans);
+}
+
+#app {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.v-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.v-title {
+  margin: 0;
+  font: 600 var(--text-18) / 1.2 var(--font-serif);
+  color: var(--forest);
+}
+
+.v-tools {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.v-sub {
+  margin: 0;
+  font: 600 var(--text-14) / 1.3 var(--font-sans);
+  color: var(--ink-2);
+}
+
+.v-muted {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: var(--text-12);
+}
+
+.v-empty {
+  margin: 0;
+  padding: var(--space-4);
+  color: var(--ink-2);
+  background: var(--panel);
+  border-radius: var(--radius);
+}
+
+.v-status {
+  margin: 0;
+  font-size: var(--text-13);
+  color: var(--ink-2);
+}
+
+.v-status[data-kind='error'],
+.v-error {
+  color: var(--oxblood);
+}
+
+.v-button,
+.v-tab {
+  min-height: var(--target-min);
+  padding: var(--space-1) var(--space-3);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.v-button:hover,
+.v-tab:hover {
+  background: var(--forest-tint);
+}
+
+.v-button--quiet {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-2);
+}
+
+.v-tabs {
+  display: inline-flex;
+  gap: 0;
+}
+
+.v-tab {
+  border-radius: 0;
+}
+
+.v-tab:first-child {
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+
+.v-tab:last-child {
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.v-tab + .v-tab {
+  border-left: 0;
+}
+
+.v-tab[aria-selected='true'] {
+  background: var(--forest);
+  border-color: var(--forest);
+  color: var(--on-forest);
+}
+
+.v-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 3px;
+}
+
+.v-link:hover {
+  text-decoration-color: var(--forest);
+}
+
+.v-untrusted::before {
+  content: '⚠ ';
+  color: var(--oxblood);
+}
+
+/* Cite chips: the control number and page, like the room's exhibit chips. */
+.v-cites {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.v-cite {
+  min-height: 20px;
+  padding: 0 var(--space-2);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius-chip);
+  background: var(--surface);
+  color: var(--forest);
+  font: 500 var(--text-12) / 1.6 var(--font-mono);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.v-cite:hover {
+  border-color: var(--forest);
+  background: var(--forest-tint);
+}
+
+/* Summary: the case header and a tile per section. */
+.v-case {
+  display: grid;
+  gap: var(--space-1);
+  padding-bottom: var(--space-3);
+  border-bottom: var(--hairline) solid var(--brass-rule);
+}
+
+.v-case__caption {
+  margin: 0;
+  font: 600 var(--text-16) / 1.3 var(--font-serif);
+}
+
+.v-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: var(--space-2);
+}
+
+.v-tile {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-align: left;
+}
+
+button.v-tile {
+  cursor: pointer;
+}
+
+button.v-tile:hover {
+  border-color: var(--forest);
+}
+
+.v-tile__n {
+  font: 600 var(--text-26) / 1 var(--font-serif);
+  color: var(--forest);
+}
+
+.v-tile__label {
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+
+/* Board: columns by status, cards in reading order. */
+.v-board {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(14rem, 1fr);
+  gap: var(--space-3);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+}
+
+.v-col {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--panel);
+  border-radius: var(--radius);
+}
+
+.v-col__head {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0 var(--space-1);
+  font: 600 var(--text-13) / 1.4 var(--font-sans);
+  color: var(--ink-2);
+}
+
+.v-col[data-key='missing'] .v-col__head,
+.v-col[data-key='check'] .v-col__head {
+  color: var(--oxblood);
+}
+
+.v-col__count {
+  font-family: var(--font-mono);
+  color: var(--ink-3);
+}
+
+/* A long column scrolls inside, so the board stays one screen tall in the chat. */
+.v-col__cards {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  max-height: 32rem;
+  overflow-y: auto;
+  margin: 0;
+  padding: 2px;
+  list-style: none;
+}
+
+.v-card {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.v-card[data-untrusted] {
+  border-color: var(--oxblood);
+}
+
+.v-card__title {
+  margin: 0;
+  font: 600 var(--text-14) / 1.35 var(--font-sans);
+}
+
+.v-card__meta {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: var(--text-12);
+}
+
+.v-card__next {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.v-due {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  margin: 0;
+  font-size: var(--text-12);
+}
+
+.v-due__date {
+  font-family: var(--font-mono);
+}
+
+.v-due__state {
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-chip);
+  background: var(--forest-tint);
+  color: var(--forest);
+}
+
+.v-due[data-state='late'] .v-due__state,
+.v-due[data-state='passed'] .v-due__state {
+  background: var(--oxblood-tint);
+  color: var(--oxblood);
+}
+
+.v-due[data-state='soon'] .v-due__state,
+.v-due[data-state='check'] .v-due__state {
+  background: var(--panel);
+  color: var(--brass-text);
+}
+
+/* Timeline: the room's chart kit draws it; the picked event's cites sit below. */
+.v-timeline {
+  --chart-ground: var(--surface);
+  min-height: 12rem;
+}
+
+.v-detail {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.v-detail p,
+.v-detail h3 {
+  margin: 0;
+}
+
+/* Grid: one row per document, every cell a way into its document. */
+.v-filter {
+  min-height: var(--target-min);
+  padding: 0 var(--space-2);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font: inherit;
+}
+
+/* Long lists scroll inside under a sticky header, so the grid stays one screen tall in the chat. */
+.v-grid {
+  max-height: 34rem;
+  overflow: auto;
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.v-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-13);
+}
+
+.v-table th {
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  text-align: left;
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.v-sort {
+  width: 100%;
+  padding: var(--space-2);
+  border: 0;
+  background: none;
+  font-weight: 600;
+  text-align: left;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.v-table th[aria-sort='ascending'] .v-sort::after {
+  content: ' ▲';
+}
+
+.v-table th[aria-sort='descending'] .v-sort::after {
+  content: ' ▼';
+}
+
+.v-table td {
+  padding: 0;
+  border-bottom: var(--hairline) solid var(--rule);
+  vertical-align: top;
+}
+
+.v-table td .v-cite {
+  margin: var(--space-2);
+}
+
+.v-cell {
+  display: block;
+  width: 100%;
+  min-height: var(--target-min);
+  padding: var(--space-2);
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.v-cell:hover {
+  background: var(--forest-tint);
+}
+
+.v-table td[data-kind='number'] .v-cell {
+  text-align: right;
+  font-family: var(--font-mono);
+}
+
+.v-table td[data-kind='date'] .v-cell {
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.v-table tr[data-privileged] td:first-child {
+  box-shadow: inset 3px 0 0 var(--oxblood);
+}
+
+/* Reader: one cited page, beside or below the view. */
+.v-reader {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--surface);
+  border: var(--hairline) solid var(--forest);
+  border-radius: var(--radius);
+}
+
+.v-reader__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.v-reader__label {
+  flex: 1;
+  font-family: var(--font-mono);
+  color: var(--forest);
+}
+
+.v-reader__text {
+  max-height: 22rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  font: var(--text-13) / 1.55 var(--font-serif);
+}
+
+.v-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .v-button,
+  .v-tab,
+  .v-cite,
+  .v-cell {
+    transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+  }
+}

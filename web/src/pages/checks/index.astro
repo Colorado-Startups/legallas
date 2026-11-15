@@ -1,0 +1,49 @@
+---
+// Approving a public-records check (worker/public-records.ts). An AI asked to look a name up in public records; this
+// page shows the member exactly which name and which public sites, and nothing leaves the room until they approve.
+// The shell is static like every page; the request comes from GET /api/checks/:id (worker/routes/checks.ts), and the
+// decision goes back with POST. src/scripts/checks.ts renders with textContent only.
+import Room from '../../layouts/Room.astro';
+import { NOT_A_CONSUMER_REPORT, NOT_A_LAWYER, RECORDS_NOT_CONCLUSIONS } from '../../../worker/public-records.ts';
+import '../../styles/checks.css';
+---
+
+<Room title="Public records check">
+  <section class="chk" aria-labelledby="chk-title">
+    <h1 id="chk-title" class="t-h1">Public records check</h1>
+
+    <div class="chk-body" data-check-panel hidden>
+      <p class="chk-lede">
+        <span data-check-via></span> asked to look up <strong data-check-name></strong> (<span data-check-kind></span>) in public
+        records.
+      </p>
+
+      <h2 class="t-h3">Approving sends this name to</h2>
+      <ul class="chk-list" data-check-sends></ul>
+      <p class="t-small chk-note">Only these sites receive the name, and only once. Nothing has been sent yet.</p>
+
+      <h2 class="t-h3">Searched by hand</h2>
+      <p class="t-small chk-note">The result links these sites and says what to look for. The room does not send them the name.</p>
+      <ul class="chk-list" data-check-hand></ul>
+
+      <aside class="chk-notice" aria-label="Before you approve">
+        <p class="t-small">{NOT_A_CONSUMER_REPORT}</p>
+        <p class="t-small">{RECORDS_NOT_CONCLUSIONS}</p>
+        <p class="t-small">{NOT_A_LAWYER}</p>
+      </aside>
+
+      <div class="chk-actions" data-check-actions>
+        <button type="button" class="c-button c-button--primary" data-check-approve>Approve and send</button>
+        <button type="button" class="c-button c-button--quiet" data-check-decline>Decline</button>
+      </div>
+      <p class="t-caption chk-status" data-check-status role="status"></p>
+    </div>
+
+    <section class="c-empty" data-check-missing hidden>
+      <p class="c-empty__text">This request is not open: it lapsed, was made by someone else, or the room has the check turned off.</p>
+      <a class="c-button" href="/">Overview</a>
+    </section>
+  </section>
+</Room>
+
+<script src="../../scripts/checks.ts"></script>

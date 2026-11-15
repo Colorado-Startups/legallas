@@ -1,0 +1,297 @@
+/*
+  Header, brand portrait and nav (DESIGN.md section 7, "Header"; card F1). Room.astro is the only user.
+  The privilege line and the tools cluster are elements of the header block.
+*/
+.c-header {
+  position: relative;
+  z-index: var(--z-header);
+  background: var(--surface);
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+/* The confidentiality line from the matter config: quiet, but always present (and printed). */
+.c-header__privilege {
+  margin: 0;
+  padding: var(--space-1) var(--gutter);
+  background: var(--panel);
+  border-bottom: var(--hairline) solid var(--rule);
+  color: var(--ink-2);
+  font-size: var(--text-12);
+  line-height: 1rem;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.c-header__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  align-items: center;
+  max-width: var(--page-max);
+  min-height: 3.5rem;
+  margin: 0 auto;
+  padding: var(--space-2) var(--gutter);
+}
+
+.c-header__brand {
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-2);
+  align-items: center;
+  min-height: var(--target-min);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  border-radius: var(--radius);
+}
+
+.c-header__brand:hover {
+  color: var(--forest);
+  text-decoration: none;
+}
+
+/* The brand mark is Legallas himself: the small Legallas at 32px (LegallasGlyph.astro, glyph.css), never a state target. */
+.c-header__portrait {
+  display: inline-flex;
+  flex: none;
+}
+
+/* Ask and the Account menu, at the far end of the bar. */
+.c-header__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  margin-left: auto;
+  font-size: var(--text-14);
+}
+
+.c-header__who {
+  overflow: hidden;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.c-header__who:has([data-me-email]:empty) {
+  display: none;
+}
+
+/*
+  Activity is the owner's ledger; me.ts sets html[data-role] once /api/me answers. The :not() keeps this
+  rule stronger than the button display it shares an element with.
+*/
+html:not([data-role='owner']) .c-header__owner {
+  display: none;
+}
+
+/*
+  A member refused an action: me.ts lists the refused actions in html[data-cannot], and every control for
+  one carries data-needs. !important beats the hidden-attribute toggles and button displays they share.
+*/
+html[data-cannot~='readComments'] [data-needs~='readComments'],
+html[data-cannot~='comment'] [data-needs~='comment'],
+html[data-cannot~='upload'] [data-needs~='upload'],
+html[data-cannot~='flag'] [data-needs~='flag'],
+html[data-cannot~='connect'] [data-needs~='connect'] {
+  display: none !important;
+}
+
+/* With no discussion column, the document viewer takes the full width. */
+html[data-cannot~='readComments'] .doc-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/*
+  The Account menu (R65; at every width, the owner 2026-10-03): a native <details> beside Ask holding who is signed in,
+  Connect AI, the owner's Activity and Sign out. It is closed from the first paint, so the bar never changes when
+  /api/me answers; header-account.ts adds Escape and closing on a click or focus outside it.
+*/
+.c-header__menu {
+  position: relative;
+  flex: none;
+}
+
+.c-header__more {
+  gap: var(--space-1);
+  padding-right: var(--space-2);
+  list-style: none;
+}
+
+.c-header__more::-webkit-details-marker {
+  display: none;
+}
+
+.c-header__caret {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.c-header__menu[open] .c-header__caret {
+  transform: rotate(180deg);
+}
+
+/* The open panel: a small sheet under the summary, right-aligned, one row per link. */
+.c-header__menu[open] > .c-header__account {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 14rem;
+  max-width: calc(100vw - 2 * var(--gutter));
+  padding: var(--space-2) 0;
+  background: var(--surface);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-overlay);
+}
+
+/* Rows never set display: the role rules above hide Activity and Connect AI by display. */
+.c-header__account > .c-button {
+  justify-content: flex-start;
+  height: 2.5rem;
+  padding: 0 var(--space-4);
+  border-radius: 0;
+}
+
+/* Who is signed in heads the panel once /api/me has filled it; empty, the rule above keeps it hidden. */
+.c-header__account > .c-header__who:has([data-me-email]:not(:empty)) {
+  display: block;
+  margin-bottom: var(--space-1);
+  padding: var(--space-1) var(--space-4) var(--space-2);
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+/*
+  In forced colors quiet buttons gain a border (components.css); in the panel its own border bounds the rows.
+  Canvas, not transparent: forced colors repaint a transparent border in the text color.
+*/
+@media (forced-colors: active) {
+  .c-header__account > .c-button {
+    border-color: Canvas;
+  }
+}
+
+/*
+  The header sits at --z-header, under the split exhibit pane (--z-pane, 64rem and up), so the open panel lifts
+  it just above the pane. A full-screen pane sheet (below 64rem) stays on top; the drawer and toasts stay above.
+*/
+:root:not([data-exhibit='sheet']) .c-header:has(.c-header__menu[open]) {
+  z-index: calc(var(--z-pane) + 1);
+}
+
+/* The glyph slot inside the Ask button takes no room until card F8 fills it. */
+.c-header__glyph {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  shape-rendering: crispEdges;
+}
+
+.c-header__glyph:empty {
+  display: none;
+}
+
+/* Nav: the six sections in working order. Wraps below 48rem; never hides behind a menu. */
+.c-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.c-nav__item {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0 var(--space-3);
+  color: var(--ink-2);
+  font-size: var(--text-14);
+  font-weight: 500;
+  line-height: 1.25rem;
+  text-decoration: none;
+  border-radius: var(--radius);
+}
+
+.c-nav__item:hover {
+  color: var(--forest);
+  background: var(--panel);
+  text-decoration: none;
+}
+
+.c-nav__item[aria-current='page'] {
+  color: var(--forest);
+  background: var(--forest-tint);
+  font-weight: 600;
+}
+
+@media (max-width: 64rem) {
+  .c-header__bar {
+    gap: var(--space-2) var(--space-4);
+  }
+}
+
+/*
+  Between the phone layout and 68rem the tools take their own right-aligned line from the first paint (R89).
+  68rem is the widest one-line bar measured across the six section pages (1,060.4px on /people/, with the
+  fixture's "Regulator", the current item in bold and the hint as "Ctrl K"), plus 17px for a classic scrollbar
+  and 0.5rem for a font swap (the fallback fonts measure narrower). Above it one line always fits, so the wrap
+  never depends on late text: neither the hint turning into the narrower "⌘K" after load (ask-drawer.ts), the
+  web fonts arriving nor a scrollbar appearing can change the header's line count. Remeasure it when the bar
+  gains a section or a tool.
+*/
+@media (min-width: 48.0625rem) and (max-width: 68rem) {
+  .c-header__tools {
+    flex-basis: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/*
+  The hint is "Ctrl K" in the markup and becomes "⌘K" on Apple platforms once ask-drawer.ts runs. Its chip holds the
+  wider hint's width either way, so the swap never narrows the tools and slides the centered nav (R89).
+*/
+.c-header__kbd {
+  box-sizing: content-box;
+  justify-content: center;
+  min-width: 6ch;
+}
+
+@media (max-width: 48rem) {
+  .c-header__bar {
+    padding-block: var(--space-2) var(--space-3);
+  }
+
+  /* Brand and tools share the first line; the nav takes its own full-width line below. */
+  .c-header__nav {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .c-nav {
+    margin-left: calc(var(--space-2) * -1);
+  }
+
+  .c-nav__item {
+    padding: 0 var(--space-2);
+  }
+
+  /* Brand, Ask and Account fit one line at any phone width: no keyboard hint on a phone. */
+  .c-header__tools {
+    gap: var(--space-1);
+  }
+
+  .c-header__kbd {
+    display: none;
+  }
+}

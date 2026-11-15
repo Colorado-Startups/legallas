@@ -1,0 +1,26 @@
+{
+  "reviews": [
+    {
+      "date": "2026-11-02",
+      "areas": [
+        "who-can-see-what",
+        "citations",
+        "sync-and-save-back",
+        "migrations",
+        "pii-guard",
+        "spend-guard",
+        "connector-contract"
+      ],
+      "bugs": [
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        267
+      ]
+    }
+  ]
+}

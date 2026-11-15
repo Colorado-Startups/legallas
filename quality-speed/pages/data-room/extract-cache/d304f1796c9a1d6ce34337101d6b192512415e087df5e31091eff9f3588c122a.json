@@ -1,0 +1,11 @@
+{
+ "version": 3,
+ "sha256": "d304f1796c9a1d6ce34337101d6b192512415e087df5e31091eff9f3588c122a",
+ "pages": [
+  {
+   "n": 1,
+   "ocr": false,
+   "text": "HARBOR LABS SAMPLE RECORD. Fictional: every name, date and number is invented.\nPage 1 of 1\nStock ledger of Harbor Labs, Inc., kept by Nina Note, Secretary, as of June 30, 2011\nCS-1: Jane Doe, 613,240 shares of common stock.\nCS-2: Richard Roe, 613,240 shares of common stock.\nPS-1: Alder Peak Ventures, L.P., 395,370 shares of Series Seed Preferred.\nPS-2: Lantern Street Seed I, LLC, 33,000 shares of Series Seed Preferred.\nPS-3: Angie Angel, 10,000 shares of Series Seed Preferred.\nPS-4: Sam Seed, 17,000 shares of Series Seed Preferred.\nTotal shares issued: 1,681,850."
+  }
+ ]
+}

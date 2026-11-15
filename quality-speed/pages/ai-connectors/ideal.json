@@ -1,0 +1,12 @@
+{
+  "ideal": "A customer connects their own Claude, Copilot, Harvey or open-weight model in minutes, gets right answers with sources fast, and no other AI connects.",
+  "sources": [
+    {"title": "Claude API docs: Tool search tool", "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool", "date": "2026-11-05"},
+    {"title": "Microsoft Writing Style Guide: Writing step-by-step instructions", "url": "https://learn.microsoft.com/en-us/style-guide/procedures-instructions/writing-step-by-step-instructions", "date": "2026-04-02"},
+    {"title": "Model Context Protocol specification 2025-11-25: Authorization", "url": "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization", "date": "2025-11-25"},
+    {"title": "Anthropic: Writing effective tools for agents, with agents", "url": "https://www.anthropic.com/research/writing-tools-for-agents", "date": "2025-09-11"}
+  ],
+  "quality": "Every unsupported AI refused, and all four supported AIs pass the whole connector contract.",
+  "speed": "Each AI's setup guide in seven steps or fewer.",
+  "consumption": "Every AI loads the room's whole tool list in under 10,000 tokens, and each answer's tool results stay inside 25,000."
+}

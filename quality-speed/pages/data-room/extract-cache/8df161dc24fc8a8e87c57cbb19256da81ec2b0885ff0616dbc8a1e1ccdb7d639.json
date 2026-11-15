@@ -1,0 +1,16 @@
+{
+ "version": 3,
+ "sha256": "8df161dc24fc8a8e87c57cbb19256da81ec2b0885ff0616dbc8a1e1ccdb7d639",
+ "pages": [
+  {
+   "n": 1,
+   "ocr": false,
+   "text": "HARBOR LABS SAMPLE RECORD. Fictional: every name, date and number is invented.\nPage 1 of 2\nPrivilege log of Plaintiff Jane Doe for production volume JD-PROD-001, September 10,\n2013\nEach entry is a claim by counsel. The court decides whether a claim holds.\nPL-001. JD000051-JD000051. 2012-10-18. Email from Jane Doe to Lisa Low. Basis\nclaimed: Attorney-client privilege. Client request for legal advice about the reply\nto her demand letter.\nPL-002. JD000085-JD000085. 2013-05-07. Notes from Lisa Low to File. Basis claimed:\nWork product. Counsel notes of a call about the production schedule.\nPL-003. JD000086-JD000086. 2012-10-20. Letter from Lisa Low to Jane Doe. Basis\nclaimed: Attorney-client privilege. Counsel instruction to keep documents.\nPL-004. JD000087-JD000087. 2013-04-23. Memo from Lisa Low to File. Basis claimed:\nWork product. Counsel notes prepared for this case.\nPL-005. JD000088-JD000088. 2013-08-20. Memo from Lisa Low to Jane Doe. Basis\nclaimed: Attorney-client privilege and work product. Counsel advice about resolving\nthe case."
+  },
+  {
+   "n": 2,
+   "ocr": false,
+   "text": "HARBOR LABS SAMPLE RECORD. Fictional: every name, date and number is invented.\nPage 2 of 2\nPL-006. JD000089-JD000089. 2013-03-12. Spreadsheet from Lisa Low to File. Basis\nclaimed: Work product. Counsel chart of claims and proof.\nPL-007. JD000090-JD000090. 2013-03-19. Spreadsheet from Ed Expert to Lisa Low. Basis\nclaimed: Work product. Draft damages model prepared at the direction of counsel.\nPL-008. JD000091-JD000092. 2013-04-16. Memo from Ed Expert to Lisa Low. Basis\nclaimed: Work product. Draft analysis prepared at the direction of counsel."
+  }
+ ]
+}

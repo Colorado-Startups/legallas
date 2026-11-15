@@ -1,0 +1,11 @@
+{
+  "page": "github-app",
+  "signoff_comment": 6649186308,
+  "metrics": [
+    { "id": "app_permissions_off", "lens": "quality", "unit": "count", "direction": "lower", "floor": 5, "goal": 0, "weight": 1, "max_age_hours": 48, "min_samples": 5, "goal_source": "https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/best-practices-for-creating-a-github-app" },
+    { "id": "app_token_runs_passing", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 50, "goal": 100, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/github-app/PLAN.md#goals" },
+    { "id": "app_token_job_seconds_p50", "lens": "speed", "unit": "seconds", "direction": "lower", "floor": 300, "goal": 60, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://docs.github.com/en/billing/reference/actions-runner-pricing" },
+    { "id": "lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 10, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" }
+  ],
+  "changes": []
+}

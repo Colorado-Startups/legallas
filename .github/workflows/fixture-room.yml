@@ -1,0 +1,305 @@
+# The fixture room on GitHub-hosted Linux, by hand only: seeds the fictional
+# Doe v. Harbor Labs room (`npm run dev:seed`), serves it with `wrangler dev --local`,
+# photographs the routes given (`npm run dev:shoot`), runs the local MCP smoke
+# (`npm run mcp:smoke` against `npm run mcp:dev`) and uploads the PNGs,
+# report.json, the smoke table and the server logs as one artifact.
+#
+# Linux, from the committed extract cache (quality-speed/pages/data-room/extract-cache):
+# the seed reads each document's text from it, so no Swift extractor or OCR runs,
+# and the step fails if the cache misses a document or the seed leaves one
+# unindexed. About a tenth of hosted macOS's price. The company fixture needs its
+# entries in the cache too (#206). Run it when a change to the room's pages or the
+# MCP needs the evidence:
+#
+#   gh workflow run fixture-room.yml -R Colorado-Startups/legallas --ref <branch> \
+#     -f routes='/ /chronology/ /documents/'
+#
+# The fixture input picks what is seeded: case is the Doe v. Harbor Labs room
+# with its matter, company is the same company with no matter and with the
+# checklist on. Add -f fixture=company -f routes='/ /checklist/' to see it.
+#
+# The roles input runs the six kits and five claude-for-legal skills (scripts/kit-run.ts) as each role named,
+# after the owner's shots and smoke: both servers restart as that role's dev
+# identity, its pages are photographed, and its AI connection runs every kit's
+# tool steps and reads both views. investor adds a deal room on the fixture's
+# folders, the lawyer-analysis folder included, and checks that the guest sees
+# none of the privileged work product. Add -f roles='owner counsel investor'.
+#
+# The law input builds the statutes the Entity choice page cites (web/worker/entity-matrix.ts) from their
+# official sources into the local law bucket (npm run law -- --only ... --local), so the page dates every
+# cell and legallas_search_law answers on the runner. Add -f fixture=company -f law=true -f routes='/entity/'.
+#
+# Fixture data only, and no secrets: .dev.vars is the committed example
+# (ASK_MOCK=1 and MCP_SEARCH_MOCK=1 keep Ask and search on the runner), every
+# wrangler call is --local with remote bindings disabled, and dev:shoot fails
+# the run on any request that leaves localhost.
+name: Fixture room
+
+on:
+  workflow_dispatch:
+    inputs:
+      routes:
+        description: Room routes to photograph, separated by spaces (each starts with /)
+        type: string
+        default: / /chronology/ /documents/
+      fixture:
+        description: Which fixture to seed (case has a matter, company has none)
+        type: choice
+        options:
+          - case
+          - company
+        default: case
+      strict:
+        description: Fail the shots on console errors, CSP violations and HTTP errors too (dev:shoot --strict)
+        type: boolean
+        default: false
+      roles:
+        description: Run the kits and shots as these roles too, separated by spaces (owner, counsel, investor)
+        type: string
+        default: ''
+      law:
+        description: Build the Entity choice page's statutes into the local law library first
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fixture-room-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  fixture-room:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      WRANGLER_SEND_METRICS: "false"
+      ROOM_PORT: "8789"
+      # legallas-mcp's local port: MCP_DEV_ORIGIN in .dev.vars.example and
+      # mcp:smoke's default base both name it.
+      MCP_PORT: "8790"
+      # dev:shoot's default is the Mac path.
+      CHROME_PATH: google-chrome
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Tools that read their config from HOME (wrangler, npm, gh) start
+      # without anyone's logins.
+      - name: Private HOME
+        run: |
+          mkdir -p "$RUNNER_TEMP/home"
+          echo "HOME=$RUNNER_TEMP/home" >> "$GITHUB_ENV"
+      # What dev:shoot writes to .claude/shots/ locally, plus the logs, in one
+      # folder outside the checkout (upload-artifact leaves out paths under a
+      # dot folder such as .claude).
+      - name: Output folder
+        run: |
+          mkdir -p "$RUNNER_TEMP/shots/logs"
+          echo "SHOTS=$RUNNER_TEMP/shots" >> "$GITHUB_ENV"
+          echo "LOGS=$RUNNER_TEMP/shots/logs" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # Each route must be a path on the room, so nothing else reaches the
+      # command line.
+      - name: Routes
+        id: routes
+        env:
+          ROUTES: ${{ inputs.routes }}
+          ROLES: ${{ inputs.roles }}
+        run: |
+          read -r -a routes <<< "$ROUTES"
+          if [ "${#routes[@]}" -eq 0 ] || [ "${#routes[@]}" -gt 20 ]; then
+            echo "::error title=Routes::Give 1 to 20 routes, separated by spaces"
+            exit 1
+          fi
+          for route in "${routes[@]}"; do
+            if ! [[ "$route" =~ ^/[A-Za-z0-9._~/%?=\&-]*$ ]]; then
+              echo "::error title=Routes::Not a room path: $route"
+              exit 1
+            fi
+          done
+          echo "list=${routes[*]}" >> "$GITHUB_OUTPUT"
+          read -r -a roles <<< "$ROLES"
+          for role in "${roles[@]}"; do
+            case "$role" in
+              owner|counsel|investor) ;;
+              *) echo "::error title=Roles::Not a role: $role"; exit 1 ;;
+            esac
+          done
+          echo "roles=${roles[*]}" >> "$GITHUB_OUTPUT"
+      - name: Toolchain
+        run: |
+          uname -a
+          node --version
+          google-chrome --version
+      # No install scripts, as in ci.yml's checks: the only ones in the
+      # lockfile place or check a binary their platform package already ships.
+      - name: Web install
+        working-directory: web
+        run: npm ci --ignore-scripts
+      # Fails if the cache misses a fixture document, before the seed would try the Mac-only extractor.
+      - name: Extract cache
+        run: node quality-speed/pages/data-room/lab/extract-cache.ts install --out "$RUNNER_TEMP/fixture-room/cache"
+      # A room's settings are never committed, so the fixture room starts from the
+      # examples, on the entries with pro's routes: its pages read the case picture.
+      - name: Seed the fixture room
+        id: seed
+        working-directory: web
+        env:
+          FIXTURE: ${{ inputs.fixture }}
+          ROLES: ${{ steps.routes.outputs.roles }}
+        run: |
+          cp .dev.vars.example .dev.vars
+          grep -qx 'ASK_MOCK=1' .dev.vars
+          # The fixture's control prefix (its config says DOE); the Workers read the secret, unset shows DOC.
+          echo 'CONTROL_PREFIX=DOE' >> .dev.vars
+          # A guest is served only while rooms are on (worker/rooms.ts).
+          if [[ " $ROLES " == *" investor "* ]]; then echo 'ROOMS_ENABLED=1' >> .dev.vars; fi
+          # The examples already name the pro entries and the research chat's Durable Object (#345). The company room
+          # also turns the checklist on, for an invented entity type and formation date, so -f routes=/checklist/
+          # shows its matches, gaps and dates (scripts/dev-room.ts).
+          node scripts/dev-room.ts --fixture "$FIXTURE"
+          grep -q 'entry-pro' wrangler.jsonc
+          grep -q 'entry-pro' wrangler.mcp.jsonc
+          set -o pipefail
+          npm run dev:seed -- --fixture "$FIXTURE" --out "$RUNNER_TEMP/fixture-room" 2>&1 | tee "$LOGS/seed.log"
+          if grep -q 'were not indexed' "$LOGS/seed.log"; then
+            echo "::error title=Unindexed::the seed left a fixture document out of the index"
+            exit 1
+          fi
+          # The investor's deal room: the deal folders and the lawyer-analysis folder, whose privileged work product
+          # the guest must still never see (the manifest's marks, worker/privilege.ts).
+          if [[ " $ROLES " == *" investor "* ]]; then
+            npm run room -- create Seed round --folder 01-Corporate-Records --folder 03-Investor-Agreements \
+              --folder 06-Cap-Table --folder 10-Lawyer-Analysis --local 2>&1 | tee "$LOGS/room.log"
+            room=$(grep -oE 'Created room [0-9a-f-]+' "$LOGS/room.log" | awk '{print $3}')
+            test -n "$room"
+            npm run room -- invite "$room" dev-investor@example.test investor Test Investor --local 2>&1 | tee -a "$LOGS/room.log"
+            echo "room=$room" >> "$GITHUB_OUTPUT"
+            # The document the guest's view page shows: its id is the one sync made, not the fixture's.
+            doc=$(npx wrangler d1 execute legallas --local --json --command \
+              "SELECT id FROM documents WHERE path = '01-Corporate-Records/Bylaws__20110609__Harbor-Labs.pdf'" |
+              node -e 'let s="";process.stdin.on("data",(d)=>(s+=d)).on("end",()=>console.log(JSON.parse(s)[0].results[0]?.id??""))')
+            test -n "$doc"
+            echo "doc=$doc" >> "$GITHUB_OUTPUT"
+          fi
+      # Public law only, from the official hosts scripts/law/sources.ts allows. The units are the ones the Entity
+      # choice page cites (worker/entity-matrix.test.ts keeps this list equal to them); all are default units.
+      - name: Law library
+        if: inputs.law
+        timeout-minutes: 12
+        working-directory: web
+        env:
+          LEGALLAS_LAW_NEXT: "1"
+          LEGALLAS_LAW_DIR: ${{ runner.temp }}/law
+        run: |
+          set -o pipefail
+          npm run law -- --only co-llc-act,co-bca,co-corps-associations,de-dgcl,de-franchise-tax,co-tax-code,de-corporate-income-tax,us-tax-code --local 2>&1 | tee "$LOGS/law.log"
+      - name: Build the room
+        working-directory: web
+        run: npm run build
+      # One after the other: two wrangler dev sessions starting at once can
+      # pick the same free port for the socket that links them ("Address
+      # already in use"). legallas-mcp first, since the room's MCP_GRANTS
+      # binding calls it.
+      - name: Start legallas-mcp and the room
+        id: servers
+        working-directory: web
+        run: |
+          # Kept in a file, so the per-role step restarts both the same way.
+          cat > "$RUNNER_TEMP/serve.sh" <<'SH'
+          serve() {
+            local name="$1" port="$2" inspector="$3"
+            shift 3
+            nohup npx wrangler dev "$@" --local --port "$port" --inspector-port "$inspector" \
+              --show-interactive-dev-session=false >> "$LOGS/$name.log" 2>&1 &
+            for _ in $(seq 1 90); do
+              if curl -s -o /dev/null --max-time 2 "http://localhost:$port/"; then
+                echo "$name answers on localhost:$port"
+                return 0
+              fi
+              sleep 1
+            done
+            echo "::error title=Server did not start::$name is not answering on localhost:$port after 90 s"
+            tail -n 50 "$LOGS/$name.log"
+            return 1
+          }
+          serve_both() {
+            serve mcp "$MCP_PORT" 9230 -c wrangler.mcp.jsonc
+            serve room "$ROOM_PORT" 9229
+          }
+          SH
+          . "$RUNNER_TEMP/serve.sh"
+          serve_both
+      # Before the smoke, which adds and revokes clients, so the pages show the
+      # room as seeded.
+      - name: Screenshots
+        working-directory: web
+        env:
+          ROUTES: ${{ steps.routes.outputs.list }}
+          STRICT: ${{ inputs.strict }}
+        run: |
+          read -r -a routes <<< "$ROUTES"
+          args=(--port "$ROOM_PORT" --out "$SHOTS")
+          if [ "$STRICT" = true ]; then args+=(--strict); fi
+          npm run dev:shoot -- "${args[@]}" "${routes[@]}"
+      # The table shows statuses, codes and lengths only (never tokens).
+      - name: MCP smoke
+        if: ${{ !cancelled() && steps.servers.outcome == 'success' }}
+        working-directory: web
+        run: |
+          set -o pipefail
+          npm run mcp:smoke 2>&1 | tee "$LOGS/mcp-smoke.txt"
+      # Each role in turn, after the owner's smoke: both servers restart as that role, its pages are photographed, and
+      # scripts/kit-run.ts runs the six kits and five plugin skills and reads both views through its AI connection.
+      # A restart keeps the smoke's /register limit (run 42294762537: 429 at 52 s, after one), so kit-run waits it out.
+      # Fixture text only, saved per kit under kits/<role>/.
+      - name: Kits and pages per role
+        if: ${{ !cancelled() && steps.servers.outcome == 'success' && steps.routes.outputs.roles != '' }}
+        working-directory: web
+        env:
+          ROLES: ${{ steps.routes.outputs.roles }}
+          ROUTES: ${{ steps.routes.outputs.list }}
+          ROOM: ${{ steps.seed.outputs.room }}
+          DOC: ${{ steps.seed.outputs.doc }}
+          FIXTURE: ${{ inputs.fixture }}
+        run: |
+          set -o pipefail
+          . "$RUNNER_TEMP/serve.sh"
+          read -r -a roles <<< "$ROLES"
+          read -r -a routes <<< "$ROUTES"
+          failed=0
+          for role in "${roles[@]}"; do
+            echo "::group::$role"
+            pkill -f 'wrangler dev' || true
+            pkill -f workerd || true
+            for _ in $(seq 1 30); do
+              curl -s -o /dev/null --max-time 1 "http://localhost:$MCP_PORT/" || curl -s -o /dev/null --max-time 1 "http://localhost:$ROOM_PORT/" || break
+              sleep 1
+            done
+            sed -i "s/^DEV_IDENTITY_EMAIL=.*/DEV_IDENTITY_EMAIL=dev-$role@example.test/" .dev.vars
+            serve_both
+            room_args=()
+            if [ "$role" = investor ]; then
+              npm run dev:shoot -- --port "$ROOM_PORT" --out "$SHOTS/roles/$role" / "/rooms/$ROOM/view/$DOC" || failed=1
+              room_args=(--room-base "http://localhost:$ROOM_PORT" --room "$ROOM")
+            else
+              npm run dev:shoot -- --port "$ROOM_PORT" --out "$SHOTS/roles/$role" "${routes[@]}" || failed=1
+            fi
+            # In an if, so a failing role (pipefail) is counted and the next role still runs.
+            if ! npm run kit:run -- --as "$role" --fixture "$FIXTURE" --out "$SHOTS/kits" "${room_args[@]}" 2>&1 | tee "$LOGS/kits-$role.txt"; then failed=1; fi
+            echo "::endgroup::"
+          done
+          cat "$SHOTS"/kits/*/report.md >> "$GITHUB_STEP_SUMMARY" || true
+          exit "$failed"
+      - name: Upload shots
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: fixture-room-${{ github.run_id }}
+          path: ${{ runner.temp }}/shots/
+          if-no-files-found: warn
+          retention-days: 14

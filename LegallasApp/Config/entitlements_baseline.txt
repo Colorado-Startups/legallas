@@ -1,0 +1,5 @@
+# Entitlements baseline for LegallasApp/Scripts/verify-app.sh.
+# These three keys must be present and true in Legallas.entitlements.
+com.apple.security.app-sandbox
+com.apple.security.files.user-selected.read-write
+com.apple.security.files.bookmarks.app-scope

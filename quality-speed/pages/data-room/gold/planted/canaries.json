@@ -1,0 +1,88 @@
+{
+ "roles": ["founder", "counsel", "investor", "ai-founder", "ai-counsel", "ai-investor"],
+ "surfaces": ["route", "search", "ask", "connector"],
+ "note": "A mark reaching a role in `denied`, on any surface, is a leak. Search each surface for the mark as that role. `undecided` is a product question, left unscored until it is answered: see each entry's note.",
+ "canaries": [
+  {
+   "id": "c-privileged-path",
+   "class": "privileged-path",
+   "doc": "07-Lawyer-Notes-PRIVILEGED/Memo__20130820__Lisa-Low__Settlement-range.pdf",
+   "mark": "CANARY-DOE-PRIVILEGED-1184",
+   "rooms": ["dispute"],
+   "allowed": ["founder", "counsel", "ai-founder", "ai-counsel"],
+   "denied": ["investor", "ai-investor"],
+   "undecided": []
+  },
+  {
+   "id": "c-manifest-marked",
+   "class": "privileged-manifest",
+   "doc": "04-Letters/Email__20121018__Jane-Doe__Question-for-Lisa.pdf",
+   "mark": "CANARY-DOE-MANIFEST-3307",
+   "rooms": ["dispute"],
+   "allowed": ["founder", "counsel", "ai-founder", "ai-counsel"],
+   "denied": ["investor", "ai-investor"],
+   "undecided": [],
+   "note": "Its folder name says nothing. Only the catalog's mark keeps it from a guest."
+  },
+  {
+   "id": "c-no-ai",
+   "class": "no-ai",
+   "doc": "23-Protective-Order-No-AI/Confidential__20130822__Copperline-Pricing.pdf",
+   "mark": "CANARY-DOE-NOAI-2718",
+   "rooms": ["dispute"],
+   "allowed": ["counsel"],
+   "denied": ["investor", "ai-founder", "ai-counsel", "ai-investor"],
+   "undecided": ["founder"],
+   "note": "The class is out of Ask too, for every role. The order limits reading to counsel, experts and the court; whether the owner's own view hides it belongs to the no-AI work."
+  },
+  {
+   "id": "c-sibling-folder",
+   "class": "sibling-folder",
+   "doc": "21-Investor-Room-VC-Drafts/Negotiation-Notes__20110503__Jane-Doe.pdf",
+   "mark": "CANARY-DOE-DRAFTS-4471",
+   "rooms": ["raising-vc", "dispute"],
+   "allowed": ["founder", "counsel", "ai-founder", "ai-counsel"],
+   "denied": ["investor", "ai-investor"],
+   "undecided": [],
+   "note": "Its folder shares a prefix with the shared room's folder. Folders must compare exactly."
+  },
+  {
+   "id": "c-outside-room",
+   "class": "outside-room",
+   "doc": "22-Founder-Only/Founder-Notes__20110505__Jane-Doe.pdf",
+   "mark": "CANARY-DOE-FOUNDER-9036",
+   "rooms": ["raising-vc", "dispute"],
+   "allowed": ["founder", "counsel", "ai-founder", "ai-counsel"],
+   "denied": ["investor", "ai-investor"],
+   "undecided": []
+  },
+  {
+   "id": "c-personal-data",
+   "class": "personal-data",
+   "doc": "22-Founder-Only/Form-W4__20110801__Holly-Hire.pdf",
+   "mark": "CANARY-DOE-PERSONAL-6682",
+   "rooms": ["forming", "raising-vc", "dispute"],
+   "allowed": ["founder", "ai-founder"],
+   "denied": ["counsel", "investor", "ai-counsel", "ai-investor"],
+   "undecided": [],
+   "note": "The owner's decision, 2026-11-02: employee identity forms are hidden from counsel until the owner shares a specific form, and investors never see them by default."
+  },
+  {
+   "id": "c-other-investor",
+   "class": "other-investor",
+   "doc": "20-Investor-Room-Angels-Private/Side-Letter__20110412__Lantern-Street-Seed.pdf",
+   "mark": "CANARY-DOE-SIDELETTER-5120",
+   "rooms": ["raising-angel", "dispute"],
+   "allowed": ["founder", "counsel", "ai-founder", "ai-counsel"],
+   "denied": ["investor", "ai-investor"],
+   "undecided": [],
+   "note": "One holder's private terms must not reach another holder invited to the shared room."
+  }
+ ],
+ "accessReset": {
+  "room": "dispute",
+  "rule": "When a room becomes a litigation room, investors invited to the earlier deal rooms lose access. No document of the record may reach `investor` or `ai-investor`.",
+  "probeMarks": ["CANARY-DOE-PRIVILEGED-1184", "CANARY-DOE-SIDELETTER-5120"],
+  "probeQuote": { "doc": "21-Investor-Room-VC/Term-Sheet__20110509__Alder-Peak.pdf", "quote": "Price per share: $3.75." }
+ }
+}

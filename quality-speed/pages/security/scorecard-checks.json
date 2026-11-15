@@ -1,0 +1,24 @@
+{
+  "held": {
+    "Binary-Artifacts": 10,
+    "Dangerous-Workflow": 10,
+    "Dependency-Update-Tool": 10,
+    "Pinned-Dependencies": 10,
+    "Security-Policy": 10,
+    "Token-Permissions": 10,
+    "Vulnerabilities": 10
+  },
+  "not_held": {
+    "Branch-Protection": "Its top score needs approving reviewers, and one login does all the work here. The Settings page checks the rules that do apply",
+    "CI-Tests": "Not about weakness. The Actions page covers it",
+    "CII-Best-Practices": "The project has no OpenSSF Best Practices badge yet. Hold it once the badge is awarded",
+    "Code-Review": "It counts GitHub approvals, and a login can't approve its own pull request. Review here is the required claude-review check, which the Pull requests page measures",
+    "Contributors": "It counts how many companies contributors come from, and Colorado Startups is the only one so far",
+    "Fuzzing": "It hunts for bugs nobody knows of yet, and this page's ideal state is about known ones. The Testing page is where more testing belongs",
+    "License": "A licence file says nothing about any weakness",
+    "Maintained": "It reads 0 until the repository is 90 days old, whatever is done. Hold it from 2027-02-01",
+    "Packaging": "Nothing is released from this repository, so it can't run",
+    "SAST": "It credits only CodeQL and SonarCloud. sast_findings_open measures this with Semgrep",
+    "Signed-Releases": "Nothing is released from this repository, so it can't run"
+  }
+}

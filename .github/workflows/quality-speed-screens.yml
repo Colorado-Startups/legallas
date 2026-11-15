@@ -1,0 +1,81 @@
+# Screenshots of every page of the Quality and Speed site and the chart kit's gallery, at desktop and two phone widths
+# (390 and 375), light and dark, on invented numbers. Browser runs don't happen on a laptop, so page sessions read this
+# artifact instead:
+#
+#   gh run download <run id> -R Colorado-Startups/legallas -n quality-speed-screens
+#
+# report.json beside the shots lists console errors, security-policy breaks, off-site requests, layout shift and pages
+# wider than their shot (a sideways scroll, #292), and any of them turns this red. Not a required check. It runs the pull
+# request's own code, so it holds no secret and no write scope.
+#
+# A pull request that changes only page folders shoots those pages, the home page and the pages that draw other pages'
+# scores; anything else, and a manual run, shoots every route (.github/scripts/screens_routes.py says how).
+name: Quality and Speed screens
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/quality-speed-screens.yml
+      - quality-speed/**
+      - '!quality-speed/**/*.md'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: quality-speed-screens-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screens:
+    # Branches of this repo only.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Private HOME
+        run: |
+          mkdir -p "$RUNNER_TEMP/home"
+          echo "HOME=$RUNNER_TEMP/home" >> "$GITHUB_ENV"
+      # Depth 2: the pull request's merge and its base parent, which is all screens_routes.py diffs.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # The build needs an empty folder, so the gallery goes in after it.
+      - name: Build on invented numbers
+        run: |
+          node quality-speed/core/build.ts --synthetic --out "$RUNNER_TEMP/site"
+          mkdir -p "$RUNNER_TEMP/site/gallery"
+          node quality-speed/core/charts/examples/gallery.ts "$RUNNER_TEMP/site/gallery/index.html"
+      # As in claude-confinement.yml: Chrome's sandbox needs user namespaces, and the VM serves one job.
+      - name: Let Chrome use its sandbox
+        run: |
+          if [ -f /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+      - name: Shoot the changed pages
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # The browser asks for this on its own; the site has none, and a 404 would turn this run red.
+          : > "$RUNNER_TEMP/site/favicon.ico"
+          python3 -m http.server 3200 --bind 127.0.0.1 --directory "$RUNNER_TEMP/site" &
+          curl -fsS --retry 10 --retry-connrefused --retry-delay 1 -o /dev/null http://127.0.0.1:3200/favicon.ico
+          routes="$(python3 .github/scripts/screens_routes.py "$RUNNER_TEMP/site")"
+          # shellcheck disable=SC2086
+          node web/scripts/dev-shoot.ts --port 3200 --out "$RUNNER_TEMP/shots" --widths 1440,390,375 --variants light,dark \
+            --chrome "$(command -v google-chrome)" --strict $routes
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: quality-speed-screens
+          path: ${{ runner.temp }}/shots
+          if-no-files-found: ignore
+          retention-days: 7

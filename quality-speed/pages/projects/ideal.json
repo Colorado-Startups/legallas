@@ -1,0 +1,33 @@
+{
+  "ideal": "One ordered board, every card ready, at most 3 in progress, none stale; views, workflows and charts keep it true with no hand edits.",
+  "sources": [
+    {
+      "title": "GitHub Docs: Using the built-in automations",
+      "url": "https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/using-the-built-in-automations",
+      "date": "2026-11-09"
+    },
+    {
+      "title": "GitHub Docs: Customizing a view",
+      "url": "https://docs.github.com/en/issues/planning-and-tracking-with-projects/customizing-views-in-your-project/customizing-a-view",
+      "date": "2026-11-09"
+    },
+    {
+      "title": "GitHub Docs: Best practices for Projects",
+      "url": "https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/best-practices-for-projects",
+      "date": "2026-11-06"
+    },
+    {
+      "title": "GitHub Docs: Linking a pull request to an issue",
+      "url": "https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue",
+      "date": "2026-11-06"
+    },
+    {
+      "title": "The Kanban Guide (May 2025): Work Item Age",
+      "url": "https://kanbanguides.org/the-kanban-guide/2025.5/",
+      "date": "2025-05-01"
+    }
+  ],
+  "quality": "At most 3 cards in progress or review, open cards ordered and table first, done cards on merged PRs, views and Status as set.",
+  "speed": "No started card sits in progress or review longer than 3 days.",
+  "consumption": "The board is read once a day by the admin job, one query, no reads of its own."
+}

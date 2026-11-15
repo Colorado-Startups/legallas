@@ -1,0 +1,376 @@
+{
+  "tools": [
+    {
+      "name": "legallas_search",
+      "title": "Search case documents",
+      "description": "Search every document in the counsel room by meaning and keywords. Returns passages with the document id, control number, title, folder, page and a link to that page in the room. When more passages matched than fit, pass next_cursor with the same query and limit for the rest (each call searches again). To read whole pages, use legallas_read_pages with an id from these results.",
+      "inputSchema": {
+        "type": "object",
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "Words or a question to find in the case documents."
+          },
+          "limit": {
+            "default": 10,
+            "description": "Passages to return, at most 20.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "cursor": {
+            "description": "next_cursor from a previous result, with the same query and limit, for the passages that did not fit.",
+            "type": "string",
+            "maxLength": 64
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "annotations": {
+        "title": "Search case documents",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "legallas_case_overview",
+      "title": "Case overview",
+      "description": "The case picture the room publishes: the tracks counsel is preparing and the violations they rest on, with points to prove and their proof, grouped per violation, and for a track with a brief its theory, cast, hurdles, dates to confirm, key exhibits, drafts and counts; then parties, people, chronology of events, the claims of the pleading (when the summary has a priorCase, that pleading closed and its claims are history), and money facts, each with citations to documents and pages (control number, page and room link). Start with section \"summary\", then page through a section with its cursor. An entry too long for one page comes in parts sharing its id (part, parts): join their lists in order, and merge a list item marked continues into the item before it.",
+      "inputSchema": {
+        "type": "object",
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "section": {
+            "default": "summary",
+            "description": "Which part of the case picture to return. \"summary\" gives counts and the case header.",
+            "type": "string",
+            "enum": [
+              "summary",
+              "tracks",
+              "violations",
+              "events",
+              "people",
+              "orgs",
+              "claims",
+              "money",
+              "docs"
+            ]
+          },
+          "cursor": {
+            "description": "From a previous call, to fetch the next page of a long section.",
+            "type": "string",
+            "maxLength": 64
+          }
+        }
+      },
+      "annotations": {
+        "title": "Case overview",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://legallas/overview",
+          "visibility": [
+            "model",
+            "app"
+          ]
+        },
+        "ui/resourceUri": "ui://legallas/overview"
+      }
+    },
+    {
+      "name": "legallas_list_documents",
+      "title": "List case documents",
+      "description": "List documents in the counsel room, up to 100 per page, with id, control number, title, folder, type, page count, Key flag, room link and designations: privileged, and where known the document date, document type, from and to. With since, only documents added or changed since then. When more remain, pass next_cursor to get the next page. Use legallas_search to find documents by content instead.",
+      "inputSchema": {
+        "type": "object",
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "folder": {
+            "description": "Only documents in this folder (as shown in results). Omit for all.",
+            "type": "string",
+            "maxLength": 300
+          },
+          "since": {
+            "description": "Only documents added or changed at or after this time: a date (2026-10-01) or date and time in UTC (2026-10-01T09:00:00Z). Pass as_of from an earlier result to see what is new since then; a document may come back that an earlier result listed.",
+            "type": "string",
+            "maxLength": 40
+          },
+          "cursor": {
+            "description": "next_cursor from a previous call, with the same folder and since, to fetch the next page.",
+            "type": "string",
+            "maxLength": 128
+          }
+        }
+      },
+      "annotations": {
+        "title": "List case documents",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "ui": {
+          "resourceUri": "ui://legallas/grid",
+          "visibility": [
+            "model",
+            "app"
+          ]
+        },
+        "ui/resourceUri": "ui://legallas/grid"
+      }
+    },
+    {
+      "name": "legallas_get_document",
+      "title": "Get document details",
+      "description": "Details of one document: control number, title, folder, type, page count, dates, Key flag, room link and designations (privileged, and where known the document date, document type, from, to and a summary). Does not return its text; use legallas_read_pages for that.",
+      "inputSchema": {
+        "type": "object",
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,64}$",
+            "description": "A document id from search or list results."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "annotations": {
+        "title": "Get document details",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "legallas_read_pages",
+      "title": "Read document pages",
+      "description": "Read the text of pages from one document, at most 20 pages or about 60,000 characters per call, each page labelled with its number and room link. When more remains, the result says which page to continue from (next). A single page longer than the limit comes back cut and marked truncated; pass next_cursor with the same id to read the rest of it.",
+      "inputSchema": {
+        "type": "object",
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,64}$",
+            "description": "A document id from search or list results."
+          },
+          "from": {
+            "default": 1,
+            "description": "First page to read (1-based).",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "to": {
+            "description": "Last page to read. At most 20 pages per call.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "cursor": {
+            "description": "next_cursor from a previous result for this document: continues inside the page that was cut.",
+            "type": "string",
+            "maxLength": 64
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "annotations": {
+        "title": "Read document pages",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "legallas_view_visual",
+      "title": "View a visual",
+      "description": "The visual binder made to explain the matter: charts, timelines and one-idea pages grouped into tabs. With no id, its tabs and pages (each with id, slug, control number and room link). With an id or slug, the text the page shows (headings, labels, table cells and chart labels) and its room link, and an image of the page where the client takes images. When more remains, the result gives a cursor to continue.",
+      "inputSchema": {
+        "type": "object",
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "id": {
+            "description": "A visual's id (from search results or the binder contents) or its slug. Omit it to list the binder.",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,64}$"
+          },
+          "cursor": {
+            "description": "A previous result's next, to continue the binder contents or a long text.",
+            "type": "string",
+            "maxLength": 512
+          }
+        }
+      },
+      "annotations": {
+        "title": "View a visual",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "legallas_get_comments",
+      "title": "Read comment threads",
+      "description": "Comment threads on one document from the counsel room's members: each thread's first comment and its replies, with author, time, page, whether the thread is resolved, and room links. Pass page for only the threads about one page. When more remain, the result gives a cursor for the next threads.",
+      "inputSchema": {
+        "type": "object",
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,64}$",
+            "description": "A document id from search or list results."
+          },
+          "page": {
+            "description": "Only the threads on this page: the first comment or a reply names it. Omit for all.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000
+          },
+          "cursor": {
+            "description": "From a previous call, to fetch the next threads.",
+            "type": "string",
+            "maxLength": 512
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "annotations": {
+        "title": "Read comment threads",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "legallas_get_file",
+      "title": "Get an original file",
+      "description": "The original file of one document. Small PNG, JPEG and WebP images come back as the image itself where the app supports it; otherwise, PDFs and larger files included, the result gives the file details, page count and room link, and legallas_read_pages reads its text. Visual binder pages point to legallas_view_visual.",
+      "inputSchema": {
+        "type": "object",
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,64}$",
+            "description": "A document id from search or list results."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "annotations": {
+        "title": "Get an original file",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "legallas_template",
+      "title": "Read a template",
+      "description": "Lists the template library; with a path, returns that template a part at a time.",
+      "inputSchema": {
+        "type": "object",
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "path": {
+            "description": "A path from the list.",
+            "type": "string",
+            "maxLength": 200
+          },
+          "part": {
+            "default": 1,
+            "description": "next_part from the last result.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 999
+          }
+        }
+      },
+      "annotations": {
+        "title": "Read a template",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "legallas_search_law",
+      "title": "Search the law library",
+      "description": "Search the law library: the public statutes, rules and opinions this room chose to hold. Public law, separate from the case documents. Returns passages with the canonical citation, the official source link, the date retrieved and the track; an opinion passage also says which writing it is from (the opinion of the court, a concurrence or a dissent) and its author. Only the opinion of the court states the holding. With list: true and no query, lists what the library holds, one row per unit, paged with next_cursor.",
+      "inputSchema": {
+        "type": "object",
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "query": {
+            "description": "Words or a legal question: a doctrine, an element, a statute or rule number. Leave out with list.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "list": {
+            "description": "true lists what the library holds instead of searching: one row per statute or rule section, jury instruction or opinion, with its citation, official link and track.",
+            "type": "boolean"
+          },
+          "track": {
+            "default": "any",
+            "description": "civil: authority for a court claim; regulator: authority for a filing with a regulator; any: both. Material that applies to both appears under either.",
+            "type": "string",
+            "enum": [
+              "civil",
+              "regulator",
+              "any"
+            ]
+          },
+          "limit": {
+            "default": 6,
+            "description": "Passages to return, at most 12.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          },
+          "cursor": {
+            "description": "next_cursor from a previous result, with the same other arguments, to continue it.",
+            "type": "string",
+            "maxLength": 160
+          }
+        }
+      },
+      "annotations": {
+        "title": "Search the law library",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

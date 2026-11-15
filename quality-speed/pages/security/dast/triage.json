@@ -1,0 +1,114 @@
+{
+ "schema": 1,
+ "entries": [
+  {
+   "alert": "10055-6",
+   "targets": [
+    "mcp-member",
+    "mcp-stranger"
+   ],
+   "status": "accepted",
+   "reason": "The MCP server's pages allow no script (default-src 'none') and load images only as data: URLs, so injected CSS can neither run code nor fetch or send anything. The inline style is each page's own stylesheet.",
+   "decided": "2026-11-06"
+  },
+  {
+   "alert": "10055-13",
+   "targets": [
+    "mcp-member",
+    "mcp-stranger"
+   ],
+   "status": "accepted",
+   "reason": "No form-action on purpose (web/mcp/pages/index.ts htmlResponse): Chrome applies it to the redirect after the consent form's POST, which goes to the AI app's own callback. The pages allow no script, and their templates escape every value a request can carry (quality-speed/pages/security/PLAN.md, the audits).",
+   "decided": "2026-11-06"
+  },
+  {
+   "alert": "10202",
+   "targets": [
+    "mcp-member",
+    "mcp-stranger"
+   ],
+   "paths": "^/(authorize|connect)$",
+   "status": "accepted",
+   "reason": "ZAP looks for a token by name only. The consent form carries the OAuth library's consent handle: single-use, 10 minutes, tied to the browser that opened it (web/mcp/authorize.ts). The /connect form downloads the Copilot package and changes nothing.",
+   "decided": "2026-11-06"
+  },
+  {
+   "alert": "10106",
+   "status": "accepted",
+   "reason": "The scan reaches the Workers over plain HTTP on localhost by design. A deployed room runs on a Cloudflare custom domain, which serves HTTPS, and the room sends HSTS for a year (web/worker/headers.ts).",
+   "decided": "2026-11-06"
+  },
+  {
+   "alert": "40014-2",
+   "targets": [
+    "room-member"
+   ],
+   "paths": "^/api/comments$",
+   "status": "accepted",
+   "reason": "The scan's script string comes back as JSON data (application/json, nosniff, CSP default-src 'none'). The room's pages put comment bodies in with textContent and el(), never innerHTML (web/src/scripts/comments.ts).",
+   "decided": "2026-11-06"
+  },
+  {
+   "alert": "10096",
+   "status": "accepted",
+   "reason": "The Unix times are RFC 7591's client_id_issued_at in /register answers and numeric constants in the build's script files. Neither says anything about the room.",
+   "decided": "2026-11-06"
+  },
+  {
+   "alert": "10024",
+   "targets": [
+    "room-member"
+   ],
+   "status": "accepted",
+   "reason": "The address in the URL is the crawler's own invented one, which it typed into the Activity filter and the hold page's forms. The room sends Referrer-Policy: no-referrer, so a URL never leaves for another site.",
+   "decided": "2026-11-06"
+  },
+  {
+   "alert": "10031",
+   "targets": [
+    "room-member"
+   ],
+   "status": "accepted",
+   "reason": "Informational. The query values ZAP matched (action=sign_in, view=decided) are the filters' own fixed option values. The room serves these pages as files built ahead of time and never writes a query value into them.",
+   "decided": "2026-11-06"
+  },
+  {
+   "alert": "10109",
+   "status": "accepted",
+   "reason": "Informational: the pages use script, so ZAP suggests its browser-driven spider. The room's route table, imported as an API definition, covers every route the pages call.",
+   "decided": "2026-11-06"
+  },
+  {
+   "alert": "10112",
+   "status": "accepted",
+   "reason": "Informational: ZAP notes a response that sets a cookie it takes for a session token. It is the forms' anti-forgery token (web/mcp/forms.ts) or the OAuth library's consent cookie, and names no weakness.",
+   "decided": "2026-11-06"
+  },
+  {
+   "alert": "10104",
+   "status": "accepted",
+   "reason": "Informational: ZAP lists answers that differ when it changes the User-Agent header. Neither Worker decides access by User-Agent; the room only records it in its audit log.",
+   "decided": "2026-11-06"
+  },
+  {
+   "alert": "6-5",
+   "targets": [
+    "room-member"
+   ],
+   "paths": "^/api/hold/custodians$",
+   "status": "accepted",
+   "reason": "ZAP sent the route's own last segment as a custodian's name and saw a different answer. The name is a D1 bound parameter (web/worker/hold.ts addCustodian) and a Worker has no file system; the answer flips between 201 and 409 because a custodian is added once per hold.",
+   "decided": "2026-11-07"
+  },
+  {
+   "alert": "10027",
+   "targets": [
+    "mcp-member"
+   ],
+   "paths": "^/mcp$",
+   "status": "accepted",
+   "reason": "Informational. The match is the word select in a minified MCP App view's own script (this.select(t)), sent in a POST /mcp resource, not a comment. It names no table or query.",
+   "decided": "2026-11-07"
+  }
+ ]
+}

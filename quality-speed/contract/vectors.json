@@ -1,0 +1,1004 @@
+[
+  {
+    "name": "every metric at goal reads exactly 100, with no rounding loss",
+    "metrics": [
+      {
+        "id": "a",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "b",
+        "lens": "speed",
+        "floor": 60,
+        "goal": 10,
+        "direction": "lower",
+        "weight": 1
+      },
+      {
+        "id": "use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      }
+    ],
+    "records": [
+      {
+        "id": "a",
+        "value": 100,
+        "status": "ok"
+      },
+      {
+        "id": "b",
+        "value": 10,
+        "status": "ok"
+      },
+      {
+        "id": "use",
+        "value": 100,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 100,
+      "speed": 100,
+      "consumption": 100,
+      "raw": 100,
+      "display": 100
+    }
+  },
+  {
+    "name": "each lens counts a third",
+    "metrics": [
+      {
+        "id": "a",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "b",
+        "lens": "speed",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      }
+    ],
+    "records": [
+      {
+        "id": "a",
+        "value": 90,
+        "status": "ok"
+      },
+      {
+        "id": "b",
+        "value": 30,
+        "status": "ok"
+      },
+      {
+        "id": "use",
+        "value": 100,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 90,
+      "speed": 30,
+      "consumption": 100,
+      "raw": 73.333333,
+      "display": 73
+    }
+  },
+  {
+    "name": "lower is better interpolates and clamps both ways",
+    "metrics": [
+      {
+        "id": "a",
+        "lens": "quality",
+        "floor": 60,
+        "goal": 10,
+        "direction": "lower",
+        "weight": 1
+      },
+      {
+        "id": "b",
+        "lens": "quality",
+        "floor": 60,
+        "goal": 10,
+        "direction": "lower",
+        "weight": 1
+      },
+      {
+        "id": "c",
+        "lens": "speed",
+        "floor": 60,
+        "goal": 10,
+        "direction": "lower",
+        "weight": 1
+      },
+      {
+        "id": "use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      }
+    ],
+    "records": [
+      {
+        "id": "a",
+        "value": 35,
+        "status": "ok"
+      },
+      {
+        "id": "b",
+        "value": 500,
+        "status": "ok"
+      },
+      {
+        "id": "c",
+        "value": 1,
+        "status": "ok"
+      },
+      {
+        "id": "use",
+        "value": 100,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 25,
+      "speed": 100,
+      "consumption": 100,
+      "raw": 75,
+      "display": 75
+    }
+  },
+  {
+    "name": "an almost perfect page rounds down",
+    "metrics": [
+      {
+        "id": "a",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "b",
+        "lens": "speed",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      }
+    ],
+    "records": [
+      {
+        "id": "a",
+        "value": 99.4,
+        "status": "ok"
+      },
+      {
+        "id": "b",
+        "value": 100,
+        "status": "ok"
+      },
+      {
+        "id": "use",
+        "value": 100,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 99.4,
+      "speed": 100,
+      "consumption": 100,
+      "raw": 99.8,
+      "display": 99
+    }
+  },
+  {
+    "name": "a missing record scores 0 and an empty axis is never renormalized",
+    "metrics": [
+      {
+        "id": "a",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "b",
+        "lens": "speed",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      }
+    ],
+    "records": [
+      {
+        "id": "a",
+        "value": 100,
+        "status": "ok"
+      },
+      {
+        "id": "use",
+        "value": 100,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 100,
+      "speed": 0,
+      "consumption": 100,
+      "raw": 66.666667,
+      "display": 66
+    }
+  },
+  {
+    "name": "null value scores 0 but a real 0 on a lower-is-better metric scores 100",
+    "metrics": [
+      {
+        "id": "a",
+        "lens": "quality",
+        "floor": 10,
+        "goal": 0,
+        "direction": "lower",
+        "weight": 1
+      },
+      {
+        "id": "b",
+        "lens": "speed",
+        "floor": 10,
+        "goal": 0,
+        "direction": "lower",
+        "weight": 1
+      },
+      {
+        "id": "use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      }
+    ],
+    "records": [
+      {
+        "id": "a",
+        "value": 0,
+        "status": "ok"
+      },
+      {
+        "id": "b",
+        "value": null,
+        "status": "missing"
+      },
+      {
+        "id": "use",
+        "value": 100,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 100,
+      "speed": 0,
+      "consumption": 100,
+      "raw": 66.666667,
+      "display": 66
+    }
+  },
+  {
+    "name": "data past its own age limit is stale and scores 0",
+    "now": "2026-11-10T00:00:00Z",
+    "metrics": [
+      {
+        "id": "a",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1,
+        "max_age_hours": 48
+      },
+      {
+        "id": "b",
+        "lens": "speed",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1,
+        "max_age_hours": 336
+      },
+      {
+        "id": "use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      }
+    ],
+    "records": [
+      {
+        "id": "a",
+        "value": 100,
+        "status": "ok",
+        "measured_at": "2026-11-05T00:00:00Z"
+      },
+      {
+        "id": "b",
+        "value": 100,
+        "status": "ok",
+        "measured_at": "2026-11-05T00:00:00Z"
+      },
+      {
+        "id": "use",
+        "value": 100,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 0,
+      "speed": 100,
+      "consumption": 100,
+      "raw": 66.666667,
+      "display": 66
+    }
+  },
+  {
+    "name": "a rate on too few samples scores 0, so 1 of 1 can't read as 100",
+    "metrics": [
+      {
+        "id": "a",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1,
+        "min_samples": 5
+      },
+      {
+        "id": "b",
+        "lens": "speed",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1,
+        "min_samples": 5
+      },
+      {
+        "id": "use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      }
+    ],
+    "records": [
+      {
+        "id": "a",
+        "value": 100,
+        "sample_size": 1,
+        "status": "ok"
+      },
+      {
+        "id": "b",
+        "value": 100,
+        "sample_size": 5,
+        "status": "ok"
+      },
+      {
+        "id": "use",
+        "value": 100,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 0,
+      "speed": 100,
+      "consumption": 100,
+      "raw": 66.666667,
+      "display": 66
+    }
+  },
+  {
+    "name": "no_events scores 100 while its coverage check is at goal",
+    "metrics": [
+      {
+        "id": "check",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "fix",
+        "lens": "speed",
+        "floor": 72,
+        "goal": 24,
+        "direction": "lower",
+        "weight": 1,
+        "coverage_metric": "check"
+      },
+      {
+        "id": "use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      }
+    ],
+    "records": [
+      {
+        "id": "check",
+        "value": 100,
+        "status": "ok"
+      },
+      {
+        "id": "fix",
+        "value": null,
+        "status": "no_events"
+      },
+      {
+        "id": "use",
+        "value": 100,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 100,
+      "speed": 100,
+      "consumption": 100,
+      "raw": 100,
+      "display": 100
+    }
+  },
+  {
+    "name": "no_events with a dead coverage check scores 0",
+    "metrics": [
+      {
+        "id": "check",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "fix",
+        "lens": "speed",
+        "floor": 72,
+        "goal": 24,
+        "direction": "lower",
+        "weight": 1,
+        "coverage_metric": "check"
+      },
+      {
+        "id": "use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      }
+    ],
+    "records": [
+      {
+        "id": "check",
+        "value": null,
+        "status": "missing"
+      },
+      {
+        "id": "fix",
+        "value": null,
+        "status": "no_events"
+      },
+      {
+        "id": "use",
+        "value": 100,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 0,
+      "speed": 0,
+      "consumption": 100,
+      "raw": 33.333333,
+      "display": 33
+    }
+  },
+  {
+    "name": "a metric short of its goal only lowers its own lens",
+    "metrics": [
+      {
+        "id": "a",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 9
+      },
+      {
+        "id": "guard",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "b",
+        "lens": "speed",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      }
+    ],
+    "records": [
+      {
+        "id": "a",
+        "value": 100,
+        "status": "ok"
+      },
+      {
+        "id": "guard",
+        "value": 99,
+        "status": "ok"
+      },
+      {
+        "id": "b",
+        "value": 100,
+        "status": "ok"
+      },
+      {
+        "id": "use",
+        "value": 100,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 99.9,
+      "speed": 100,
+      "consumption": 100,
+      "raw": 99.966667,
+      "display": 99
+    }
+  },
+  {
+    "name": "a missing metric scores 0",
+    "metrics": [
+      {
+        "id": "a",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "guard",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "b",
+        "lens": "speed",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      }
+    ],
+    "records": [
+      {
+        "id": "a",
+        "value": 100,
+        "status": "ok"
+      },
+      {
+        "id": "b",
+        "value": 100,
+        "status": "ok"
+      },
+      {
+        "id": "use",
+        "value": 100,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 50,
+      "speed": 100,
+      "consumption": 100,
+      "raw": 83.333333,
+      "display": 83
+    }
+  },
+  {
+    "name": "weights apply within a lens",
+    "metrics": [
+      {
+        "id": "a",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 3
+      },
+      {
+        "id": "b",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "c",
+        "lens": "speed",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      }
+    ],
+    "records": [
+      {
+        "id": "a",
+        "value": 100,
+        "status": "ok"
+      },
+      {
+        "id": "b",
+        "value": 0,
+        "status": "ok"
+      },
+      {
+        "id": "c",
+        "value": 0,
+        "status": "ok"
+      },
+      {
+        "id": "use",
+        "value": 100,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 75,
+      "speed": 0,
+      "consumption": 100,
+      "raw": 58.333333,
+      "display": 58
+    }
+  },
+  {
+    "name": "groups combine within each lens by whole-number weights",
+    "groups": [
+      {
+        "id": "form",
+        "weight": 50
+      },
+      {
+        "id": "raise",
+        "weight": 30
+      },
+      {
+        "id": "dispute",
+        "weight": 20
+      }
+    ],
+    "metrics": [
+      {
+        "id": "f_q",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1,
+        "group": "form"
+      },
+      {
+        "id": "f_s",
+        "lens": "speed",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1,
+        "group": "form"
+      },
+      {
+        "id": "r_q",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1,
+        "group": "raise"
+      },
+      {
+        "id": "r_s",
+        "lens": "speed",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1,
+        "group": "raise"
+      },
+      {
+        "id": "d_q",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1,
+        "group": "dispute"
+      },
+      {
+        "id": "d_s",
+        "lens": "speed",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1,
+        "group": "dispute"
+      },
+      {
+        "id": "f_use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1,
+        "group": "form"
+      },
+      {
+        "id": "r_use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1,
+        "group": "raise"
+      },
+      {
+        "id": "d_use",
+        "lens": "consumption",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1,
+        "group": "dispute"
+      }
+    ],
+    "records": [
+      {
+        "id": "f_q",
+        "value": 100,
+        "status": "ok"
+      },
+      {
+        "id": "f_s",
+        "value": 100,
+        "status": "ok"
+      },
+      {
+        "id": "r_q",
+        "value": 100,
+        "status": "ok"
+      },
+      {
+        "id": "r_s",
+        "value": 0,
+        "status": "ok"
+      },
+      {
+        "id": "d_q",
+        "value": 0,
+        "status": "ok"
+      },
+      {
+        "id": "d_s",
+        "value": 0,
+        "status": "ok"
+      },
+      {
+        "id": "f_use",
+        "value": 100,
+        "status": "ok"
+      },
+      {
+        "id": "r_use",
+        "value": 0,
+        "status": "ok"
+      },
+      {
+        "id": "d_use",
+        "value": 100,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 80,
+      "speed": 50,
+      "consumption": 70,
+      "raw": 66.666667,
+      "display": 66
+    }
+  },
+  {
+    "name": "a signed-off page with no consumption metric scores Consumption 0",
+    "metrics": [
+      {
+        "id": "a",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "b",
+        "lens": "speed",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      }
+    ],
+    "records": [
+      {
+        "id": "a",
+        "value": 100,
+        "status": "ok"
+      },
+      {
+        "id": "b",
+        "value": 100,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 100,
+      "speed": 100,
+      "consumption": 0,
+      "raw": 66.666667,
+      "display": 66
+    }
+  },
+  {
+    "name": "consumption interpolates like any lens, lower is better",
+    "metrics": [
+      {
+        "id": "a",
+        "lens": "quality",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "b",
+        "lens": "speed",
+        "floor": 0,
+        "goal": 100,
+        "direction": "higher",
+        "weight": 1
+      },
+      {
+        "id": "tokens",
+        "lens": "consumption",
+        "floor": 1000,
+        "goal": 200,
+        "direction": "lower",
+        "weight": 3
+      },
+      {
+        "id": "minutes",
+        "lens": "consumption",
+        "floor": 60,
+        "goal": 10,
+        "direction": "lower",
+        "weight": 1
+      }
+    ],
+    "records": [
+      {
+        "id": "a",
+        "value": 90,
+        "status": "ok"
+      },
+      {
+        "id": "b",
+        "value": 60,
+        "status": "ok"
+      },
+      {
+        "id": "tokens",
+        "value": 600,
+        "status": "ok"
+      },
+      {
+        "id": "minutes",
+        "value": 5,
+        "status": "ok"
+      }
+    ],
+    "expect": {
+      "quality": 90,
+      "speed": 60,
+      "consumption": 62.5,
+      "raw": 70.833333,
+      "display": 70
+    }
+  }
+]

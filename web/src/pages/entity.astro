@@ -1,0 +1,38 @@
+---
+// Entity choice (worker/entity-matrix.ts): a Colorado LLC, a Colorado C corp and a Delaware C corp, factor by factor. Each
+// cell names its statutes; each statute links to its official text with the day the law library fetched it. The data
+// comes from GET /api/entity-matrix. Research support: nothing here picks a form for the company.
+import Room from '../layouts/Room.astro';
+import { TAX_LINE } from '../../worker/product-notices.ts';
+import '../styles/entity-matrix.css';
+---
+
+<Room title="Entity choice">
+  <section class="em" aria-labelledby="em-title">
+    <h1 id="em-title" class="t-h1">Entity choice</h1>
+    <p class="t-small em-lead">Three ways to form, side by side. Every cell names the statutes it rests on.</p>
+    <p class="t-caption" data-em-status role="status">Loading the matrix.</p>
+
+    <div data-em-view hidden>
+      <div class="em-meter">
+        <p class="t-small em-meter__count" data-em-count></p>
+        <progress class="em-meter__bar" data-em-progress max="1" value="0"></progress>
+        <p class="t-caption" data-em-law hidden></p>
+      </div>
+
+      <div class="c-table-wrap em-wrap">
+        <table class="c-table em-table">
+          <caption class="u-vh">Colorado LLC, Colorado C corp and Delaware C corp, by factor, with each cell's statutes</caption>
+          <thead>
+            <tr data-em-head><th scope="col">Factor</th></tr>
+          </thead>
+          <tbody data-em-rows></tbody>
+        </table>
+      </div>
+
+      <p class="t-caption em-note">{TAX_LINE}</p>
+    </div>
+  </section>
+</Room>
+
+<script src="../scripts/entity-matrix.ts"></script>

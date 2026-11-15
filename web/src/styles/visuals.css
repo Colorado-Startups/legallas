@@ -1,0 +1,60 @@
+/*
+  Shared by the binder (binder.css) and the viewer (viewer.css): tab accents and the icon sprite (card P8;
+  the accent values are card F6's). Accents come from the manifest as data-accent (validated against ACCENTS
+  in worker/visuals.ts); they color marks only (icons, the read bar, the current page chip edge), never text
+  on its own. Every value is at least 5:1 against the surface and the page. The room is light only (R67).
+*/
+
+[data-accent] {
+  --tab-accent: var(--forest);
+}
+/* Chambers values (card F6): crimson is --oxblood; gold sits a step darker than --brass-text in light. */
+[data-accent='gold'] { --tab-accent: #6e592b; }
+[data-accent='teal'] { --tab-accent: #2f5e63; }
+[data-accent='rust'] { --tab-accent: #8a4a25; }
+[data-accent='plum'] { --tab-accent: #5e4570; }
+[data-accent='crimson'] { --tab-accent: #6b1e23; }
+[data-accent='ink'] { --tab-accent: var(--ink); }
+
+.binder-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Sprite icons (binder-data.ts icon()): 20px line icons, 1.5px stroke in the current color. */
+.binder-icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The breadcrumb both pages carry: Documents / Binder (/ the tab, in the viewer). The binder sits under Documents. */
+.binder-crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+  list-style: none;
+}
+
+.binder-crumbs li + li::before {
+  margin-right: var(--space-2);
+  color: var(--ink-3);
+  content: '/';
+}
+
+.binder-crumbs a[aria-current='page'] {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}

@@ -1,0 +1,52 @@
+[
+ {
+  "id": "coverage",
+  "page": "colorado-business-law",
+  "value": 87.09,
+  "status": "ok",
+  "stage": "lab",
+  "measured_at": "2026-11-02T08:14:29Z",
+  "source_url": "https://github.com/Colorado-Startups/legallas/commit/6cba3013144291b1026f6892b376c4e6ba2e3e73",
+  "sample_size": 31
+ },
+ {
+  "id": "flags",
+  "page": "colorado-business-law",
+  "value": 0,
+  "status": "ok",
+  "stage": "lab",
+  "measured_at": "2026-11-02T08:14:29Z",
+  "source_url": "https://github.com/Colorado-Startups/legallas/commit/6cba3013144291b1026f6892b376c4e6ba2e3e73",
+  "sample_size": 1
+ },
+ {
+  "id": "verified",
+  "page": "colorado-business-law",
+  "value": 87.5,
+  "status": "ok",
+  "stage": "lab",
+  "measured_at": "2026-11-02T08:14:29Z",
+  "source_url": "https://github.com/Colorado-Startups/legallas/commit/6cba3013144291b1026f6892b376c4e6ba2e3e73",
+  "sample_size": 8
+ },
+ {
+  "id": "fresh",
+  "page": "colorado-business-law",
+  "value": 100,
+  "status": "ok",
+  "stage": "lab",
+  "measured_at": "2026-11-02T08:14:29Z",
+  "source_url": "https://github.com/Colorado-Startups/legallas/commit/6cba3013144291b1026f6892b376c4e6ba2e3e73",
+  "sample_size": 26
+ },
+ {
+  "id": "rights",
+  "page": "colorado-business-law",
+  "value": 100,
+  "status": "ok",
+  "stage": "lab",
+  "measured_at": "2026-11-02T08:14:29Z",
+  "source_url": "https://github.com/Colorado-Startups/legallas/commit/6cba3013144291b1026f6892b376c4e6ba2e3e73",
+  "sample_size": 8
+ }
+]

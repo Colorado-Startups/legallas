@@ -1,0 +1,14 @@
+Creative Commons CC0 1.0 Universal
+
+Applies to: the original templates in this folder, that is, Legallas's own drafting. To the extent possible under law,
+Colorado Startups, LTD has waived all copyright and related or neighboring rights to them. You can copy, change,
+distribute and use them, including commercially, without asking and without conditions.
+
+Full legal code: https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+Does not apply to:
+- Bundled third-party forms (Series Seed, the Y Combinator SAFE, Common Paper NDAs and others). Each keeps its own licence,
+  listed in bundled-forms.md.
+- The code in the rest of this repository, which stays Apache-2.0 (see the LICENSE file at the repository root).
+
+Each template's front matter says `licence: CC0-1.0`. No lawyer has reviewed this licence choice.

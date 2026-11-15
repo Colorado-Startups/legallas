@@ -1,0 +1,12 @@
+{
+  "ideal": "Every template a founder or investor needs exists, may ship, fills cleanly, and never claims a lawyer reviewed it.",
+  "sources": [
+    { "title": "Claude Code docs: MCP output limits and warnings", "url": "https://code.claude.com/docs/en/mcp", "date": "2026-11-06" },
+    { "title": "Anthropic Usage Policy: high-risk use case requirements", "url": "https://www.anthropic.com/legal/aup", "date": "2025-09-15" },
+    { "title": "Web Content Accessibility Guidelines (WCAG) 2.2, W3C Recommendation", "url": "https://www.w3.org/TR/WCAG22/", "date": "2024-12-12" },
+    { "title": "web.dev: Measure performance with the RAIL model", "url": "https://web.dev/articles/rail", "date": "2020-06-10" }
+  ],
+  "quality": "Every needed document covered, licensed to ship, every field filled, and told plainly that no lawyer reviewed it.",
+  "speed": "Every template renders with its fields filled in 100 ms or less, so the response feels instant.",
+  "consumption": "An AI reads any template whole, in parts under 10,000 tokens each, and the daily lane checks every template in 5 minutes of runner time."
+}

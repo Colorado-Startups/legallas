@@ -1,0 +1,29 @@
+{
+  "card": "M2",
+  "meta": {
+    "caption": "Doe v. Harbor Labs, Inc.",
+    "court": "District Court, Example County",
+    "division": "Courtroom 3C",
+    "judge": null,
+    "filed": "2012-12-18",
+    "operativePleading": {
+      "title": "First Amended Complaint",
+      "cite": { "path": "08-Court-Pleadings/Complaint_FAC__20130409__Jane-Doe__First-Amended.pdf", "page": null }
+    },
+    "definedTerms": [{ "term": "Harbor Labs", "means": "Harbor Labs, Inc., a fictional Delaware corporation" }]
+  },
+  "people": [
+    { "id": "p-roe", "name": "Richard Roe", "role": "defendant", "side": "defendant", "title": "CTO", "orgs": ["org-harbor"],
+      "cites": [{ "path": "01-Corporate-Records/Stock_Agreement_SA__20110607__Harbor-Labs__Countersigned.pdf", "page": 1 }] },
+    { "id": "p-doe", "name": "Jane Doe", "role": "plaintiff", "side": "client", "title": "CEO", "orgs": ["org-harbor"],
+      "cites": [{ "path": "08-Court-Pleadings/Complaint_FAC__20130409__Jane-Doe__First-Amended.pdf", "page": 2 }] }
+  ],
+  "orgs": [
+    { "id": "org-harbor", "name": "Harbor Labs, Inc.", "kind": "company", "side": "defendant", "parent": null, "formed": "2011-02-08",
+      "cites": [{ "path": "01-Corporate-Records/Stock_Agreement_SA__20110607__Harbor-Labs__Countersigned.pdf", "page": 1 }] }
+  ],
+  "links": [
+    { "from": "p-roe", "to": "org-harbor", "label": "officer of",
+      "cites": [{ "path": "01-Corporate-Records/Stock_Agreement_SA__20110607__Harbor-Labs__Countersigned.pdf", "page": 4 }] }
+  ]
+}

@@ -1,0 +1,178 @@
+---
+// Shell for every room page. Card F1 owns the look (web/DESIGN.md, header block); this file also fixes the
+// parts that are security requirements: noindex, no third-party anything, and the confidentiality line
+// read from the gitignored matter config. Script hooks are data-* attributes; classes are for style only.
+// data-case-only and data-company-only are for the Worker, which shapes a room with no matter (worker/room-shape.ts).
+import '../styles/room.css';
+import '../styles/print.css';
+import LegallasGlyph from '../components/LegallasGlyph.astro';
+import GuideSlot from '../slots/GuideSlot.astro';
+import type { GuidePage } from '../scripts/guide-bus.ts';
+import { names, roomConfig as config } from '../scripts/room-config.ts';
+import { regulatorNav } from '../scripts/regulator-nav.ts';
+import { CASE_ROOM_NOTICE, SHORT_LINE } from '../../worker/product-notices.ts';
+import { DEFAULT_ASSISTANT_NAME, DEFAULT_INSTANCE_NAME } from '../../worker/room-names.ts';
+// The two latin text faces, preloaded so they are usually in hand at the first paint: with font-display swap, a
+// face arriving later redraws the header and headings in new widths (layout shift, R89). Same files as tokens.css.
+import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import serifLatin from '@fontsource-variable/source-serif-4/files/source-serif-4-latin-wght-normal.woff2?url';
+import { CONTROL_PREFIX_FALLBACK } from '../scripts/control-prefix.ts';
+import { mcpHost } from '../../worker/room-settings.ts';
+
+interface Props {
+  title: string;
+  /**
+   * The page guide's key (guide-bus.ts): renders the Legallas guide band under the header, in a room with the
+   * litigation pack (slots/GuideSlot.astro). /ask has none.
+   */
+  guide?: GuidePage;
+}
+const { title, guide } = Astro.props;
+
+// The room's six sections: the case picture, the two tracks counsel brings (the court complaint and the regulator
+// filings), then the record. aria-current marks the one this page belongs to. The Binder sits under Documents;
+// the prior case's claims (/claims/) are reached from the foot of each track page, Ask from the header's Ask button
+// (the drawer's "Open as page" reaches /ask) and Activity from the Account menu, so those mark nothing current.
+const path = Astro.url.pathname;
+const under = (...prefixes: string[]) => prefixes.some((prefix) => path.startsWith(prefix));
+const onActivity = path.startsWith('/activity');
+const onProposals = path.startsWith('/proposals');
+
+// The matter config is gitignored, so CI and fresh clones build with the generic banner (scripts/room-config.ts).
+const banner = config?.banner ?? 'Confidential. Attorney Eyes Only.';
+// The regulator is named by the matter, so its label and full name live in the gitignored config too: source names
+// no matter (regulator-nav.ts).
+const regulator = regulatorNav(config);
+const nav = [
+  { href: '/', label: 'Overview', current: path === '/' },
+  { href: '/complaint/', label: 'Complaint', current: under('/complaint'), caseOnly: true },
+  { href: '/regulator/', label: regulator.label, current: under('/regulator'), title: regulator.title, caseOnly: true },
+  { href: '/chronology/', label: 'Chronology', current: under('/chronology'), caseOnly: true },
+  { href: '/people/', label: 'Entities & People', current: under('/people'), caseOnly: true },
+  {
+    href: '/documents/',
+    label: 'Documents',
+    current: under('/documents', '/doc', '/case-files', '/inbox', '/binder', '/visual'),
+  },
+];
+// Control numbers are formatted on the client as <prefix>-000412; scripts read it from <html data-control-prefix>.
+const configuredPrefix = config?.controlPrefix ?? '';
+const controlPrefix = /^[A-Z]{2,6}$/.test(configuredPrefix) ? configuredPrefix : CONTROL_PREFIX_FALLBACK;
+// The room's names (worker/room-names.ts). Scripts read a renamed room's from <html data-instance-name> and
+// data-assistant-name (src/scripts/room-names.ts); with the default names the attributes are left out, so the page
+// is exactly what it was before the names were configurable.
+const instanceAttr = names.instanceName === DEFAULT_INSTANCE_NAME ? undefined : names.instanceName;
+const assistantAttr = names.assistantName === DEFAULT_ASSISTANT_NAME ? undefined : names.assistantName;
+---
+
+<!doctype html>
+<html lang="en" data-control-prefix={controlPrefix} data-instance-name={instanceAttr} data-assistant-name={assistantAttr}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#1F3A2E" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={serifLatin} as="font" type="font/woff2" crossorigin />
+    <title>{title} | {names.instanceName}</title>
+    {/* First of every script, so it hears a page script that fails to load (boot-guard.ts). */}
+    <script src="../scripts/boot-guard.ts"></script>
+    {/* A page's own first script (doc.astro: doc-early.ts). Module scripts run in page order, so one here runs before the guide's. */}
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="c-header">
+      <p class="c-header__privilege"><span data-case-only>{banner}</span><span data-company-only hidden>Private. By invitation only.</span></p>
+      <div class="c-header__bar">
+        <a class="c-header__brand" href="/">
+          <span class="c-header__portrait"><LegallasGlyph size={32} /></span>
+          <span>{names.instanceName}</span>
+        </a>
+        <nav class="c-header__nav" aria-label="Room">
+          <ul class="c-nav">
+            {
+              nav.map((item) => (
+                <li data-case-only={item.caseOnly ? '' : undefined}>
+                  <a class="c-nav__item" href={item.href} aria-current={item.current ? 'page' : undefined} title={item.title}>
+                    {item.label}{item.title && <span class="u-vh"> ({item.title})</span>}
+                  </a>
+                </li>
+              ))
+            }
+            {/* Shown by me.ts only while /api/me says the room's company checklist is on, so any other room keeps its navigation. */}
+            <li data-checklist-link hidden>
+              <a class="c-nav__item" href="/checklist/" aria-current={under('/checklist') ? 'page' : undefined}>Checklist</a>
+            </li>
+            {/* A company room only: the Worker shows it there (room-shape.ts). The page itself answers in any room. */}
+            <li data-company-only hidden>
+              <a class="c-nav__item" href="/entity/" aria-current={under('/entity') ? 'page' : undefined}>Entity choice</a>
+            </li>
+          </ul>
+        </nav>
+        <div class="c-header__tools">
+          <button type="button" class="c-button c-button--primary" data-ask-open aria-keyshortcuts="Control+K Meta+K">
+            <span class="c-header__glyph" data-glyph-slot aria-hidden="true"><LegallasGlyph size={20} /></span>
+            <span>Ask</span>
+            <kbd class="c-kbd c-header__kbd" aria-hidden="true">Ctrl K</kbd>
+          </button>
+          <details class="c-header__menu" data-account>
+            <summary class="c-button c-button--quiet c-header__more">
+              Account
+              <svg class="c-header__caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </summary>
+            <div class="c-header__account" id="room-account">
+              <span class="c-header__who">
+                <span class="u-vh">Signed in as </span>
+                <span data-me-email></span>
+              </span>
+              <a class="c-button c-button--quiet" href={`https://${mcpHost}/connect`} data-needs="connect">Connect AI</a>
+              <a class="c-button c-button--quiet c-header__owner" href="/activity/" aria-current={onActivity ? 'page' : undefined}>
+                Activity
+              </a>
+              <a class="c-button c-button--quiet" href="/hold/" aria-current={path.startsWith('/hold') ? 'page' : undefined}>Legal hold</a>
+              {/* Shown by me.ts only when /api/me says the room's proposals are on (docs/design/propose-and-approve.md). */}
+              <a class="c-button c-button--quiet" href="/proposals/" aria-current={onProposals ? 'page' : undefined} data-proposals-link hidden>
+                Proposals
+              </a>
+              {/* Written into the bundle at release (scripts/notices.ts, docs/licences/NOTICE-draft.md). */}
+              <a class="c-button c-button--quiet" href="/THIRD-PARTY-NOTICES.txt">Third-party notices</a>
+              <a class="c-button c-button--quiet" href="/cdn-cgi/access/logout">Sign out</a>
+            </div>
+          </details>
+        </div>
+      </div>
+    </header>
+    {guide && <GuideSlot page={guide} />}
+    <main id="main" tabindex="-1">
+      {/* A7: at the top of any case room. room-shape.ts removes it from a company room. */}
+      <aside class="case-notice" role="note" aria-labelledby="case-notice-title" data-case-only>
+        <p><strong id="case-notice-title">{CASE_ROOM_NOTICE.title}</strong> {CASE_ROOM_NOTICE.body}</p>
+        <ul>
+          {CASE_ROOM_NOTICE.cautions.map((line) => (typeof line === 'string' ? <li>{line}</li> : <li>{line[0]}<strong>{line[1]}</strong>{line[2]}</li>))}
+        </ul>
+      </aside>
+      <slot />
+    </main>
+    <footer class="room-footer" data-case-only>
+      <p>{names.instanceName} counsel room. Private, by invitation only.</p>
+      <p>{SHORT_LINE}</p>
+    </footer>
+    <footer class="room-footer" data-company-only hidden>
+      <p>{names.instanceName}. Private, by invitation only.</p>
+      <p>{SHORT_LINE}</p>
+    </footer>
+    <div data-ask-drawer hidden></div>
+    {/* The drawer head's small Legallas (chat-drawer.ts clones it), so the miniature comes from astro:assets like the
+        header's. Template content is inert: nothing in it is fetched until the drawer opens. */}
+    <template data-glyph-template><LegallasGlyph size={24} /></template>
+    <script src="../scripts/me.ts"></script>
+    <script src="../scripts/header-account.ts"></script>
+    <script src="../slots/ask-slot.ts"></script>
+  </body>
+</html>

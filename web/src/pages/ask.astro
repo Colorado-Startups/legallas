@@ -1,0 +1,114 @@
+---
+// Ask (card P7): questions about the matter, answered from the room's documents with pinpoint cites.
+// The page is static; src/scripts/chat.ts asks, streams, keeps browser-only history and drives the companion.
+// Research mode (plan D10 to D12): the Quick / Research switch shows only when GET /api/research says it is on;
+// picking Research loads research-panel.ts into [data-research], whose threads are saved in the room.
+// Layout (web/design/ask, R61): the companion beside the conversation, a compact row when the room is narrow
+// or the exhibit pane (F7) takes the right half, and a small avatar beside the question box on a phone.
+import Room from '../layouts/Room.astro';
+import LegallasGlyph from '../components/LegallasGlyph.astro';
+import LegallasStills from '../components/LegallasStills.astro';
+import '../styles/companion.css';
+import '../styles/chat.css';
+import { COMPACT_LABEL, SHORT_LINE } from '../../worker/product-notices.ts';
+import { ownerName, sentence } from '../../worker/room-settings.ts';
+
+const DATA_USE_URL = 'developers.cloudflare.com/workers-ai/platform/data-usage/';
+---
+
+<Room title="Ask">
+  <div class="ask-frame">
+    <div class="ask-layout">
+      <aside class="ask-companion" aria-label="Companion" data-companion>
+        {/* The rig's stills (DESIGN.md section 8), plain images, so he shows without script; Rive plays over them when
+            motion is allowed. He greets first (chat-companion.ts starts at hello). The state is the text below. */}
+        <div class="companion-art ask-companion__art" data-companion-art aria-hidden="true"><LegallasStills width={192} state="hello" /></div>
+        {/* On a phone the small Legallas (F8, R68) stands in for the bust beside the question box. */}
+        <span class="ask-companion__glyph" data-companion-glyph aria-hidden="true"><LegallasGlyph size={32} /></span>
+        <div class="ask-companion__text">
+          <p class="ask-companion__state t-ui-strong" data-companion-state>Ready</p>
+          <p class="ask-companion__note t-small" data-companion-note></p>
+        </div>
+        <button type="button" class="c-button c-button--quiet ask-companion__quiet" data-companion-quiet aria-pressed="false">
+          Quiet
+        </button>
+      </aside>
+
+      <section class="ask-main" aria-labelledby="ask-title">
+        <header class="ask-head">
+          <h1 id="ask-title" class="ask-head__title">Ask</h1>
+          <p class="ask-head__sub t-small">Answers cite documents in this room only.</p>
+          <div class="ask-head__actions">
+            {/* Quick stays the default; research-mode.ts shows the switch only when research is on for this member. */}
+            <div class="ask-mode" role="radiogroup" aria-label="Answer mode" data-ask-modes hidden>
+              <button type="button" role="radio" class="c-button ask-mode__option" aria-checked="true" data-ask-mode="quick">Quick</button>
+              <button type="button" role="radio" class="c-button ask-mode__option" aria-checked="false" tabindex="-1" data-ask-mode="research">Research</button>
+            </div>
+            <button type="button" class="c-button" data-chat-new>New question</button>
+            <button type="button" class="c-button" data-chat-clear hidden>Clear history</button>
+          </div>
+        </header>
+        <p class="ask-head__sub t-small">{SHORT_LINE}</p>
+
+        <p class="ask-empty" data-chat-empty>
+          Ask about a person, a date, a payment or a document. Every answer cites the page it comes from.
+        </p>
+        <ol class="ask-log" data-chat-log aria-label="Conversation"></ol>
+        <div data-research hidden></div>
+      </section>
+
+      <form class="ask-form" data-chat-form>
+        {/* The label key sits in the composer panel, so the sticky composer never covers it. */}
+        <ul class="ask-legend ask-form__legend t-small" aria-label="Answer labels">
+          <li class="ask-legend__item" data-kind="fact"><span class="ask-claim__mark" aria-hidden="true"></span>Fact<span class="ask-legend__desc">: stated in a cited document</span></li>
+          <li class="ask-legend__item" data-kind="read"><span class="ask-claim__mark" aria-hidden="true"></span>Read<span class="ask-legend__desc">: what a cited page says</span></li>
+          <li class="ask-legend__item" data-kind="inference"><span class="ask-claim__mark" aria-hidden="true">&#8756;</span>Inference<span class="ask-legend__desc">: reasoning from the facts</span></li>
+        </ul>
+        <label for="chat-question" class="t-label">Your question</label>
+        <p class="ask-form__context" data-chat-context hidden>
+          <span class="c-chip" data-chat-context-label></span>
+          <button type="button" class="c-button c-button--quiet" data-chat-context-clear>Ask about everything</button>
+        </p>
+        <div class="ask-form__row">
+          <textarea
+            id="chat-question"
+            class="c-input ask-form__input"
+            name="question"
+            rows="2"
+            maxlength="2000"
+            required
+            placeholder="Ask about a person, a date, a payment or a document"
+            data-chat-input></textarea>
+          <button type="submit" class="c-button c-button--primary ask-form__send">Ask</button>
+        </div>
+        <div class="ask-form__meta t-caption">
+          <span data-chat-count aria-live="off">0 / 2000</span>
+          <span>Ctrl or ⌘ Enter sends.</span>
+        </div>
+        <p class="ask-form__status t-small" data-chat-status role="status"></p>
+        <p class="ask-head__sub t-caption">{COMPACT_LABEL}</p>
+      </form>
+
+      <details class="ask-privacy t-caption">
+        <summary>Where your questions go</summary>
+        <p>
+          Quick answers: the room records that you asked, never what. The question and its answer are saved only in this
+          browser profile until you use Sign out or Clear history, so clear them on a shared computer.
+        </p>
+        <p data-research-privacy hidden>
+          Research: each thread, with its questions, answers and step counts, is saved in this room on Cloudflare, where
+          only you can open it. Delete a thread at any time; the room deletes it 90 days after its last question.
+          Cloudflare's point-in-time recovery keeps deleted data for up to 30 days.
+        </p>
+        <p>{sentence(ownerName)} runs this room on Cloudflare, which does not train models on its content.</p>
+        <blockquote>
+          "Cloudflare does not use your Customer Content to (1) train any AI models made available on Workers AI or (2)
+          improve any Cloudflare or third-party services"
+        </blockquote>
+        <p class="ask-privacy__source">Workers AI data usage: {DATA_USE_URL}</p>
+      </details>
+    </div>
+  </div>
+</Room>
+
+<script src="../scripts/chat.ts"></script>

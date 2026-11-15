@@ -1,0 +1,22 @@
+---
+// The Overview of a room with no matter, under "connect your own AI" (worker/room-shape.ts): its heading, its checklist and
+// where its documents live.
+import '../styles/company-home.css';
+import ChecklistCard from './ChecklistCard.astro';
+import { companyName } from '../../worker/room-settings.ts';
+---
+
+<section class="company-home" data-company-only hidden>
+  <h1 class="t-h1">{companyName}</h1>
+  <ChecklistCard />
+  <h2 class="t-h2">Where your documents live</h2>
+  <p class="company-home__line" data-company-status role="status">Loading the folders.</p>
+  <ul class="company-folders" data-company-folders></ul>
+</section>
+
+<script>
+  // A few lines for every other room: only a room with no matter loads the folder list, and a chunk that fails to load
+  // shows the list's error line instead of leaving Loading up (#219).
+  import { bootCompanyHome } from '../scripts/company-home-boot.ts';
+  void bootCompanyHome(document, () => import('../scripts/company-home.ts'));
+</script>

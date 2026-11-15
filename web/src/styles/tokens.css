@@ -1,0 +1,107 @@
+/*
+  Legallas Chambers tokens (web/DESIGN.md sections 2 to 5; card F1). Every custom property the room uses
+  lives here, and no other stylesheet may hold a literal color.
+  Fonts are self-hosted from @fontsource (the CSP allows font-src 'self' only).
+  Light only (the owner, 2026-10-02): the room has no dark theme, on screen or in print.
+*/
+/* wght, not opsz: 50,936 bytes against 122,360, loaded before every page's first paint (DESIGN.md section 4). */
+@import '@fontsource-variable/source-serif-4/wght.css';
+@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
+:root {
+  color-scheme: light;
+
+  /* Color (section 2), light */
+  --paper: #faf7f0;
+  --panel: #f2ede2;
+  --surface: #fffdf8;
+  --ink: #1a1f1c;
+  --ink-2: #4a524d;
+  --ink-3: #666d68;
+  --forest: #1f3a2e;
+  --forest-hover: #2e5a45;
+  --forest-tint: #e3ebe5;
+  --on-forest: var(--paper);
+  --brass-rule: #a98b4f;
+  --brass-mark: #8c7140;
+  --brass-text: #7a6232;
+  --oxblood: #6b1e23;
+  --oxblood-tint: #f3e4e2;
+  --rule: #d9cfbb;
+  --border: #8a8272;
+  --focus: #1f5fa8;
+  --slate: #4b5d6b;
+  --graphite: #6b6b6b;
+
+  /* Encoding marks (section 3), light. Marks only; text never wears these. */
+  --enc-client: #3b9874;
+  --enc-defendant: #813537;
+  --enc-company: #045b8a;
+  --enc-third: #8d6813;
+  --enc-court: var(--graphite);
+  --enc-filing: var(--ink-2);
+
+  /*
+    Game layer (sections 7 and 8). The hex texture is a faint honeycomb for the Overview header only, about 4%
+    visual weight: --rule lines at 45% opacity. A data URI cannot read a custom property, so its stroke repeats
+    the --rule literal; change both together. The fog haze is the gap-row ground (c-fog): never darker than
+    --panel, so every text pair that passes on --panel passes on it.
+  */
+  --hex-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='48'%3E%3Cpath d='M14 0 28 8V24L14 32 0 24V8ZM14 32V48' fill='none' stroke='%23d9cfbb' stroke-opacity='.45'/%3E%3C/svg%3E");
+  --fog-haze: linear-gradient(90deg, var(--panel), color-mix(in srgb, var(--panel) 35%, var(--surface)));
+
+  /* Type (section 4) */
+  --font-serif: 'Source Serif 4 Variable', 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --text-12: 0.75rem;
+  --text-13: 0.8125rem;
+  --text-14: 0.875rem;
+  --text-16: 1rem;
+  --text-18: 1.125rem;
+  --text-21: 1.3125rem;
+  --text-26: 1.625rem;
+  --text-34: 2.125rem;
+  --text-44: 2.75rem;
+
+  /* Space, shape, layout, motion (section 5) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --radius: 4px;
+  --radius-chip: 2px;
+  --hairline: 1px;
+  --shadow-overlay: 0 1px 2px rgb(26 31 28 / 0.08), 0 8px 24px rgb(26 31 28 / 0.14);
+  --page-max: 80rem;
+  --gutter: var(--space-5);
+  --measure: 66ch;
+  --row-h: 36px;
+  --target-min: 24px;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+  --z-header: 10;
+  --z-pane: 30;
+  --z-drawer: 40;
+  --z-toast: 50;
+}
+
+@media (max-width: 48rem) {
+  :root {
+    --gutter: var(--space-4);
+  }
+}
+
+/* Forced colors keep url() images; the hex texture is decoration, so it drops out there. */
+@media (forced-colors: active) {
+  :root {
+    --hex-texture: none;
+  }
+}

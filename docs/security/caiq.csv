@@ -1,0 +1,284 @@
+id,domain,answer,how,evidence
+A&A-01.1,Audit and assurance,No,No audit policy. No audit run.,docs/security/README.md; docs/security/control-map.md
+A&A-01.2,Audit and assurance,No,No audit policy.,docs/security/README.md
+A&A-02.1,Audit and assurance,No,"No SOC 2, ISO/IEC 27001 or 42001 report.",docs/security/README.md
+A&A-03.1,Audit and assurance,No,No audit plan.,docs/security/README.md
+A&A-04.1,Audit and assurance,No,No audit run. Control map is our own.,docs/security/control-map.md
+A&A-05.1,Audit and assurance,No,No audit process.,docs/security/README.md
+A&A-06.1,Audit and assurance,No,No audit findings. Scan findings have fix deadlines.,docs/security/vulnerability-management.md; quality-speed/pages/security/triage.json
+A&A-06.2,Audit and assurance,No,No audit findings. Scan readings on the Security page.,quality-speed/pages/security/page.ts
+AIS-01.1,Application and interface security,Yes,"Access, data, AI and vulnerability policies. Changed by PR.",docs/security/access.md; docs/security/data-and-network.md; docs/security/vulnerability-management.md
+AIS-01.2,Application and interface security,Yes,Every 12 months and on change.,docs/security/README.md
+AIS-02.1,Application and interface security,Yes,Access token and members row per request; strict CSP; no CORS; HSTS; Origin check on writes.,web/worker/auth.ts; web/worker/headers.ts; web/worker/http.ts
+AIS-03.1,Application and interface security,Yes,Security page: nightly readings and key age against goals.,quality-speed/pages/security/PLAN.md; quality-speed/pages/security/readings.ts
+AIS-04.1,Application and interface security,Yes,"PR off main: sign-off on every commit, verified signatures on main, required CI, secret scan, merge queue.",docs/security/vulnerability-management.md; .github/workflows/ci.yml
+AIS-05.1,Application and interface security,Yes,Code: ci-ok and dco. Ask: replica eval hard gates.,.github/workflows/ci.yml; web/scripts/ask-eval-gate.ts
+AIS-05.2,Application and interface security,Yes,"CI on web/ changes: tests, type check, build, Worker dry runs.",.github/workflows/ci.yml
+AIS-06.1,Application and interface security,Yes,Pinned product version; release checklist with rollback target and D1 bookmark.,docs/security/bcp-dr.md; web/README.md
+AIS-06.2,Application and interface security,Yes,Room owner: release workflow; token limited to main.,docs/security/encryption.md
+AIS-07.1,Application and interface security,Yes,"Critical, high: 3 days (max 14). Medium, low: 14 days (max 60).",docs/security/vulnerability-management.md
+AIS-07.2,Application and interface security,Yes,Dependabot security updates.,.github/dependabot.yml
+AIS-08.1,Application and interface security,Yes,"MCP: OAuth 2.1 PKCE, one read scope, hashed tokens, role per call, rate limits, callback allowlist.",web/mcp/oauth.ts; web/mcp/server.ts; web/mcp/redirects.ts
+AIS-08.2,Application and interface security,Yes,Every 12 months and on any MCP tool change.,docs/security/access.md
+BCR-01.1,Business continuity and resilience,Yes,BCP/DR policy 1.0.,docs/security/bcp-dr.md
+BCR-01.2,Business continuity and resilience,Yes,"Every 12 months, after drills and recoveries.",docs/security/bcp-dr.md
+BCR-02.1,Business continuity and resilience,Yes,"Each failure: recovery, RPO and RTO goal.",docs/security/bcp-dr.md
+BCR-02.2,Business continuity and resilience,Yes,Every 12 months.,docs/security/bcp-dr.md
+BCR-03.1,Business continuity and resilience,Yes,"Rollback, D1 Time Travel, backup restore, re-sync, counsel pack.",docs/security/bcp-dr.md
+BCR-04.1,Business continuity and resilience,Yes,BCP/DR policy is the plan.,docs/security/bcp-dr.md
+BCR-05.1,Business continuity and resilience,Yes,"Our code plus Cloudflare's D1, R2 and Time Travel docs.",docs/security/bcp-dr.md
+BCR-05.2,Business continuity and resilience,Yes,In this repo; sent with vendor reviews.,docs/security/bcp-dr.md; docs/security/questionnaire.md
+BCR-05.3,Business continuity and resilience,Yes,Every 12 months.,docs/security/bcp-dr.md
+BCR-06.1,Business continuity and resilience,No,Drill command exists; no live result yet.,docs/security/bcp-dr.md; web/README.md; web/worker/backup
+BCR-07.1,Business continuity and resilience,Yes,Room owner: emails members. Members use the counsel pack.,docs/security/bcp-dr.md
+BCR-08.1,Business continuity and resilience,Yes,"Room owner: sets up the backup Worker; daily once scheduled. D1 Time Travel: 30 days Paid, 7 Free.",docs/security/bcp-dr.md; web/README.md; web/worker/backup
+BCR-08.2,Business continuity and resilience,Yes,"Copy stays in the account, under another location hint; SHA-256 per object; 30-day bucket lock.",web/README.md; web/worker/backup; docs/security/encryption.md
+BCR-08.3,Business continuity and resilience,No,Restore and drill commands exist; CI runs them on the fictional room. No live result yet.,docs/security/bcp-dr.md; web/README.md; web/worker/backup
+BCR-09.1,Business continuity and resilience,Yes,"Steps for bad release, damaged database, lost original, region outage, lost account.",docs/security/bcp-dr.md
+BCR-09.2,Business continuity and resilience,Yes,Every 12 months and after any recovery.,docs/security/bcp-dr.md
+BCR-10.1,Business continuity and resilience,No,Drill command exists; no live result yet.,docs/security/bcp-dr.md; web/README.md; web/worker/backup
+BCR-10.2,Business continuity and resilience,NA,No premises.,docs/security/control-map.md
+BCR-11.1,Business continuity and resilience,Yes,"Room owner: backup under another location hint (a hint, not a region guarantee); same location refused. One provider.",docs/security/bcp-dr.md; web/README.md
+CCC-01.1,Change control and configuration,Yes,Change control in vulnerability management policy.,docs/security/vulnerability-management.md
+CCC-01.2,Change control and configuration,Yes,Every 12 months and on change.,docs/security/vulnerability-management.md
+CCC-02.1,Change control and configuration,Yes,Required CI and merge queue; release checklist; replica eval.,docs/security/vulnerability-management.md; docs/security/bcp-dr.md; .github/workflows/ci.yml
+CCC-03.1,Change control and configuration,Yes,"PR from claude/*. No push, force-push or deletion on main.",docs/security/vulnerability-management.md; CLAUDE.md
+CCC-04.1,Change control and configuration,Yes,"Room owner: only their account adds or removes Workers, databases, buckets. Declared in Wrangler config.",web/wrangler.example.jsonc; SECURITY.md
+CCC-05.1,Change control and configuration,No,No SLA. Updates reach a room only when its owner moves the pin.,docs/security/vulnerability-management.md
+CCC-06.1,Change control and configuration,Yes,Example Wrangler configs; repo settings from the settings page.,web/wrangler.example.jsonc; web/wrangler.mcp.example.jsonc; .github/workflows/settings-apply.yml
+CCC-06.2,Change control and configuration,Yes,Every 12 months.,docs/security/README.md
+CCC-07.1,Change control and configuration,No,CI blocks repo baseline breaks. No drift alert on live rooms.,web/worker/config.test.ts
+CCC-08.1,Change control and configuration,No,"No exception procedure. Only emergency path: SECURITY.md, ""If something leaks"".",SECURITY.md
+CCC-08.2,Change control and configuration,No,No GRC-04 process.,docs/security/README.md
+CCC-09.1,Change control and configuration,Yes,Room owner: Worker rollback or D1 restore to pre-change bookmark.,docs/security/bcp-dr.md
+CEK-01.1,Cryptography and key management,Yes,Encryption policy 1.0.,docs/security/encryption.md
+CEK-01.2,Cryptography and key management,Yes,Every 12 months and on change.,docs/security/encryption.md
+CEK-02.1,Cryptography and key management,Yes,Cloudflare: at-rest keys. Room owner: Worker secrets. Maintainer: key age.,docs/security/encryption.md
+CEK-03.1,Cryptography and key management,No,Cloudflare AES-256 (GCM) and Web Crypto. No certification (e.g. FIPS 140) shown.,docs/security/encryption.md
+CEK-04.1,Cryptography and key management,Yes,"AES-256 (GCM), TLS 1.2+, RS256, scrypt.",docs/security/encryption.md; web/worker/auth.ts; web/scripts/pii-hash.ts
+CEK-05.1,Cryptography and key management,Yes,Same PR and checks; policy changes in the same PR.,docs/security/encryption.md; docs/security/README.md
+CEK-06.1,Cryptography and key management,No,No crypto risk and cost analysis step.,docs/security/encryption.md
+CEK-07.1,Cryptography and key management,No,No crypto risk program.,docs/security/encryption.md
+CEK-08.1,Cryptography and key management,No,Cloudflare-managed keys. D1 and R2 offer no customer keys.,docs/security/encryption.md
+CEK-09.1,Cryptography and key management,No,No audit.,docs/security/README.md
+CEK-09.2,Cryptography and key management,No,No audit. Key age measured nightly.,docs/security/encryption.md
+CEK-10.1,Cryptography and key management,Yes,Cloudflare: at-rest keys. App: Web Crypto getRandomValues.,web/mcp/consent-repeat.ts; web/mcp/admin-clients.ts
+CEK-11.1,Cryptography and key management,Yes,One purpose per Worker secret; wrangler secret put; not in config or process.env.,docs/security/encryption.md; web/wrangler.example.jsonc
+CEK-12.1,Cryptography and key management,Yes,90-day expiry or rotation; age measured nightly.,docs/security/encryption.md; quality-speed/pages/security/collect-keys.ts
+CEK-13.1,Cryptography and key management,Yes,Exposed secret rotated first.,docs/security/incident-response.md; SECURITY.md
+CEK-14.1,Cryptography and key management,No,No key destruction procedure. Cloudflare destroys its own.,docs/security/encryption.md
+CEK-15.1,Cryptography and key management,NA,No key management system; no pre-activation state.,docs/security/encryption.md
+CEK-16.1,Cryptography and key management,NA,No key management system; no suspension state.,docs/security/encryption.md
+CEK-17.1,Cryptography and key management,NA,No key management system. Keys expire or rotate within 90 days.,docs/security/encryption.md
+CEK-18.1,Cryptography and key management,NA,No archived keys.,docs/security/encryption.md
+CEK-19.1,Cryptography and key management,NA,Compromised keys are never reused.,docs/security/incident-response.md
+CEK-20.1,Cryptography and key management,NA,No customer-held keys. Cloudflare holds at-rest keys.,docs/security/encryption.md
+CEK-21.1,Cryptography and key management,No,No key status inventory. Key age measured nightly.,quality-speed/pages/security/collect-keys.ts
+DCS-01.1,Datacenter security,NA,No premises; Cloudflare's own reports.,docs/security/control-map.md; docs/security/README.md
+DCS-01.2,Datacenter security,NA,No premises.,docs/security/control-map.md
+DCS-02.1,Datacenter security,No,No disposal policy for maintainer equipment.,docs/security/control-map.md
+DCS-02.2,Datacenter security,No,No data destruction procedure.,docs/security/control-map.md
+DCS-02.3,Datacenter security,No,No disposal policy.,docs/security/control-map.md
+DCS-03.1,Datacenter security,NA,Colorado Startups holds no room data or hardware. Room owner moves their own data.,SECURITY.md; docs/security/bcp-dr.md
+DCS-03.2,Datacenter security,NA,No room data or hardware held.,SECURITY.md
+DCS-03.3,Datacenter security,NA,No room data or hardware held.,SECURITY.md
+DCS-04.1,Datacenter security,NA,No offices.,docs/security/control-map.md
+DCS-04.2,Datacenter security,NA,No offices.,docs/security/control-map.md
+DCS-05.1,Datacenter security,NA,No physical media.,docs/security/control-map.md
+DCS-05.2,Datacenter security,NA,No physical media.,docs/security/control-map.md
+DCS-06.1,Datacenter security,Yes,Logical assets classed by risk. No physical assets.,docs/security/data-and-network.md; docs/security/bcp-dr.md
+DCS-06.2,Datacenter security,Yes,Every 12 months.,docs/security/data-and-network.md
+DCS-07.1,Datacenter security,NA,No sites. Room parts listed in BCP/DR.,docs/security/bcp-dr.md
+DCS-07.2,Datacenter security,NA,No sites.,docs/security/bcp-dr.md
+DCS-08.1,Datacenter security,NA,No premises; Cloudflare's own reports.,docs/security/README.md
+DCS-09.1,Datacenter security,NA,"Identity auth, not device.",docs/security/access.md
+DCS-10.1,Datacenter security,NA,No premises; Cloudflare's own reports.,docs/security/README.md
+DCS-10.2,Datacenter security,NA,No premises; Cloudflare's own reports.,docs/security/README.md
+DCS-11.1,Datacenter security,NA,No premises; Cloudflare's own reports.,docs/security/README.md
+DCS-12.1,Datacenter security,NA,No premises; Cloudflare's own reports.,docs/security/README.md
+DCS-13.1,Datacenter security,NA,No premises; Cloudflare's own reports.,docs/security/README.md
+DCS-14.1,Datacenter security,NA,No premises; Cloudflare's own reports.,docs/security/README.md
+DCS-15.1,Datacenter security,NA,No premises; Cloudflare's own reports.,docs/security/README.md
+DCS-16.1,Datacenter security,NA,No premises; Cloudflare's own reports.,docs/security/README.md
+DCS-17.1,Datacenter security,NA,No premises; Cloudflare's own reports.,docs/security/README.md
+DCS-18.1,Datacenter security,NA,Cloudflare runs data centres. Room recovery: BCP/DR.,docs/security/README.md; docs/security/bcp-dr.md
+DSP-01.1,Data security and privacy,Yes,Data and network policy.,docs/security/data-and-network.md
+DSP-01.2,Data security and privacy,Yes,Every 12 months and on change.,docs/security/data-and-network.md
+DSP-02.1,Data security and privacy,NA,"No media; Cloudflare disposes. Room owner: deletes Workers, D1, buckets at matter end.",docs/security/data-and-network.md; docs/security/README.md
+DSP-03.1,Data security and privacy,Yes,Data classes and where each lives.,docs/security/data-and-network.md
+DSP-03.2,Data security and privacy,Yes,Every 12 months.,docs/security/data-and-network.md
+DSP-04.1,Data security and privacy,Yes,Five classes. Privileged hidden by role.,docs/security/data-and-network.md; web/worker/privilege.ts
+DSP-05.1,Data security and privacy,Yes,"Stores, AI paths, request flow.",docs/security/data-and-network.md; docs/security/ai-governance.md; docs/security/access.md
+DSP-05.2,Data security and privacy,Yes,Every 12 months and on change.,docs/security/data-and-network.md; docs/security/ai-governance.md
+DSP-06.1,Data security and privacy,Yes,Room owner owns all room data. Colorado Startups holds none.,SECURITY.md; docs/security/data-and-network.md
+DSP-06.2,Data security and privacy,Yes,Every 12 months.,docs/security/README.md
+DSP-07.1,Data security and privacy,Yes,"Two locks, read-only MCP, append-only audit, private defaults.",docs/security/access.md; SECURITY.md
+DSP-08.1,Data security and privacy,Yes,No content in logs or audit rows; SSNs blocked. Workers AI keeps no inputs or outputs; an outside backend only with zero retention; a member's own AI vendor follows its own terms.,docs/security/data-and-network.md; docs/security/ai-governance.md; docs/security/ai-risk-assessment.md
+DSP-08.2,Data security and privacy,No,Private defaults. Not checked against each law.,docs/security/data-and-network.md; docs/security/ai-governance.md
+DSP-09.1,Data security and privacy,No,No DPIA. AI risk assessment only.,docs/security/ai-risk-assessment.md
+DSP-10.1,Data security and privacy,Yes,TLS every hop; zero-retention gate for processors.,docs/security/encryption.md; web/worker/ask-gate.ts
+DSP-11.1,Data security and privacy,No,No request procedure. Room owner: can remove a member's row and access.,web/scripts/member.ts
+DSP-12.1,Data security and privacy,No,No privacy notice. Notice set is a draft.,docs/security/ai-governance.md
+DSP-13.1,Data security and privacy,Yes,Cloudflare; outside Ask backend only past the zero-retention gate.,docs/security/data-and-network.md; web/worker/ask-gate.ts
+DSP-14.1,Data security and privacy,Yes,Room owner: every other processor is off until they turn it on.,docs/security/ai-governance.md; web/worker/ask-gate.ts
+DSP-15.1,Data security and privacy,Yes,Never. Tests use the fictional room only.,CLAUDE.md; web/fixtures
+DSP-16.1,Data security and privacy,No,"Replaced files 30 days, threads 90. No schedule for documents or audit log.",docs/security/data-and-network.md
+DSP-17.1,Data security and privacy,Yes,"Classes, encryption, roles, privilege, audit, deletion.",docs/security/data-and-network.md; docs/security/encryption.md
+DSP-18.1,Data security and privacy,NA,Colorado Startups holds no room data. Requests go to the room owner.,SECURITY.md
+DSP-19.1,Data security and privacy,Yes,Room owner: picks D1 and R2 region; sets jurisdiction at creation.,docs/security/data-and-network.md
+GRC-01.1,"Governance, risk and compliance",Yes,Seven policies. Changed by PR.,docs/security/README.md
+GRC-01.2,"Governance, risk and compliance",Yes,Every 12 months and on change.,docs/security/README.md
+GRC-02.1,"Governance, risk and compliance",No,No ERM program. AI risk only.,docs/security/ai-risk-assessment.md; docs/security/control-map.md
+GRC-03.1,"Governance, risk and compliance",Yes,Every 12 months; same PR as the control.,docs/security/README.md
+GRC-04.1,"Governance, risk and compliance",No,No exception process.,docs/security/README.md
+GRC-05.1,"Governance, risk and compliance",No,"No people, endpoint or management-system policies.",docs/security/control-map.md
+GRC-06.1,"Governance, risk and compliance",Yes,"Colorado Startups maintains. Owner, maintainer, member duties set.",docs/security/README.md; docs/security/incident-response.md
+GRC-07.1,"Governance, risk and compliance",No,Frameworks mapped. No register of laws or contracts.,docs/security/control-map.md; docs/security/ai-risk-assessment.md
+GRC-07.2,"Governance, risk and compliance",No,No register.,docs/security/control-map.md
+GRC-08.1,"Governance, risk and compliance",No,No interest groups.,docs/security/README.md
+HRS-01.1,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-01.2,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-01.3,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-02.1,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-02.2,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-03.1,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-03.2,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-04.1,Human resources,No,No remote work policy. No case data in this repo.,CLAUDE.md; docs/security/control-map.md
+HRS-04.2,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-05.1,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-06.1,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-07.1,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-08.1,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-09.1,Human resources,Yes,"Owner, maintainer, member duties written.",docs/security/incident-response.md; docs/security/access.md
+HRS-10.1,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-11.1,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-11.2,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-12.1,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-12.2,Human resources,No,No staff programme.,docs/security/control-map.md
+HRS-13.1,Human resources,No,No notice process. CLAUDE.md rules load for every contributor.,CLAUDE.md
+IAM-01.1,Identity and access management,Yes,Access policy 1.0.,docs/security/access.md
+IAM-01.2,Identity and access management,Yes,Every 12 months and on change.,docs/security/access.md
+IAM-02.1,Identity and access management,Yes,No passwords: email code or Cloudflare login. Tokens hashed.,docs/security/access.md; docs/security/encryption.md
+IAM-02.2,Identity and access management,Yes,Every 12 months.,docs/security/access.md
+IAM-03.1,Identity and access management,No,Members table and audit log. No scheduled review.,docs/security/access.md; web/worker/audit.ts
+IAM-04.1,Identity and access management,No,One owner per room. No second approver.,docs/security/vulnerability-management.md; docs/security/bcp-dr.md
+IAM-05.1,Identity and access management,Yes,Three roles; privileged hidden; read-only MCP; read-only CI tokens.,docs/security/access.md; docs/security/ai-governance.md
+IAM-06.1,Identity and access management,No,"Room owner: CLI, then Access. No audit row yet.",docs/security/access.md
+IAM-07.1,Identity and access management,Yes,"Removal ends row, invitations, MCP at once; daily sweep. Room owner: remove from Access.",docs/security/access.md; web/mcp/sweep.ts
+IAM-08.1,Identity and access management,No,No scheduled review.,docs/security/access.md
+IAM-09.1,Identity and access management,Yes,"Owner only: activity log, admin pages, revoking others' AI.",web/worker/auth.ts; web/mcp/admin-clients.ts; web/mcp/connections.ts
+IAM-10.1,Identity and access management,No,Owner role standing. Sessions expire.,docs/security/access.md
+IAM-10.2,Identity and access management,No,One owner holds all by design.,docs/security/access.md
+IAM-11.1,Identity and access management,Yes,Only the room owner grants access. Vendor has none.,docs/security/access.md; SECURITY.md
+IAM-12.1,Identity and access management,Yes,One email per person; audit names email and AI app.,docs/security/access.md; web/mcp/audit.ts
+IAM-13.1,Identity and access management,No,Owner MFA; members email code. Room owner: turn on Access MFA.,docs/security/access.md
+IAM-13.2,Identity and access management,Yes,RS256 Access tokens per request; server-bound OAuth tokens.,web/worker/auth.ts; web/mcp/oauth.ts
+IAM-14.1,Identity and access management,Yes,No passwords; hashed tokens; secrets in Cloudflare.,docs/security/encryption.md; .github/scripts/secret-scan.sh
+IAM-15.1,Identity and access management,Yes,Token and members row per request; role per MCP call.,web/worker/auth.ts; web/mcp/server.ts
+IPY-01.1,Interoperability and portability,Yes,"MCP: OAuth, scope, tools, limits documented.",docs/security/access.md; web/mcp/contract.ts
+IPY-01.2,Interoperability and portability,No,No interoperability policy.,docs/security/README.md
+IPY-01.3,Interoperability and portability,No,No portability policy.,docs/security/README.md
+IPY-01.4,Interoperability and portability,No,No data exchange policy.,docs/security/README.md
+IPY-01.5,Interoperability and portability,No,No policy.,docs/security/README.md
+IPY-02.1,Interoperability and portability,Yes,MCP tools. Room owner: holds D1 and R2; counsel pack exports originals.,web/mcp/contract.ts; web/scripts/counsel-pack.ts
+IPY-03.1,Interoperability and portability,Yes,"HTTPS, TLS 1.2+.",docs/security/encryption.md
+IPY-04.1,Interoperability and portability,No,No agreement. Data never leaves the owner's account.,SECURITY.md
+I&S-01.1,Infrastructure security,Yes,"Data and network, encryption policies. Serverless.",docs/security/data-and-network.md; docs/security/encryption.md
+I&S-01.2,Infrastructure security,Yes,Every 12 months and on change.,docs/security/data-and-network.md
+I&S-02.1,Infrastructure security,Yes,"Cloudflare scales Workers. AI spend ceilings, rate limits, daily caps.",web/worker/spend.ts; web/wrangler.example.jsonc
+I&S-03.1,Infrastructure security,Yes,Reads audited; owner emailed per new session and AI connection.,web/worker/audit.ts; web/worker/signins.ts
+I&S-03.2,Infrastructure security,Yes,HTTPS; TLS inside Cloudflare.,docs/security/encryption.md
+I&S-03.3,Infrastructure security,Yes,Token and members row; MCP OAuth; no CORS.,web/worker/auth.ts; web/worker/headers.ts
+I&S-03.4,Infrastructure security,Yes,Every 12 months and on change.,docs/security/data-and-network.md
+I&S-03.5,Infrastructure security,Yes,"HTTPS on custom domain only; outbound https, public only.",web/wrangler.example.jsonc; docs/security/encryption.md
+I&S-04.1,Infrastructure security,NA,Serverless: no hosts or OS. Room owner: 2FA on Cloudflare.,docs/security/access.md
+I&S-05.1,Infrastructure security,Yes,"Local dev identity, banned from production by test. Fictional test room.",web/worker/config.test.ts; CLAUDE.md
+I&S-05.2,Infrastructure security,Yes,Production data never leaves production.,CLAUDE.md
+I&S-06.1,Infrastructure security,Yes,One Cloudflare account per room. Guests: own room only.,SECURITY.md; web/worker/rooms.ts
+I&S-07.1,Infrastructure security,Yes,Sync over HTTPS.,docs/security/encryption.md; web/scripts/sync.ts
+I&S-08.1,Infrastructure security,Yes,Case content and privileged classes; AI risks rated.,docs/security/data-and-network.md; docs/security/ai-risk-assessment.md
+I&S-09.1,Infrastructure security,Yes,Cloudflare DDoS; rate limits; two locks; CSP. Room owner: add WAF rules.,docs/security/data-and-network.md
+LOG-01.1,Logging and monitoring,Yes,Data and network policy.,docs/security/data-and-network.md
+LOG-01.2,Logging and monitoring,Yes,Every 12 months and on change.,docs/security/data-and-network.md
+LOG-02.1,Logging and monitoring,Yes,Append-only trigger; hash-chain export; kept until owner deletes.,web/migrations/0019_audit_append_only.sql; web/worker/audit-chain.ts
+LOG-03.1,Logging and monitoring,Yes,"Sign-ins, AI connections, refused callbacks, reads, files sent. Error logs on.",web/worker/signins.ts; web/mcp/audit.ts
+LOG-03.2,Logging and monitoring,Yes,"Owner emailed: new session, new AI connection, refused callback.",web/worker/signins.ts; web/connect/security-brief.md
+LOG-04.1,Logging and monitoring,No,Owner only. Export audited; activity page views not.,web/worker/audit-chain.ts; web/worker/routes/comments.ts
+LOG-05.1,Logging and monitoring,No,No anomaly detection.,docs/security/data-and-network.md
+LOG-05.2,Logging and monitoring,Yes,Owner triages by incident severity table.,docs/security/incident-response.md
+LOG-06.1,Logging and monitoring,Yes,"Cloudflare: D1 clock, UTC, column default.",web/migrations/0001_init.sql
+LOG-07.1,Logging and monitoring,Yes,"Who, when, document, AI app. No query or text.",docs/security/data-and-network.md; web/mcp/audit.ts
+LOG-07.2,Logging and monitoring,Yes,Every 12 months and on change.,docs/security/data-and-network.md
+LOG-08.1,Logging and monitoring,Yes,Prevented: error codes only; invocation logs off.,docs/security/data-and-network.md; web/wrangler.example.jsonc
+LOG-09.1,Logging and monitoring,Yes,"Email, time, action, document, AI app, IP, browser.",web/worker/audit.ts
+LOG-10.1,Logging and monitoring,Yes,Trigger blocks edits and deletes. Owner-only read.,web/migrations/0019_audit_append_only.sql; web/worker/auth.ts
+LOG-11.1,Logging and monitoring,Yes,Key age nightly on Security page.,quality-speed/pages/security/collect-keys.ts
+LOG-12.1,Logging and monitoring,No,No key event log.,docs/security/encryption.md
+LOG-13.1,Logging and monitoring,NA,No premises; Cloudflare's own reports.,docs/security/control-map.md
+LOG-14.1,Logging and monitoring,Yes,Planted drills void a scanner reading that misses them.,quality-speed/pages/security/scan.sh
+LOG-14.2,Logging and monitoring,No,No paging. Failures show in CI and on the Security page.,docs/security/vulnerability-management.md
+SEF-01.1,"Incidents, e-discovery and forensics",Yes,Incident policy; audit hash-chain export; legal holds.,docs/security/incident-response.md; web/worker/audit-chain.ts; web/worker/hold.ts
+SEF-01.2,"Incidents, e-discovery and forensics",Yes,Every 12 months and after level 1 or 2 incidents.,docs/security/incident-response.md
+SEF-02.1,"Incidents, e-discovery and forensics",Yes,Three levels with contain and notice deadlines.,docs/security/incident-response.md
+SEF-02.2,"Incidents, e-discovery and forensics",Yes,Every 12 months and after level 1 or 2 incidents.,docs/security/incident-response.md
+SEF-03.1,"Incidents, e-discovery and forensics",Yes,Owner notifies members; maintainer notifies affected owners.,docs/security/incident-response.md
+SEF-04.1,"Incidents, e-discovery and forensics",Yes,Tabletop 2026-11-05; next November 2027. No live drill.,docs/security/tabletop-2026-11.md
+SEF-05.1,"Incidents, e-discovery and forensics",No,No incident metrics.,docs/security/incident-response.md
+SEF-06.1,"Incidents, e-discovery and forensics",Yes,Three levels with examples.,docs/security/incident-response.md
+SEF-07.1,"Incidents, e-discovery and forensics",Yes,"Detect, contain, assess, notify, fix, review.",docs/security/incident-response.md
+SEF-07.2,"Incidents, e-discovery and forensics",Yes,Yearly review and tabletop.,docs/security/incident-response.md; docs/security/tabletop-2026-11.md
+SEF-08.1,"Incidents, e-discovery and forensics",Yes,"Members told: level 1 in 24 h, level 2 in 72 h.",docs/security/incident-response.md
+SEF-08.2,"Incidents, e-discovery and forensics",Yes,Room owner: legal notices. Shorter legal deadlines win.,docs/security/incident-response.md
+SEF-09.1,"Incidents, e-discovery and forensics",No,No incident record store.,docs/security/incident-response.md
+SEF-09.2,"Incidents, e-discovery and forensics",No,No records review.,docs/security/incident-response.md
+SEF-10.1,"Incidents, e-discovery and forensics",No,No authority contact list.,docs/security/incident-response.md
+SEF-10.2,"Incidents, e-discovery and forensics",No,No contact list.,docs/security/incident-response.md
+STA-01.1,Supply chain and shared responsibility,Yes,AI processors: zero-retention gate. Dependencies pinned and scanned.,docs/security/ai-governance.md; docs/security/vulnerability-management.md
+STA-01.2,Supply chain and shared responsibility,Yes,Every 12 months and on processor change.,docs/security/ai-governance.md
+STA-02.1,Supply chain and shared responsibility,Yes,"Each control: Built in, Room owner, Platform or Gap.",docs/security/README.md
+STA-02.2,Supply chain and shared responsibility,Yes,Every 12 months.,docs/security/README.md
+STA-03.1,Supply chain and shared responsibility,Yes,"Duties marked for Cloudflare, room owner, members' AI vendors.",docs/security/README.md; docs/security/ai-governance.md
+STA-04.1,Supply chain and shared responsibility,Yes,Room owner settings per policy; security brief for firms.,docs/security/README.md; web/connect/security-brief.md
+STA-05.1,Supply chain and shared responsibility,Yes,This file marks owner per answer.,docs/security/caiq.csv
+STA-06.1,Supply chain and shared responsibility,Yes,Every 12 months. Not externally validated.,docs/security/README.md
+STA-07.1,Supply chain and shared responsibility,Yes,"Enforced in code, tested in CI, self-assessed. Not audited.",.github/workflows/ci.yml
+STA-08.1,Supply chain and shared responsibility,Yes,"Cloudflare; optional Groq or own model host; members' AI; GitHub, Blacksmith, Anthropic.",docs/security/data-and-network.md; SECURITY.md
+STA-09.1,Supply chain and shared responsibility,No,No SBOM. Lockfiles pin dependencies.,docs/security/vulnerability-management.md
+STA-09.2,Supply chain and shared responsibility,No,No SBOM.,docs/security/vulnerability-management.md
+STA-10.1,Supply chain and shared responsibility,Yes,osv-scanner and Scorecard nightly; processors on change.,docs/security/vulnerability-management.md; docs/security/ai-governance.md
+STA-11.1,Supply chain and shared responsibility,No,No service agreement.,docs/security/README.md
+STA-12.1,Supply chain and shared responsibility,No,No scheduled terms review.,docs/security/README.md
+STA-13.1,Supply chain and shared responsibility,Yes,"Yearly policy review, tabletop, this self-assessment.",docs/security/README.md; docs/security/tabletop-2026-11.md
+STA-14.1,Supply chain and shared responsibility,No,Only AI processors: zero retention.,docs/security/ai-governance.md
+STA-15.1,Supply chain and shared responsibility,No,Cloudflare reports in Trust Hub; not reviewed on a schedule.,docs/security/README.md
+STA-16.1,Supply chain and shared responsibility,Yes,Processor retention read before use; dependencies scored nightly.,docs/security/ai-governance.md; web/ASK-MODEL.md
+TVM-01.1,Threat and vulnerability management,Yes,"Vulnerability policy: scans, deadlines, triage.",docs/security/vulnerability-management.md
+TVM-01.2,Threat and vulnerability management,Yes,Every 12 months and on change.,docs/security/vulnerability-management.md
+TVM-02.1,Threat and vulnerability management,Yes,Upload type allowlist by first bytes; sync guards; injection fencing. No antivirus.,docs/security/data-and-network.md; docs/security/ai-governance.md
+TVM-02.2,Threat and vulnerability management,Yes,Every 12 months and on change.,docs/security/data-and-network.md
+TVM-03.1,Threat and vulnerability management,Yes,"Nightly osv-scanner, Semgrep; gitleaks per change; Dependabot weekly.",docs/security/vulnerability-management.md
+TVM-04.1,Threat and vulnerability management,No,No threat analysis process. AI risks rated.,docs/security/ai-risk-assessment.md
+TVM-04.2,Threat and vulnerability management,No,No threat model.,docs/security/ai-risk-assessment.md
+TVM-05.1,Threat and vulnerability management,Yes,Live OSV database nightly; Dependabot weekly.,quality-speed/pages/security/scan.sh; .github/dependabot.yml
+TVM-06.1,Threat and vulnerability management,Yes,"Dependabot weekly, npm and Actions.",.github/dependabot.yml
+TVM-07.1,Threat and vulnerability management,No,No third-party penetration test.,docs/security/README.md; docs/security/vulnerability-management.md
+TVM-08.1,Threat and vulnerability management,Yes,Nightly scans; critical and high in 3 days (max 14).,docs/security/vulnerability-management.md
+TVM-09.1,Threat and vulnerability management,Yes,CISA BOD 26-04 tiers; OpenSSF Best Practices.,docs/security/vulnerability-management.md; quality-speed/pages/security/PLAN.md
+TVM-10.1,Threat and vulnerability management,Yes,NIST AI RMF for AI; CISA mapping for vulnerabilities.,docs/security/ai-risk-assessment.md; docs/security/vulnerability-management.md
+TVM-11.1,Threat and vulnerability management,Yes,Tracked to fix or written dismissal; affected owners told.,quality-speed/pages/security/triage.json; docs/security/incident-response.md
+TVM-12.1,Threat and vulnerability management,Yes,"Security page, nightly.",quality-speed/pages/security/page.ts
+UEM-01.1,Endpoint management,No,No endpoint policy.,docs/security/control-map.md
+UEM-01.2,Endpoint management,No,No endpoint policy.,docs/security/control-map.md
+UEM-02.1,Endpoint management,Yes,"Claude, Microsoft 365 Copilot and Harvey by default; the room owner can allow others. Each lawyer signs in as themselves.",web/mcp/contract.ts; web/mcp/redirects.ts
+UEM-03.1,Endpoint management,No,No endpoint check.,docs/security/control-map.md
+UEM-04.1,Endpoint management,No,No endpoint inventory.,docs/security/control-map.md
+UEM-05.1,Endpoint management,No,No endpoint controls.,docs/security/access.md
+UEM-06.1,Endpoint management,No,No lock rule.,docs/security/control-map.md
+UEM-07.1,Endpoint management,No,No managed endpoints.,docs/security/control-map.md
+UEM-08.1,Endpoint management,No,No managed endpoints. Mac app relies on owner's FileVault.,docs/security/encryption.md
+UEM-09.1,Endpoint management,No,No managed endpoints.,docs/security/control-map.md
+UEM-10.1,Endpoint management,No,No managed endpoints.,docs/security/control-map.md
+UEM-11.1,Endpoint management,No,No endpoint DLP.,docs/security/control-map.md
+UEM-12.1,Endpoint management,No,No managed mobiles.,docs/security/control-map.md
+UEM-13.1,Endpoint management,No,No remote wipe.,docs/security/control-map.md
+UEM-14.1,Endpoint management,No,No device check. Members sign in via Access.,docs/security/access.md

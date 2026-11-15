@@ -1,0 +1,11 @@
+{
+  "ideal": "Every main commit builds, fast and the same bytes every time, into a small, complete release a room can update to soon after merge.",
+  "sources": [
+    { "title": "Cloudflare Workers limits", "url": "https://developers.cloudflare.com/workers/platform/limits/", "date": "2026-10-29" },
+    { "title": "DevOps Research and Assessment: software delivery performance metrics", "url": "https://dora.dev/guides/dora-metrics-four-keys/", "date": "2026-01-05" },
+    { "title": "Martin Fowler: Continuous Integration", "url": "https://martinfowler.com/articles/continuousIntegration.html", "date": "2024-01-18" }
+  ],
+  "quality": "Every main commit builds, two builds of one commit match byte for byte, and the release passes all five checks.",
+  "speed": "The web and Mac builds each take a minute or less, a tenth of the ten-minute build.",
+  "consumption": "A small release: a room downloads only the parts it runs."
+}

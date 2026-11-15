@@ -1,0 +1,37 @@
+---
+// Shell for the front door pages under /welcome/. These are the only pages a visitor sees before
+// signing in, so they load nothing from the room: no Room layout, no /_astro/ bundle (that path stays
+// behind Cloudflare Access), no scripts. Styles and fonts come from fixed files under /welcome/,
+// each named in the Worker's public list (worker/public.ts). Keep <style> and <script> blocks out of
+// this file and its pages: Astro would bundle them under /_astro/.
+interface Props {
+  title: string;
+  /** Plays the arrival motion (the seal draws itself, then the words rise). */
+  animated?: boolean;
+  /** Smaller seal and headline, for the refusal pages. */
+  compact?: boolean;
+}
+const { title, animated = false, compact = false } = Astro.props;
+const classes = ['door', animated && 'door-animated', compact && 'door-compact'].filter(Boolean).join(' ');
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#faf7f0" />
+    <link rel="icon" href="/welcome/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/welcome/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/welcome/door.css" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <main class={classes}>
+      <slot />
+    </main>
+  </body>
+</html>
