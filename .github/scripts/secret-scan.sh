@@ -155,13 +155,13 @@ case "${EVENT_NAME:-}" in
     # workflow_dispatch (the manual run) and anything else: the full history.
 esac
 
-# The launch snapshot (#2) adds the whole tree in one commit. Run 43747961458 read it
-# whole: 2 findings, both web/scripts/iwork.test.ts line 280, a test's fake key that
-# only a whole-file read matches. The full history starts after it.
-snapshot=f668214f58118acc870eefa0683aa3dc971ad9b3
-if [[ "${range[0]}" == --full-history ]] && is_commit "$snapshot"; then
-    range+=(--not "$snapshot")
-fi
+# Findings only a reviewed change here can excuse, each by its gitleaks fingerprint: one
+# commit, file, rule and line, so a later change to that file is still read. The launch
+# snapshot (#2) adds the whole tree in one commit, and run 43747961458 read it whole: a
+# test's fake key that only a whole-file read matches, reported twice on that line.
+excused=("f668214f58118acc870eefa0683aa3dc971ad9b3:web/scripts/iwork.test.ts:private-key:280")
+excused_file="$(mktemp)"
+printf '%s\n' "${excused[@]}" >"$excused_file"
 
 # How many commits in that range have a hunk that leaves lines, the only thing gitleaks
 # reads, which it must at least match. Deleting, moving, changing a mode and an empty commit
@@ -178,9 +178,11 @@ expected="$(git log "${range[@]}" --text -p --diff-merges=first-parent --diff-fi
 #   --diff-merges=first-parent: read what a merge commit adds; git log skips it otherwise.
 #   --ignore-gitleaks-allow: only a reviewed change to this scan can excuse a finding,
 #   never a comment on the line itself.
+#   --gitleaks-ignore-path: the excused list above; a tracked .gitleaksignore is refused earlier.
 log="$(mktemp)"
 status=0
 "$gitleaks" git --config "$rules" --redact --verbose --no-banner --exit-code 1 --ignore-gitleaks-allow \
+    --gitleaks-ignore-path "$excused_file" \
     --log-opts="--text --diff-merges=first-parent ${range[*]}" . 2>&1 | tee "$log" || status="${PIPESTATUS[0]}"
 [[ "$status" -eq 0 ]] || exit "$status"
 

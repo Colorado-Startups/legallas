@@ -27,7 +27,7 @@
     { "id": "licences", "group": "ip", "label": "Licence review rerun on the launch commit", "owner": false, "from": "gate", "after": "go_ahead", "evidence": 12 },
 
     { "id": "merchant", "group": "third_party", "label": "Merchant of record accepts in writing", "owner": true, "from": "review", "evidence": null },
-    { "id": "go_ahead", "group": "third_party", "label": "Owner's go-ahead", "owner": true, "from": "gate", "evidence": 12 },
+    { "id": "go_ahead", "group": "third_party", "label": "Owner's go-ahead", "owner": true, "from": "gate", "evidence": null },
     { "id": "first_sale", "group": "third_party", "label": "Business account, books, reseller-only sales", "owner": true, "from": "review", "evidence": null },
 
     { "id": "terms", "group": "contracts", "label": "Short terms accepted at install", "owner": false, "from": "review", "evidence": null },
