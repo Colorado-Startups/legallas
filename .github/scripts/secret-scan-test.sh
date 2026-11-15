@@ -114,6 +114,30 @@ scan_all; found "a secret in old history, on a whole-history scan" $?
 new_repo; echo "$secret" >notes.txt; save "secret"
 EVENT_NAME=push PUSH_BEFORE="$base" bash "$script" >"$log" 2>&1; found "a push's secret" $?
 
+scan_queue() {
+    EVENT_NAME=merge_group MERGE_GROUP_BASE_SHA="${1:-$base}" MERGE_GROUP_HEAD_SHA="$(git rev-parse HEAD)" bash "$script" >"$log" 2>&1
+}
+
+new_repo; echo "$secret" >notes.txt; save "secret"
+scan_queue; found "a merge queue run's secret" $?
+
+new_repo; git switch -q -c stray; echo "$secret" >stray.txt; save "stray secret"; git switch -q main
+echo "Still nothing" >notes.txt; save "queued"
+scan_queue; passed "a merge queue run reads only its own range, not a stray branch" $? "Read 1 commits"
+
+new_repo; echo "Still nothing" >notes.txt; save "notes"
+scan_queue "0123456789012345678901234567890123456789"; refused "a merge group's base that doesn't resolve" $? "isn't a commit"
+
+# The whole-history scan starts after the launch snapshot: a copy of the script names this test's own.
+after_snapshot="$work/after-snapshot.sh"
+new_repo; echo "$secret" >notes.txt; save "snapshot"; sed "s/^snapshot=.*/snapshot=$(git rev-parse HEAD)/" "$script" >"$after_snapshot"
+echo "Still nothing" >more.txt; save "after"
+env -u EVENT_NAME bash "$after_snapshot" >"$log" 2>&1; passed "a whole-history scan skips the snapshot and what came before it" $? "Read 1 commits"
+
+new_repo; echo "Still nothing" >notes.txt; save "snapshot"; sed "s/^snapshot=.*/snapshot=$(git rev-parse HEAD)/" "$script" >"$after_snapshot"
+echo "$secret" >later.txt; save "secret after"
+env -u EVENT_NAME bash "$after_snapshot" >"$log" 2>&1; found "a secret after the snapshot, on a whole-history scan" $?
+
 # A comment or a file in the pull request can't excuse it.
 new_repo; echo "token = \"$secret\" # gitleaks"":allow" >notes.txt; save "secret"
 scan_pr; found "an inline allow comment" $?
@@ -286,10 +310,12 @@ new_repo; ln -s start.txt notes.txt; save "a link"; link_base="$(git rev-parse H
 PATH="$shim:$PATH" scan_pr "$link_base"; refused "the same, when it only turns a link into a file" $? "scanned 0 commits"
 
 # A rule or a read added to the scan that flags what's already on this branch shows here,
-# not on the next whole-history scan. One range from the first commit, so another session's
-# branch can't fail this one.
+# not on the next whole-history scan. One range from the launch snapshot (else the first
+# commit), as the whole-history scan reads it, so another session's branch can't fail this one.
 cd "$root" || exit 1
-EVENT_NAME=pull_request PR_BASE_SHA="$(git rev-list --max-parents=0 HEAD | tail -n 1)" PR_HEAD_SHA="$(git rev-parse HEAD)" bash "$script" >"$log" 2>&1
+history_start="$(sed -n 's/^snapshot=//p' "$script")"
+git rev-parse --verify --quiet "$history_start^{commit}" >/dev/null || history_start="$(git rev-list --max-parents=0 HEAD | tail -n 1)"
+EVENT_NAME=pull_request PR_BASE_SHA="$history_start" PR_HEAD_SHA="$(git rev-parse HEAD)" bash "$script" >"$log" 2>&1
 passed "this repository's own history reads clean" $? "no leaks found"
 
 echo
