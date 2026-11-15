@@ -1,0 +1,15 @@
+Legallas
+Copyright 2026 Colorado Startups, LTD.
+
+This product includes software developed by Colorado Startups, LTD.
+and the Legallas contributors.
+
+The room kits in web/connect/skill/ adapt text from claude-for-legal
+by Anthropic (https://github.com/anthropics/claude-for-legal), under
+the Apache License 2.0: the review grid's cell states from its
+tabular-review skill, and the chronology's weights, merged sources
+and gaps from its chronology skill.
+
+Release bundles of Legallas also contain third-party software and
+fonts under their own licences. Their notices are in the
+THIRD-PARTY-NOTICES file inside each bundle.

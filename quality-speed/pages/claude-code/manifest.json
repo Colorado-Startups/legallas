@@ -1,0 +1,20 @@
+{
+  "page": "claude-code",
+  "signoff_comment": 6678893938,
+  "metrics": [
+    {"id": "fence_proven", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 3, "max_age_hours": 840, "min_samples": 1, "goal_source": "https://code.claude.com/docs/en/sandboxing"},
+    {"id": "shipped_bugs_open", "lens": "quality", "unit": "count", "direction": "lower", "floor": 15, "goal": 0, "weight": 2, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://cloud.google.com/devops/state-of-devops"},
+    {"id": "rule_clean", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 80, "goal": 100, "weight": 2, "max_age_hours": 48, "min_samples": 30, "goal_source": "https://code.claude.com/docs/en/best-practices"},
+    {"id": "instruction_broken", "lens": "quality", "unit": "count", "direction": "lower", "floor": 5, "goal": 0, "weight": 1, "max_age_hours": 48, "min_samples": 20, "goal_source": "https://code.claude.com/docs/en/memory"},
+    {"id": "task_to_merge_p50", "lens": "speed", "unit": "hours", "direction": "lower", "floor": 168, "goal": 24, "weight": 1, "max_age_hours": 48, "min_samples": 5, "goal_source": "https://cloud.google.com/devops/state-of-devops"},
+    {"id": "task_to_merge_p90", "lens": "speed", "unit": "hours", "direction": "lower", "floor": 168, "goal": 24, "weight": 1, "max_age_hours": 48, "min_samples": 10, "goal_source": "https://cloud.google.com/devops/state-of-devops"},
+    {"id": "tokens_per_merged_change", "lens": "consumption", "unit": "tokens", "direction": "lower", "floor": 80000000, "goal": 35000000, "weight": 3, "max_age_hours": 48, "min_samples": 5, "goal_source": "https://code.claude.com/docs/en/costs"},
+    {"id": "lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 30, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"}
+  ],
+  "changes": [
+    {"date": "2026-11-06", "metric": "first_commit_to_merge_p90", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 828},
+    {"date": "2026-11-06", "metric": "fence_proven", "field": "critical", "from": true, "to": false, "reason": "wrong_basis", "issue": 645},
+    {"date": "2026-11-06", "metric": "first_pass", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 846},
+    {"date": "2026-11-06", "metric": "shipped_bugs_open", "field": "added", "from": null, "to": "shipped_bugs_open", "reason": "added_toward_ideal", "issue": 846}
+  ]
+}

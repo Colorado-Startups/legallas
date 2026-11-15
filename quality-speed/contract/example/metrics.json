@@ -1,0 +1,9 @@
+[
+  { "id": "line_coverage", "page": "code", "value": 72.5, "status": "ok", "stage": "lab", "measured_at": "2026-11-01T06:17:00Z", "source_url": "https://github.com/Colorado-Startups/legallas/actions/runs/1001", "sample_size": 1 },
+  { "id": "functions_over_60_lines", "page": "code", "value": 0, "status": "ok", "stage": "lab", "measured_at": "2026-11-01T06:17:00Z", "source_url": "https://github.com/Colorado-Startups/legallas/actions/runs/1001", "sample_size": 1 },
+  { "id": "secret_scan_clean", "page": "code", "value": null, "status": "missing", "stage": "lab", "measured_at": null, "source_url": null, "sample_size": null },
+  { "id": "test_time_p50", "page": "code", "value": 240, "status": "ok", "stage": "lab", "measured_at": "2026-11-01T06:17:00Z", "source_url": "https://github.com/Colorado-Startups/legallas/actions/runs/1001", "sample_size": 12 },
+  { "id": "time_to_fix_alert", "page": "code", "value": null, "status": "no_events", "stage": "lab", "measured_at": "2026-11-01T06:17:00Z", "source_url": "https://github.com/Colorado-Startups/legallas/actions/runs/1001", "sample_size": 0 },
+  { "id": "planted_alert_found", "page": "code", "value": 1, "status": "ok", "stage": "lab", "measured_at": "2026-10-20T06:17:00Z", "source_url": "https://github.com/Colorado-Startups/legallas/actions/runs/1000", "sample_size": 1 },
+  { "id": "worker_cpu_ms_p50", "page": "code", "value": 18, "status": "ok", "stage": "lab", "measured_at": "2026-11-01T06:17:00Z", "source_url": "https://github.com/Colorado-Startups/legallas/actions/runs/1001", "sample_size": 40 }
+]

@@ -1,0 +1,7 @@
+{
+  "card": "M4",
+  "money": [
+    { "id": "m-0001", "date": "2012-07-30", "amountCents": 1763420, "from": "p-doe", "to": "org-harbor", "label": "Share purchase balance",
+      "cites": [{ "path": "06-Cap-Table/Bank_Statement_BS__20120730__Harbor-Labs__July.pdf", "page": 2 }] }
+  ]
+}

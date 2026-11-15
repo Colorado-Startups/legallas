@@ -1,0 +1,968 @@
+# Measures this repository for the private Quality and Speed site: runs each page's collectors, validates what they
+# found, appends one score line per page to the history, builds the site and publishes it privately.
+#
+# `plan`, the lanes and `site` are read-only and leave only artifacts. The jobs that hold a publish right or a key run on
+# GitHub-hosted runners, on `main` only. Each key's job stays off until the repository variable named in its condition
+# is set, or, for what only an environment holds, until a job that reads it says so: a job's `if` can't read an
+# environment's variables or secrets (#905). The publish guard, failing closed: `preflight` and `signed-out` run
+# on every run, and anything short of a proven private site makes `containment` replace the site with a blank page,
+# because stopping would leave an exposed site standing. Either failure fails the run. Cancelling a run after it has made
+# its blank page does the same, and leaves the site blank until the next run.
+#
+# The site stays a blank page until the QUALITY_SPEED_PUBLISH repository variable reads `pages`, so the first deploys
+# prove all of this with nothing to lose. Nothing ties that variable to a proven run, so set it only after a green one. To test containment on purpose, which blanks the site until the next run:
+#
+#   gh workflow run quality-speed.yml -R Colorado-Startups/legallas -f containment-drill=true
+#
+# It runs daily and on demand only, never on a merge: a merge run cost about $0.07 a merge (5 Nov), and the daily run
+# measures the same lanes. The minute is off the hour because scheduled runs can be delayed or dropped at busy times; each
+# metric's age limit absorbs one miss. A manual run takes every lane, Mac and Windows
+# included, so use it with a reason, or name one page to take only its lanes:
+#
+#   gh workflow run quality-speed.yml -R Colorado-Startups/legallas
+#   gh workflow run quality-speed.yml -R Colorado-Startups/legallas -f page=testing
+#
+# Pages never edit this file: `plan` reads each page's lanes.json (contract/README.md) and `collect` runs one job per lane. A failed lane
+# shows as a failed job and its metrics score 0 as missing, and the other pages still reach the site. A lane past its time
+# limit reads as cancelled, and so does the whole run, even when everything else passed and the site went out.
+#
+# `linux` lanes hold no stored secret and no write scope, only a narrow read-only built-in token, so they could take
+# Blacksmith's free minutes, counted by the same guard as CI (.github/scripts/build_minutes_guard.py). That is off until
+# Code-OS's org-wide meter exists (BLACKSMITH_ALLOWED there), so today they run GitHub-hosted. `plan` and `site` stay GitHub-hosted: one chooses what runs and the other builds what gets published. `choose-runner`,
+# `plan` and `history` take seconds, so they run on GitHub's 1-core runner (ubuntu-slim), a third of the price. A run can't
+# write to the repository: the history lives in an artifact (quality-speed/core/history-fetch.ts). One concurrency group
+# per ref with no cancel, so two runs on main can't fork that history.
+name: Quality and Speed
+
+on:
+  schedule:
+    - cron: '37 8 * * *'
+  workflow_dispatch:
+    inputs:
+      containment-drill:
+        description: Fail the signed-out check on purpose, to prove the site gets replaced with a blank page
+        type: boolean
+        default: false
+      page:
+        description: Take only this page's lanes (its folder in quality-speed/pages); empty takes every lane
+        type: string
+        default: ''
+
+permissions: {}
+
+# Only main writes the history, so a branch's manual run can't fork it or take the place of a run waiting on main.
+concurrency:
+  group: quality-speed-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # Not a check, as in ci.yml: a failure here never stops the run, and the lanes then fall back to GitHub-hosted. All read
+  # scopes, and only main saves the ledger.
+  choose-runner:
+    runs-on: ubuntu-slim
+    # As in ci.yml: room for main to rebuild a lost ledger, up to 300 reads on one CPU.
+    timeout-minutes: 5
+    continue-on-error: true
+    permissions:
+      actions: read
+      checks: read
+      contents: read
+      pull-requests: read
+    outputs:
+      runner: ${{ steps.guard.outputs.runner }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/scripts
+      - name: Restore the ledger
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: build-minutes-ledger.json
+          key: build-minutes-ledger-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: build-minutes-ledger-
+      - name: Build minutes guard
+        id: guard
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_RUNNER: ${{ vars.CI_RUNNER }}
+        run: python3 .github/scripts/build_minutes_guard.py
+      - name: Save the ledger
+        if: github.ref == 'refs/heads/main'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: build-minutes-ledger.json
+          key: build-minutes-ledger-${{ github.run_id }}-${{ github.run_attempt }}
+
+  # Which lanes this run takes: quality-speed/core/lanes.ts says how the event and the weekday decide.
+  plan:
+    runs-on: ubuntu-slim
+    timeout-minutes: 3
+    permissions:
+      contents: read
+    outputs:
+      matrix: ${{ steps.lanes.outputs.matrix }}
+      blacksmith: ${{ steps.lanes.outputs.blacksmith }}
+      hosted: ${{ steps.lanes.outputs.hosted }}
+      live-tests: ${{ steps.lanes.outputs.live-tests }}
+      app: ${{ steps.lanes.outputs.app }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            quality-speed
+            .github/scripts
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # A drill measures nothing: an event lanes.ts doesn't name takes no lanes. The jobs against the sample room cost
+      # money, so they take the scheduled run and a manual one on main, never a merge or a drill. On main, the lanes that
+      # read with the App's token move to `collect-app` (.github/scripts/app_lanes.py).
+      - name: Lanes
+        id: lanes
+        env:
+          EVENT_NAME: ${{ inputs.containment-drill && 'drill' || github.event_name }}
+          ON_MAIN: ${{ github.ref == 'refs/heads/main' }}
+          ONLY_PAGE: ${{ inputs.page }}
+        run: |
+          node quality-speed/core/lanes.ts --event "$EVENT_NAME" --weekday "$(date -u +%u)" --page "$ONLY_PAGE" > "$RUNNER_TEMP/lanes.txt"
+          python3 .github/scripts/app_lanes.py "$RUNNER_TEMP/lanes.txt" "$ON_MAIN" >> "$GITHUB_OUTPUT"
+          if [ "$GITHUB_REF" = refs/heads/main ] && { [ "$EVENT_NAME" = schedule ] || [ "$EVENT_NAME" = workflow_dispatch ]; }; then
+            echo "live-tests=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  # The security page's key read-outs (quality-speed/pages/security/collect-keys.ts): the names and dates of stored secrets,
+  # never their values, which the built-in token can't read. No checkout, so no repository code runs beside the
+  # key. Each read-out keeps its status line, so a refusal never reads as "off". Until the key exists this does
+  # nothing, and the keys metric reads as missing. Settings and Projects read with the App's token (collect-app).
+  admin-read:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: quality-speed
+    permissions: {}
+    outputs:
+      id: ${{ steps.keep.outputs.artifact-id }}
+    steps:
+      - name: Read
+        env:
+          GH_TOKEN: ${{ secrets.QUALITY_SPEED_METRICS_GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          out="$RUNNER_TEMP/admin-read"
+          mkdir -p "$out"
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::notice title=Quality and Speed::QUALITY_SPEED_METRICS_GITHUB_TOKEN doesn't exist yet"
+            exit 0
+          fi
+          environments="$(gh api "repos/$REPO/environments" --jq '.environments[].name | "environments/\(.)/secrets"' || true)"
+          # shellcheck disable=SC2086
+          for path in actions/secrets dependabot/secrets environments $environments; do
+            gh api --include "repos/$REPO/$path" > "$out/$(printf '%s' "repository-$path" | tr '/' '-').txt" || true
+          done
+      - id: keep
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: admin-read
+          path: ${{ runner.temp }}/admin-read
+          if-no-files-found: ignore
+          retention-days: 1
+
+  # The scripts for `live-journeys`, which holds a key and so has no checkout. Each page copies in only what its own jobs
+  # need. Only this run on main makes it, on GitHub's runners, and that job takes it by id, because a lane's token can
+  # replace an artifact of the same name and a re-run would then run its code beside the key.
+  key-job-input:
+    needs: live-room-ready
+    if: needs.live-room-ready.outputs.ready == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      id: ${{ steps.input.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Today's input
+        run: |
+          for page in data-room; do
+            script="quality-speed/pages/$page/key-job-input.ts"
+            if [ -f "$script" ]; then node "$script" --out "$RUNNER_TEMP/input"; fi
+          done
+      - id: input
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: key-job-input
+          path: ${{ runner.temp }}/input
+          if-no-files-found: ignore
+          retention-days: 1
+
+  # The sample room's switch: whether the `quality-speed` environment holds all that `live-room` hands run.ts. Those are
+  # the environment's, which a job's `if` never sees, so gating `live-room` on CLOUDFLARE_ACCOUNT_ID skipped every run
+  # (#905). It can't be SAMPLE_ROOM_URL either: that is set from the room's first deploy. This job reads them in a step,
+  # as true or false only, and names what's missing in a warning: a step the owner hasn't taken yet, not a red run.
+  live-room-ready:
+    needs: plan
+    if: needs.plan.outputs.live-tests == 'true'
+    runs-on: ubuntu-slim
+    timeout-minutes: 3
+    environment: quality-speed
+    permissions: {}
+    outputs:
+      ready: ${{ steps.ready.outputs.ready }}
+    steps:
+      - name: Ready
+        id: ready
+        env:
+          ACCOUNT_SET: ${{ vars.CLOUDFLARE_ACCOUNT_ID != '' }}
+          TOKEN_SET: ${{ secrets.LIVE_ROOM_CLOUDFLARE_TOKEN != '' }}
+          LOGIN_SET: ${{ secrets.SAMPLE_ROOM_TEST_LOGIN_SECRET != '' }}
+        run: |
+          missing=()
+          [ "$ACCOUNT_SET" = true ] || missing+=('variable CLOUDFLARE_ACCOUNT_ID')
+          [ "$TOKEN_SET" = true ] || missing+=('secret LIVE_ROOM_CLOUDFLARE_TOKEN')
+          [ "$LOGIN_SET" = true ] || missing+=('secret SAMPLE_ROOM_TEST_LOGIN_SECRET')
+          if [ "${#missing[@]}" -gt 0 ]; then
+            list="$(printf '%s, ' "${missing[@]}")"
+            echo "::warning title=Sample room::Not deployed. The quality-speed environment has no ${list%, }: the owner's steps are in quality-speed/pages/data-room/live/README.md"
+            exit 0
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+  # Deploys the sample room, invented data only, and its test login, when their code or data changed on main. Needs the
+  # code, so it checks out main, never a pull request. Off until `live-room-ready` finds what run.ts needs. A stop that
+  # waits on a person's step in Cloudflare is a warning and leaves the job green (run.ts PersonStep); anything else fails it.
+  # `up` is the switch for the jobs against the room: a job's `if` can read it, where it can't read a variable set by hand.
+  live-room:
+    needs: live-room-ready
+    if: needs.live-room-ready.outputs.ready == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: quality-speed
+    permissions:
+      contents: read
+    outputs:
+      up: ${{ steps.up.outputs.up }}
+      id: ${{ steps.keep.outputs.artifact-id }}
+    steps:
+      - name: Private HOME
+        run: |
+          mkdir -p "$RUNNER_TEMP/home"
+          echo "HOME=$RUNNER_TEMP/home" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # No install scripts, and before any key is in reach.
+      - name: Install
+        working-directory: web
+        run: npm ci --ignore-scripts
+      - name: Deploy if changed
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.LIVE_ROOM_CLOUDFLARE_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          SAMPLE_ROOM_TEST_LOGIN_SECRET: ${{ secrets.SAMPLE_ROOM_TEST_LOGIN_SECRET }}
+        run: node quality-speed/pages/data-room/live/run.ts --out "$RUNNER_TEMP/live-room"
+      # run.ts writes live-room.json when the room is up, deployed now or already current; not when it stops on a person's step.
+      - name: Up
+        id: up
+        run: |
+          if jq -e '.roomUrl | startswith("https://")' "$RUNNER_TEMP/live-room/live-room.json" > /dev/null 2>&1; then
+            echo "up=true" >> "$GITHUB_OUTPUT"
+          fi
+      # The room's address goes here and not in the log. `live-journeys` takes it by id.
+      - id: keep
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: live-room
+          path: ${{ runner.temp }}/live-room
+          if-no-files-found: ignore
+          retention-days: 3
+
+  # Chrome journeys, Ask and the role checks against the sample room. Holds the test login and no AI key.
+  live-journeys:
+    needs: [key-job-input, live-room]
+    if: needs.key-job-input.outputs.id != '' && needs.live-room.outputs.up == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: quality-speed
+    permissions: {}
+    outputs:
+      id: ${{ steps.keep.outputs.artifact-id }}
+    steps:
+      - name: Private HOME
+        run: |
+          mkdir -p "$RUNNER_TEMP/home"
+          echo "HOME=$RUNNER_TEMP/home" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          artifact-ids: ${{ needs.key-job-input.outputs.id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/input
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          artifact-ids: ${{ needs.live-room.outputs.id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/live-room
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # The address comes from live-room.json, masked before anything can print it: an env value shows in the log.
+      - name: Journeys
+        env:
+          SAMPLE_ROOM_TEST_LOGIN_SECRET: ${{ secrets.SAMPLE_ROOM_TEST_LOGIN_SECRET }}
+        run: |
+          SAMPLE_ROOM_URL="$(jq -r .roomUrl "$RUNNER_TEMP/live-room/live-room.json")"
+          echo "::add-mask::$SAMPLE_ROOM_URL"
+          export SAMPLE_ROOM_URL
+          node "$RUNNER_TEMP/input/quality-speed/pages/data-room/live/journeys.ts" --out "$RUNNER_TEMP/live-output"
+      - id: keep
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: live-output
+          path: ${{ runner.temp }}/live-output
+          if-no-files-found: ignore
+          retention-days: 3
+
+  # The law pages' questions, `questions`, `eval_usd` and `law_lookup_tokens_p95` (quality-speed/core/law/README.md). Builds
+  # the public law library as rooms get it, then the law eval (web/scripts/law/eval.ts) on the sample room's Workers AI:
+  # every question retrieved, the day's 10 answered. Public law and invented questions only. An answer costs about 450
+  # neurons (ask-replica.ts TYPICAL_ANSWER_NEURONS), so the 214 questions (6 Nov) do not fit the 7,000 a day scripts may
+  # use: each lane carries its questions' last answers (facts/law-runs.json), and every question is answered once in about
+  # 22 days. The spend lease (web/scripts/spend-guard.ts) stops the run at those 7,000 (web/worker/budget.ts BUDGET: the
+  # day's 9,000 less 2,000 kept for the Workers), counted in the sample room's D1. With no room config here, `paidMonthlyUsd` is 0, so it never reaches paid neurons; a stopped run still
+  # reports what it did. The library's embeddings (3.8 million tokens, about 4,100 neurons) are cached by text hash, so
+  # a run embeds only parts that changed. Off until the sample room exists: the lease counts in the room's D1
+  # (`spend_counters`), which its first deploy makes, so the job starts on `live-room`'s `up`. Never on a variable: a
+  # job's `if` can't read the environment's, and `SAMPLE_ROOM_URL`, set by hand, was never set, so the job skipped every
+  # run (runs 42299384004, 42363807228, 42495412801). `LIVE_ROOM_CLOUDFLARE_TOKEN` needs Workers AI Read for this job.
+  law-eval:
+    needs: live-room
+    if: needs.live-room.outputs.up == 'true'
+    runs-on: ubuntu-latest
+    # The first run embeds the whole library, 235 calls; later runs take a few minutes.
+    timeout-minutes: 45
+    environment: quality-speed
+    permissions:
+      contents: read
+    outputs:
+      id: ${{ steps.keep.outputs.artifact-id }}
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Private HOME
+        working-directory: .
+        run: |
+          mkdir -p "$RUNNER_TEMP/home" "$RUNNER_TEMP/law"
+          {
+            echo "HOME=$RUNNER_TEMP/home"
+            echo "LEGALLAS_LAW_DIR=$RUNNER_TEMP/law"
+          } >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # No install scripts, and before any key is in reach.
+      - name: Install
+        run: npm ci --ignore-scripts
+      - name: The library's embeddings
+        id: embeddings
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/law/replica/embeddings.json
+          key: law-embeddings-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: law-embeddings-
+      - name: Build the law library
+        env:
+          LEGALLAS_LAW_CONTACT: ${{ vars.LEGALLAS_LAW_CONTACT }}
+        run: |
+          # A room config would set a paid month: this job must stop at the free neurons.
+          if [[ -e legallas.config.json || -e room.config.json ]]; then echo "::error title=Law eval::a room config is checked in"; exit 1; fi
+          npm run --silent law
+          sha256sum "$LEGALLAS_LAW_DIR/replica/embeddings.json" > "$RUNNER_TEMP/embeddings.before" 2> /dev/null || true
+      - name: The law pages' questions
+        working-directory: .
+        run: node quality-speed/core/law/collect.ts --questions > "$RUNNER_TEMP/law-questions.json"
+      - name: Law eval
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.LIVE_ROOM_CLOUDFLARE_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: 'false'
+        run: npm run --silent eval:law -- --set "$RUNNER_TEMP/law-questions.json" --answer-daily 10
+      # The report and the library it searched: the law lanes rebuild the law tool's answers from them.
+      - id: keep
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: law-eval
+          path: |
+            ${{ runner.temp }}/law/eval
+            ${{ runner.temp }}/law/out
+          if-no-files-found: ignore
+          retention-days: 3
+      - name: Embeddings changed
+        id: changed
+        if: ${{ !cancelled() }}
+        run: |
+          if [[ -f "$LEGALLAS_LAW_DIR/replica/embeddings.json" ]] && ! sha256sum --status -c "$RUNNER_TEMP/embeddings.before" 2> /dev/null; then
+            echo "save=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Save the library's embeddings
+        if: ${{ !cancelled() && steps.changed.outputs.save == 'true' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/law/replica/embeddings.json
+          key: law-embeddings-${{ github.run_id }}-${{ github.run_attempt }}
+
+  # The last run's state, fetched once so every lane and `site` see the same copy. They download it by id: a name isn't
+  # unique across a run's jobs, so a lane could upload one of its own, and a download by name would take the newest.
+  history:
+    runs-on: ubuntu-slim
+    # Seconds, or up to an hour when busy CI has spent the repository's API quota: history-fetch.ts waits for it once.
+    timeout-minutes: 65
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      state-id: ${{ steps.state.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: quality-speed
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: History from main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node quality-speed/core/history-fetch.ts --out "$RUNNER_TEMP/state-in"
+      - id: state
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: state-in
+          path: ${{ runner.temp }}/state-in
+          if-no-files-found: ignore
+          retention-days: 1
+
+  # The lanes on Blacksmith's free minutes, a third party's machines, so with only the read scopes most pages need. An alert
+  # list stays off them: a lane that needs more declares a GitHub-hosted runner, and runs in `collect-hosted`.
+  collect:
+    needs: [choose-runner, plan, history, admin-read, live-journeys, law-eval]
+    # An empty matrix is an error in GitHub Actions, and no page has lanes until the first one lands. !cancelled(): a failed
+    # choose-runner or keyed job must not stop the lanes.
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.history.result == 'success' && needs.plan.outputs.blacksmith != '{"include":[]}' }}
+    name: ${{ matrix.slug }} (${{ matrix.lane }})
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.blacksmith) }}
+    # Off Blacksmith, a lane with no install takes GitHub's 1-core runner: these lanes read GitHub's API and git, so one CPU
+    # bills a third and takes about as long (5 Nov: 32 such lanes, 49 billed minutes a day). A lane that installs web/
+    # keeps ubuntu-latest's 2 CPUs.
+    runs-on: ${{ (needs.choose-runner.outputs.runner == '"ubuntu-latest"' || needs.choose-runner.outputs.runner == '') && !matrix.install && 'ubuntu-slim' || fromJSON(needs.choose-runner.outputs.runner || '"ubuntu-latest"') }}
+    # LANE_WORST_CASE_MINUTES in build_minutes_guard.py, which is what makes the guard a real stop. A longer lane declares
+    # linux-hosted.
+    timeout-minutes: 10
+    # Read scopes only.
+    permissions:
+      actions: read
+      checks: read
+      contents: read
+      issues: read
+      pull-requests: read
+      statuses: read
+    defaults:
+      run:
+        shell: bash
+    steps: &lane-steps
+      - name: Private HOME
+        run: |
+          mkdir -p "$RUNNER_TEMP/home"
+          echo "HOME=$RUNNER_TEMP/home" >> "$GITHUB_ENV"
+      # Full history: delivery metrics read how the repository got here.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # No install scripts: they would run before anyone reads a dependency change.
+      - name: Install
+        if: matrix.install
+        working-directory: web
+        run: npm ci --ignore-scripts
+      - name: This lane's last run
+        if: needs.history.outputs.state-id != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          artifact-ids: ${{ needs.history.outputs.state-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/state-in
+      # What the keyed jobs found, for the lanes that read it, by id so a lane can't stand in its own copy. Nothing there reads
+      # as missing, never as zero.
+      - name: Admin read-outs
+        if: matrix.admin && needs.admin-read.outputs.id != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          artifact-ids: ${{ needs.admin-read.outputs.id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/key-jobs/admin-read
+      - name: Live journeys' output
+        if: matrix.runner != 'choose-runner' && matrix.slug == 'data-room' && needs.live-journeys.outputs.id != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          artifact-ids: ${{ needs.live-journeys.outputs.id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/key-jobs/live-output
+      - name: The law eval's report and library
+        if: matrix.runner != 'choose-runner' && matrix.lane == 'law' && needs.law-eval.outputs.id != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          artifact-ids: ${{ needs.law-eval.outputs.id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/key-jobs/law-eval
+      # The testing lab's mutant outcomes from its last run (quality-speed/pages/testing/cache.ts), so it runs only the
+      # mutants whose code or tests changed. Saved after a stopped run too: the next run finishes what this one left.
+      - name: Mutant outcomes
+        if: matrix.slug == 'testing' && matrix.lane == 'lab'
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/mutant-cache
+          key: testing-mutants-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: testing-mutants-
+      - name: Collect
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KEY_JOB_OUTPUT_DIR: ${{ runner.temp }}/key-jobs
+          LEGALLAS_LAW_CONTACT: ${{ vars.LEGALLAS_LAW_CONTACT }}
+          PAGE: ${{ matrix.slug }}
+          LANE: ${{ matrix.lane }}
+          MUTANT_CACHE: ${{ matrix.slug == 'testing' && format('{0}/mutant-cache/outcomes.json', runner.temp) || '' }}
+        run: node quality-speed/core/collect.ts --page "$PAGE" --lane "$LANE" --out "$RUNNER_TEMP/records" --state-in "$RUNNER_TEMP/state-in"
+      - name: Save the mutant outcomes
+        if: ${{ !cancelled() && matrix.slug == 'testing' && matrix.lane == 'lab' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/mutant-cache
+          key: testing-mutants-${{ github.run_id }}-${{ github.run_attempt }}
+      # After a failure too: a lane that dropped one bad record keeps the good ones. No file means the lane failed, and
+      # merge.ts reads that from the plan.
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: records-${{ matrix.slug }}-${{ matrix.lane }}
+          path: ${{ runner.temp }}/records
+          if-no-files-found: ignore
+          retention-days: 3
+
+  # The same steps on GitHub's own runners, with every read scope a page can need. A job's scopes are fixed, which is why
+  # this is a second job and not a line in the matrix.
+  collect-hosted:
+    needs: [plan, history, admin-read, live-journeys, law-eval]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.history.result == 'success' && needs.plan.outputs.hosted != '{"include":[]}' }}
+    name: ${{ matrix.slug }} (${{ matrix.lane }})
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.hosted) }}
+    runs-on: ${{ matrix.runner }}
+    # A Mac minute counts 10x, so a hung Mac lane stops sooner. lanes.ts keeps Mac and Windows lanes weekly.
+    timeout-minutes: ${{ matrix.runner == 'macos-26' && 20 || 45 }}
+    # Read scopes only.
+    permissions:
+      actions: read
+      checks: read
+      contents: read
+      deployments: read
+      issues: read
+      pages: read
+      pull-requests: read
+      security-events: read
+      statuses: read
+      vulnerability-alerts: read
+    defaults:
+      run:
+        shell: bash
+    steps: *lane-steps
+
+  # The Settings, Projects and GitHub App lanes, which read what the job's own token can't: with an installation token of
+  # the org's Legallas Automation App, read levels only, made per lane and revoked when the job ends. Its key is in
+  # environment `settings`, which only main reaches, so this job runs on main only (off main, app_lanes.py leaves those
+  # lanes in `collect` and `collect-hosted`). GitHub-hosted, because it holds a secret. The token reaches only its lane's
+  # Collect step, never a log. Permissions: quality-speed/pages/github-app/expected.json.
+  collect-app:
+    needs: [plan, history]
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' && needs.plan.result == 'success' && needs.history.result == 'success' && needs.plan.outputs.app != '{"include":[]}' }}
+    name: ${{ matrix.slug }} (${{ matrix.lane }})
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.app) }}
+    runs-on: ubuntu-latest
+    environment: settings
+    timeout-minutes: 10
+    # Read scopes only, as `collect-hosted`.
+    permissions:
+      actions: read
+      checks: read
+      contents: read
+      deployments: read
+      issues: read
+      pages: read
+      pull-requests: read
+      security-events: read
+      statuses: read
+      vulnerability-alerts: read
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Private HOME
+        run: |
+          mkdir -p "$RUNNER_TEMP/home"
+          echo "HOME=$RUNNER_TEMP/home" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Install
+        if: matrix.install
+        working-directory: web
+        run: npm ci --ignore-scripts
+      - name: This lane's last run
+        if: needs.history.outputs.state-id != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          artifact-ids: ${{ needs.history.outputs.state-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/state-in
+      # Settings: the repository and organization settings reads.ts lists, as QS_SETTINGS_TOKEN.
+      - name: Settings token
+        id: settings-token
+        if: matrix.slug == 'settings'
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.CS_APP_CLIENT_ID }}
+          private-key: ${{ secrets.CS_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-actions: read
+          permission-administration: read
+          permission-contents: read
+          permission-dependabot-secrets: read
+          permission-metadata: read
+          permission-organization-administration: read
+          permission-organization-hooks: read
+          permission-repository-hooks: read
+          permission-secrets: read
+      # Projects: the org's board, read once here into the read-out board.ts parses ($KEY_JOB_OUTPUT_DIR/admin-read/).
+      - name: Projects token
+        id: projects-token
+        if: matrix.slug == 'projects'
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.CS_APP_CLIENT_ID }}
+          private-key: ${{ secrets.CS_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-organization-projects: read
+      - name: Board read-out
+        if: matrix.slug == 'projects'
+        env:
+          GH_TOKEN: ${{ steps.projects-token.outputs.token }}
+          OUT: ${{ runner.temp }}/key-job/admin-read
+          PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER }}
+        run: |
+          mkdir -p "$OUT"
+          board=quality-speed/pages/projects/board.ts
+          node --input-type=module -e "import { BOARD_QUERY } from './$board'; process.stdout.write(BOARD_QUERY);" > "$RUNNER_TEMP/board-query.graphql"
+          org="$(node --input-type=module -e "import { ORG } from './$board'; process.stdout.write(ORG);")"
+          # The repository variable PROJECT_NUMBER, when set, wins over board.ts (the public repo's board has its own number).
+          if [ -n "$PROJECT_NUMBER" ]; then
+            case "$PROJECT_NUMBER" in *[!0-9]*) echo "::error title=Board read-out::PROJECT_NUMBER must be digits"; exit 1;; esac
+            number="$PROJECT_NUMBER"
+          else
+            number="$(node --input-type=module -e "import { BOARD_NUMBER } from './$board'; process.stdout.write(String(BOARD_NUMBER));")"
+          fi
+          # Every page of the board (274 cards on 2026-11-05), each with its headers: BOARD_QUERY takes $endCursor (#597). A
+          # refused or failed read is still written: board.ts reads it as unmeasured, never good news.
+          gh api graphql --paginate --include -F query=@"$RUNNER_TEMP/board-query.graphql" -F org="$org" -F number="$number" \
+            > "$OUT/projects-board.txt" || echo "::warning title=Board read-out::the board read failed; the Projects page reads missing"
+      # GitHub App: its own installation token, which can read the App's listing. Metadata only.
+      - name: App token
+        id: app-token
+        if: matrix.slug == 'github-app'
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.CS_APP_CLIENT_ID }}
+          private-key: ${{ secrets.CS_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-metadata: read
+      - name: Collect
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LEGALLAS_LAW_CONTACT: ${{ vars.LEGALLAS_LAW_CONTACT }}
+          PAGE: ${{ matrix.slug }}
+          LANE: ${{ matrix.lane }}
+          QS_SETTINGS_TOKEN: ${{ steps.settings-token.outputs.token }}
+          # Settings: claude_review_enabled, a gate. This job has no environment, so it reads the repository's value.
+          CLAUDE_ENABLED_VAR: ${{ vars.CLAUDE_ENABLED }}
+          QS_APP_TOKEN: ${{ steps.app-token.outputs.token }}
+          KEY_JOB_OUTPUT_DIR: ${{ matrix.slug == 'projects' && format('{0}/key-job', runner.temp) || '' }}
+        run: node quality-speed/core/collect.ts --page "$PAGE" --lane "$LANE" --out "$RUNNER_TEMP/records" --state-in "$RUNNER_TEMP/state-in"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: records-${{ matrix.slug }}-${{ matrix.lane }}
+          path: ${{ runner.temp }}/records
+          if-no-files-found: ignore
+          retention-days: 3
+
+  site:
+    needs: [plan, history, collect, collect-hosted, collect-app]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.history.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Read scopes only. actions, checks, issues and pull-requests: Git Crafter actions/pages reads this repository's runs, checks
+    # and pull requests for the Process page.
+    permissions:
+      contents: read
+      actions: read
+      checks: read
+      issues: read
+      pull-requests: read
+    outputs:
+      pages-name: ${{ steps.name.outputs.name }}
+    steps:
+      - name: Private HOME
+        run: |
+          mkdir -p "$RUNNER_TEMP/home"
+          echo "HOME=$RUNNER_TEMP/home" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # Each lane's artifact in a folder named for it: merge.ts reads a lane's records only from its own (#373).
+      - name: This run's records
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: records-*
+          merge-multiple: false
+          path: ${{ runner.temp }}/records
+      # download-artifact unpacks a lone match flat, with no folder (`artifacts.length === 1` at that commit). Its name comes
+      # from the API, never from what the lane wrote.
+      - name: A lone lane's records under its name
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          names="$(gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts" --jq '.artifacts[].name | select(startswith("records-"))' | sort -u)"
+          if [ -n "$names" ] && [ "$(printf '%s\n' "$names" | wc -l)" -eq 1 ]; then
+            mv "$RUNNER_TEMP/records" "$RUNNER_TEMP/lone"
+            mkdir "$RUNNER_TEMP/records"
+            mv "$RUNNER_TEMP/lone" "$RUNNER_TEMP/records/$names"
+          fi
+      - name: The last run's state
+        if: needs.history.outputs.state-id != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          artifact-ids: ${{ needs.history.outputs.state-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/state-in
+      # A lane this run didn't plan keeps its last record and original time, so a weekly lane survives the daily runs
+      # and goes stale honestly. Only records that pass the format go on from here.
+      - name: Merge and append
+        env:
+          PLANNED: ${{ needs.plan.outputs.matrix }}
+        run: node quality-speed/core/merge.ts --fresh "$RUNNER_TEMP/records" --state "$RUNNER_TEMP/state-in" --out "$RUNNER_TEMP/state" --planned "$PLANNED" --copy-page-files
+      # The Process page (quality-speed/process/README.md): Legallas's maps, each step scored by this run's metrics, built
+      # by Git Crafter actions/pages at a pinned commit. Skipped until quality-speed/process/ is on the branch.
+      - name: Process page data
+        if: hashFiles('quality-speed/process/config.json') != ''
+        run: node quality-speed/process/adapt.ts --state "$RUNNER_TEMP/state"
+      - name: Process page
+        if: hashFiles('quality-speed/process/config.json') != ''
+        uses: SoulCraft-Org/git-crafter/actions/pages@d3c15df43c8e373f431f4bf9800339e7c995494e # v4.6.4
+        with:
+          pages: process
+          config: quality-speed/process/config.json
+      # Only main adds to the history, before the build, so a failed build leaves no gap in the scores. Overwriting deletes a
+      # copy a lane planted, and history-fetch.ts takes only a run's newest in any case.
+      - name: Keep the history
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: quality-speed-history
+          path: ${{ runner.temp }}/state
+          if-no-files-found: error
+          overwrite: true
+          retention-days: 90
+      - name: Build
+        run: node quality-speed/core/build.ts --state "$RUNNER_TEMP/state" --out "$RUNNER_TEMP/site"
+      # Before the guard, so the Process page passes the same secret scan, allow-lists and size limits as every page.
+      - name: Add the Process page
+        if: hashFiles('quality-speed/process/config.json') != ''
+        run: cp -R quality-speed/process/dist "$RUNNER_TEMP/site/process"
+      - name: Publish guard
+        run: node quality-speed/core/guard.ts --site "$RUNNER_TEMP/site"
+      # At random, once the lanes have ended, as `blank` explains.
+      - name: Artifact name
+        id: name
+        run: echo "name=pages-$(openssl rand -hex 16)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          name: ${{ steps.name.outputs.name }}
+          path: ${{ runner.temp }}/site
+          retention-days: 7
+
+  # Last in line before the deploy, so what it reads is current. It runs even when the site failed to build: a site that
+  # has gone public must not stay up because today's build broke.
+  preflight:
+    needs: site
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      pages: read
+    outputs:
+      public: ${{ steps.match.outputs.public }}
+    steps:
+      # Pages match the repository: a private repository's site is private, a public one's public. The site holds counts
+      # only (quality-speed/BRIEF.md), so a public repository publishes it.
+      - name: Pages match the repository
+        id: match
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          for _ in 1 2 3; do
+            repo_private="$(gh api "repos/$REPO" --jq .private)"
+            pages_public="$(gh api "repos/$REPO/pages" --jq .public)"
+            if { [ "$repo_private" = true ] && [ "$pages_public" = false ]; } || { [ "$repo_private" = false ] && [ "$pages_public" = true ]; }; then
+              echo "public=$pages_public" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep 20
+          done
+          echo "::error title=Quality and Speed::the Pages site's visibility doesn't match the repository's"
+          exit 1
+
+  # The page the first deploys and containment use. Made here because the jobs that deploy have no run step, and last so it
+  # waits the least. deploy-pages takes only a name, and a lane's token can upload or replace an artifact, so this job and
+  # `site` pick a random name once the lanes have ended: a lane can't plant a name that doesn't exist yet.
+  blank:
+    needs: preflight
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions: {}
+    outputs:
+      name: ${{ steps.page.outputs.name }}
+    steps:
+      - name: Blank page
+        id: page
+        run: |
+          mkdir -p "$RUNNER_TEMP/blank"
+          printf '<!doctype html>\n<meta charset="utf-8">\n<title>Quality and Speed</title>\n' > "$RUNNER_TEMP/blank/index.html"
+          echo "name=blank-$(openssl rand -hex 16)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          name: ${{ steps.page.outputs.name }}
+          path: ${{ runner.temp }}/blank
+          retention-days: 1
+
+  # main only, three times over: this condition, the environment's branch policy, and the claims Pages checks. No checkout
+  # and no run step, so nothing from the repository runs beside this job's rights. The blank page holds nothing the site
+  # build makes, so it can go out while the site can't, which is how the first deploys prove the guard before any page exists.
+  deploy:
+    needs: [site, blank, preflight]
+    if: >-
+      ${{ !cancelled() && github.ref == 'refs/heads/main' &&
+      needs.blank.result == 'success' && needs.preflight.result == 'success' &&
+      (needs.site.result == 'success' || vars.QUALITY_SPEED_PUBLISH != 'pages') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: github-pages
+    permissions:
+      id-token: write
+      pages: write
+    steps:
+      - uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+        with:
+          artifact_name: ${{ vars.QUALITY_SPEED_PUBLISH == 'pages' && needs.site.outputs.pages-name || needs.blank.outputs.name }}
+
+  # A private site: a signed-out request must end at GitHub's sign-in page, whether or not this run deployed; anything else
+  # fails, the page coming back, a 404 or a 500 alike. A public site: the page must load. Three looks across a minute,
+  # because a deploy takes time to reach every edge.
+  signed-out:
+    needs: [deploy, preflight]
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pages: read
+    steps:
+      - name: The page doesn't come back signed out
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          DRILL: ${{ inputs.containment-drill }}
+          PUBLIC: ${{ needs.preflight.outputs.public }}
+        run: |
+          if [ "$DRILL" = true ]; then
+            echo "::error title=Quality and Speed::containment drill: failing this check on purpose"
+            exit 1
+          fi
+          site="$(gh api "repos/$REPO/pages" --jq .html_url)"
+          owner="$(printf '%s' "${REPO%%/*}" | tr '[:upper:]' '[:lower:]')"
+          # Private: every path must reach the sign-in page. Public: the root loads (a blank deploy has no other page).
+          urls=("$site")
+          if [ "$PUBLIC" = false ]; then urls+=("${site}data-room/" "https://$owner.github.io/${REPO##*/}/"); fi
+          for look in 1 2 3; do
+            for url in "${urls[@]}"; do
+              final="$(curl -sS -L --retry 3 --retry-delay 5 --max-time 60 -o /dev/null -w '%{http_code} %{url_effective}' "$url" || true)"
+              case "$PUBLIC:$final" in
+                'false:200 https://github.com/login' | 'false:200 https://github.com/login?'*) ;;
+                'true:200 '*) ;;
+                *)
+                  echo "::error title=Quality and Speed::a signed-out request didn't end where this site's visibility says (status ${final%% *})"
+                  exit 1
+                  ;;
+              esac
+            done
+            if [ "$look" != 3 ]; then sleep 30; fi
+          done
+
+  # Anything short of a proven private site: replace it. Same shape as `deploy`, and the job it reacts to has already failed
+  # the run. It needs this run's blank page, because it has no other page to publish: if `blank` fails, it can't fire, and
+  # the failed run is the signal.
+  containment:
+    needs: [preflight, signed-out, blank]
+    if: >-
+      ${{ always() && github.ref == 'refs/heads/main' && needs.blank.result == 'success' &&
+      (needs.preflight.result != 'success' || needs.signed-out.result != 'success') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: github-pages
+    permissions:
+      id-token: write
+      pages: write
+    steps:
+      - uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+        with:
+          artifact_name: ${{ needs.blank.outputs.name }}

@@ -1,0 +1,10 @@
+path,bucket,filename,ext,size_bytes,md5,dup_status,privilege,content_summary,key_dates,key_parties,reviewed
+01-Corporate-Records/Stock_Agreement_SA__20110607__Harbor-Labs__Countersigned.pdf,01,Stock_Agreement_SA__20110607__Harbor-Labs__Countersigned.pdf,pdf,1000,d41d8cd98f00b204e9800998ecf8427e,unique,None,"Stock agreement among Harbor Labs, Inc., Doe and Roe, signed by Doe and Roe.",2011-06-07,Harbor Labs; J. Doe,yes
+08-Court-Pleadings/Complaint_FAC__20130409__Jane-Doe__First-Amended.pdf,08,Complaint_FAC__20130409__Jane-Doe__First-Amended.pdf,pdf,2000,d41d8cd98f00b204e9800998ecf8427f,unique,None,"First amended complaint, five counts.",2013-04-09,J. Doe; Harbor Labs,yes
+04-Letters/Email_EML__20120507__Mark-Moe__Meeting-Plan.pdf,04,Email_EML__20120507__Mark-Moe__Meeting-Plan.pdf,pdf,300,d41d8cd98f00b204e9800998ecf84280,unique,,"Meeting plan email; mentions an offer to buy back the shares,
+and a second line.",2012-05-07; 2012-05-09,M. Moe,yes
+04-Letters/Letter_LTR.pdf,04,Letter_LTR.pdf,pdf,300,d41d8cd98f00b204e9800998ecf84281,unique,No,"A letter without the filename convention.","Sent 5/15/2012, received 2012-05-17",R. Roe,no
+07-Lawyer-Notes-PRIVILEGED/Memo_MEM__20120528__Lisa-Low__Removal-Summary.pdf,07,Memo_MEM__20120528__Lisa-Low__Removal-Summary.pdf,pdf,400,d41d8cd98f00b204e9800998ecf84282,unique,,"Counsel notes.",2012-05-28,,yes
+10-Lawyer-Analysis/Claim_Chart__WP__20130312.xlsx,10,Claim_Chart__WP__20130312.xlsx,xlsx,500,d41d8cd98f00b204e9800998ecf84283,unique,Attorney work product,"Claim chart.",2013-03-12,,yes
+05-Expense-Records/Not_Mirrored_NM__20120229.pdf,05,Not_Mirrored_NM__20120229.pdf,pdf,10,d41d8cd98f00b204e9800998ecf84284,unique,None,"Not in the room.",,,no
+,,,,,,,,,,,

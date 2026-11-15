@@ -1,0 +1,10 @@
+{
+  "ideal": "Fast, trusted tests: every real risk has a test that fails when it breaks, nothing flaky, and a red run always means a real break.",
+  "sources": [
+    { "title": "Martin Fowler: Continuous Integration", "url": "https://martinfowler.com/articles/continuousIntegration.html", "date": "2024-01-18" },
+    { "title": "Ham Vocke: The Practical Test Pyramid", "url": "https://martinfowler.com/articles/practical-test-pyramid.html", "date": "2018-02-26" }
+  ],
+  "quality": "Every real risk proven by a planted break, 80% of its mutants caught, and no flaky test.",
+  "speed": "The web suite finishes within a minute on a pull request.",
+  "consumption": "Billed test minutes no more than the jobs' speed goals add up to."
+}

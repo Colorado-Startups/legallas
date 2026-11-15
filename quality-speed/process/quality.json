@@ -1,0 +1,10 @@
+{
+ "comment": "The Quality config Git Crafter actions/pages reads for the Process page's map steps. adapt.ts writes its targets and data from Legallas's own run; Legallas's site stays its own (quality-speed/core).",
+ "repo": "Colorado-Startups/legallas",
+ "name": "Legallas",
+ "tabs": [["legallas", "Legallas"]],
+ "targets": "quality-speed/process/out/targets",
+ "data": "quality-speed/process/out/data",
+ "history": "quality-speed/process/out/history",
+ "out": "quality-speed/process/out/quality"
+}

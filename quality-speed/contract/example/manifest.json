@@ -1,0 +1,14 @@
+{
+  "page": "code",
+  "signoff_comment": 1001,
+  "metrics": [
+    { "id": "line_coverage", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 40, "goal": 90, "weight": 3, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://testing.googleblog.com/2020/08/code-coverage-best-practices.html" },
+    { "id": "functions_over_60_lines", "lens": "quality", "unit": "count", "direction": "lower", "floor": 50, "goal": 0, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://google.github.io/eng-practices/review/reviewer/looking-for.html" },
+    { "id": "secret_scan_clean", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 2, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://docs.github.com/en/code-security/secret-scanning/introduction/about-secret-scanning" },
+    { "id": "test_time_p50", "lens": "speed", "unit": "seconds", "direction": "lower", "floor": 600, "goal": 120, "weight": 1, "max_age_hours": 48, "min_samples": 5, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" },
+    { "id": "time_to_fix_alert", "lens": "speed", "unit": "hours", "direction": "lower", "floor": 168, "goal": 24, "weight": 1, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "planted_alert_found", "goal_source": "https://sre.google/sre-book/monitoring-distributed-systems/" },
+    { "id": "planted_alert_found", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 1, "max_age_hours": 744, "min_samples": 1, "goal_source": "https://sre.google/sre-book/testing-reliability/" },
+    { "id": "worker_cpu_ms_p50", "lens": "consumption", "unit": "ms", "direction": "lower", "floor": 50, "goal": 10, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://developers.cloudflare.com/workers/platform/limits/" }
+  ],
+  "changes": []
+}

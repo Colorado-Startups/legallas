@@ -1,0 +1,53 @@
+// legallas-backup: the room backup (README.md, "Backup and restore"). A Worker apart from the room that only runs a
+// Cloudflare Workflow (worker/backup/): it copies the room's R2 objects and D1 rows into a backup bucket in the same
+// Cloudflare account, and its drill restores them into scratch copies and checks every count and hash. It has no route,
+// no workers.dev URL and no preview URL, so nothing on the internet reaches it. Deploy with `npm run backup:deploy`.
+//
+// The example a room starts from: copy it to wrangler.backup.jsonc and fill in the two database IDs (the fields marked
+// below). The room bucket names and the room database must be the room's own, as wrangler.jsonc binds them;
+// worker/backup/config.test.ts and `npm run backup` check that, and that the backup and scratch copies are neither.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "legallas-backup",
+  "main": "./worker/backup/entry.ts",
+  "compatibility_date": "2026-09-30",
+  "upload_source_maps": true,
+
+  "workers_dev": false,
+  "preview_urls": false,
+
+  "d1_databases": [
+    // The room's database, as wrangler.jsonc binds it: read by a backup, written only by a restore into an empty one.
+    { "binding": "DB", "database_name": "legallas", "database_id": "REPLACE_WITH_D1_DATABASE_ID" },
+    // Empty except while a drill runs. From `npx wrangler d1 create legallas-scratch --location enam`.
+    { "binding": "SCRATCH_DB", "database_name": "legallas-scratch", "database_id": "REPLACE_WITH_SCRATCH_D1_DATABASE_ID" }
+  ],
+
+  "r2_buckets": [
+    // The room's buckets, as wrangler.jsonc binds them: read by a backup, written only by a restore into an empty one.
+    { "binding": "FILES", "bucket_name": "legallas-files" },
+    { "binding": "INDEX", "bucket_name": "legallas-index" },
+    { "binding": "LAW", "bucket_name": "legallas-law" },
+    // The second copy. From `npx wrangler r2 bucket create legallas-backup --location enam`: another region than the room's.
+    { "binding": "BACKUP", "bucket_name": "legallas-backup" },
+    // Empty except while a drill runs. From `npx wrangler r2 bucket create legallas-scratch --location enam`.
+    { "binding": "SCRATCH", "bucket_name": "legallas-scratch" }
+  ],
+
+  // The backup runs when the owner starts it (`npm run backup`). To run it daily too, add a schedule to this entry,
+  // such as "schedules": ["23 8 * * *"] (08:23 UTC), and deploy again. Remove it and deploy to stop.
+  "workflows": [{ "name": "legallas-backup", "binding": "BACKUP_FLOW", "class_name": "RoomBackup" }],
+
+  // A step may hash a page of large files: 2 minutes of CPU, not the room's 5 s. A full copy reads and writes about four
+  // times per object, past Workers Paid's default 10,000 subrequests, so the ceiling is raised; both stay inside the
+  // CPU time and requests Workers Paid includes for a room of about 1 GB (README.md, "Backup and restore").
+  "limits": { "cpu_ms": 120000, "subrequests": 1000000 },
+
+  // Error logs on; invocation logs and traces off, as in the room: spans can record R2 keys.
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "logs": { "enabled": true, "invocation_logs": false },
+    "traces": { "enabled": false }
+  }
+}

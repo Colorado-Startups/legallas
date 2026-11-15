@@ -1,0 +1,52 @@
+---
+// The companion's stills (DESIGN.md section 8, plan PR-L2): one raster per companion state, rendered from the rig
+// (@brand/states/<state>.webp, 240:280; @brand is the brand pack, astro.config.mjs), self-hosted and resized at
+// build time by astro:assets into AVIF and WebP at 1x and 2x the shown width (WebP for the <img> too). They are the
+// fallback under the Rive canvas: what shows without script, under reduced motion and whenever the rig fails to
+// load. One <picture data-still> per state; only the first is unhidden, so the others (lazy) are never fetched until
+// companion-rive.ts asks for one.
+// Same origin, so the page CSP (`img-src 'self'`, worker/headers.ts) allows them. Decorative: alt="" and
+// aria-hidden; the state is the text beside him. No inline styles (the CSP has no 'unsafe-inline'): companion.css
+// and game.css size them to the arched window. Every image in the brand pack is checked for metadata by
+// src/scripts/image-metadata.test.ts.
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+import { drawnStates, type CompanionState } from '../scripts/companion-contract.ts';
+
+interface Props {
+  /** The width the page shows him at, in CSS pixels: 192 on Ask, 88 in the guide band. */
+  width: number;
+  /** The still shown before script runs (and without it): the page's first companion state. */
+  state?: CompanionState;
+}
+const { width, state: first = 'idle' } = Astro.props;
+
+const files = import.meta.glob<ImageMetadata>('@brand/states/*.webp', { eager: true, import: 'default' });
+// Keyed by file name: how Vite spells a glob key through an alias is its own business.
+const byName = new Map(Object.entries(files).map(([key, image]) => [key.slice(key.lastIndexOf('/') + 1), image]));
+// All or none (drawnStates): with none there is nothing to draw, and companion.css hides the empty window.
+const stills = drawnStates(new Set(byName.keys())).map((state) => ({ state, src: byName.get(`${state}.webp`)! })); // safe: drawnStates checked it
+// The art is 240:280. Never read `src.width`, `.height`, `.src` or spread it: any access outside <Picture> makes
+// astro:assets keep the full-size original in the build (scripts/dist-images.ts fails the build if it does).
+const height = Math.round((width * 280) / 240);
+---
+
+{
+  stills.map(({ state, src }) => (
+    <Picture
+      src={src}
+      formats={['avif', 'webp']}
+      fallbackFormat="webp"
+      widths={[width, width * 2]}
+      sizes={`${width}px`}
+      width={width}
+      height={height}
+      alt=""
+      aria-hidden="true"
+      decoding="async"
+      loading="lazy"
+      class="companion-still"
+      pictureAttributes={{ 'data-still': state, hidden: state !== first }}
+    />
+  ))
+}

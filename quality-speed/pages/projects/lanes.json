@@ -1,0 +1,1 @@
+[{ "id": "board", "runner": "linux-hosted", "cadence": "daily", "collector": "collect.ts", "admin": true }]

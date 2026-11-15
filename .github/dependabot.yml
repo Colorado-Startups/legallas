@@ -1,0 +1,61 @@
+# Dependabot version updates (security updates are on in the repo settings and
+# use the same groups). Each ecosystem gets at most one grouped minor and patch
+# pull request a week; majors arrive one by one.
+#
+# A release must be 7 days old before Dependabot proposes it (30 for a major),
+# so a compromised or broken release is usually pulled before it reaches CI:
+# npm installs it on the Linux runners, and an updated action also runs in the
+# Mac jobs (`swift`, `office-mac`).
+#
+# Swift is not listed: the package has no external dependencies. Add a `swift`
+# entry when one arrives.
+version: 2
+updates:
+  # Actions are pinned to full commit SHAs; Dependabot updates the SHA and the
+  # `# vX.Y.Z` comment together.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Denver
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        applies-to: version-updates
+        patterns: ['*']
+      actions-security:
+        applies-to: security-updates
+        patterns: ['*']
+    labels: [dependencies, 'area:infra']
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: npm
+    directory: /web
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Denver
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
+    groups:
+      # Auth, the MCP server and the bundled viewer runtimes (exact pins, see
+      # web/README.md) stay out of the group: each comes as its own pull request.
+      web-minor-patch:
+        applies-to: version-updates
+        update-types: [minor, patch]
+        exclude-patterns:
+          - '@cloudflare/workers-oauth-provider'
+          - '@modelcontextprotocol/*'
+          - 'jose'
+          - 'pdfjs-dist'
+          - '@rive-app/*'
+      web-security:
+        applies-to: security-updates
+        update-types: [minor, patch]
+    labels: [dependencies, 'area:web']
+    open-pull-requests-limit: 5

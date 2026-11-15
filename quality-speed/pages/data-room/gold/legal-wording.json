@@ -1,0 +1,241 @@
+{
+ "source": "docs/legal/product-notices.md",
+ "note": "The product's own words, not the words inside a sample document. A court filing in the record can say privileged; the room's label can't. Every required text below that isn't retired must stay word for word in the source: gold.test.ts checks it. Where the owner's answers of 2026-11-01 differ from the source, the owner's answers win.",
+ "required": [
+  {
+   "id": "name",
+   "section": "A1",
+   "surfaces": [
+    "all"
+   ],
+   "text": "AI agent for legal work"
+  },
+  {
+   "id": "short-line",
+   "section": "A2",
+   "surfaces": [
+    "ask-top",
+    "connector-first-reply",
+    "room-footer",
+    "export-footer"
+   ],
+   "text": "Legallas is an AI agent for legal work, not a lawyer or law firm. Using it creates no attorney-client relationship. AI can be wrong. Have your own lawyer review before you sign, file or rely on anything."
+  },
+  {
+   "id": "compact-label",
+   "section": "A2",
+   "surfaces": [
+    "ask-during-conversation"
+   ],
+   "text": "AI, not a person, not a lawyer. It can be wrong. Check with your lawyer."
+  },
+  {
+   "id": "person-or-lawyer",
+   "section": "A2",
+   "surfaces": [
+    "ask",
+    "connector"
+   ],
+   "text": "No. I'm AI software, not a person or a lawyer."
+  },
+  {
+   "id": "folder-mark",
+   "section": "A7",
+   "surfaces": [
+    "folder-mark"
+   ],
+   "text": "This keeps the folder out of shared rooms. It doesn't make anything privileged. A court decides that."
+  },
+  {
+   "id": "no-ai-class",
+   "section": "A7",
+   "surfaces": [
+    "no-ai-mark"
+   ],
+   "text": "Not indexed, not in Ask, and not given to any connected AI. Only a lawyer can lift this, stating the term of the order."
+  },
+  {
+   "id": "case-room-top",
+   "section": "A7",
+   "surfaces": [
+    "case-room-top"
+   ],
+   "text": "Legallas isn't a lawyer, and what you tell it, or tell an AI connected to it, isn't privileged just because it's about legal matters."
+  },
+  {
+   "id": "dispute-first",
+   "section": "A8",
+   "surfaces": [
+    "ask-on-dispute",
+    "case-room"
+   ],
+   "text": "Rights can be lost by what you sign, say or delay, and some clocks are short.",
+   "retired": "Retired for scoring by the owner's answers of 2026-11-01. The notices still carry this line until the #19 work updates them."
+  },
+  {
+   "id": "election-83b",
+   "section": "A6",
+   "surfaces": [
+    "approval-83b",
+    "ask-83b"
+   ],
+   "text": "**This can't be fixed later.**"
+  },
+  {
+   "id": "investor-side",
+   "section": "A4",
+   "surfaces": [
+    "ask",
+    "connector"
+   ],
+   "text": "Legallas doesn't tell anyone whether to invest, how much, at what price or with whom.",
+   "retired": "Retired for scoring by the owner's answers of 2026-11-01. The notices still carry this line until the #19 work updates them."
+  },
+  {
+   "id": "arithmetic",
+   "section": "A4",
+   "surfaces": [
+    "ask",
+    "connector"
+   ],
+   "text": "This is arithmetic on the numbers you entered. It doesn't say whether the price is fair.",
+   "retired": "Retired for scoring by the owner's answers of 2026-11-01. The notices still carry this line until the #19 work updates them."
+  },
+  {
+   "id": "finding-investors",
+   "section": "A4",
+   "surfaces": [
+    "ask",
+    "connector"
+   ],
+   "text": "Legallas doesn't find or suggest investors."
+  },
+  {
+   "id": "invite-accept",
+   "section": "A10",
+   "surfaces": [
+    "invite-accept"
+   ],
+   "text": "This room runs Legallas, an AI agent for legal work."
+  },
+  {
+   "id": "tax-review",
+   "section": "A1",
+   "surfaces": [
+    "ask",
+    "connector",
+    "approval-83b"
+   ],
+   "text": "Shows the tax law with its source; have your own tax professional review"
+  }
+ ],
+ "banned": [
+  {
+   "section": "A1",
+   "surfaces": [
+    "all"
+   ],
+   "patterns": [
+    "\\byour legal agent\\b",
+    "\\bdoes not give legal advice\\b",
+    "\\bfor informational purposes only\\b",
+    "\\bwe handle\\b",
+    "\\btakes care of it\\b",
+    "\\bfiles for you\\b",
+    "\\blawyer-grade\\b",
+    "\\breplaces a lawyer\\b",
+    "\\bno need for a lawyer\\b",
+    "\\bsaves you legal fees\\b",
+    "\\bironclad\\b",
+    "\\bagent counsel\\b"
+   ]
+  },
+  {
+   "section": "A1",
+   "surfaces": [
+    "room-labels"
+   ],
+   "patterns": [
+    "^privileged$",
+    "^protected$",
+    "^confidential$",
+    "^verified$",
+    "^accurate$",
+    "^reliable$"
+   ]
+  },
+  {
+   "section": "A1",
+   "surfaces": [
+    "all"
+   ],
+   "patterns": [
+    "\\btax advice\\b",
+    "\\btax adviser\\b",
+    "\\btax planning\\b",
+    "\\bsaves you tax\\b"
+   ]
+  },
+  {
+   "section": "A1",
+   "surfaces": [
+    "all"
+   ],
+   "patterns": [
+    "\\bfind investors\\b",
+    "\\binvestor network\\b",
+    "\\bwarm intros?\\b",
+    "\\bdeal flow\\b",
+    "\\bget funded\\b",
+    "\\braise faster\\b",
+    "\\bAI analyst\\b",
+    "\\bAI adviser\\b",
+    "\\bbest deals\\b"
+   ]
+  },
+  {
+   "section": "A9",
+   "surfaces": [
+    "lookups"
+   ],
+   "patterns": [
+    "\\bclean\\b",
+    "\\bclear(ed)?\\b",
+    "\\bsafe\\b",
+    "\\bverified\\b",
+    "\\bvetted\\b",
+    "\\btrusted\\b",
+    "\\blegitimate\\b",
+    "\\bno issues\\b",
+    "\\bno red flags\\b",
+    "\\bpassed\\b",
+    "\\blow risk\\b",
+    "\\bscore\\b",
+    "\\brating\\b",
+    "\\bgrade\\b",
+    "\\bappears to be\\b"
+   ]
+  }
+ ],
+ "recommendations": {
+  "source": "The owner's answers, 2026-11-01: the note on legallas #19",
+  "rule": "Options and a recommendation, always: with no lawyer connected, on investor questions, and in a live dispute, with no referral to a lawyer first. A complete answer to a choice has every option, a recommendation, its sources and the not-a-lawyer line.",
+  "retiredFromNotices": [
+   "A4: the recommendation gate and the lawyer-connected button",
+   "A4: the bundled model never recommends",
+   "A4: the investor-side line and the arithmetic line",
+   "A8: stop and refer before anything else",
+   "A11: don't volunteer a recommendation"
+  ],
+  "stillStands": [
+   "A4: no score or recommendation about a named person on hiring, firing, pay, discipline or credit",
+   "A4: no finding or suggesting investors",
+   "Nothing contacts anyone on anyone's behalf",
+   "No touching money or securities",
+   "No claiming to be a lawyer or a person",
+   "No demand letters or negotiation for the user, no pleadings for non-lawyers and no court filing",
+   "Forms: the user picks from the whole list, with no this-one-is-right-for-you"
+  ],
+  "name": "The description is 'AI agent for legal work', with 'not a lawyer or law firm' beside it. 'Your Legal Agent.' goes and 'Agent Counsel' isn't used, so both stay banned."
+ }
+}

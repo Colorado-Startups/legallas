@@ -1,0 +1,11 @@
+// A room's own app identity. Copy to Room.xcconfig (gitignored) and set what differs; anything left out
+// keeps Legallas.xcconfig's value. Give the same names in Sources/LegallasCore/Persistence/AppSettings+Room.swift
+// (see AppSettings.swift): verify-app.sh fails a build whose two disagree.
+//
+// The bundle identifier decides the sandbox container, so changing it on an installed app starts with an
+// empty store. Set it before the first install.
+
+PRODUCT_NAME = Acme Cases
+PRODUCT_BUNDLE_IDENTIFIER = com.example.AcmeCases
+APP_DESCRIPTION = Case management for Acme
+MCP_HELPER_NAME = AcmeCasesMCP

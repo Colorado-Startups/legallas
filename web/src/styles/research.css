@@ -1,0 +1,189 @@
+/*
+  Research mode's panel (plan D10 to D12) on the Ask page and in the drawer: the saved threads in a disclosure,
+  then the open thread's turns. Turns and answers are chat-answer.css's, unchanged, so a research answer looks
+  like a quick one with a counts line above it. Loaded with research-panel.ts on first use. Tokens only.
+*/
+
+.ask-research {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.ask-threads {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.ask-threads__summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--target-min);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.ask-threads__new {
+  justify-self: start;
+}
+
+.ask-threads__message {
+  max-width: var(--measure);
+  margin: 0;
+  color: var(--ink-2);
+}
+
+/* Where threads live (plan D12): after the disclosure, so it shows even when the list is closed. */
+.ask-research__note {
+  max-width: var(--measure);
+  margin: calc(-1 * var(--space-2)) 0 0;
+  color: var(--ink-3);
+}
+
+.ask-threads__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ask-threads__list:empty {
+  display: none;
+}
+
+/* A row: the thread (title and date) as one button, Delete beside it. The open thread's button carries
+   aria-current, and its row is marked as a selected table row is (DESIGN.md 7, Document table): the forest wash and
+   a 2px forest edge on the left. */
+.ask-thread {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  align-items: center;
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.ask-thread:has([aria-current='true']) {
+  background: var(--forest-tint);
+  box-shadow: inset 2px 0 0 var(--forest);
+}
+
+.ask-thread__open {
+  display: grid;
+  gap: 0 var(--space-3);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  min-height: 2.5rem;
+  padding: var(--space-1) var(--space-2);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.ask-thread__open:hover {
+  color: var(--forest-hover);
+}
+
+.ask-thread__open[aria-current='true'] {
+  font-weight: 600;
+}
+
+.ask-thread__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ask-thread__date {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.ask-thread__delete[data-state='confirm'] {
+  color: var(--ink);
+  font-weight: 600;
+  border: var(--hairline) solid var(--border);
+}
+
+/* The counts line above a research answer: what the agent did, in counts only. */
+.ask-steps {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.ask-steps:empty {
+  display: none;
+}
+
+@container ask (max-width: 40rem) {
+  .ask-thread__open {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media print {
+  .ask-threads {
+    display: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .ask-thread:has([aria-current='true']) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+
+/* Public-records cards (records-card.ts): a check's sources, findings and notices beside the answer, never inside it. */
+.rec-cards {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-3) 0 0;
+}
+
+.rec-card {
+  padding: var(--space-3);
+  background: var(--panel);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.rec-card p,
+.rec-card ul {
+  margin: 0 0 var(--space-2);
+}
+
+.rec-card__title {
+  margin: 0 0 var(--space-2);
+  font-weight: 600;
+}
+
+.rec-group {
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+.rec-source {
+  margin: 0 0 var(--space-3);
+}
+
+.rec-source__name {
+  margin: 0 0 var(--space-1);
+  font-weight: 600;
+}
+
+.rec-findings {
+  padding-left: var(--space-4);
+}
+
+.rec-notices {
+  margin: var(--space-3) 0 0;
+  padding-top: var(--space-2);
+  border-top: var(--hairline) solid var(--rule);
+}

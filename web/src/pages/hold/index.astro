@@ -1,0 +1,67 @@
+---
+// The hold screen (worker/hold.ts). A member starts a legal hold here, with or without a case number, then records its
+// custodians, the notice, each acknowledgment, reminders and the release; an unacknowledged custodian is flagged. It always
+// names what the room can't reach, word for word from docs/legal/product-notices.md (A7), and says the hold blocks nothing
+// yet. The state comes from GET /api/hold; src/scripts/hold.ts renders with textContent only.
+import Room from '../../layouts/Room.astro';
+import { HOLD_CANNOT_REACH, HOLD_CANNOT_REACH_HEADING, HOLD_RECORDS_ONLY } from '../../../worker/hold.ts';
+import '../../styles/hold.css';
+---
+
+<Room title="Legal hold">
+  <section class="hold" aria-labelledby="hold-title">
+    <h1 id="hold-title" class="t-h1">Legal hold</h1>
+
+    <p class="hold-state" data-hold-state role="status"></p>
+    <p class="hold-limit">{HOLD_RECORDS_ONLY}</p>
+
+    <form class="hold-form" data-hold-post="/api/hold" data-hold-off hidden>
+      <label class="t-small" for="hold-case">Case number, if there is one</label>
+      <input id="hold-case" class="hold-input" name="case_number" maxlength="120" autocomplete="off" />
+      <button type="submit" class="c-button c-button--primary">Start a legal hold</button>
+    </form>
+
+    <div data-hold-on hidden>
+      <p class="t-small">Record each step as you take it. The room sends no email: you send the notice and reminders.</p>
+      <h2 class="t-h3">Custodians</h2>
+      <ul class="hold-list" data-hold-custodians></ul>
+      <form class="hold-form" data-hold-post="/api/hold/custodians">
+        <label class="t-small" for="hold-email">Email</label>
+        <input id="hold-email" class="hold-input" name="email" type="email" required autocomplete="off" />
+        <label class="t-small" for="hold-name">Name</label>
+        <input id="hold-name" class="hold-input" name="name" maxlength="120" autocomplete="off" />
+        <button type="submit" class="c-button">Add custodian</button>
+      </form>
+
+      <h2 class="t-h3">Notice</h2>
+      <p class="hold-notice" data-hold-notice></p>
+      <form class="hold-form" data-hold-post="/api/hold/notice">
+        <button type="submit" class="c-button">I sent the notice to everyone not yet notified</button>
+      </form>
+      <form class="hold-form" data-hold-post="/api/hold/acknowledgments">
+        <label class="t-small" for="hold-ack">Acknowledged by</label>
+        <input id="hold-ack" class="hold-input" name="email" type="email" required autocomplete="off" />
+        <button type="submit" class="c-button">Record acknowledgment</button>
+      </form>
+      <form class="hold-form" data-hold-post="/api/hold/reminders">
+        <button type="submit" class="c-button">I reminded everyone not yet acknowledged</button>
+      </form>
+
+      <h2 class="t-h3">Release</h2>
+      <form class="hold-form" data-hold-post="/api/hold/release">
+        <label class="t-small" for="hold-reason">Reason</label>
+        <input id="hold-reason" class="hold-input" name="reason" maxlength="2000" required autocomplete="off" />
+        <button type="submit" class="c-button">Release the hold</button>
+      </form>
+    </div>
+
+    <aside class="hold-reach" aria-labelledby="hold-reach-title">
+      <h2 id="hold-reach-title" class="t-h3">{HOLD_CANNOT_REACH_HEADING}</h2>
+      <ul class="hold-list">
+        {HOLD_CANNOT_REACH.map((item) => <li>{item}</li>)}
+      </ul>
+    </aside>
+  </section>
+</Room>
+
+<script src="../../scripts/hold.ts"></script>

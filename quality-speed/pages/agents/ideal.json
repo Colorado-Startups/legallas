@@ -1,0 +1,13 @@
+{
+  "ideal": "Every GitHub agent session, any vendor, by hand or automation, ends in a merged change, fast, on few tokens and minutes, after two-minute setup.",
+  "sources": [
+    { "title": "GitHub Docs: Creating automations with Copilot cloud agent", "url": "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/create-automations", "date": "2026-10-28" },
+    { "title": "GitHub Docs: Troubleshooting Copilot cloud agent", "url": "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/troubleshoot-cloud-agent", "date": "2026-10-28" },
+    { "title": "GitHub Docs: Best practices for using Copilot to work on tasks", "url": "https://docs.github.com/en/copilot/tutorials/cloud-agent/get-the-best-results", "date": "2026-10-28" },
+    { "title": "GitHub Docs: Customizing the development environment for Copilot cloud agent", "url": "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/customize-the-agent-environment", "date": "2026-10-28" },
+    { "title": "GitHub Changelog: Introducing the Agents tab in your repository", "url": "https://github.blog/changelog/2026-01-26-introducing-the-agents-tab-in-your-repository/", "date": "2026-01-26" }
+  ],
+  "quality": "Sessions and automation runs end in merged changes or verdicts, every automation has a credit limit, and setup succeeds.",
+  "speed": "Setup takes two minutes, and a session hands back its pull request well inside GitHub's one-hour timeout.",
+  "consumption": "Each merged change uses few Actions minutes, and the daily read is one short job."
+}

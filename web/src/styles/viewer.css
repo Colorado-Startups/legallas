@@ -1,0 +1,265 @@
+/*
+  The page-at-a-time binder viewer (card P8): kicker, title, summary, page chips, the sandboxed
+  frame, the "leaves the room" notice and the fletched Previous and Next. Breadcrumb, accents and sprite: visuals.css.
+*/
+@import './visuals.css';
+
+.binder-viewer__head {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.binder-viewer__head h1 {
+  margin: 0;
+}
+
+.binder-viewer__kicker {
+  margin: 0;
+  color: var(--brass-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+}
+
+.binder-viewer__summary {
+  max-width: var(--measure);
+  margin: var(--space-1) 0 0;
+  color: var(--ink-2);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1.625rem;
+}
+
+/* Page chips: the tab's pages in order; the current one reads like the current nav item. */
+.binder-chips {
+  margin: var(--space-4) calc(-1 * var(--gutter)) var(--space-3);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.binder-chips ol {
+  display: flex;
+  gap: var(--space-2);
+  width: max-content;
+  margin: 0;
+  padding: var(--space-1) var(--gutter);
+  list-style: none;
+}
+
+.binder-chips a {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  max-width: 16rem;
+  min-height: var(--target-min);
+  padding: var(--space-1) var(--space-2);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+  text-decoration: none;
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius-chip);
+}
+
+.binder-chips a:hover {
+  background: var(--forest-tint);
+  color: var(--forest-hover);
+}
+
+.binder-chips__n {
+  flex: none;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  font-variant-numeric: tabular-nums;
+}
+
+.binder-chips__t {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.binder-chips a[aria-current='page'] {
+  background: var(--forest-tint);
+  color: var(--forest);
+  font-weight: 600;
+  border-color: var(--forest);
+  box-shadow: inset 0 -2px 0 var(--tab-accent);
+}
+
+.binder-chips a[aria-current='page'] .binder-chips__n {
+  color: var(--forest);
+}
+
+/* The frame: nothing decorative around the evidence, a quiet bar above it. */
+.binder-stage {
+  overflow: hidden;
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.binder-stage__bar {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  min-height: 2.5rem;
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+  background: var(--panel);
+  color: var(--ink-3);
+  font-size: var(--text-12);
+  line-height: 1rem;
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.binder-stage iframe {
+  display: block;
+  width: 100%;
+  height: max(30rem, calc(100dvh - 14rem));
+  border: 0;
+  background: var(--surface);
+}
+
+.binder-stage:fullscreen {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0;
+}
+
+.binder-stage:fullscreen iframe {
+  flex: 1;
+  height: auto;
+}
+
+/* Pinned to the window: the visual above can be a full screen tall, so a bar below it would go unseen. */
+.binder-out {
+  position: fixed;
+  bottom: var(--space-4);
+  left: 50%;
+  z-index: var(--z-toast);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  width: max-content;
+  max-width: calc(100% - 2 * var(--space-4));
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--text-14);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-overlay);
+  transform: translateX(-50%);
+}
+
+.binder-out a {
+  overflow-wrap: anywhere;
+  font-weight: 600;
+}
+
+/* Previous and Next with D2's fletched arrows (brand/arrow-prev.svg and arrow-next.svg). */
+.binder-turns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.binder-turn {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0 var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+}
+
+.binder-turn:hover {
+  background: var(--forest-tint);
+  color: var(--forest-hover);
+}
+
+.binder-turn__arrow {
+  display: block;
+  grid-row: span 2;
+  width: 28px;
+  height: 28px;
+  color: var(--forest);
+}
+
+.binder-turn__arrow svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.binder-turn__kicker {
+  color: var(--ink-2);
+  font-size: var(--text-12);
+  line-height: 1rem;
+}
+
+.binder-turn__title {
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  font-weight: 600;
+  line-height: 1.375rem;
+}
+
+.binder-turn--next {
+  grid-column: 2;
+  grid-template-columns: minmax(0, 1fr) auto;
+  text-align: right;
+}
+
+.binder-turn--next .binder-turn__arrow {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+}
+
+@media (max-width: 48rem) {
+  .binder-stage__hint {
+    visibility: hidden;
+  }
+
+  .binder-stage iframe {
+    height: max(26rem, calc(100dvh - 10rem));
+  }
+
+  .binder-turns {
+    grid-template-columns: 1fr;
+  }
+
+  .binder-turn--next {
+    grid-column: auto;
+  }
+}
+
+@media (forced-colors: active) {
+  .binder-chips a[aria-current='page'] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  .binder-stage,
+  .binder-out {
+    border-color: CanvasText;
+  }
+}
+
+@media print {
+  .binder-chips,
+  .binder-stage__bar,
+  .binder-turns,
+  .binder-out {
+    display: none;
+  }
+}

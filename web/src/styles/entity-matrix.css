@@ -1,0 +1,186 @@
+/*
+  Entity choice (src/pages/entity.astro). Composes c-table and c-table-wrap; page classes are em-*. Tokens only, no
+  literal colors. Under 48rem each factor stacks as a card and each cell carries its form's name (data-label).
+*/
+
+.em .t-h1 {
+  margin: 0 0 var(--space-2);
+}
+
+.em-lead {
+  max-width: var(--measure);
+  margin: 0 0 var(--space-4);
+  color: var(--ink-2);
+}
+
+.em-meter {
+  display: grid;
+  gap: var(--space-1);
+  max-width: 28rem;
+  margin: 0 0 var(--space-4);
+}
+
+.em-meter p {
+  margin: 0;
+}
+
+.em-meter__count {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.em-meter__bar {
+  width: 100%;
+  height: var(--space-2);
+  overflow: hidden;
+  appearance: none;
+  background: var(--rule);
+  border: 0;
+}
+
+.em-meter__bar::-webkit-progress-bar {
+  background: var(--rule);
+}
+
+.em-meter__bar::-webkit-progress-value {
+  background: var(--forest);
+}
+
+.em-meter__bar::-moz-progress-bar {
+  background: var(--forest);
+}
+
+.em-wrap {
+  margin: 0 0 var(--space-3);
+}
+
+.em-table th,
+.em-table td {
+  height: auto;
+  padding: var(--space-3);
+  vertical-align: top;
+}
+
+.em-table thead th {
+  white-space: normal;
+}
+
+.em-table td {
+  min-width: 12rem;
+  border-left: var(--hairline) solid var(--rule);
+}
+
+.em-table tbody tr:hover {
+  background: none;
+}
+
+/* A row's factor: c-table's th is a sticky, one-line column header, so undo both here. */
+.em-table .em-factor {
+  position: static;
+  min-width: 9rem;
+  color: var(--ink);
+  font-weight: 600;
+  text-align: left;
+  white-space: normal;
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.em-table tbody tr:last-child .em-factor {
+  border-bottom: 0;
+}
+
+.em-text {
+  margin: 0 0 var(--space-2);
+  color: var(--ink);
+}
+
+.em-cites {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.em-cite {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-2);
+  align-items: baseline;
+}
+
+.em-cite__name {
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+  white-space: nowrap;
+}
+
+a.em-cite__name {
+  color: var(--forest);
+}
+
+.em-cite__date {
+  color: var(--ink-3);
+  font-size: var(--text-13);
+  font-variant-numeric: tabular-nums;
+}
+
+.em-cite--missing .em-cite__name {
+  color: var(--ink-2);
+}
+
+.em-cite--missing .em-cite__date {
+  color: var(--brass-text);
+}
+
+.em-note {
+  max-width: var(--measure);
+  margin: 0;
+  color: var(--ink-3);
+}
+
+@media (max-width: 48rem) {
+  .em-table,
+  .em-table tbody,
+  .em-table tr,
+  .em-table th,
+  .em-table td {
+    display: block;
+    width: auto;
+  }
+
+  .em-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .em-table tbody tr {
+    border-bottom: var(--hairline) solid var(--border);
+  }
+
+  .em-table tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .em-table .em-factor,
+  .em-table tbody tr:last-child .em-factor {
+    border-bottom: var(--hairline) solid var(--rule);
+  }
+
+  .em-table td {
+    min-width: 0;
+    border-left: 0;
+  }
+
+  .em-table td::before {
+    content: attr(data-label);
+    display: block;
+    margin: 0 0 var(--space-1);
+    color: var(--ink-2);
+    font-size: var(--text-13);
+    font-weight: 600;
+  }
+}

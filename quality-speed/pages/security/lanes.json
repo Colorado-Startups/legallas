@@ -1,0 +1,5 @@
+[
+  { "id": "gate", "runner": "linux", "cadence": "daily", "collector": "collect-gate.ts" },
+  { "id": "scan", "runner": "linux-hosted", "cadence": "nightly", "collector": "collect-scan.ts" },
+  { "id": "keys", "runner": "linux-hosted", "cadence": "daily", "collector": "collect-keys.ts", "admin": true }
+]

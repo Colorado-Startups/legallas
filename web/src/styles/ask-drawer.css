@@ -1,0 +1,111 @@
+/*
+  The Ask drawer (card P7): composes c-drawer (DESIGN.md 7, Drawer) with the shared answer styles in chat.css.
+  Loaded with chat-drawer.ts on first use.
+*/
+
+.ask-drawer__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-drawer);
+  background: color-mix(in srgb, var(--ink) 28%, transparent);
+}
+
+/* The small Legallas (F8, R68) draws its own round frame; this only keeps it from shrinking in the head row. */
+.ask-drawer__glyph {
+  display: inline-flex;
+  flex: none;
+}
+
+.ask-drawer__titles {
+  display: grid;
+  min-width: 0;
+  margin-right: auto;
+}
+
+.ask-drawer__titles .c-drawer__title {
+  margin: 0;
+}
+
+.ask-drawer__note {
+  min-height: 1rem;
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.ask-drawer__page {
+  color: var(--forest);
+}
+
+.ask-drawer__close {
+  min-width: 2rem;
+  padding: 0;
+}
+
+.ask-drawer__body {
+  display: grid;
+  align-content: start;
+  gap: var(--space-5);
+}
+
+.ask-drawer__earlier {
+  margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-4)) 0;
+  padding: var(--space-2) var(--space-4);
+  background: var(--panel);
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.ask-drawer__earlier > summary {
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.ask-drawer__earlier[open] > .ask-log {
+  margin: var(--space-4) 0 var(--space-2);
+}
+
+.ask-drawer__foot {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.ask-drawer__form {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.ask-drawer__input {
+  min-height: 2.5rem;
+  resize: none;
+}
+
+.ask-drawer__status {
+  min-height: 0;
+  margin: 0;
+  color: var(--ink);
+}
+
+.ask-drawer__status:empty {
+  display: none;
+}
+
+.ask-drawer__hint {
+  margin: 0;
+  color: var(--ink-3);
+}
+
+/* The drawer's claims sit in a narrower column. */
+.ask-drawer .ask-claim {
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+}
+
+.ask-drawer .c-claim {
+  font-size: var(--text-16);
+  line-height: 1.625rem;
+}
+
+@media print {
+  .ask-drawer,
+  .ask-drawer__scrim {
+    display: none;
+  }
+}

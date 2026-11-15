@@ -1,0 +1,39 @@
+{
+  "page": "actions",
+  "signoff_comment": 6572085205,
+  "metrics": [
+    {"id": "allowance_forecast_usd", "lens": "quality", "unit": "usd", "direction": "lower", "floor": 270, "goal": 180, "weight": 4, "max_age_hours": 48, "min_samples": 30, "goal_source": "https://docs.github.com/en/billing/concepts/product-billing/github-actions"},
+    {"id": "main_green_pct", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 90, "goal": 100, "weight": 3, "max_age_hours": 48, "min_samples": 10, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"},
+    {"id": "gates_ran_pct", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 90, "goal": 100, "weight": 3, "max_age_hours": 48, "min_samples": 10, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"},
+    {"id": "planted_failures_caught_pct", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 50, "goal": 100, "weight": 3, "max_age_hours": 48, "min_samples": 29, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"},
+    {"id": "flaky_trees_pct", "lens": "quality", "unit": "percent", "direction": "lower", "floor": 5, "goal": 0, "weight": 3, "max_age_hours": 48, "min_samples": 20, "goal_source": "https://martinfowler.com/articles/nonDeterminism.html"},
+    {"id": "runs_deleted", "lens": "quality", "unit": "count", "direction": "lower", "floor": 1, "goal": 0, "weight": 2, "max_age_hours": 48, "min_samples": 30, "goal_source": "https://docs.github.com/en/actions/reference/workflows-and-actions/contexts"},
+    {"id": "usd_per_merge", "lens": "quality", "unit": "usd", "direction": "lower", "floor": 0.5, "goal": 0.1, "weight": 2, "max_age_hours": 48, "min_samples": 10, "goal_source": "https://docs.github.com/en/billing/reference/actions-runner-pricing"},
+    {"id": "blacksmith_minutes_31d", "lens": "quality", "unit": "minutes", "direction": "lower", "floor": 2100, "goal": 1900, "weight": 2, "max_age_hours": 48, "min_samples": 30, "goal_source": "https://docs.blacksmith.sh/blacksmith-runners/overview"},
+    {"id": "unpinned_dependencies", "lens": "quality", "unit": "count", "direction": "lower", "floor": 5, "goal": 0, "weight": 2, "max_age_hours": 48, "min_samples": 20, "goal_source": "https://docs.github.com/en/actions/reference/security/secure-use"},
+    {"id": "workflow_lint_pass", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 2, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://docs.github.com/en/actions/reference/security/secure-use"},
+    {"id": "jobs_with_timeout_pct", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 80, "goal": 100, "weight": 1, "max_age_hours": 48, "min_samples": 10, "goal_source": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax"},
+    {"id": "workflows_proven_pct", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 50, "goal": 100, "weight": 1, "max_age_hours": 48, "min_samples": 8, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"},
+    {"id": "gates_intact", "lens": "quality", "unit": "count", "direction": "higher", "floor": 5, "goal": 6, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets"},
+    {"id": "repeat_runs_per_merge", "lens": "quality", "unit": "ratio", "direction": "lower", "floor": 1, "goal": 0, "weight": 1, "max_age_hours": 48, "min_samples": 10, "goal_source": "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows"},
+    {"id": "app_token_runs_passing", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 50, "goal": 100, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/github-app/PLAN.md#goals"},
+    {"id": "green_minutes_p50", "lens": "speed", "unit": "minutes", "direction": "lower", "floor": 20, "goal": 5, "weight": 3, "max_age_hours": 48, "min_samples": 20, "goal_source": "https://docs.cloud.google.com/architecture/devops/devops-tech-continuous-integration"},
+    {"id": "green_minutes_p95", "lens": "speed", "unit": "minutes", "direction": "lower", "floor": 30, "goal": 10, "weight": 3, "max_age_hours": 48, "min_samples": 20, "goal_source": "https://docs.cloud.google.com/architecture/devops/devops-tech-continuous-integration"},
+    {"id": "slowest_job_minutes_p95", "lens": "speed", "unit": "minutes", "direction": "lower", "floor": 20, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 20, "goal_source": "https://docs.cloud.google.com/architecture/devops/devops-tech-continuous-integration"},
+    {"id": "app_token_job_seconds_p50", "lens": "speed", "unit": "seconds", "direction": "lower", "floor": 300, "goal": 60, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://docs.github.com/en/billing/reference/actions-runner-pricing"},
+    {"id": "queue_seconds_p90", "lens": "speed", "unit": "seconds", "direction": "lower", "floor": 300, "goal": 30, "weight": 1, "max_age_hours": 48, "min_samples": 20, "goal_source": "https://docs.github.com/en/actions/concepts/metrics"},
+    {"id": "billed_minutes_per_merge", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 83, "goal": 17, "weight": 1, "max_age_hours": 48, "min_samples": 10, "goal_source": "https://docs.github.com/en/billing/reference/actions-runner-pricing"}
+  ],
+  "changes": [
+    {"date": "2026-11-04", "metric": "billed_minutes_per_merge", "field": "added", "from": null, "to": "billed_minutes_per_merge", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6644463105},
+    {"date": "2026-11-05", "metric": "gates_ran_pct", "field": "critical", "from": true, "to": false, "reason": "wrong_basis", "issue": 645},
+    {"date": "2026-11-05", "metric": "planted_failures_caught_pct", "field": "critical", "from": true, "to": false, "reason": "wrong_basis", "issue": 645},
+    {"date": "2026-11-06", "metric": "allowance_forecast_usd", "field": "floor", "from": 162, "to": 270, "reason": "wrong_basis", "issue": 241},
+    {"date": "2026-11-06", "metric": "allowance_forecast_usd", "field": "goal", "from": 108, "to": 180, "reason": "wrong_basis", "issue": 241},
+    {"date": "2026-11-09", "metric": "gates_intact", "field": "added", "from": null, "to": "gates_intact", "reason": "added_toward_ideal", "issue": 959},
+    {"date": "2026-11-09", "metric": "repeat_runs_per_merge", "field": "added", "from": null, "to": "repeat_runs_per_merge", "reason": "added_toward_ideal", "issue": 959},
+    {"date": "2026-11-09", "metric": "app_token_runs_passing", "field": "added", "from": null, "to": "app_token_runs_passing", "reason": "added_toward_ideal", "issue": 959},
+    {"date": "2026-11-09", "metric": "app_token_job_seconds_p50", "field": "added", "from": null, "to": "app_token_job_seconds_p50", "reason": "added_toward_ideal", "issue": 959},
+    {"date": "2026-11-09", "metric": "queue_seconds_p90", "field": "added", "from": null, "to": "queue_seconds_p90", "reason": "added_toward_ideal", "issue": 959}
+  ]
+}

@@ -1,0 +1,284 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4C0000000000000000000028 /* LegallasCore in Frameworks */ = {isa = PBXBuildFile; productRef = 4C0000000000000000000031 /* LegallasCore */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		4C0000000000000000000014 /* Legallas.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Legallas.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C0000000000000000000015 /* Legallas.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Legallas.xcconfig; sourceTree = "<group>"; };
+		4C0000000000000000000017 /* Signing.xcconfig.example */ = {isa = PBXFileReference; lastKnownFileType = text; path = Signing.xcconfig.example; sourceTree = "<group>"; };
+		4C0000000000000000000019 /* embed-mcp.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "embed-mcp.sh"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		4C0000000000000000000013 /* Exceptions for "Legallas" folder in "Legallas" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				Legallas.entitlements,
+			);
+			target = 4C0000000000000000000020 /* Legallas */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		4C0000000000000000000012 /* Legallas */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4C0000000000000000000013 /* Exceptions for "Legallas" folder in "Legallas" target */,
+			);
+			path = Legallas;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4C0000000000000000000025 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4C0000000000000000000028 /* LegallasCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4C0000000000000000000010 = {
+			isa = PBXGroup;
+			children = (
+				4C0000000000000000000012 /* Legallas */,
+				4C0000000000000000000016 /* Config */,
+				4C0000000000000000000018 /* Scripts */,
+				4C0000000000000000000011 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4C0000000000000000000011 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4C0000000000000000000014 /* Legallas.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4C0000000000000000000016 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				4C0000000000000000000015 /* Legallas.xcconfig */,
+				4C0000000000000000000017 /* Signing.xcconfig.example */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		4C0000000000000000000018 /* Scripts */ = {
+			isa = PBXGroup;
+			children = (
+				4C0000000000000000000019 /* embed-mcp.sh */,
+			);
+			path = Scripts;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4C0000000000000000000020 /* Legallas */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4C0000000000000000000021 /* Build configuration list for PBXNativeTarget "Legallas" */;
+			buildPhases = (
+				4C0000000000000000000024 /* Sources */,
+				4C0000000000000000000025 /* Frameworks */,
+				4C0000000000000000000026 /* Resources */,
+				4C0000000000000000000027 /* Embed LegallasMCP */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				4C0000000000000000000012 /* Legallas */,
+			);
+			name = Legallas;
+			packageProductDependencies = (
+				4C0000000000000000000031 /* LegallasCore */,
+			);
+			productName = Legallas;
+			productReference = 4C0000000000000000000014 /* Legallas.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4C0000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					4C0000000000000000000020 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+				};
+			};
+			buildConfigurationList = 4C0000000000000000000002 /* Build configuration list for PBXProject "Legallas" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4C0000000000000000000010;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4C0000000000000000000030 /* XCLocalSwiftPackageReference ".." */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 4C0000000000000000000011 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4C0000000000000000000020 /* Legallas */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4C0000000000000000000026 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4C0000000000000000000027 /* Embed LegallasMCP */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed LegallasMCP";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "exec /bin/sh \"$SRCROOT/Scripts/embed-mcp.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4C0000000000000000000024 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4C0000000000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		4C0000000000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		4C0000000000000000000022 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4C0000000000000000000015 /* Legallas.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		4C0000000000000000000023 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4C0000000000000000000015 /* Legallas.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4C0000000000000000000002 /* Build configuration list for PBXProject "Legallas" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4C0000000000000000000003 /* Debug */,
+				4C0000000000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4C0000000000000000000021 /* Build configuration list for PBXNativeTarget "Legallas" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4C0000000000000000000022 /* Debug */,
+				4C0000000000000000000023 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		4C0000000000000000000030 /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "..";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4C0000000000000000000031 /* LegallasCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4C0000000000000000000030 /* XCLocalSwiftPackageReference ".." */;
+			productName = LegallasCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 4C0000000000000000000001 /* Project object */;
+}

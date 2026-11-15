@@ -1,0 +1,82 @@
+# The default law pack against the real sites: a dry run that downloads every
+# unit, checks each came back whole and lists it with its source and date.
+# Nothing is uploaded and no Cloudflare login exists here. The text stays on the
+# runner and goes with it, which is why this runs here and not on a laptop.
+#
+# It runs when the pack or a parser it uses changes, and by hand, to catch a site
+# changing its layout or its robots file:
+#
+#   gh workflow run law-pack.yml -R Colorado-Startups/legallas --ref <branch> \
+#     -f only=us-advisers-act,us-sec-part-275
+#
+# GitHub-hosted on purpose: the Blacksmith guard counts only the workflows in
+# COUNTED_WORKFLOWS (.github/scripts/build_minutes_guard.py), and this is not one.
+name: Law pack
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/law-pack.yml
+      - web/scripts/law/cfr-annual.ts
+      - web/scripts/law/colorado-rules.ts
+      - web/scripts/law/compilation.ts
+      - web/scripts/law/crs-whole.ts
+      - web/scripts/law/default-pack*.ts
+      - web/scripts/law/delaware.ts
+      - web/scripts/law/ecfr-bulk.ts
+      - web/scripts/law/parse.ts
+      - web/scripts/law/pdf-paragraphs.ts
+      - web/scripts/law/robots.ts
+      - web/scripts/law/sec.ts
+      - web/worker/law-cite.ts
+  workflow_dispatch:
+    inputs:
+      only:
+        description: Only these units, separated by commas (empty for the whole pack)
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: law-pack-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dry-run:
+    # Branches of this repo only.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Private HOME
+        run: |
+          mkdir -p "$RUNNER_TEMP/home"
+          echo "HOME=$RUNNER_TEMP/home" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Install
+        working-directory: web
+        run: npm ci --ignore-scripts
+      - name: Dry run
+        working-directory: web
+        env:
+          LEGALLAS_LAW_DIR: ${{ runner.temp }}/law
+          # Who sec.gov hears is asking. A repository variable, so the address isn't in the code.
+          LEGALLAS_LAW_CONTACT: ${{ vars.LEGALLAS_LAW_CONTACT }}
+          # The units behind the flag too, so they are proven against the real sites before any room turns it on.
+          LEGALLAS_LAW_NEXT: '1'
+          ONLY: ${{ inputs.only }}
+        run: |
+          set -o pipefail
+          if [ -n "$ONLY" ]; then
+            npm run --silent law -- --only "$ONLY" | tee "$RUNNER_TEMP/report.txt"
+          else
+            npm run --silent law | tee "$RUNNER_TEMP/report.txt"
+          fi
+          { echo '```'; cat "$RUNNER_TEMP/report.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

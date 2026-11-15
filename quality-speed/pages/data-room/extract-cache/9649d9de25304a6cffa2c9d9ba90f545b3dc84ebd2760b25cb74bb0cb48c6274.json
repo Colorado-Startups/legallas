@@ -1,0 +1,11 @@
+{
+ "version": 3,
+ "sha256": "9649d9de25304a6cffa2c9d9ba90f545b3dc84ebd2760b25cb74bb0cb48c6274",
+ "pages": [
+  {
+   "n": 1,
+   "ocr": false,
+   "text": "HARBOR LABS SAMPLE RECORD. Fictional: every name, date and number is invented.\nPage 1 of 1\nTechnology Assignment Agreement, June 7, 2011\nJane Doe assigns to Harbor Labs, Inc. all of her right, title and interest in the\nKitchenGrid software, designs, customer research, trade name and marks.\nThe assignment is made in exchange for the 613,240 shares sold to her under the\nStock Agreement.\nShe agrees to sign what the company reasonably asks for to record this assignment.\nShe holds the domain kitchengrid.example and will move it to the company on request.\nSigned: Jane Doe. Accepted for the company: Richard Roe, Chief Technology Officer."
+  }
+ ]
+}

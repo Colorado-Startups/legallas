@@ -1,0 +1,34 @@
+{
+  "page": "code",
+  "signoff_comment": 6644367879,
+  "metrics": [
+    {"id": "checks_failing", "lens": "quality", "unit": "count", "direction": "lower", "floor": 1, "goal": 0, "weight": 12, "max_age_hours": 48, "min_samples": 3028, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"},
+    {"id": "long_functions", "lens": "quality", "unit": "count", "direction": "lower", "floor": 46, "goal": 0, "weight": 22, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/code/PLAN.md#goals"},
+    {"id": "long_files", "lens": "quality", "unit": "count", "direction": "lower", "floor": 10, "goal": 0, "weight": 11, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/code/PLAN.md#goals"},
+    {"id": "type_escapes", "lens": "quality", "unit": "count", "direction": "lower", "floor": 1150, "goal": 0, "weight": 22, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://typescript-eslint.io/rules/no-explicit-any/"},
+    {"id": "dead_code", "lens": "quality", "unit": "count", "direction": "lower", "floor": 58, "goal": 0, "weight": 11, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/code/PLAN.md#goals"},
+    {"id": "duplication", "lens": "quality", "unit": "percent", "direction": "lower", "floor": 3, "goal": 1, "weight": 11, "max_age_hours": 48, "min_samples": 1000, "goal_source": "https://docs.sonarsource.com/sonarqube-server/latest/quality-standards-administration/managing-quality-gates/introduction-to-quality-gates/"},
+    {"id": "dependencies_current", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 75, "goal": 100, "weight": 11, "max_age_hours": 48, "min_samples": 5, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/code/PLAN.md#goals"},
+    {"id": "public_symbols_documented", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 50, "goal": 100, "weight": 10, "max_age_hours": 48, "min_samples": 100, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/763bae5882a1896f71a674163e3fba9a0797e0b9/quality-speed/pages/documentation/PLAN.md#goals"},
+    {"id": "dead_names", "lens": "quality", "unit": "count", "direction": "lower", "floor": 20, "goal": 0, "weight": 10, "max_age_hours": 48, "min_samples": 20, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/763bae5882a1896f71a674163e3fba9a0797e0b9/quality-speed/pages/documentation/PLAN.md#goals"},
+    {"id": "broken_internal_links", "lens": "quality", "unit": "count", "direction": "lower", "floor": 10, "goal": 0, "weight": 10, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://www.w3.org/Provider/Style/URI"},
+    {"id": "long_sentence_share", "lens": "quality", "unit": "percent", "direction": "lower", "floor": 30, "goal": 0, "weight": 5, "max_age_hours": 48, "min_samples": 100, "goal_source": "https://www.gov.uk/guidance/content-design/writing-for-gov-uk"},
+    {"id": "lag_drill", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/763bae5882a1896f71a674163e3fba9a0797e0b9/quality-speed/pages/documentation/PLAN.md#goals"},
+    {"id": "web_loop_seconds", "lens": "speed", "unit": "seconds", "direction": "lower", "floor": 600, "goal": 60, "weight": 60, "max_age_hours": 720, "min_samples": 5, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"},
+    {"id": "mac_loop_seconds", "lens": "speed", "unit": "seconds", "direction": "lower", "floor": 600, "goal": 120, "weight": 40, "max_age_hours": 2160, "min_samples": 3, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"},
+    {"id": "reading_minutes_p90", "lens": "speed", "unit": "minutes", "direction": "lower", "floor": 10, "goal": 1, "weight": 20, "max_age_hours": 48, "min_samples": 24, "goal_source": "https://doi.org/10.1016/j.jml.2019.104047"},
+    {"id": "doc_lag_hours_p90", "lens": "speed", "unit": "hours", "direction": "lower", "floor": 720, "goal": 24, "weight": 20, "max_age_hours": 48, "min_samples": 1, "coverage_metric": "lag_drill", "goal_source": "https://cloud.google.com/blog/products/devops-sre/using-the-four-keys-to-measure-your-devops-performance"},
+    {"id": "lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 10, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"}
+  ],
+  "changes": [
+    {"date": "2026-11-05", "metric": "lane_minutes", "field": "added", "from": null, "to": "lane_minutes", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6646881034},
+    {"date": "2026-11-05", "metric": "checks_failing", "field": "critical", "from": true, "to": false, "reason": "wrong_basis", "issue": 645},
+    {"date": "2026-11-09", "metric": "public_symbols_documented", "field": "added", "from": null, "to": "public_symbols_documented", "reason": "added_toward_ideal", "issue": 949},
+    {"date": "2026-11-09", "metric": "dead_names", "field": "added", "from": null, "to": "dead_names", "reason": "added_toward_ideal", "issue": 949},
+    {"date": "2026-11-09", "metric": "broken_internal_links", "field": "added", "from": null, "to": "broken_internal_links", "reason": "added_toward_ideal", "issue": 949},
+    {"date": "2026-11-09", "metric": "long_sentence_share", "field": "added", "from": null, "to": "long_sentence_share", "reason": "added_toward_ideal", "issue": 949},
+    {"date": "2026-11-09", "metric": "lag_drill", "field": "added", "from": null, "to": "lag_drill", "reason": "added_toward_ideal", "issue": 949},
+    {"date": "2026-11-09", "metric": "reading_minutes_p90", "field": "added", "from": null, "to": "reading_minutes_p90", "reason": "added_toward_ideal", "issue": 949},
+    {"date": "2026-11-09", "metric": "doc_lag_hours_p90", "field": "added", "from": null, "to": "doc_lag_hours_p90", "reason": "added_toward_ideal", "issue": 949}
+  ]
+}

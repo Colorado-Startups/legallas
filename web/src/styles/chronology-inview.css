@@ -1,0 +1,52 @@
+/*
+  The Chronology's "In view" table (chronology-inview.ts; card Q3, R59): the events in the zoomed window, under the
+  chart. Composes c-table; page classes are chron-inview-*. Tokens only.
+*/
+.chron-inview {
+  margin-top: var(--space-5);
+}
+
+.chron-inview__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: baseline;
+  margin: 0 0 var(--space-2);
+}
+
+.chron-inview__title {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.chron-inview__range {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: var(--text-13);
+}
+
+.chron-inview__pick {
+  min-height: var(--target-min);
+  padding: 0;
+  background: none;
+  color: var(--forest);
+  font: inherit;
+  text-align: left;
+  border: 0;
+  cursor: pointer;
+}
+
+.chron-inview__pick:hover {
+  color: var(--forest-hover);
+  text-decoration: underline;
+}
+
+.chron-inview__cites > * + * {
+  margin-left: var(--space-1);
+}
+
+@media print {
+  .chron-inview {
+    display: none;
+  }
+}

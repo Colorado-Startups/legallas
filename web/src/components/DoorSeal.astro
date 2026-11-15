@@ -1,0 +1,12 @@
+---
+// The room's mark for the front door: the brand pack's (src/scripts/brand.ts), else the neutral one. The Worker's 403
+// page draws the same mark (worker/extensions.ts); door.css colors and animates it.
+import { markSvg } from '../scripts/brand.ts';
+
+interface Props {
+  animated?: boolean;
+}
+const { animated = false } = Astro.props;
+---
+
+<Fragment set:html={markSvg(animated)} />

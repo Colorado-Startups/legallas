@@ -1,0 +1,26 @@
+/* The Overview of a room with no matter (components/CompanyHome.astro). Tokens only. */
+
+.company-home .t-h2 {
+  margin-top: var(--space-5);
+}
+
+.company-home__line {
+  margin: var(--space-2) 0 var(--space-5);
+  color: var(--ink-2);
+}
+
+.company-folders {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  gap: var(--space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.company-folder {
+  display: block;
+  padding: var(--space-4);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}

@@ -1,0 +1,257 @@
+/*
+  The Overview's campaign map (overview-map.ts): one objective card per track in the case header. The card itself
+  is c-objective, its marks c-mark and its meter c-meter (components.css); this file lays them out and draws the
+  small pictures. Tokens only; sizes arrive as custom properties set from script (CSP).
+*/
+
+.ov-map {
+  margin-top: var(--space-6);
+}
+
+.ov-map__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ov-map__item {
+  display: flex;
+  min-width: 0;
+}
+
+.ov-map__none {
+  margin: 0;
+  color: var(--ink-2);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+}
+
+/* The whole card opens its track page: the title's link stretches over it. Equal heights in a row. */
+.ov-objective {
+  position: relative;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+
+.ov-objective:has(.ov-objective__link:hover) {
+  border-color: var(--forest);
+}
+
+
+.ov-objective__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ov-objective__link::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+}
+
+.ov-objective__link:hover {
+  color: var(--forest-hover);
+  text-decoration: underline;
+}
+
+/* The structure picture holds the thumbnail's drawn height (head, legend and 20rem of drawing), so the tree arriving moves nothing. */
+.ov-mini[data-picture='structure'] {
+  min-height: 28rem;
+}
+
+/* Cite chips, other links and the structure tree's controls stay above the stretched link. */
+.ov-objective a:not(.ov-objective__link),
+.ov-mini[data-picture='structure'] {
+  position: relative;
+  z-index: 1;
+}
+
+/* Against: party chips, as the record names them. */
+/* The chips take the meta row's first line; the meter wraps under them. */
+.ov-against {
+  flex: 1 0 100%;
+  min-width: 0;
+}
+
+.ov-against__label {
+  margin: 0 0 var(--space-1);
+  color: var(--ink-3);
+  font-size: var(--text-12);
+}
+
+.ov-against__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ov-party {
+  gap: var(--space-1);
+  max-width: 100%;
+}
+
+.ov-meter {
+  margin: 0;
+}
+
+/* The small picture closes the card, across both of its columns. */
+.ov-mini {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding-top: var(--space-3);
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.ov-mini__label {
+  margin: 0 0 var(--space-2);
+  color: var(--ink-3);
+}
+
+.ov-mini__none {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+
+/* The structure tree as a thumbnail: the whole drawing scaled to one height, centred. */
+.ov-mini[data-picture='structure'] .viz-svg {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 20rem;
+  margin-inline: auto;
+}
+
+/* Figures against their limits: each figure on its own scale, the limit a rule. */
+.ov-caps {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.ov-caps__label {
+  color: var(--ink-2);
+  font-size: var(--text-12);
+}
+
+.ov-caps__value {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-13);
+}
+
+.ov-cap {
+  position: relative;
+  display: block;
+  height: 0.75rem;
+  background: var(--panel);
+  border-radius: var(--radius-chip);
+}
+
+.ov-cap__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--ov-fill, 0%);
+  background: var(--enc-company);
+  border-radius: var(--radius-chip);
+}
+
+.ov-cap__limit {
+  position: absolute;
+  inset: calc(-1 * var(--space-1)) auto calc(-1 * var(--space-1)) var(--ov-limit, 100%);
+  width: 2px;
+  margin-left: -1px;
+  background: var(--ink);
+}
+
+/* A step that put one org under another: from, arrow, to. */
+.ov-moves__step {
+  margin: 0 0 var(--space-2);
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+
+.ov-moves__date {
+  color: var(--ink);
+  font-size: var(--text-12);
+}
+
+.ov-moves__list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ov-move {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: flex-start;
+}
+
+.ov-move__how {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding-left: var(--space-2);
+  color: var(--ink-2);
+  font-size: var(--text-12);
+}
+
+.ov-move__arrow {
+  flex: none;
+  width: 16px;
+  height: 20px;
+}
+
+/* The entities a violation touches, as hex tiles. */
+.ov-entities {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-13);
+}
+
+.ov-entities__item {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  min-width: 0;
+}
+
+.ov-entities__more {
+  color: var(--ink-3);
+  font-size: var(--text-12);
+}
+
+@media (forced-colors: active) {
+  .ov-cap {
+    border: var(--hairline) solid CanvasText;
+  }
+
+  .ov-cap__fill,
+  .ov-cap__limit {
+    background: CanvasText;
+  }
+}
+
+@media print {
+  .ov-objective__link::after {
+    content: none;
+  }
+}

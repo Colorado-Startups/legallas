@@ -1,0 +1,86 @@
+# The Data room page's lab numbers: brings the fictional room up on GitHub-hosted
+# Linux from the committed extract cache, drives it, and uploads report.json, a frame
+# per journey and the server logs as one artifact
+# (quality-speed/pages/data-room/lab/README.md). Half an hour for every journey, on Linux
+# minutes, so pass only what you need to look at.
+#
+# By hand, to look at a change. The Data room page's nightly lanes call run.ts themselves.
+#
+#   gh workflow run sample-room-lab.yml -R Colorado-Startups/legallas --ref <branch> -f only=doc-open
+#
+# Fixture data only, and no secrets: every wrangler call is --local, the settings are
+# the committed examples, the room's search is its keyword index and its model a canned
+# answer, and the run fails on any request that leaves localhost.
+name: Sample room lab
+
+on:
+  workflow_dispatch:
+    inputs:
+      samples:
+        description: Samples per journey
+        type: number
+        default: 20
+      record:
+        description: Room type of the invented record, or empty for the dev fixture
+        type: string
+        default: ""
+      only:
+        description: Just these journeys, comma-separated, or empty for all of them
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sample-room-lab-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Tools that read their config from HOME (wrangler, npm) start without
+      # anyone's logins.
+      - name: Private HOME
+        run: |
+          mkdir -p "$RUNNER_TEMP/home"
+          echo "HOME=$RUNNER_TEMP/home" >> "$GITHUB_ENV"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Toolchain
+        run: |
+          uname -a
+          node --version
+          google-chrome --version
+      # No install scripts, as in ci.yml's checks: the only ones in the lockfile
+      # place or check a binary their platform package already ships.
+      - name: Web install
+        working-directory: web
+        run: npm ci --ignore-scripts
+      - name: Lab tests
+        run: node --test quality-speed/pages/data-room/lab/lab.test.ts
+      - name: Run the lab
+        env:
+          SAMPLES: ${{ inputs.samples }}
+          RECORD: ${{ inputs.record }}
+          ONLY: ${{ inputs.only }}
+        run: |
+          args=(--out "$RUNNER_TEMP/lab" --room "$RUNNER_TEMP/lab-room" --samples "$SAMPLES")
+          if [ -n "$RECORD" ]; then args+=(--record "$RECORD"); fi
+          if [ -n "$ONLY" ]; then args+=(--only "$ONLY"); fi
+          node quality-speed/pages/data-room/lab/run.ts "${args[@]}"
+      # always(): a run that hits the job's timeout counts as cancelled, and its report and logs are what show why.
+      - name: Upload
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: sample-room-lab-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/lab/
+          if-no-files-found: warn
+          retention-days: 90

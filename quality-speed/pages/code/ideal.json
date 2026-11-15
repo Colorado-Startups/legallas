@@ -1,0 +1,11 @@
+{
+  "ideal": "Every file and folder as small and plain as the job allows: green checks, short units, no escapes, no dead or copied code, true docs.",
+  "sources": [
+    { "title": "Cloudflare Workers limits", "url": "https://developers.cloudflare.com/workers/platform/limits/", "date": "2026-10-29" },
+    { "title": "Alex Russell: The Performance Inequality Gap, 2026", "url": "https://infrequently.org/2025/11/performance-inequality-gap-2026/", "date": "2025-11-28" },
+    { "title": "Martin Fowler: Continuous Integration", "url": "https://martinfowler.com/articles/continuousIntegration.html", "date": "2024-01-18" }
+  ],
+  "quality": "No function past 60 lines or file past 400, no type escape, nothing unused or copied, docs commented, short and never drifting.",
+  "speed": "The web loop answers in about a minute, the Mac jobs in two, and any answer reads in a minute.",
+  "consumption": "Few tokens to read each file, and the lane inside five minutes."
+}

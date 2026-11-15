@@ -1,0 +1,50 @@
+excluded:
+  - .build
+  - .swiftpm
+  - DerivedData
+  - web
+  # Claude Code worktrees (.claude/worktrees/*) are full checkouts with their own .build.
+  - .claude
+
+# Allow short identifier names; the codebase uses dc, fm, f, e, etc. idiomatically.
+identifier_name:
+  min_length:
+    warning: 1
+    error: 1
+  max_length:
+    warning: 60
+    error: 80
+
+# Relax line length; test assertion chains legitimately run long.
+line_length:
+  warning: 300
+  error: 400
+  ignores_comments: true
+  ignores_urls: true
+
+# Relax function length; CaseExporter and ProposalApplier are legitimately large.
+function_body_length:
+  warning: 150
+  error: 250
+
+# Relax type body length; large test suites and model definitions are common.
+type_body_length:
+  warning: 550
+  error: 700
+
+# Relax file length; test files consolidate related tests by design.
+file_length:
+  warning: 700
+  error: 1000
+
+# Relax parameter count; SettlementScorer.score() needs many domain inputs.
+function_parameter_count:
+  warning: 9
+  error: 12
+
+# Disable rules that conflict with idiomatic patterns in this codebase.
+disabled_rules:
+  - force_cast                    # used in JSON test assertions
+  - optional_data_string_conversion  # codebase uses String(data:encoding:) idiomatically
+  - comma                         # aligned static constants use extra spaces intentionally
+  - cyclomatic_complexity         # ProposalApplier switch is legitimately large

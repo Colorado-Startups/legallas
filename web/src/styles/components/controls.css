@@ -1,0 +1,241 @@
+/*
+  Controls and inline marks: button, kbd, input, chip, cite chip, entity shapes (DESIGN.md sections 3 and 7;
+  card F1). State lives in ARIA and data attributes, never in classes.
+*/
+
+/* Button: 32px tall. Default is neutral; --primary is the forest fill; --quiet has no border. */
+.c-button {
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+  min-width: var(--target-min);
+  height: 2rem;
+  padding: 0 var(--space-3);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-14);
+  font-weight: 500;
+  line-height: 1.25rem;
+  text-decoration: none;
+  white-space: nowrap;
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.c-button:hover {
+  background: var(--forest-tint);
+  color: var(--forest-hover);
+  text-decoration: none;
+}
+
+.c-button--primary {
+  background: var(--forest);
+  color: var(--on-forest);
+  font-weight: 600;
+  border-color: var(--forest);
+}
+
+.c-button--primary:hover {
+  background: var(--forest-hover);
+  color: var(--on-forest);
+  border-color: var(--forest-hover);
+}
+
+.c-button--quiet {
+  background: transparent;
+  color: var(--forest);
+  border-color: transparent;
+}
+
+.c-button[aria-pressed='true'] {
+  background: var(--forest-tint);
+  color: var(--forest);
+  border-color: var(--forest);
+}
+
+.c-button:disabled,
+.c-button[aria-disabled='true'] {
+  background: transparent;
+  color: var(--ink-3);
+  border-color: var(--rule);
+  cursor: not-allowed;
+}
+
+/* A quiet button stays borderless when disabled; only its text dims. */
+.c-button--quiet:disabled,
+.c-button--quiet[aria-disabled='true'] {
+  border-color: transparent;
+}
+
+/* Keyboard hint, e.g. the Ask button's Ctrl K. Follows the text color of what holds it. */
+.c-kbd {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-1);
+  color: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1rem;
+  border: var(--hairline) solid currentColor;
+  border-radius: var(--radius-chip);
+  opacity: 0.8;
+}
+
+/* Text input: the drawer's question box, filters. */
+.c-input {
+  width: 100%;
+  min-height: 2.25rem;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+}
+
+.c-input::placeholder {
+  color: var(--ink-3);
+}
+
+.c-input[aria-invalid='true'] {
+  border-color: var(--oxblood);
+}
+
+/* Chip: a label, not a button. Neutral, privileged, Key, from counsel. */
+.c-chip {
+  --shape-size: 12px;
+
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-1);
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--space-2);
+  color: var(--ink-2);
+  font-family: var(--font-sans);
+  font-size: var(--text-13);
+  line-height: 1;
+  white-space: nowrap;
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius-chip);
+}
+
+.c-chip--privileged {
+  background: var(--oxblood-tint);
+  color: var(--oxblood);
+  border-color: var(--oxblood);
+}
+
+.c-chip--key {
+  color: var(--brass-text);
+  border-color: var(--brass-mark);
+}
+
+.c-chip--counsel {
+  color: var(--forest);
+  border-color: var(--forest);
+}
+
+/* The Key chip's target badge (or any chip icon): 12px, single ink. */
+.c-chip__icon {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  color: var(--brass-mark);
+}
+
+/* Cite chip: "DOE-000412 at 3". Opens the exhibit pane; aria-expanded while its pane is open. */
+.c-cite {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+  padding: 0 var(--space-2);
+  background: var(--forest-tint);
+  color: var(--forest);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  font-weight: 500;
+  line-height: 1rem;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border: var(--hairline) solid transparent;
+  border-radius: var(--radius-chip);
+}
+
+.c-cite:hover {
+  color: var(--forest-hover);
+  border-color: var(--forest);
+  text-decoration: none;
+}
+
+.c-cite[aria-expanded='true'] {
+  background: var(--forest);
+  color: var(--on-forest);
+  border-color: var(--forest);
+}
+
+.c-cite--dead,
+.c-cite--dead:hover {
+  background: transparent;
+  color: var(--ink-3);
+  text-decoration: line-through;
+  border-color: var(--rule);
+  cursor: default;
+}
+
+/* Entity shapes (section 3): color comes from data-side, size from --shape-size on the holder. */
+.c-shape {
+  flex: none;
+  width: var(--shape-size, 16px);
+  height: var(--shape-size, 16px);
+  overflow: visible;
+  fill: var(--enc-court);
+  vertical-align: middle;
+}
+
+.c-shape[data-side='client'] {
+  fill: var(--enc-client);
+}
+
+.c-shape[data-side='defendant'] {
+  fill: var(--enc-defendant);
+}
+
+.c-shape[data-side='nominal'],
+.c-shape[data-side='company'] {
+  fill: var(--enc-company);
+}
+
+.c-shape[data-side='court'] {
+  fill: var(--enc-court);
+}
+
+.c-shape[data-side='third'] {
+  fill: var(--enc-third);
+}
+
+.c-shape[data-side='filing'] {
+  fill: none;
+  stroke: var(--enc-filing);
+  stroke-width: 1.5;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .c-button,
+  .c-cite,
+  .c-nav__item {
+    transition:
+      background-color var(--dur-1) var(--ease),
+      color var(--dur-1) var(--ease),
+      border-color var(--dur-1) var(--ease);
+  }
+}

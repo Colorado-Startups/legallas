@@ -1,0 +1,17 @@
+{
+  "page": "build",
+  "signoff_comment": 6644072268,
+  "metrics": [
+    { "id": "main_commits_building", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 1, "max_age_hours": 48, "min_samples": 10, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" },
+    { "id": "release_reproducible", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 2, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://reproducible-builds.org/docs/definition/" },
+    { "id": "release_gaps", "lens": "quality", "unit": "count", "direction": "lower", "floor": 5, "goal": 0, "weight": 3, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/build/PLAN.md#goals" },
+    { "id": "web_build_seconds_p50", "lens": "speed", "unit": "seconds", "direction": "lower", "floor": 600, "goal": 60, "weight": 1, "max_age_hours": 48, "min_samples": 5, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" },
+    { "id": "mac_build_seconds_p50", "lens": "speed", "unit": "seconds", "direction": "lower", "floor": 600, "goal": 60, "weight": 1, "max_age_hours": 48, "min_samples": 3, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" },
+    { "id": "lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 10, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" },
+    { "id": "release_gzip_bytes", "lens": "consumption", "unit": "bytes", "direction": "lower", "floor": 9600000, "goal": 4800000, "weight": 3, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/build/PLAN.md#goals" }
+  ],
+  "changes": [
+    {"date": "2026-11-05", "metric": "lane_minutes", "field": "added", "from": null, "to": "lane_minutes", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6646870363},
+    {"date": "2026-11-05", "metric": "release_gzip_bytes", "field": "added", "from": null, "to": "release_gzip_bytes", "reason": "added_toward_ideal", "issue": 645}
+  ]
+}

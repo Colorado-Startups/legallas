@@ -1,0 +1,52 @@
+// Build settings for the Legallas app target (LegallasApp/Legallas.xcodeproj).
+//
+// The project file carries no target settings on purpose: change them here,
+// where a diff is readable, instead of in project.pbxproj (Do Not Touch).
+
+PRODUCT_NAME = Legallas
+PRODUCT_BUNDLE_IDENTIFIER = org.coloradostartups.Legallas
+// Info.plist's NSHumanReadableCopyright, and the file name of the helper in Contents/Helpers.
+APP_DESCRIPTION = Case management for a company and its counsel
+MCP_HELPER_NAME = LegallasMCP
+INFOPLIST_FILE = Legallas/Info.plist
+GENERATE_INFOPLIST_FILE = NO
+CODE_SIGN_ENTITLEMENTS = Legallas/Legallas.entitlements
+
+// The Icon Composer file Legallas/AppIcon.icon (layered Liquid Glass icon).
+// actool compiles it into Assets.car and AppIcon.icns and adds
+// CFBundleIconName and CFBundleIconFile to the built Info.plist.
+ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon
+
+// Mac only for now. The iPhone destination adds iphoneos and iphonesimulator
+// here, with SDKROOT = auto and IPHONEOS_DEPLOYMENT_TARGET.
+SDKROOT = macosx
+SUPPORTED_PLATFORMS = macosx
+MACOSX_DEPLOYMENT_TARGET = 26.0
+// Apple silicon only, like the LegallasMCP helper swift build makes for the host.
+ARCHS = arm64
+
+SWIFT_VERSION = 6.0
+SWIFT_STRICT_CONCURRENCY = complete
+ENABLE_PREVIEWS = YES
+COMBINE_HIDPI_IMAGES = YES
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks
+
+ENABLE_HARDENED_RUNTIME = YES
+
+// The "Embed LegallasMCP" phase runs swift build against the package at the
+// repository root, which a sandboxed build script cannot read.
+ENABLE_USER_SCRIPT_SANDBOXING = NO
+
+// Sign to Run Locally (ad hoc) unless Signing.xcconfig names a team. CI always
+// builds this way. Installed copies need a stable identity: an ad hoc signature
+// changes on every build, and macOS then asks before letting the new build
+// open the old build's sandbox container.
+CODE_SIGN_STYLE = Automatic
+CODE_SIGN_IDENTITY = -
+DEVELOPMENT_TEAM =
+
+// Gitignored; a room's own app name and identity. See Room.xcconfig.example.
+#include? "Room.xcconfig"
+
+// Gitignored; copy Signing.xcconfig.example and fill in your team ID.
+#include? "Signing.xcconfig"

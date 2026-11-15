@@ -1,0 +1,31 @@
+# Area labels from changed paths (actions/labeler v7 format).
+area:web:
+  - changed-files:
+      - any-glob-to-any-file: ['web/**']
+area:apple:
+  - changed-files:
+      - any-glob-to-any-file: ['LegallasApp/**', 'Tests/LegallasAppTests/**', 'Tests/LegallasUITests/**']
+area:mcp:
+  - changed-files:
+      - any-glob-to-any-file: ['Sources/LegallasMCP/**', 'Tests/LegallasMCPTests/**', 'Tests/LegallasFunctionalTests/**', 'Tests/LegallasE2ETests/**']
+area:kit:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'Package.swift'
+          - 'Package.resolved'
+          - 'Sources/LegallasCore/**'
+          - 'Sources/LegallasExtraction/**'
+          - 'Sources/LegallasExtract/**'
+          - 'Tests/LegallasCoreTests/**'
+          - 'Tests/LegallasExtractionTests/**'
+          - 'Tests/LegallasUnitTests/**'
+          - 'Tests/LegallasIntegrationTests/**'
+area:quality-speed:
+  - changed-files:
+      - any-glob-to-any-file: ['quality-speed/**']
+area:infra:
+  - changed-files:
+      - any-glob-to-any-file: ['.github/**', '.claude/**', '.swiftlint.yml', '.gitignore', '.gitattributes', '.editorconfig']
+documentation:
+  - changed-files:
+      - any-glob-to-any-file: ['**/*.md']

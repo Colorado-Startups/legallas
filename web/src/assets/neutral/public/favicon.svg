@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <!-- The neutral mark (worker/mark.ts) on a forest badge. Public: the room's and the front door's icon. -->
+  <rect width="48" height="48" rx="10" fill="#1f3a2e"/>
+  <rect x="10" y="10" width="28" height="28" rx="5" fill="none" stroke="#c9ae74" stroke-width="2.4"/>
+  <path d="M18.5 38V24.5a5.5 5.5 0 0 1 11 0V38" fill="none" stroke="#faf7f0" stroke-width="2.4"/>
+  <circle cx="26.5" cy="31" r="1.8" fill="#faf7f0"/>
+</svg>

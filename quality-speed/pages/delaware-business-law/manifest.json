@@ -1,0 +1,17 @@
+{
+  "page": "delaware-business-law",
+  "signoff_comment": 6649583614,
+  "metrics": [
+    {"id": "coverage", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 3, "max_age_hours": 48, "min_samples": 40, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/delaware-business-law/PLAN.md#goals"},
+    {"id": "flags", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 2, "max_age_hours": 48, "min_samples": 12, "goal_source": "https://delcode.delaware.gov/title8/c001/sc07/index.html"},
+    {"id": "verified", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 1, "max_age_hours": 48, "min_samples": 8, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/delaware-business-law/PLAN.md#goals"},
+    {"id": "fresh", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 1, "max_age_hours": 48, "min_samples": 35, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/delaware-business-law/PLAN.md#goals"},
+    {"id": "rights", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 1, "max_age_hours": 48, "min_samples": 8, "goal_source": "https://delcode.delaware.gov/title8/title8.pdf"},
+    {"id": "change_lag", "lens": "speed", "unit": "days", "direction": "lower", "floor": 30, "goal": 0, "weight": 1, "max_age_hours": 48, "min_samples": 2, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/delaware-business-law/PLAN.md#goals"},
+    {"id": "lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 10, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"},
+    {"id": "law_lookup_tokens_p95", "lens": "consumption", "unit": "tokens", "direction": "lower", "floor": 10000, "goal": 2250, "weight": 3, "max_age_hours": 48, "min_samples": 10, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/web/mcp/contract.ts"}
+  ],
+  "changes": [
+    {"date": "2026-11-05", "metric": "law_lookup_tokens_p95", "field": "added", "from": null, "to": "law_lookup_tokens_p95", "reason": "added_toward_ideal", "issue": 645}
+  ]
+}

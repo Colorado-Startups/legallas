@@ -1,0 +1,2 @@
+# A run's drill-down rows, read by page.ts when present. Written by the collector, never committed.
+detail.json

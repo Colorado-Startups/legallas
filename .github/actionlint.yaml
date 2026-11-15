@@ -1,0 +1,17 @@
+# Runner labels actionlint does not know (ci.yml's header says why): `xcode-27`,
+# GitHub's hosted macOS 27 image with Xcode 27, still a preview that
+# actionlint's list lacks; the swift and office-mac jobs run on it. Drop it here
+# once actionlint knows it (or GitHub renames it at GA).
+#
+# No self-hosted labels: a workflow that names one fails the lint.
+self-hosted-runner:
+  labels:
+    - xcode-27
+
+# A real scope, proven on a run on 2026-11-02, that actionlint's list lacks
+# (docs: controlling permissions for GITHUB_TOKEN). The one workflow that uses it
+# is named, and only this message. Drop it here once actionlint knows it.
+paths:
+  .github/workflows/quality-speed.yml:
+    ignore:
+      - 'unknown permission scope "vulnerability-alerts"'

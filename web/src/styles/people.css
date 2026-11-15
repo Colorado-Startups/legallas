@@ -1,0 +1,486 @@
+/*
+  Card P3 (People). Page-scoped classes for /people/ (Entities & People): the head with search and the Structure /
+  Graph / Table / By date toggle, the By date card and its violation chips, side filter chips, the structure, graph and table area, and the profile drawer (a side
+  column from 64rem, a bottom sheet below) led by its unit card. Composes the c-* blocks from components.css;
+  every color is a token.
+*/
+
+.people-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.people-head__title {
+  margin: 0;
+}
+
+.people-head__summary {
+  margin: var(--space-1) 0 0;
+  color: var(--ink-2);
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+}
+
+.people-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.people-find {
+  width: 15rem;
+  max-width: 100%;
+}
+
+.people-views {
+  display: inline-flex;
+  gap: var(--space-1);
+}
+
+.people-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
+.people-sides {
+  --shape-size: 12px;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* A side switched off keeps its shape and words, crossed out, so the state never rests on color. */
+.people-side[aria-pressed='false'] > span {
+  color: var(--ink-3);
+  text-decoration: line-through;
+}
+
+.people-side[aria-pressed='false'] > .c-shape {
+  opacity: 0.35;
+}
+
+.people-legend,
+.people-count {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+}
+
+.people-count:empty {
+  display: none;
+}
+
+.people-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.people[data-profile-open] .people-body {
+  grid-template-columns: minmax(0, 1fr) 23rem;
+}
+
+.people-main {
+  min-width: 0;
+}
+
+.people-graph,
+.people-structure {
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+/* The structure tree (viz/tree.ts) sits on the card, so its label halos take the card's ground. */
+.people-structure {
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+
+.people-structure .viz {
+  --chart-ground: var(--surface);
+}
+
+/* Side chips and the graph legend filter the graph and table; the structure and By date show every entity. */
+.people[data-view='structure'] .people-filters,
+.people[data-view='dates'] .people-filters {
+  display: none;
+}
+
+/* By date (viz/story.ts) on the same card as the structure, led by its violation chips (All, A, B, C). */
+.people-dates {
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.people-dates .viz {
+  --chart-ground: var(--surface);
+}
+
+.people-vchips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.people-vchip {
+  --shape-size: 12px;
+
+  gap: var(--space-2);
+  min-width: 0;
+  max-width: 18rem;
+  height: 2rem;
+  padding: 0 var(--space-3);
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  font-weight: 400;
+  border-radius: var(--radius-chip);
+}
+
+.people-vchip[aria-pressed='true'] {
+  background: var(--forest-tint);
+  color: var(--forest);
+  border-color: var(--forest);
+}
+
+.people-vchip:has(> .c-mark) {
+  padding-left: var(--space-1);
+}
+
+.people-vchip__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The unit card (c-dossier): an entity's head is the structure's hex tile; the defendant side reads in oxblood. */
+.people-unit {
+  margin: var(--space-3) 0 0;
+}
+
+.people-unit__hex {
+  --shape-size: 12px;
+
+  flex: none;
+  overflow: visible;
+}
+
+.people-unit__hex > path {
+  fill: var(--surface);
+  stroke: var(--border);
+  stroke-width: 1.25;
+}
+
+.people-unit__side[data-side='defendant'] {
+  color: var(--oxblood);
+}
+
+/* The drawer is 23rem wide: the three counts share one row rather than wrapping two and one. */
+.people-unit .c-dossier__counts {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* "Named in": the violations, each led by its letter mark, then the prior case's counts. */
+.people-named {
+  flex: 1 1 100%;
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.people-named__link {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  min-height: var(--target-min);
+  color: var(--forest);
+}
+
+.people-named__item--prior {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: baseline;
+  color: var(--ink-2);
+}
+
+.people-table th[scope='row'] {
+  background: transparent;
+  font-weight: 400;
+  text-align: left;
+}
+
+/* A party's name as a button: its side mark, then the name. Selects that party. */
+.people-link {
+  --shape-size: 12px;
+
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  min-height: var(--target-min);
+  padding: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  border: 0;
+  cursor: pointer;
+}
+
+.people-link:hover > span {
+  color: var(--forest-hover);
+  text-decoration: underline;
+}
+
+/* Profile drawer */
+.people-profile {
+  position: sticky;
+  top: var(--space-4);
+  max-height: calc(100vh - var(--space-6));
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  overflow: auto;
+  background: var(--surface);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+}
+
+.people-profile__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.people-profile__label {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.people-profile__close {
+  font-size: var(--text-18);
+}
+
+.people-profile__name {
+  --shape-size: 20px;
+
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  margin: var(--space-3) 0 0;
+}
+
+.people-profile__title {
+  margin: var(--space-1) 0 0;
+  color: var(--ink-2);
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+}
+
+.people-profile__chips {
+  --shape-size: 12px;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+}
+
+.people-profile__facts {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: var(--space-2) var(--space-3);
+  margin: var(--space-4) 0 0;
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+}
+
+.people-profile__facts dt {
+  color: var(--ink-2);
+}
+
+.people-profile__facts dd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+  margin: 0;
+}
+
+.people-profile__section {
+  position: relative;
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.people-profile__more {
+  position: absolute;
+  top: var(--space-4);
+  right: 0;
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+}
+
+.people-profile__list {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+}
+
+.people-tie {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.people-tie__line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-2);
+  align-items: center;
+}
+
+.people-tie__label {
+  color: var(--ink-2);
+}
+
+.people-row {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  gap: var(--space-3);
+}
+
+.people-row__date {
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.people-row__body {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.people-row__note {
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+}
+
+.people-cites {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.people-profile__ask {
+  width: 100%;
+  margin-top: var(--space-5);
+}
+
+.people-status:empty {
+  display: none;
+}
+
+.people-status {
+  color: var(--ink-2);
+}
+
+/* Below 64rem the profile is a bottom sheet over the graph. */
+@media (max-width: 64rem) {
+  .people[data-profile-open] .people-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .people-profile {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: var(--z-drawer);
+    max-height: 60vh;
+    padding: var(--space-4);
+    border-width: var(--hairline) 0 0;
+    border-radius: var(--radius) var(--radius) 0 0;
+    box-shadow: var(--shadow-overlay);
+  }
+}
+
+@media (max-width: 48rem) {
+  .people-tools,
+  .people-find {
+    width: 100%;
+  }
+
+  /* The search takes its own line, so the three view buttons sit together under it. */
+  .people-find {
+    flex: 1 1 100%;
+  }
+
+  .people-legend {
+    display: none;
+  }
+
+  .people-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}
+
+@media print {
+  .people-tools,
+  .people-filters,
+  .people-profile__close,
+  .people-profile__ask {
+    display: none;
+  }
+
+  .people-profile {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    box-shadow: none;
+  }
+}
+
+/* The chart frame's own title and table toggle: the page has its own Graph / Table toggle and table. */
+.people-graph .viz__head {
+  display: none;
+}
+
+/*
+  The exhibit pane (card F7). Split view (wider than 64rem): the page keeps the left half, so the profile that
+  holds the cite stays beside the exhibit and the graph steps aside until the pane closes. Sheet (64rem and
+  below): the pane covers the page, so the profile sheet sits under it.
+*/
+@media screen and (width > 64rem) {
+  :root[data-exhibit='split'] .people[data-profile-open] .people-main {
+    display: none;
+  }
+
+  :root[data-exhibit='split'] .people[data-profile-open] .people-body {
+    grid-template-columns: minmax(0, 36rem);
+  }
+}
+
+@media (max-width: 64rem) {
+  :root[data-exhibit='sheet'] .people-profile {
+    z-index: calc(var(--z-pane) - 1);
+  }
+}

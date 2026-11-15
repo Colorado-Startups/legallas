@@ -1,0 +1,95 @@
+{
+  "page": "settings",
+  "signoff_comment": 6642745059,
+  "metrics": [
+    {
+      "id": "settings_drift_count",
+      "lens": "quality",
+      "unit": "count",
+      "direction": "lower",
+      "floor": 10,
+      "goal": 0,
+      "weight": 3,
+      "max_age_hours": 48,
+      "min_samples": 74,
+      "goal_source": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets"
+    },
+    {
+      "id": "gates_intact",
+      "lens": "quality",
+      "unit": "pass",
+      "direction": "higher",
+      "floor": 0,
+      "goal": 1,
+      "weight": 2,
+      "max_age_hours": 48,
+      "min_samples": 1,
+      "goal_source": "https://docs.github.com/en/actions/reference/security/secure-use"
+    },
+    {
+      "id": "stop_budgets_ok",
+      "lens": "quality",
+      "unit": "pass",
+      "direction": "higher",
+      "floor": 0,
+      "goal": 1,
+      "weight": 2,
+      "max_age_hours": 48,
+      "min_samples": 1,
+      "goal_source": "https://docs.github.com/en/billing/how-tos/set-up-budgets"
+    },
+    {
+      "id": "planted_drift_detected",
+      "lens": "quality",
+      "unit": "pass",
+      "direction": "higher",
+      "floor": 0,
+      "goal": 1,
+      "weight": 1,
+      "max_age_hours": 48,
+      "min_samples": 1,
+      "goal_source": "https://docs.github.com/en/actions/reference/security/secure-use"
+    },
+    {
+      "id": "drift_fix_hours",
+      "lens": "speed",
+      "unit": "hours",
+      "direction": "lower",
+      "floor": 336,
+      "goal": 48,
+      "weight": 2,
+      "max_age_hours": 48,
+      "min_samples": 1,
+      "coverage_metric": "planted_drift_detected",
+      "goal_source": "https://docs.github.com/en/actions/reference/security/secure-use"
+    },
+    {
+      "id": "read_gap_hours",
+      "lens": "speed",
+      "unit": "hours",
+      "direction": "lower",
+      "floor": 168,
+      "goal": 26,
+      "weight": 1,
+      "max_age_hours": 48,
+      "min_samples": 7,
+      "goal_source": "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows"
+    },
+    {
+      "id": "lane_minutes",
+      "lens": "consumption",
+      "unit": "minutes",
+      "direction": "lower",
+      "floor": 30,
+      "goal": 5,
+      "weight": 1,
+      "max_age_hours": 48,
+      "min_samples": 1,
+      "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"
+    }
+  ],
+  "changes": [
+    {"date": "2026-11-05", "metric": "lane_minutes", "field": "added", "from": null, "to": "lane_minutes", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6648067671},
+    {"date": "2026-11-05", "metric": "gates_intact", "field": "critical", "from": true, "to": false, "reason": "wrong_basis", "issue": 645}
+  ]
+}

@@ -1,0 +1,4 @@
+[
+  { "id": "mac", "runner": "macos", "cadence": "weekly", "collector": "collect.ts" },
+  { "id": "windows", "runner": "windows", "cadence": "weekly", "collector": "collect.ts", "install": true }
+]

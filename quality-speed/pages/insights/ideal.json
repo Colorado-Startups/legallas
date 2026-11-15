@@ -1,0 +1,23 @@
+{
+  "ideal": "Every change into main is counted daily; few need repair, those are repaired within an hour, and work merges within a day.",
+  "sources": [
+    {
+      "title": "GitHub Docs: About protected branches",
+      "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches",
+      "date": "2026-11-03"
+    },
+    {
+      "title": "GitHub Docs: Linking a pull request to an issue",
+      "url": "https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue",
+      "date": "2026-03-18"
+    },
+    {
+      "title": "Google Cloud: Using the Four Keys to measure your DevOps performance",
+      "url": "https://cloud.google.com/blog/products/devops-sre/using-the-four-keys-to-measure-your-devops-performance",
+      "date": "2020-09-22"
+    }
+  ],
+  "quality": "At most one change in twenty needs repair or is rework, and nine in ten trace to an issue or a board card.",
+  "speed": "Changes land on most days, merge within a day of their first commit, and a failure is repaired within an hour.",
+  "consumption": "The daily read uses few API calls and one short job."
+}

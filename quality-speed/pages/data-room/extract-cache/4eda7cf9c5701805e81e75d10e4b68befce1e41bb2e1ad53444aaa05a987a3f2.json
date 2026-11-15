@@ -1,0 +1,16 @@
+{
+ "version": 3,
+ "sha256": "4eda7cf9c5701805e81e75d10e4b68befce1e41bb2e1ad53444aaa05a987a3f2",
+ "pages": [
+  {
+   "n": 1,
+   "ocr": false,
+   "text": "HARBOR LABS SAMPLE RECORD. Fictional: every name, date and number is invented.\nPage 1 of 2\nSeries Seed Preferred Stock: summary of terms, signed May 9, 2011\nInvestor: Alder Peak Ventures, L.P. Amount: $1,482,637.50 for 395,370 shares.\nPrice per share: $3.75. Pre-money valuation: $5,662,856.25, fully diluted, counting\nthe option pool and the shares issued on note conversion.\nLiquidation preference: one times the purchase price, non-participating.\nConversion: one to one into common stock, at the holder's option.\nBoard: three seats. Jane Doe, Richard Roe and one director named by Alder Peak, who\nwill be Mark Moe."
+  },
+  {
+   "n": 2,
+   "ocr": false,
+   "text": "HARBOR LABS SAMPLE RECORD. Fictional: every name, date and number is invented.\nPage 2 of 2\nProtective provisions: the investor's consent is needed to change the charter, issue\nsenior stock or sell the company.\nPro rata rights: the investor may keep its percentage in later rounds.\nNo-shop: 30 days from signing.\nInvestor counsel fees: paid by the company, capped at $25,000.\nTarget closing: on or before June 30, 2011.\nExcept for the no-shop and confidentiality terms, this summary is not binding."
+  }
+ ]
+}

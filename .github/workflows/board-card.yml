@@ -1,0 +1,156 @@
+# Files one card on the org's Legallas Project board (Project 1): a draft item
+# with its Stage, Order and Codebase set. Features and improvements are cards,
+# never issues (CLAUDE.md, "Start here"), and a cloud session can't reach the
+# Projects API itself, so the board clerk starts this by hand
+# (workflow_dispatch) with the card's fields as inputs.
+#
+# The token is the org's GitHub App, "Legallas Automation" (`legallas-automation`, owner steps
+# S1 and S2), minted for this one job with only `organization_projects: write`.
+# The job's own GITHUB_TOKEN gets no scope at all. The key is in the
+# `board-card` environment, which allows `main` only, so a branch's copy of
+# this file can't reach it.
+#
+# A workflow gaining write scopes needed independent sign-off: #393 comment
+# 6648916031. The App and environment setup is recorded in #393 comment 6648846691.
+#
+# The inputs are data: they reach the script only through `env` and go to the
+# API as GraphQL variables, never into the query text or a shell command. The
+# Stage and Codebase must name an option the board already has, and the Order
+# must be a number. Everything is checked before the card is made, and a card
+# whose fields then fail to set is deleted, so a run leaves a whole card or none.
+name: Board card
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: Card title
+        required: true
+        type: string
+      body:
+        description: "Goal, customer, files and done when (Markdown)"
+        required: true
+        type: string
+      stage:
+        description: "Stage, as the board names it"
+        required: true
+        type: string
+      order:
+        description: "Order, a number"
+        required: true
+        type: string
+      codebase:
+        description: "Codebase, as the board names it"
+        required: true
+        type: string
+        default: legallas
+
+permissions: {}
+
+# One card at a time, and none cancelled halfway.
+concurrency:
+  group: board-card
+  cancel-in-progress: false
+
+jobs:
+  card:
+    if: github.ref == 'refs/heads/main'
+    # Holds the App's key, so GitHub-hosted (CLAUDE.md, "Tests run in the cloud").
+    runs-on: ubuntu-latest
+    environment: board-card
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: App token
+        id: app
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.CS_APP_CLIENT_ID }}
+          private-key: ${{ secrets.CS_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          permission-organization-projects: write
+      - name: File the card
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          OWNER: ${{ github.repository_owner }}
+          PROJECT_NUMBER: ${{ vars.PROJECT_NUMBER || '1' }}
+          TITLE: ${{ inputs.title }}
+          BODY: ${{ inputs.body }}
+          STAGE: ${{ inputs.stage }}
+          ORDER: ${{ inputs.order }}
+          CODEBASE: ${{ inputs.codebase }}
+        run: |
+          set -euo pipefail
+          # Escaped as workflow commands need, so a value with a line break can't start a command of its own.
+          fail() {
+            local message="${1//'%'/%25}"
+            message="${message//$'\r'/%0D}"
+            echo "::error title=Board card::${message//$'\n'/%0A}" >&2
+            exit 1
+          }
+
+          [[ -n "${TITLE//[[:space:]]/}" ]] || fail "the title is empty"
+          (( ${#TITLE} <= 256 )) || fail "the title is over 256 characters"
+          (( ${#BODY} <= 60000 )) || fail "the body is over 60,000 characters"
+          [[ "$ORDER" =~ ^-?[0-9]+(\.[0-9]+)?$ ]] || fail "the order must be a number"
+
+          # The board and its fields, by name.
+          # shellcheck disable=SC2016 # GraphQL's own $variables, single-quoted on purpose.
+          project="$(gh api graphql -F number="$PROJECT_NUMBER" -f owner="$OWNER" -f query='
+            query($owner: String!, $number: Int!) {
+              organization(login: $owner) {
+                projectV2(number: $number) {
+                  id
+                  fields(first: 100) {
+                    nodes {
+                      ... on ProjectV2FieldCommon { id name dataType }
+                      ... on ProjectV2SingleSelectField { options { id name } }
+                    }
+                  }
+                }
+              }
+            }')" || fail "project $PROJECT_NUMBER is not readable"
+          project_id="$(jq -er '.data.organization.projectV2.id' <<<"$project")" || fail "project $PROJECT_NUMBER is not readable"
+
+          # value_for <field> <value>: the field's id and the GraphQL value to set,
+          # as one JSON object. A single-select value must be one of its options.
+          value_for() {
+            local field
+            field="$(jq -ec --arg name "$1" '[.data.organization.projectV2.fields.nodes[] | select(.name == $name)] | if length == 1 then .[0] else empty end' <<<"$project")" ||
+              fail "the board has no single field named $1"
+            case "$(jq -r '.dataType' <<<"$field")" in
+              SINGLE_SELECT)
+                jq -ec --arg value "$2" '{id, value: {singleSelectOptionId: ([.options[] | select(.name == $value) | .id] | if length == 1 then .[0] else error("no option") end)}}' <<<"$field" 2>/dev/null ||
+                  fail "$1 has no option named $2; it has: $(jq -r '[.options[].name] | join(", ")' <<<"$field")" ;;
+              NUMBER) jq -ec --arg value "$2" '{id, value: {number: ($value | tonumber)}}' <<<"$field" 2>/dev/null || fail "$1 must be a number" ;;
+              TEXT) jq -ec --arg value "$2" '{id, value: {text: $value}}' <<<"$field" ;;
+              *) fail "$1 is a $(jq -r '.dataType' <<<"$field") field, which this workflow can't set" ;;
+            esac
+          }
+          stage="$(value_for Stage "$STAGE")"
+          order="$(value_for Order "$ORDER")"
+          codebase="$(value_for Codebase "$CODEBASE")"
+
+          # shellcheck disable=SC2016 # GraphQL's own $variables, single-quoted on purpose.
+          item="$(gh api graphql -f project="$project_id" -f title="$TITLE" -f body="$BODY" -f query='
+            mutation($project: ID!, $title: String!, $body: String!) {
+              addProjectV2DraftIssue(input: {projectId: $project, title: $title, body: $body}) { projectItem { id } }
+            }' | jq -er '.data.addProjectV2DraftIssue.projectItem.id')" || fail "the card could not be made"
+
+          remove() {
+            # shellcheck disable=SC2016 # GraphQL's own $variables, single-quoted on purpose.
+            gh api graphql -f project="$project_id" -f item="$item" -f query='
+              mutation($project: ID!, $item: ID!) { deleteProjectV2Item(input: {projectId: $project, itemId: $item}) { deletedItemId } }' >/dev/null ||
+              echo "::warning title=Board card::the half-made card $item could not be deleted; delete it on the board"
+          }
+          trap 'remove; fail "a field could not be set, so the card was deleted"' ERR
+
+          for setting in "$stage" "$order" "$codebase"; do
+            # shellcheck disable=SC2016 # GraphQL's own $variables, single-quoted on purpose.
+            jq -n --arg project "$project_id" --arg item "$item" --argjson setting "$setting" '{
+              query: "mutation($project: ID!, $item: ID!, $field: ID!, $value: ProjectV2FieldValue!) { updateProjectV2ItemFieldValue(input: {projectId: $project, itemId: $item, fieldId: $field, value: $value}) { projectV2Item { id } } }",
+              variables: {project: $project, item: $item, field: $setting.id, value: $setting.value}
+            }' | gh api graphql --input - | jq -e '.data.updateProjectV2ItemFieldValue.projectV2Item.id' >/dev/null
+          done
+          trap - ERR
+          echo "::notice title=Board card::filed $item with Stage, Order and Codebase set"

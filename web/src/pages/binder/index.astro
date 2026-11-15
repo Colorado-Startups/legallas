@@ -1,0 +1,42 @@
+---
+// /binder/: the binder home (card P8). A sober header, then one tile per tab with its pages as direct links
+// and this browser's read progress. scripts/binder.ts fills everything from /api/visuals. It is a tab under
+// Documents, so its breadcrumb starts there.
+import Room from '../../layouts/Room.astro';
+import LegallasEmpty from '../../components/LegallasEmpty.astro';
+import VisualIcons from '../../components/VisualIcons.astro';
+import '../../styles/binder.css';
+---
+
+<Room title="Binder" guide="binder">
+  <VisualIcons />
+  <section class="binder" aria-labelledby="binder-title" data-binder>
+    <nav class="binder-crumbs" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="/documents/">Documents</a></li>
+        <li><a href="/binder/" aria-current="page">Binder</a></li>
+      </ol>
+    </nav>
+    <header class="binder-head">
+      <div class="binder-head__title">
+        <h1 id="binder-title" class="t-h1">Binder</h1>
+        <p class="binder-head__count" data-binder-count></p>
+      </div>
+      <p class="binder-head__lede">
+        Each tab is a set of exhibit pages on one part of the case. Open a page to read the tab in order; the arrow
+        keys turn the pages.
+      </p>
+    </header>
+
+    <ol class="binder-grid" data-binder-tabs hidden></ol>
+
+    <div data-binder-empty hidden>
+      <LegallasEmpty title="The binder has no pages yet." />
+    </div>
+    <div data-binder-error hidden>
+      <LegallasEmpty title="The binder did not load; reload the page to try again." />
+    </div>
+  </section>
+</Room>
+
+<script src="../../scripts/binder.ts"></script>

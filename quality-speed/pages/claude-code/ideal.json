@@ -1,0 +1,13 @@
+{
+  "ideal": "Every change Claude merges shows its checks, keeps the written rules, ships no bug and lands within a day on few tokens.",
+  "sources": [
+    { "title": "Claude Code: Best practices", "url": "https://code.claude.com/docs/en/best-practices", "date": "2026-11-04" },
+    { "title": "Claude Code: Sandboxing", "url": "https://code.claude.com/docs/en/sandboxing", "date": "2026-11-04" },
+    { "title": "Claude Code: Manage costs effectively", "url": "https://code.claude.com/docs/en/costs", "date": "2026-11-02" },
+    { "title": "Anthropic: How the Claude Code team does code review", "url": "https://claude.dev/blog/solving-code-review-at-anthropic/", "date": "2026-10-15" },
+    { "title": "Google Cloud: Using the Four Keys to measure your DevOps performance", "url": "https://cloud.google.com/blog/products/devops-sre/using-the-four-keys-to-measure-your-devops-performance", "date": "2020-09-22" }
+  ],
+  "quality": "Each merge shows its checks' output and keeps the written rules, no shipped bug stays open, instruction paths resolve, and the CI fence is proven.",
+  "speed": "A task goes from its first session or commit to merged within a day, at the 90th percentile too.",
+  "consumption": "A merged change costs fewer Claude Code tokens than an average developer's active day, and the daily read is one short job."
+}

@@ -1,0 +1,73 @@
+/*
+  /documents/ facet boxes in the sidebar (card P5a): Type, Privilege, Marked, each with its count. Imported after
+  documents.css.
+*/
+
+.docs-facets {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.docs-facet-group {
+  padding-top: var(--space-4);
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.docs-facet {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.docs-facet__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-facet:not([data-expanded]) .docs-facet__item[data-overflow] {
+  display: none;
+}
+
+.docs-facet__label {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  align-items: center;
+  min-height: 1.75rem;
+  color: var(--ink);
+  font-size: var(--text-14);
+  cursor: pointer;
+}
+
+.docs-facet__box {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: var(--forest);
+}
+
+.docs-facet__name {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.docs-facet__badge {
+  width: 14px;
+  height: 14px;
+  color: var(--brass-mark);
+}
+
+.docs-facet__count {
+  color: var(--ink-3);
+  font-size: var(--text-13);
+  font-variant-numeric: tabular-nums;
+}
+
+.docs-facet__more {
+  margin-top: var(--space-1);
+  padding-inline: 0;
+}

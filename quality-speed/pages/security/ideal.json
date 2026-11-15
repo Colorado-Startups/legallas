@@ -1,0 +1,11 @@
+{
+  "ideal": "No known weakness stays open past its deadline, no secret or case data gets in, and every scan proves it still finds them.",
+  "sources": [
+    { "title": "CISA: BOD 26-04, Prioritizing Security Updates Based on Risk", "url": "https://www.cisa.gov/news-events/directives/bod-26-04-prioritizing-security-updates-based-risk", "date": "2026-06-10" },
+    { "title": "NIST SP 800-218: Secure Software Development Framework 1.1", "url": "https://csrc.nist.gov/pubs/sp/800/218/final", "date": "2022-02-03" },
+    { "title": "NIST SP 800-53 Rev. 5: Security and Privacy Controls", "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final", "date": "2020-12-10" }
+  ],
+  "quality": "No open alert or finding, no secret or forbidden path in history, and every planted drill found.",
+  "speed": "Critical and high weaknesses fixed within three days, the rest within two weeks.",
+  "consumption": "The nightly scans finish in 5 minutes or less."
+}

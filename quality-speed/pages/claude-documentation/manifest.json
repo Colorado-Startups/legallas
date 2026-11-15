@@ -1,0 +1,13 @@
+{
+  "page": "claude-documentation",
+  "signoff_comment": 6749115457,
+  "metrics": [
+    {"id": "questions_true", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 50, "goal": 100, "weight": 4, "max_age_hours": 48, "min_samples": 25, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/claude-documentation/PLAN.md#goals"},
+    {"id": "settings_match", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 2, "max_age_hours": 48, "min_samples": 6, "goal_source": "https://code.claude.com/docs/en/permissions"},
+    {"id": "deny_rules_kept", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 1, "max_age_hours": 48, "min_samples": 60, "goal_source": "https://code.claude.com/docs/en/permissions"},
+    {"id": "drift_open_hours", "lens": "speed", "unit": "hours", "direction": "lower", "floor": 168, "goal": 24, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/claude-documentation/PLAN.md#goals"},
+    {"id": "start_tokens", "lens": "consumption", "unit": "tokens", "direction": "lower", "floor": 10000, "goal": 3000, "weight": 3, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://code.claude.com/docs/en/memory#write-effective-instructions"},
+    {"id": "startup_tokens", "lens": "consumption", "unit": "tokens", "direction": "lower", "floor": 8000, "goal": 2000, "weight": 3, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://code.claude.com/docs/en/memory"}
+  ],
+  "changes": []
+}

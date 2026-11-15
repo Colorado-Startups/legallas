@@ -1,0 +1,16 @@
+{
+ "version": 3,
+ "sha256": "10753da575d1b84d45c59a35c9f110b7c5d66ab086bfc1ed11b14b0b6b46566d",
+ "pages": [
+  {
+   "n": 1,
+   "ocr": false,
+   "text": "DOE v. HARBOR LABS, INC.\nWire, 2011-06-13\nPage 1 of 2\nWire for Doe's founder shares.\nDoe wires the price of her founder shares.\nFounder share purchase.\nShare price wired after the email.\nWire in, reference SEAT-RENEWALS 3,127.40\nTransfer out, reference NORTHGATE-INTEREST 9,137.80\nService fee 17.25\nInterest 0.84\nClosing balance 12,719.54\nOpening balance 18,746.35\nWire in, reference SEAT-RENEWALS 3,127.40\nTransfer out, reference NORTHGATE-INTEREST 9,137.80\nService fee 17.25"
+  },
+  {
+   "n": 2,
+   "ocr": false,
+   "text": "DOE v. HARBOR LABS, INC.\nWire, 2011-06-13\nPage 2 of 2\nTransfer out, reference NORTHGATE-INTEREST 9,137.80\nService fee 17.25\nInterest 0.84\nClosing balance 12,719.54\nOpening balance 18,746.35\nWire in, reference SEAT-RENEWALS 3,127.40\nTransfer out, reference NORTHGATE-INTEREST 9,137.80\nService fee 17.25\nInterest 0.84"
+  }
+ ]
+}

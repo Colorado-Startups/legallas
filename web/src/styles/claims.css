@@ -1,0 +1,320 @@
+/*
+  Claims & Proof (card P4). Page-scoped classes only (claims-*), built from tokens; the c-* blocks and the viz
+  chart styles (scripts/viz/charts.css) are composed, never restyled. Nothing decorative inside the evidence views.
+*/
+
+.claims {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+}
+
+/* Head: title, lead, tally and the view switch */
+.claims-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-top: var(--space-5);
+}
+
+.claims-head__title {
+  margin: 0 0 var(--space-2);
+}
+
+.claims-head__lead {
+  max-width: var(--measure);
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.claims-head__tally {
+  margin: var(--space-1) 0 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+
+.claims-head__lead:empty,
+.claims-head__tally:empty {
+  display: none;
+}
+
+@media (min-width: 48.0625rem) {
+  .claims-head__tally {
+    display: none;
+  }
+}
+
+.claims-views {
+  display: inline-flex;
+}
+
+.claims-views__button + .claims-views__button {
+  margin-left: calc(-1 * var(--hairline));
+}
+
+.claims-views__button:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.claims-views__button:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.claims-loading {
+  color: var(--ink-3);
+}
+
+.claims-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+}
+
+/* Legend */
+.claims-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+  padding: 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  list-style: none;
+}
+
+.claims-legend__item,
+.claims-strength {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.claims-strength {
+  color: var(--ink);
+  font-size: var(--text-13);
+  white-space: nowrap;
+}
+
+/* Matrix and its aside */
+.claims-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+@media (min-width: 64rem) {
+  .claims-layout {
+    grid-template-columns: minmax(0, 1fr) 22rem;
+  }
+
+  .claims-layout__aside {
+    position: sticky;
+    top: var(--space-4);
+  }
+}
+
+.claims-layout__aside {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.claims-matrix-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.claims-matrix {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--text-14);
+}
+
+.claims-matrix :is(th, td) {
+  padding: var(--space-1) var(--space-2);
+  vertical-align: middle;
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.claims-matrix thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding-block: var(--space-2);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: var(--text-12);
+  font-weight: 600;
+  vertical-align: bottom;
+  border-bottom-color: var(--border);
+}
+
+.claims-matrix__element {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 13rem;
+  max-width: 20rem;
+  background: var(--surface);
+  font-weight: 400;
+  text-align: left;
+}
+
+.claims-matrix thead .claims-matrix__element {
+  z-index: 3;
+  background: var(--panel);
+}
+
+.claims-matrix__label {
+  margin-right: var(--space-1);
+  color: var(--ink-3);
+  font-size: var(--text-12);
+}
+
+.claims-matrix__text {
+  color: var(--ink);
+}
+
+.claims-matrix__authority {
+  display: block;
+  color: var(--ink-3);
+  font-size: var(--text-12);
+}
+
+.claims-matrix__doc {
+  min-width: 3.75rem;
+  max-width: 5rem;
+  text-align: center;
+}
+
+.claims-matrix__num,
+.claims-matrix__type {
+  display: block;
+}
+
+.claims-matrix__type {
+  overflow: hidden;
+  color: var(--ink-2);
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.claims-matrix__cell {
+  padding: 0;
+  text-align: center;
+}
+
+.claims-matrix__best {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  min-width: 8.5rem;
+  background: var(--surface);
+  text-align: left;
+  box-shadow: inset var(--hairline) 0 0 var(--rule);
+}
+
+.claims-matrix thead .claims-matrix__best {
+  z-index: 3;
+  background: var(--panel);
+}
+
+/* On a phone only the element column stays put; Strongest scrolls with the documents. */
+@media (max-width: 48rem) {
+  .claims-matrix__best {
+    position: static;
+  }
+
+  .claims-matrix__element {
+    min-width: 10rem;
+  }
+}
+
+.claims-matrix tr[aria-selected='true'] > * {
+  background: var(--forest-tint);
+}
+
+.claims-matrix tr[aria-selected='true'] > .claims-matrix__element {
+  box-shadow: inset 2px 0 0 var(--forest);
+}
+
+.claims-matrix .c-proof[aria-current='true'] {
+  outline: var(--hairline) solid var(--forest);
+  outline-offset: -2px;
+}
+
+.claims-matrix__count > th {
+  padding-block: var(--space-2);
+  background: var(--panel);
+  text-align: left;
+  border-bottom-color: var(--border);
+}
+
+.claims-count-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+}
+
+.claims-count-head__num {
+  color: var(--ink-3);
+  font-size: var(--text-13);
+}
+
+.claims-count-head__label {
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--text-18);
+  font-weight: 600;
+  line-height: 1.5rem;
+}
+
+.claims-count-head__against {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.claims-count-head__authority {
+  margin-left: auto;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  font-weight: 400;
+}
+
+.claims-party {
+  --shape-size: 12px;
+
+  gap: var(--space-1);
+}
+
+@media print {
+  .claims-views,
+  .claims-detail {
+    display: none;
+  }
+
+  .claims-layout {
+    grid-template-columns: 1fr;
+  }
+
+  /* Print the grid and its table twin; By count repeats them. */
+  .claims-panel--matrix[hidden],
+  .claims-panel--table[hidden] {
+    display: grid !important;
+  }
+
+  .claims-panel--count {
+    display: none !important;
+  }
+}

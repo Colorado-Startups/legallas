@@ -1,0 +1,12 @@
+{
+  "page": "compliance",
+  "signoff_comment": 6748565236,
+  "metrics": [
+    { "id": "policy_areas_covered", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 3, "max_age_hours": 48, "min_samples": 7, "goal_source": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf" },
+    { "id": "evidence_refs_dead", "lens": "quality", "unit": "count", "direction": "lower", "floor": 10, "goal": 0, "weight": 2, "max_age_hours": 48, "min_samples": 7, "goal_source": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf" },
+    { "id": "policy_review_age_days", "lens": "speed", "unit": "days", "direction": "lower", "floor": 730, "goal": 365, "weight": 1, "max_age_hours": 48, "min_samples": 7, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/docs/security/README.md" },
+    { "id": "restore_drill_age_days", "lens": "speed", "unit": "days", "direction": "lower", "floor": 365, "goal": 90, "weight": 2, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/docs/security/bcp-dr.md" },
+    { "id": "lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 10, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" }
+  ],
+  "changes": []
+}

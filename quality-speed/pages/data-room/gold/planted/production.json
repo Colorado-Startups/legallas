@@ -1,0 +1,334 @@
+{
+ "volume": "JD-PROD-001",
+ "prefix": "JD",
+ "digits": 6,
+ "date": "2013-09-10",
+ "last": 101,
+ "produced": [
+  {
+   "doc": "01-Corporate-Records/Bylaws__20110609__Harbor-Labs.pdf",
+   "first": 1,
+   "last": 3
+  },
+  {
+   "doc": "01-Corporate-Records/Card-Policy__20110711__Harbor-Labs.pdf",
+   "first": 4,
+   "last": 5
+  },
+  {
+   "doc": "01-Corporate-Records/Conversion-Schedule__20110602__Harbor-Labs.pdf",
+   "first": 6,
+   "last": 8
+  },
+  {
+   "doc": "01-Corporate-Records/Stock-Agreement__20110607__Harbor-Labs.pdf",
+   "first": 9,
+   "last": 15
+  },
+  {
+   "doc": "02-Board-Minutes/Board-Packet__20120327__Harbor-Labs.pdf",
+   "first": 16,
+   "last": 17
+  },
+  {
+   "doc": "02-Board-Minutes/Meeting-Notice__20120507__Mark-Moe.pdf",
+   "first": 18,
+   "last": 19
+  },
+  {
+   "doc": "02-Board-Minutes/Minutes__20120509__Special-Meeting.pdf",
+   "first": 20,
+   "last": 21
+  },
+  {
+   "doc": "02-Board-Minutes/Minutes__20121010__Board-Meeting.pdf",
+   "first": 22,
+   "last": 23
+  },
+  {
+   "doc": "02-Board-Minutes/Notice-Log__20121019__Nina-Note.pdf",
+   "first": 24,
+   "last": 25
+  },
+  {
+   "doc": "02-Board-Minutes/Sales-Forecast__20120319__Jane-Doe.pdf",
+   "first": 26,
+   "last": 27
+  },
+  {
+   "doc": "03-Investor-Agreements/Bridge-Note__20120214__Alder-Peak.pdf",
+   "first": 28,
+   "last": 29
+  },
+  {
+   "doc": "03-Investor-Agreements/Conversion-Notice__20121026__Alder-Peak.pdf",
+   "first": 30,
+   "last": 31
+  },
+  {
+   "doc": "03-Investor-Agreements/Investor-Rights-Agreement__20110621__Alder-Peak.pdf",
+   "first": 32,
+   "last": 40
+  },
+  {
+   "doc": "03-Investor-Agreements/Note-Amendment__20121018__Alder-Peak.pdf",
+   "first": 41,
+   "last": 42
+  },
+  {
+   "doc": "03-Investor-Agreements/Voting-Agreement__20110621__Alder-Peak.pdf",
+   "first": 43,
+   "last": 44
+  },
+  {
+   "doc": "04-Letters/Email__20110518__Richard-Roe__Vesting-terms.pdf",
+   "first": 45,
+   "last": 46
+  },
+  {
+   "doc": "04-Letters/Email__20110527__Jane-Doe__Acceleration-questions.pdf",
+   "first": 47,
+   "last": 48
+  },
+  {
+   "doc": "04-Letters/Email__20120507__Mark-Moe__Meeting-plan.pdf",
+   "first": 49,
+   "last": 50
+  },
+  {
+   "doc": "04-Letters/Letter__20120510__Lisa-Low__Short-notice.pdf",
+   "first": 52,
+   "last": 53
+  },
+  {
+   "doc": "04-Letters/Letter__20120511__Richard-Roe__Team-update.pdf",
+   "first": 54,
+   "last": 55
+  },
+  {
+   "doc": "04-Letters/Letter__20120522__Jane-Doe__Acceleration.pdf",
+   "first": 56,
+   "last": 57
+  },
+  {
+   "doc": "04-Letters/Letter__20120605__Richard-Roe__Card-charges.pdf",
+   "first": 58,
+   "last": 59
+  },
+  {
+   "doc": "04-Letters/Letter__20121016__Lisa-Low__Demand.pdf",
+   "first": 60,
+   "last": 61
+  },
+  {
+   "doc": "04-Letters/Letter__20121030__Dan-Dee__Reply.pdf",
+   "first": 62,
+   "last": 63
+  },
+  {
+   "doc": "04-Letters/Repurchase-Notice__20120612__Harbor-Labs.pdf",
+   "first": 64,
+   "last": 65
+  },
+  {
+   "doc": "05-Expense-Records/Card-Statement__20120229__Acme-Bank.pdf",
+   "first": 66,
+   "last": 67
+  },
+  {
+   "doc": "05-Expense-Records/Expense-Review__20120423__Carol-Count.pdf",
+   "first": 68,
+   "last": 70
+  },
+  {
+   "doc": "06-Cap-Table/Bank-Statement__201207__Acme-Bank.pdf",
+   "first": 71,
+   "last": 72
+  },
+  {
+   "doc": "06-Cap-Table/Cap-Table__20111231__Ledger-and-Co.pdf",
+   "first": 73,
+   "last": 75
+  },
+  {
+   "doc": "06-Cap-Table/Cap-Table__20121026__Ledger-and-Co.pdf",
+   "first": 76,
+   "last": 78
+  },
+  {
+   "doc": "06-Cap-Table/Share-Ledger__20120630__Ledger-and-Co.pdf",
+   "first": 79,
+   "last": 80
+  },
+  {
+   "doc": "06-Cap-Table/Vesting-Schedule__20120612__Ledger-and-Co.pdf",
+   "first": 81,
+   "last": 82
+  },
+  {
+   "doc": "06-Cap-Table/Wire__20110613__Acme-Bank.pdf",
+   "first": 83,
+   "last": 84
+  },
+  {
+   "doc": "11-Wage-Claim/Labor-Notice__20120925__State-Labor.pdf",
+   "first": 93,
+   "last": 95
+  },
+  {
+   "doc": "11-Wage-Claim/Offer-Letter__20110606__Jane-Doe.pdf",
+   "first": 96,
+   "last": 97
+  },
+  {
+   "doc": "11-Wage-Claim/Payroll-Register__20120531__Tally-Payroll.pdf",
+   "first": 98,
+   "last": 99
+  },
+  {
+   "doc": "11-Wage-Claim/Wage-Claim__20120716__Jane-Doe.pdf",
+   "first": 100,
+   "last": 101
+  }
+ ],
+ "withheld": [
+  {
+   "logId": "PL-001",
+   "doc": "04-Letters/Email__20121018__Jane-Doe__Question-for-Lisa.pdf",
+   "first": 51,
+   "last": 51
+  },
+  {
+   "logId": "PL-002",
+   "doc": "07-Lawyer-Notes-PRIVILEGED/Call-Notes__20130507__Lisa-Low.md",
+   "first": 85,
+   "last": 85
+  },
+  {
+   "logId": "PL-003",
+   "doc": "07-Lawyer-Notes-PRIVILEGED/Hold-Notice__20121020__Lisa-Low.pdf",
+   "first": 86,
+   "last": 86
+  },
+  {
+   "logId": "PL-004",
+   "doc": "07-Lawyer-Notes-PRIVILEGED/Memo__20130423__Lisa-Low__Case-plan.pdf",
+   "first": 87,
+   "last": 87
+  },
+  {
+   "logId": "PL-005",
+   "doc": "07-Lawyer-Notes-PRIVILEGED/Memo__20130820__Lisa-Low__Settlement-range.pdf",
+   "first": 88,
+   "last": 88
+  },
+  {
+   "logId": "PL-006",
+   "doc": "10-Lawyer-Analysis/Claim-Chart__WP__20130312.xlsx",
+   "first": 89,
+   "last": 89
+  },
+  {
+   "logId": "PL-007",
+   "doc": "10-Lawyer-Analysis/Damages-Model__WP__20130319.xlsx",
+   "first": 90,
+   "last": 90
+  },
+  {
+   "logId": "PL-008",
+   "doc": "10-Lawyer-Analysis/Vesting-Analysis__20130416.pdf",
+   "first": 91,
+   "last": 92
+  }
+ ],
+ "privilegeLog": [
+  {
+   "id": "PL-001",
+   "date": "2012-10-18",
+   "author": "Jane Doe",
+   "recipients": "Lisa Low",
+   "type": "Email",
+   "basis": "Attorney-client privilege",
+   "description": "Client request for legal advice about the reply to her demand letter.",
+   "first": 51,
+   "last": 51
+  },
+  {
+   "id": "PL-002",
+   "date": "2013-05-07",
+   "author": "Lisa Low",
+   "recipients": "File",
+   "type": "Notes",
+   "basis": "Work product",
+   "description": "Counsel notes of a call about the production schedule.",
+   "first": 85,
+   "last": 85
+  },
+  {
+   "id": "PL-003",
+   "date": "2012-10-20",
+   "author": "Lisa Low",
+   "recipients": "Jane Doe",
+   "type": "Letter",
+   "basis": "Attorney-client privilege",
+   "description": "Counsel instruction to keep documents.",
+   "first": 86,
+   "last": 86
+  },
+  {
+   "id": "PL-004",
+   "date": "2013-04-23",
+   "author": "Lisa Low",
+   "recipients": "File",
+   "type": "Memo",
+   "basis": "Work product",
+   "description": "Counsel notes prepared for this case.",
+   "first": 87,
+   "last": 87
+  },
+  {
+   "id": "PL-005",
+   "date": "2013-08-20",
+   "author": "Lisa Low",
+   "recipients": "Jane Doe",
+   "type": "Memo",
+   "basis": "Attorney-client privilege and work product",
+   "description": "Counsel advice about resolving the case.",
+   "first": 88,
+   "last": 88
+  },
+  {
+   "id": "PL-006",
+   "date": "2013-03-12",
+   "author": "Lisa Low",
+   "recipients": "File",
+   "type": "Spreadsheet",
+   "basis": "Work product",
+   "description": "Counsel chart of claims and proof.",
+   "first": 89,
+   "last": 89
+  },
+  {
+   "id": "PL-007",
+   "date": "2013-03-19",
+   "author": "Ed Expert",
+   "recipients": "Lisa Low",
+   "type": "Spreadsheet",
+   "basis": "Work product",
+   "description": "Draft damages model prepared at the direction of counsel.",
+   "first": 90,
+   "last": 90
+  },
+  {
+   "id": "PL-008",
+   "date": "2013-04-16",
+   "author": "Ed Expert",
+   "recipients": "Lisa Low",
+   "type": "Memo",
+   "basis": "Work product",
+   "description": "Draft analysis prepared at the direction of counsel.",
+   "first": 91,
+   "last": 92
+  }
+ ]
+}

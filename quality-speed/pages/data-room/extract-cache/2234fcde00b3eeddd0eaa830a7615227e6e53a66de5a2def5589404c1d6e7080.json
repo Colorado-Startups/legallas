@@ -1,0 +1,11 @@
+{
+ "version": 3,
+ "sha256": "2234fcde00b3eeddd0eaa830a7615227e6e53a66de5a2def5589404c1d6e7080",
+ "pages": [
+  {
+   "n": 1,
+   "ocr": false,
+   "text": "HARBOR LABS SAMPLE RECORD. Fictional: every name, date and number is invented.\nPage 1 of 1\nData Processing Agreement, April 1, 2011, between Example Hosting, Inc. and Harbor\nLabs, LLC\nExample Hosting processes customer staff data only on Harbor Labs' written\ninstructions.\nExample Hosting tells Harbor Labs of a security incident within 48 hours after it\nlearns of one.\nSubprocessors: Example Hosting uses one backup vendor, Vault Example LLC, and gives\n30 days notice before adding another.\nOn termination Example Hosting deletes the data within 60 days."
+  }
+ ]
+}

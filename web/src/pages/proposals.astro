@@ -1,0 +1,57 @@
+---
+// Proposals (docs/design/propose-and-approve.md): drafts the member's own AI proposed, for them to approve, edit and
+// approve, or reject. The owner also sees every other member's, without deciding them. The page shell is static like every page; the data comes from /api/proposals, which answers 404
+// while the room's PROPOSALS_ENABLED is off, so the page then says proposals are off. Proposal text is shown with
+// textContent only (src/scripts/proposals.ts).
+import Room from '../layouts/Room.astro';
+import '../styles/proposals.css';
+---
+
+<Room title="Proposals">
+  <section class="prop" aria-labelledby="prop-title">
+    <h1 id="prop-title" class="t-h1">Proposals</h1>
+    <p class="t-small prop-lede">
+      Drafts your own AI proposed, and for the room's owner, every member's. Nothing is added, filed, sent or shared until
+      the member whose AI proposed it approves it here.
+    </p>
+
+    <nav class="prop-tabs" aria-label="Proposals">
+      <a class="c-button c-button--quiet" href="/proposals/" data-proposals-tab="pending">Waiting</a>
+      <a class="c-button c-button--quiet" href="/proposals/?view=decided" data-proposals-tab="decided">Decided</a>
+    </nav>
+
+    <p class="t-caption prop-status" data-proposals-status role="status"></p>
+
+    <div class="c-table-wrap" data-proposals-list hidden>
+      <table class="c-table prop-table">
+        <caption class="u-vh">Proposals, newest first. Times are in your browser's time zone.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Draft</th>
+            <th scope="col">Proposed by</th>
+            <th scope="col">When</th>
+            <th scope="col">Sources</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody data-proposals-rows></tbody>
+      </table>
+    </div>
+
+    <article class="prop-detail" data-proposals-detail hidden></article>
+
+    <section class="c-empty" data-proposals-empty hidden>
+      <a class="c-button" href="/proposals/">All proposals</a>
+    </section>
+    <section class="c-empty" data-proposals-off hidden>
+      <p class="c-empty__text">Proposals are off in this room.</p>
+      <a class="c-button" href="/">Overview</a>
+    </section>
+    <section class="c-empty" data-proposals-denied hidden>
+      <p class="c-empty__text">Your access to the room does not include proposals.</p>
+      <a class="c-button" href="/">Overview</a>
+    </section>
+  </section>
+</Room>
+
+<script src="../scripts/proposals.ts"></script>

@@ -1,0 +1,65 @@
+/*
+  The document page's viewers other than PDF (card P6): image, Markdown sheet, CSV, plain text and HTML visuals,
+  as drawn by src/scripts/doc-views.ts. Split from doc.css to keep each file short. Nothing decorative inside.
+*/
+
+.doc-image-stage,
+.doc-csv-wrap,
+.doc-text {
+  max-height: max(30rem, calc(100dvh - 14rem));
+  overflow: auto;
+}
+
+.doc-image-stage {
+  text-align: center;
+}
+
+.doc-image-stage img {
+  max-width: none;
+  cursor: zoom-out;
+}
+
+.doc-image-stage img.is-fit {
+  max-width: 100%;
+  height: auto;
+  cursor: zoom-in;
+}
+
+.doc-view--sheet:not([hidden]),
+.doc-text {
+  padding: var(--space-5);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.doc-note {
+  margin: 0 0 var(--space-3);
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+
+.doc-csv :is(th, td) {
+  max-width: 28rem;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.doc-text {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.doc-visual {
+  display: block;
+  width: 100%;
+  height: max(30rem, calc(100dvh - 14rem));
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}

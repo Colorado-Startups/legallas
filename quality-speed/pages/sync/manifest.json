@@ -1,0 +1,18 @@
+{
+  "page": "sync", "signoff_comment": 6643490244,
+  "groups": [{ "id": "mac", "weight": 50 }, { "id": "windows", "weight": 50 }],
+  "metrics": [
+    { "id": "mac_files_read", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 2, "max_age_hours": 192, "min_samples": 17, "group": "mac", "goal_source": "https://learn.microsoft.com/en-us/windows/win32/search/-search-indexing-process-overview" },
+    { "id": "mac_folder_unchanged", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 2, "max_age_hours": 192, "min_samples": 9, "group": "mac", "goal_source": "https://developer.apple.com/documentation/foundation/about-apple-file-system" },
+    { "id": "mac_change_to_index_text_max", "lens": "speed", "unit": "seconds", "direction": "lower", "floor": 60, "goal": 10, "weight": 1, "max_age_hours": 192, "min_samples": 4, "group": "mac", "goal_source": "https://web.dev/articles/rail" },
+    { "id": "mac_lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 30, "goal": 5, "weight": 1, "max_age_hours": 192, "min_samples": 1, "group": "mac", "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" },
+    { "id": "windows_files_read", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 0, "goal": 100, "weight": 2, "max_age_hours": 192, "min_samples": 11, "group": "windows", "goal_source": "https://learn.microsoft.com/en-us/windows/win32/search/-search-indexing-process-overview" },
+    { "id": "windows_folder_unchanged", "lens": "quality", "unit": "pass", "direction": "higher", "floor": 0, "goal": 1, "weight": 2, "max_age_hours": 192, "min_samples": 9, "group": "windows", "goal_source": "https://learn.microsoft.com/en-us/windows/win32/fileio/block-cloning" },
+    { "id": "windows_change_to_index_text_max", "lens": "speed", "unit": "seconds", "direction": "lower", "floor": 60, "goal": 10, "weight": 1, "max_age_hours": 192, "min_samples": 4, "group": "windows", "goal_source": "https://web.dev/articles/rail" },
+    { "id": "windows_lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 30, "goal": 5, "weight": 1, "max_age_hours": 192, "min_samples": 1, "group": "windows", "goal_source": "https://martinfowler.com/articles/continuousIntegration.html" }
+  ],
+  "changes": [
+    {"date": "2026-11-05", "metric": "mac_lane_minutes", "field": "added", "from": null, "to": "mac_lane_minutes", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6646872024},
+    {"date": "2026-11-05", "metric": "windows_lane_minutes", "field": "added", "from": null, "to": "windows_lane_minutes", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6646872024}
+  ]
+}

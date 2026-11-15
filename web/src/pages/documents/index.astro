@@ -1,0 +1,158 @@
+---
+// /documents/: every live document (cards P5a and P5b). P5b's intake (Send to client, From counsel, the month
+// heatmap) renders into [data-docs-intake]; P5a's index, facets and table live in [data-docs-table], filled by
+// scripts/documents-table.ts. The hash is the selected folder; #from-counsel is the counsel uploads (old /inbox/).
+// The intake's buttons sit beside the title and its heatmap in [data-docs-heatmap] beside the filter (mockup).
+// The Binder is a tab under Documents (2026-10-02): /binder/ and /visual/ mark Documents current in the nav.
+// Download index is the data-room index as a spreadsheet (D17, worker/export.ts): every document the member may see.
+// A room with no matter (worker/room-shape.ts) names a column by its company label; documents-table.ts hides the case
+// room's columns and empty ones there (documents-table-company.ts).
+import Room from '../../layouts/Room.astro';
+import { INDEX_CSV_URL } from '../../scripts/files-api.ts';
+import '../../styles/documents.css';
+import '../../styles/documents-export.css';
+import '../../styles/documents-facets.css';
+import '../../styles/documents-narrow.css';
+import '../../styles/documents-intake.css';
+import '../../styles/markdown-body.css';
+
+const columns = [
+  { sort: 'control', label: 'Control no.' },
+  { sort: 'date', label: 'Date' },
+  { sort: 'type', label: 'Type' },
+  { sort: 'parties', label: 'From → to', companyLabel: 'Parties' },
+  { sort: 'pages', label: 'Pages', num: true },
+  { sort: 'privilege', label: 'Privilege' },
+  { sort: 'key', label: 'Key' },
+  { sort: 'summary', label: 'Summary' },
+  { sort: '', label: 'Bates' },
+];
+---
+
+<Room title="Documents" guide="documents">
+  <div class="docs-page" data-docs>
+    <div class="docs-top">
+      <header class="docs-head">
+        <h1 class="t-h1">Documents</h1>
+        <p class="docs-tally" data-docs-loading data-load-pending role="status">Loading the documents.</p>
+        <p class="docs-tally" data-docs-tally hidden></p>
+        <nav class="docs-tabs" aria-label="Documents">
+          <a class="docs-tabs__tab" href="/documents/" aria-current="page">All documents</a>
+          <a class="docs-tabs__tab" href="/binder/" data-case-only>Binder</a>
+        </nav>
+        <p class="docs-export">
+          <a class="c-button" href={INDEX_CSV_URL} aria-describedby="docs-export-note">Download index (CSV)</a>
+          <span class="docs-export__note" id="docs-export-note"><span data-case-only>Every document you can see, with its control number and a room link.</span><span data-company-only hidden>Every document you can see, with its date, parties and a room link.</span></span>
+        </p>
+      </header>
+      <section class="docs-intake" data-docs-intake aria-label="Send to client" data-case-only></section>
+    </div>
+
+    <section class="docs-layout" data-docs-table aria-label="Documents">
+      <aside class="docs-side" data-docs-ready hidden>
+        <nav class="docs-index" aria-labelledby="docs-index-label">
+          <h2 class="t-label docs-side__label" id="docs-index-label">Index</h2>
+          <ul class="docs-index__list" data-docs-index></ul>
+        </nav>
+        <div class="docs-facets" data-docs-facets></div>
+      </aside>
+
+      <div class="docs-main" data-docs-keys>
+        <div class="docs-tools">
+          <div class="docs-heatmap" data-docs-heatmap aria-busy="true" data-case-only></div>
+          <div class="docs-tools__find" data-docs-ready hidden>
+            <label class="docs-folder">
+              <span class="docs-folder__label">Folder</span>
+              <select class="c-input docs-folder__select" data-docs-folder-select></select>
+            </label>
+            <p class="docs-scope" data-docs-scope hidden>
+              <span class="c-chip c-chip--counsel" data-docs-scope-name></span>
+              <button type="button" class="c-button c-button--quiet" data-docs-clear-folder>Clear</button>
+            </p>
+            <div class="docs-filter">
+              <label class="u-vh" for="docs-filter">Filter by name, party or control number</label>
+              <svg class="docs-filter__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"></circle>
+                <path d="m10.5 10.5 3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+              </svg>
+              <input
+                id="docs-filter"
+                class="c-input docs-filter__input"
+                type="search"
+                placeholder="Filter by name, party or control number"
+                autocomplete="off"
+                spellcheck="false"
+                aria-keyshortcuts="/"
+                data-docs-filter
+              />
+              <kbd class="c-kbd docs-filter__kbd" aria-hidden="true">/</kbd>
+            </div>
+            <p class="docs-note" data-case-only>Bates numbers appear here once documents are produced.</p>
+          </div>
+        </div>
+
+        <div class="docs-guide-slot" data-docs-guide></div>
+
+        <div class="c-table-wrap docs-table-wrap" data-docs-ready hidden>
+          <table class="c-table docs-table">
+            <caption class="u-vh">Documents. Select a column heading to sort.</caption>
+            <thead>
+              <tr>
+                {
+                  columns.map((column) =>
+                    column.sort ? (
+                      <th
+                        scope="col"
+                        class={`docs-th docs-th--${column.sort}`}
+                        data-sort={column.sort}
+                        data-needs={column.sort === 'key' ? 'flag' : undefined}
+                        aria-sort={column.sort === 'control' ? 'ascending' : undefined}
+                      >
+                        <button type="button" class="docs-sort">
+                          {column.companyLabel ? (
+                            <>
+                              <span data-case-only>{column.label}</span>
+                              <span data-company-only hidden>{column.companyLabel}</span>
+                            </>
+                          ) : (
+                            column.label
+                          )}
+                        </button>
+                      </th>
+                    ) : (
+                      <th scope="col" class="docs-th docs-th--bates">{column.label}</th>
+                    ),
+                  )
+                }
+              </tr>
+            </thead>
+            <tbody data-docs-rows></tbody>
+          </table>
+        </div>
+
+        <div class="c-empty docs-empty" data-docs-nomatch hidden>
+          <p class="c-empty__text">No documents match.</p>
+          <button type="button" class="c-button" data-docs-clear-all>Clear the filters</button>
+        </div>
+
+        <div class="docs-foot" data-docs-ready hidden>
+          <p class="docs-status" role="status" data-docs-status></p>
+          <p class="docs-keys" aria-hidden="true">
+            In the list: <kbd class="c-kbd">j</kbd> <kbd class="c-kbd">k</kbd> move <kbd class="c-kbd">Enter</kbd> open
+            <kbd class="c-kbd">/</kbd> filter
+          </p>
+        </div>
+
+        <div class="c-empty" data-docs-empty hidden>
+          <p class="c-empty__text">No documents yet.</p>
+        </div>
+        <div class="c-empty" data-docs-error data-load-failed hidden>
+          <p class="c-empty__text">The documents did not load; reload the page to try again.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</Room>
+
+<script src="../../scripts/documents-table.ts"></script>
+<script src="../../scripts/documents-intake.ts"></script>

@@ -1,0 +1,117 @@
+/*
+  Chronology's selected-event panel (card P2; chronology-panel.ts): position, date, kind, title, summary, people,
+  counts, sources, Previous and Next, Ask. Split from chronology.css to keep both under 400 lines (Q3).
+  Loaded before chronology.css, whose container queries place the panel beside the timeline and override its
+  padding. Tokens only.
+*/
+
+.chron-panel {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.chron-panel__head {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.chron-panel__label {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.chron-panel__pos {
+  color: var(--ink-3);
+  font-size: var(--text-13);
+}
+
+.chron-panel__rest {
+  margin: 0;
+  color: var(--ink-2);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1.5rem;
+}
+
+.chron-panel__body {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.chron-panel__meta {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+
+.chron-panel__title {
+  margin: 0;
+  text-wrap: balance;
+}
+
+.chron-panel__summary {
+  margin: 0;
+  color: var(--ink-2);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1.5rem;
+}
+
+.chron-panel__part {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.chron-chips,
+.chron-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chron-sources {
+  flex-direction: column;
+}
+
+.chron-source {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+}
+
+.chron-source__what {
+  color: var(--ink);
+  font-size: var(--text-14);
+}
+
+.chron-pager {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  padding-top: var(--space-4);
+  border-top: var(--hairline) solid var(--rule);
+}
+
+/* D2's fletched arrows (brand/arrow-*.svg, currentColor). */
+.chron-arrow {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.chron-panel__ask {
+  width: 100%;
+}

@@ -1,0 +1,8 @@
+[
+{"id":"main_commits_building","page":"build","value":100,"status":"ok","stage":"lab","measured_at":"2026-11-02T06:24:19Z","source_url":"https://github.com/Colorado-Startups/legallas/actions/runs/41398503949","sample_size":15},
+{"id":"web_build_seconds_p50","page":"build","value":8,"status":"ok","stage":"lab","measured_at":"2026-11-02T06:24:19Z","source_url":"https://github.com/Colorado-Startups/legallas/actions/runs/41399176022","sample_size":10},
+{"id":"mac_build_seconds_p50","page":"build","value":118,"status":"ok","stage":"lab","measured_at":"2026-11-02T06:24:19Z","source_url":"https://github.com/Colorado-Startups/legallas/actions/runs/41394760150","sample_size":3},
+{"id":"release_reproducible","page":"build","value":null,"status":"missing","stage":"lab","measured_at":null,"source_url":null,"sample_size":null},
+{"id":"release_gaps","page":"build","value":2,"status":"ok","stage":"lab","measured_at":"2026-11-02T06:24:19Z","source_url":"https://github.com/Colorado-Startups/legallas/commit/26c741d26b6948e54d507bd1b82a5a1d370b8a30","sample_size":1},
+{"id":"release_gzip_bytes","page":"build","value":6043346,"status":"ok","stage":"lab","measured_at":"2026-11-02T06:24:19Z","source_url":"https://github.com/Colorado-Startups/legallas/commit/26c741d26b6948e54d507bd1b82a5a1d370b8a30","sample_size":1}
+]

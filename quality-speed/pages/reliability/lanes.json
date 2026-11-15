@@ -1,0 +1,3 @@
+[
+  { "id": "records", "runner": "linux", "cadence": "daily", "collector": "collect.ts" }
+]

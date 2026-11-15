@@ -1,0 +1,205 @@
+---
+// Card P2 (Chronology page). The matter's events on a laned timeline (F5a) with its table twin, filtered by
+// violation (A, B, C chips; ?v=), person, kind and dates, with the case's own litigation papers held back until the
+// Litigation chip asks for them; each violation's period is shaded behind the plot. The selected event's people,
+// violations, prior counts and sources sit beside it. The shell is static; src/scripts/chronology.ts fills it from
+// GET /api/matter. Spec: web/design/chronology/*.png, as amended by the violations plan (2026-10-02).
+import Room from '../../layouts/Room.astro';
+import ArrowNext from '@brand/brand/arrow-next.svg';
+import ArrowPrev from '@brand/brand/arrow-prev.svg';
+import '../../styles/chronology-panel.css';
+import '../../styles/chronology.css';
+import '../../styles/chronology-violations.css';
+
+// Violation lanes show only when the manifest has violations; the script unhides that button.
+const lanes = [
+  ['side', 'Side'],
+  ['actor', 'Person'],
+  ['type', 'Kind'],
+  ['violation', 'Violation'],
+] as const;
+---
+
+<Room title="Chronology" guide="chronology">
+  <div class="chron" data-chronology>
+    <header class="chron-head">
+      <div class="chron-head__text">
+        <h1 class="t-h1 chron-head__title">Chronology</h1>
+        <p class="chron-head__summary" data-chron-summary aria-live="polite"></p>
+        {/* In the summary's line, so the summary takes its place without moving the page. */}
+        <p class="chron-head__summary" data-chron-loading data-load-pending role="status">Loading the chronology.</p>
+        <p class="u-vh" role="status" data-chron-status></p>
+      </div>
+      <div class="chron-head__tools" data-chron-tools hidden>
+        <div class="chron-seg" role="group" aria-label="View">
+          <button type="button" class="c-button chron-seg__item" aria-pressed="true" data-chron-view="chart">Timeline</button>
+          <button type="button" class="c-button chron-seg__item" aria-pressed="false" data-chron-view="table">Table</button>
+        </div>
+        <button
+          type="button"
+          class="c-button chron-head__filters"
+          aria-expanded="false"
+          aria-controls="chron-filters"
+          data-chron-filter-toggle
+        >
+          Filters <span class="chron-head__count u-mono" data-chron-filter-count hidden></span>
+        </button>
+        <button type="button" class="c-button" data-chron-print>Print</button>
+      </div>
+    </header>
+
+    <div class="chron-marks" data-chron-marks hidden>
+      {/* One violation at a time, so a radio group (DESIGN.md section 7, Selection): one tab stop, arrows choose. */}
+      <div class="chron-marks__group" role="radiogroup" aria-label="Violation" data-chron-violations hidden>
+        <button type="button" role="radio" class="c-button chron-vchip c-select" aria-checked="true" tabindex="0" data-chron-v="">All</button>
+      </div>
+      <button
+        type="button"
+        class="c-button chron-vchip chron-vchip--litigation c-select"
+        aria-pressed="false"
+        data-chron-litigation
+        hidden
+      >
+        Litigation <span class="chron-vchip__count u-mono" data-chron-litigation-count></span>
+      </button>
+    </div>
+
+    <form class="chron-filters" id="chron-filters" aria-label="Filters" data-chron-filters data-state="closed" hidden>
+      <label class="chron-field">
+        <span class="chron-field__label">Person</span>
+        <select class="c-input chron-field__select" name="person" data-chron-person>
+          <option value="">All people</option>
+        </select>
+      </label>
+      <fieldset class="chron-field chron-field--kinds">
+        <legend class="chron-field__label">Kind</legend>
+        <div class="chron-kinds" data-chron-kinds></div>
+      </fieldset>
+      <fieldset class="chron-field chron-field--dates">
+        <legend class="chron-field__label">Dates</legend>
+        <div class="chron-dates">
+          <input
+            class="c-input chron-dates__input"
+            name="from"
+            aria-label="From"
+            placeholder="YYYY-MM-DD"
+            inputmode="numeric"
+            autocomplete="off"
+            data-chron-from
+          />
+          <span class="chron-dates__to">to</span>
+          <input
+            class="c-input chron-dates__input"
+            name="to"
+            aria-label="To"
+            placeholder="YYYY-MM-DD"
+            inputmode="numeric"
+            autocomplete="off"
+            data-chron-to
+          />
+        </div>
+      </fieldset>
+      <button type="button" class="c-button c-button--quiet chron-filters__clear" data-chron-clear>Clear filters</button>
+    </form>
+
+    <ul class="chron-active" aria-label="Active filters" data-chron-active hidden></ul>
+
+    <div class="chron-body" data-chron-body hidden>
+      <div class="chron-main">
+        <div class="chron-bar">
+          <div class="chron-lanes" role="group" aria-labelledby="chron-lanes-label" data-chron-lanes>
+            <span class="chron-lanes__label" id="chron-lanes-label">Lanes</span>
+            {
+              lanes.map(([mode, label]) => (
+                <button
+                  type="button"
+                  class="c-button chron-seg__item"
+                  aria-pressed={mode === 'side' ? 'true' : 'false'}
+                  data-chron-lane={mode}
+                  hidden={mode === 'violation'}
+                >
+                  {label}
+                </button>
+              ))
+            }
+          </div>
+          <p class="chron-keys" aria-hidden="true">
+            <kbd class="c-kbd">j</kbd> <kbd class="c-kbd">k</kbd> next and previous event
+          </p>
+        </div>
+        <div class="chron-timeline" data-chron-timeline></div>
+        <section class="chron-inview" aria-labelledby="chron-inview-title" data-chron-inview hidden>
+          <div class="chron-inview__head">
+            <h2 class="t-label chron-inview__title" id="chron-inview-title">In view</h2>
+            <p class="chron-inview__range" data-chron-inview-range></p>
+          </div>
+          <div class="c-table-wrap">
+            <table class="c-table">
+              <caption class="u-vh">Events in the chart's window</caption>
+              <thead>
+                <tr><th scope="col">Date</th><th scope="col">Event</th><th scope="col">Sources</th></tr>
+              </thead>
+              <tbody data-chron-inview-rows></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <aside class="chron-panel" aria-labelledby="chron-panel-label" data-chron-panel>
+        <div class="chron-panel__head">
+          <h2 class="t-label chron-panel__label" id="chron-panel-label">Selected event</h2>
+          <span class="chron-panel__pos u-mono" data-chron-pos hidden></span>
+        </div>
+        <p class="chron-panel__rest" data-chron-panel-empty>Choose an event to see its people, violations and sources.</p>
+        <div class="chron-panel__body" data-chron-panel-body hidden>
+          <p class="chron-panel__meta">
+            <span class="u-mono" data-chron-date></span>
+            <span class="c-chip" data-chron-kind></span>
+          </p>
+          <h3 class="t-h3 chron-panel__title" tabindex="-1" data-chron-title></h3>
+          <p class="chron-panel__summary" data-chron-event-summary hidden></p>
+          <section class="chron-panel__part" data-chron-section>
+            <h4 class="t-label chron-panel__label">People</h4>
+            <ul class="chron-chips" data-chron-people></ul>
+          </section>
+          <section class="chron-panel__part" data-chron-section>
+            <h4 class="t-label chron-panel__label">Violations</h4>
+            <ul class="chron-chips chron-chips--violations" data-chron-violations-list></ul>
+          </section>
+          <section class="chron-panel__part" data-chron-section>
+            <h4 class="t-label chron-panel__label">Prior counts</h4>
+            <ul class="chron-chips" data-chron-counts></ul>
+          </section>
+          <section class="chron-panel__part" data-chron-section>
+            <h4 class="t-label chron-panel__label">Sources</h4>
+            <ul class="chron-sources" data-chron-sources></ul>
+          </section>
+          <div class="chron-pager">
+            <button type="button" class="c-button chron-pager__button" data-chron-prev>
+              <ArrowPrev class="chron-arrow" aria-hidden="true" focusable="false" />
+              Previous
+            </button>
+            <button type="button" class="c-button chron-pager__button" data-chron-next>
+              Next
+              <ArrowNext class="chron-arrow" aria-hidden="true" focusable="false" />
+            </button>
+          </div>
+          <a class="c-button chron-panel__ask" href="/ask/" data-chron-ask>Ask about this event</a>
+        </div>
+      </aside>
+    </div>
+
+    <div class="c-empty" data-chron-empty hidden>
+      <p class="c-empty__text" data-chron-empty-text></p>
+    </div>
+    <div class="c-empty" data-chron-error data-load-failed hidden>
+      <p class="c-empty__text">The chronology did not load; reload the page to try again.</p>
+    </div>
+
+    <p class="c-provenance" data-chron-provenance hidden>
+      Prepared by the client from the record with AI assistance. Every entry cites its source; verify before relying on it.
+    </p>
+  </div>
+</Room>
+
+<script src="../../scripts/chronology.ts"></script>

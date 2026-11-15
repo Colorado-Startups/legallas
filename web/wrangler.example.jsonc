@@ -1,0 +1,192 @@
+// legallas-web: the private counsel room. Astro's static build in ./dist plus the Worker in ./worker.
+// Every request runs the Worker first, so the Access JWT and the members table are checked before
+// anything (pages, scripts, files) is served. See web/README.md for the security model.
+//
+// The example a new room starts from: copy it to wrangler.jsonc, then fill in the room's own hostname, Access team
+// and AUD, D1 database ID and alert addresses (the fields marked below). Everything else is the product's setting.
+// worker/config.test.ts holds this file and a room's own wrangler.jsonc to the same rules, and keeps them equal
+// apart from those fields.
+//
+// What a room's build fixes (worker/room-settings.ts, worker/stored-name.ts) goes in its room config and, for the Workers,
+// in a top-level "define" here: `mcpHost` in the config is "ROOM_MCP_HOST": "\"mcp.example.org\"". worker/config.test.ts
+// holds the two equal.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "legallas-web",
+  // worker/entry-pro.ts: the full product, the room's gate and router (worker/room.ts) with pro's routes (Ask, the
+  // research chat, the case picture, the visual binder) and the research Durable Object class. A room may fill in its
+  // own entry: worker/room.ts alone runs the room without them, and then leaves out the two blocks below.
+  "main": "./worker/entry-pro.ts",
+  "compatibility_date": "2026-09-30",
+  // nodejs_compat: the research chat's Agents SDK (agents, @cloudflare/ai-chat) imports node:async_hooks, node:crypto
+  // and node:diagnostics_channel (worker/agent/SPIKE.md). Compatibility dates from 2026-08-04 turn it on anyway; it is
+  // explicit, as in legallas-mcp, so a date rollback cannot drop it. nodejs_compat_do_not_populate_process_env: Node
+  // compatibility otherwise copies every var and secret into process.env, so this keeps secrets such as CONTROL_PREFIX
+  // reachable only through `env`, never by a library reading process.env. global_fetch_strictly_public: outbound
+  // fetch() (only the Access certs) always goes out over the public internet, never to another route on
+  // the room's own zone, the same as legallas-mcp. Ask's outside model backends (Groq, the room's own host), when the
+  // room turns them on, go out the same way. A flag change needs `npm run types`.
+  "compatibility_flags": ["nodejs_compat", "nodejs_compat_do_not_populate_process_env", "global_fetch_strictly_public"],
+
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "not_found_handling": "404-page"
+  },
+
+  // The only way in is the Access-protected custom domain. No workers.dev URL and no preview URLs,
+  // so nothing can reach production data without passing Access.
+  "workers_dev": false,
+  "preview_urls": false,
+  // The room's own hostname, on a zone in the same Cloudflare account. A subdomain, never the apex: HSTS covers
+  // every host under it (worker/headers.ts).
+  "routes": [{ "pattern": "room.example.com", "custom_domain": true }],
+
+  // TEAM_DOMAIN is https://<team>.cloudflareaccess.com and ACCESS_AUD is the Access application's AUD tag.
+  // Empty values make the Worker deny every request (fail closed) until Access is configured.
+  // ALLOW_DEV_IDENTITY must never appear here: it belongs in .dev.vars only (worker/config.test.ts enforces this).
+  // CONTROL_PREFIX is a secret (wrangler secret put CONTROL_PREFIX): it names the matter.
+  // LEGALLAS_MODEL is a Workers AI (@cf/) model with an entry in REASONING_EFFORT (worker/ask.ts), none in
+  // DEPRECATED_MODELS (worker/budget.ts); chosen with scripts/ask-replica.ts. gpt-oss-120b since 2026-11-05: Workers AI retires
+  // glm-5.3-flash, the model before it, on 2026-11-15 (web/ASK-MODEL.md).
+  "vars": {
+    "TEAM_DOMAIN": "",
+    "ACCESS_AUD": "",
+    // "1": refuse a sign-in whose Access token shows no second factor (a security key or a biometric; never an app code), with a
+    // page linking Cloudflare's enrollment (worker/mfa.ts). Turn on Access's own MFA too (web/README.md, "Security
+    // model"). Set it the same in wrangler.mcp.jsonc. Rollback: "0" and deploy.
+    "REQUIRE_MFA": "0",
+    "LEGALLAS_MODEL": "@cf/openai/gpt-oss-120b",
+    "DAILY_QUESTION_CAP": "100",
+    "ALERTS_ENABLED": "1",
+    // The room's IANA zone, such as "America/New_York": alert emails show it next to UTC, and the checklist's
+    // "today" is that zone's day. Unset or unknown: alerts read "America/Denver", the checklist UTC. Set it the same
+    // in wrangler.mcp.jsonc.
+    "TIME_ZONE": "America/Denver",
+    // "1": Ask also searches the law library (worker/law.ts; public law in its own bucket and AI Search instance,
+    // never the record's). Needs the LAW and LAW_SEARCH bindings below. Rollback: "0" and deploy.
+    "LAW_LIBRARY": "1",
+    // The research chat (worker/agent/, D10): "0" off until Wave 2; "1" on over a WebSocket; "http" on over an HTTP
+    // stream, if the Wave 1 probe shows Access refusing WebSockets. Rollback: "0" and deploy.
+    "RESEARCH_ENABLED": "0",
+    // "1": Ask also retrieves the visual binder's text (D8), set only after a replica eval shows no hard-gate loss.
+    "ASK_VISUALS": "0",
+    // "1": Ask gives every option and a recommendation (worker/recommend.ts, issue #19), set only after a replica eval
+    // with it on passes. Set it on both Workers together. Rollback: "0".
+    "RECOMMEND": "0",
+    // "1": the room serves proposals (worker/proposals.ts, docs/design/propose-and-approve.md): a member's AI proposes
+    // drafts and that member approves or rejects them on /proposals/. Set it on both Workers together. Rollback: "0".
+    "PROPOSALS_ENABLED": "0",
+    // "1": the room serves the company checklist (worker/checklist.ts) on /checklist/. Entity type and formation date are in
+    // the room config. Rollback: "0".
+    "CHECKLIST_ENABLED": "0",
+    // "1": members may check a person or company in public records before a deal (worker/public-records.ts). A check
+    // sends the name out of the room only after the member approves it on the room's /checks/ page. "0", the default,
+    // keeps it off, so a room turns it on by choice. Set the three settings the same in wrangler.jsonc and
+    // wrangler.mcp.jsonc.
+    "PUBLIC_RECORDS": "0",
+    // The room owner's contact email, sent to the SEC in the User-Agent header as its fair-access rules require of
+    // automated tools. "": EDGAR is linked for the member to search, never searched by the room. CourtListener needs
+    // the secret COURTLISTENER_TOKEN (the owner's own API token); unset, CourtListener is linked too.
+    "PUBLIC_RECORDS_CONTACT": "",
+    // Retention (README.md, "Retention and close-out"): RETAIN_SIGNINS_DAYS and RETAIN_AUDIT_DAYS_AFTER_CLOSE go in
+    // wrangler.mcp.jsonc, whose daily cron enforces them. This Worker reads neither. Unset, the room keeps everything.
+    // Groq, Ask's second backend once the day's free Workers AI neurons are spent (worker/ask-provider.ts). A room
+    // fills it in: zdr_confirmed true only once its own Groq organization has Zero Data Retention on, and enabled
+    // with eval_runs only after its Replica eval passes on Groq. It also needs the secret LEGALLAS_ASK_GROQ_API_KEY.
+    "ASK_GROQ": { "enabled": false, "zdr_confirmed": false, "eval_runs": [] },
+    // The room's own model host (worker/ask-host.ts): any OpenAI-compatible host serving an open-weight model, such as
+    // OpenRouter, answering every Ask question instead of Workers AI. Off: Ask runs LEGALLAS_MODEL on Workers AI in
+    // this account and needs no outside account. Turning it on sends the room's documents to that host; read
+    // ASK-MODEL.md first. url is the host's https base URL, model its name for the model, body optional extra request
+    // fields (OpenRouter's provider routing). zdr_confirmed true only once the host keeps no inputs or outputs;
+    // enabled with eval_runs only after the Replica eval passes on this host. It also needs the secret
+    // LEGALLAS_ASK_HOST_API_KEY.
+    "ASK_HOST": { "enabled": false, "zdr_confirmed": false, "eval_runs": [], "url": "", "model": "" }
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "legallas",
+      // From `npx wrangler d1 create legallas`.
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // Originals live in legallas-files under opaque keys; page-tagged text for AI Search lives in legallas-index.
+  // legallas-law holds the law library (public law; scripts/law): law/ parts for AI Search and catalog.json, the
+  // authority on which law may be cited. The Worker reads only catalog.json from it.
+  "r2_buckets": [
+    { "binding": "FILES", "bucket_name": "legallas-files" },
+    { "binding": "INDEX", "bucket_name": "legallas-index" },
+    { "binding": "LAW", "bucket_name": "legallas-law" }
+  ],
+
+  "ai": { "binding": "AI" },
+
+  // The research chat's Durable Object (worker/agent/research.ts), exported by worker/entry-pro.ts. The migration is
+  // append-only: a class renamed after it would lose its data. RESEARCH_ENABLED "0" keeps the chat itself off.
+  "durable_objects": { "bindings": [{ "name": "RESEARCH", "class_name": "LegallasResearch" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["LegallasResearch"] }],
+
+  // Questions per member per minute (worker/burst.ts), keyed by email, checked before the daily cap
+  // (DAILY_QUESTION_CAP). namespace_id is any account-unique number: 1001 to 1003 are legallas-mcp's, 1005 its tools.
+  "ratelimits": [{ "name": "ASK_LIMIT", "namespace_id": "1004", "simple": { "limit": 6, "period": 60 } }],
+
+  // The Overview's "connect your own AI" panel asks whether the member's own AI app is connected (GET /api/me/ai,
+  // worker/routes/me.ts) from legallas-mcp's live grants. MemberGrants is a named entrypoint of legallas-mcp
+  // (mcp/index.ts): only a service binding reaches it, never the internet. Deploy legallas-mcp first; until then the
+  // call fails and the panel shows "not connected". Locally it answers only while `npm run mcp:dev` runs too.
+  "services": [{ "binding": "MCP_GRANTS", "service": "legallas-mcp", "entrypoint": "MemberGrants" }],
+
+  // Ask Legallas retrieves from the "legallas" AI Search instance (scripts/wrangler.ts AI_SEARCH_INSTANCE) with
+  // search() only; generation is a direct AI.run with no gateway. Create the instance with the similarity cache
+  // and reranking off and attach it to an AI Gateway whose logs are off (see README). AI Search does not run
+  // locally, so remote is required for wrangler dev; ASK_MOCK in .dev.vars replaces it on localhost.
+  // LAW_SEARCH is the law library's own instance, "legallas-law" over legallas-law law/ (same settings, same gateway
+  // with logs off), so law and record never share an index.
+  "ai_search": [
+    { "binding": "SEARCH", "instance_name": "legallas", "remote": true },
+    { "binding": "LAW_SEARCH", "instance_name": "legallas-law", "remote": true }
+  ],
+
+  // Sign-in alerts (worker/signins.ts). The binding can send only from the room's sender address to the owner's,
+  // so even a bug cannot turn the room into a relay. The owner's address must be a verified Email Routing
+  // destination, and the sender's domain must be onboarded to Email Service.
+  "send_email": [
+    {
+      "name": "EMAIL",
+      "destination_address": "owner@example.com",
+      "allowed_sender_addresses": ["room@example.com"]
+    }
+  ],
+
+  // Stack traces in Workers Logs map back to the TypeScript source. The map is uploaded beside the Worker,
+  // never served, and the repo holds code only.
+  "upload_source_maps": true,
+
+  // Logs on for errors; traces off because spans can record R2 keys and URLs.
+  // Invocation logs are off because they record request URLs (activity filters, binder slugs); only
+  // the Worker's own console.error lines (the research Durable Object's included), which carry error codes and never
+  // text, are kept. Every one of them is kept (head_sampling_rate 1): the room's traffic is small. Workers Issues
+  // stays off here for the same reason as invocation logs: an occurrence keeps the failing request's details for
+  // 7 days (T19, 2026-10-03).
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "logs": { "enabled": true, "invocation_logs": false },
+    "traces": { "enabled": false },
+    "issues": { "enabled": false }
+  },
+
+  // A cost guard, not a performance target: no request may burn more than 5 s of CPU (the Paid default is 30 s).
+  // Well above the slowest requests. Time spent waiting on R2, D1, AI Search or Workers AI is not CPU.
+  "limits": { "cpu_ms": 5000 },
+
+  // Without host, wrangler dev rewrites request.url to the production route's host, and auth.ts
+  // (correctly) refuses the dev identity there. Keeping localhost lets local dev sign in as DEV_IDENTITY_EMAIL.
+  "dev": { "port": 8789, "host": "localhost" }
+}

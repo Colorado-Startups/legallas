@@ -1,0 +1,491 @@
+{
+  "needs": [
+    {
+      "id": "pay-and-final-pay",
+      "path": "startup-forms",
+      "need": "Paydays, pay statements and final pay",
+      "source": "https://olls.info/crs/crs2026-title-08.htm",
+      "checked": "2026-11-13",
+      "covered_by": [
+        "unit:co-wage-act",
+        "item:people.colorado-wage-rules"
+      ],
+      "flags": [
+        {
+          "kind": "deadline",
+          "text": "no later than ten days following the close of each pay period"
+        },
+        {
+          "kind": "deadline",
+          "text": "due and payable immediately"
+        }
+      ]
+    },
+    {
+      "id": "owner-wage-liability",
+      "path": "startup-forms",
+      "need": "When a 25% owner answers for unpaid wages",
+      "source": "https://olls.info/crs/crs2026-title-08.htm",
+      "checked": "2026-11-02",
+      "covered_by": [
+        "unit:co-wage-act"
+      ]
+    },
+    {
+      "id": "minimum-wage",
+      "path": "startup-forms",
+      "need": "Colorado and local minimum wage",
+      "source": "https://olls.info/crs/crs2026-title-08.htm",
+      "checked": "2026-11-13",
+      "covered_by": [
+        "unit:co-minimum-wage",
+        "item:people.colorado-wage-rules"
+      ]
+    },
+    {
+      "id": "overtime-and-exemptions",
+      "path": "startup-forms",
+      "need": "Colorado overtime, breaks and who is exempt",
+      "source": "https://cdle.colorado.gov/sites/cdle/files/adopted_2026_comps_order_%2340_7_ccr_1103-1_12.8.25.pdf",
+      "checked": "2026-11-02",
+      "covered_by": [
+        "unit:co-comps-order",
+        "item:people.colorado-wage-rules"
+      ]
+    },
+    {
+      "id": "yearly-wage-numbers",
+      "path": "startup-forms",
+      "need": "This year's Colorado wage and salary lines",
+      "source": "https://cdle.colorado.gov/sites/cdle/files/adopted_2026_pay_calc_order_7_ccr_1103-14_12.8.25.pdf",
+      "checked": "2026-11-02",
+      "covered_by": [
+        "unit:co-pay-calc-order",
+        "item:people.colorado-wage-rules"
+      ]
+    },
+    {
+      "id": "federal-wage-and-overtime",
+      "path": "startup-forms",
+      "need": "Federal minimum wage, overtime and pay records",
+      "source": "https://uscode.house.gov/us/usc/t29/s206/",
+      "checked": "2026-11-13",
+      "covered_by": [
+        "unit:us-flsa-act",
+        "item:people.colorado-wage-rules"
+      ]
+    },
+    {
+      "id": "federal-exemptions",
+      "path": "startup-forms",
+      "need": "Who is exempt from federal overtime",
+      "source": "https://www.govinfo.gov/bulkdata/ECFR/title-29/ECFR-title29.xml",
+      "checked": "2026-11-02",
+      "covered_by": [
+        "unit:us-flsa"
+      ]
+    },
+    {
+      "id": "job-postings",
+      "path": "startup-forms",
+      "need": "Pay range and benefits in every job posting",
+      "source": "https://olls.info/crs/crs2026-title-08.htm",
+      "checked": "2026-11-13",
+      "covered_by": [
+        "unit:co-equal-pay",
+        "item:people.job-postings"
+      ],
+      "flags": [
+        {
+          "kind": "deadline",
+          "text": "within thirty calendar days after a candidate who is selected"
+        }
+      ]
+    },
+    {
+      "id": "application-limits",
+      "path": "startup-forms",
+      "need": "What hiring may not ask or check",
+      "source": "https://olls.info/crs/crs2026-title-08.htm",
+      "checked": "2026-11-13",
+      "covered_by": [
+        "unit:co-hiring-limits",
+        "unit:co-equal-pay"
+      ]
+    },
+    {
+      "id": "paid-sick-leave",
+      "path": "startup-forms",
+      "need": "Paid sick leave and the notice to employees",
+      "source": "https://olls.info/crs/crs2026-title-08.htm",
+      "checked": "2026-11-02",
+      "covered_by": [
+        "unit:co-family-leave",
+        "item:people.paid-sick-leave"
+      ]
+    },
+    {
+      "id": "family-leave-premiums",
+      "path": "startup-forms",
+      "need": "Paid family and medical leave premiums",
+      "source": "https://olls.info/crs/crs2026-title-08.htm",
+      "checked": "2026-11-02",
+      "covered_by": [
+        "unit:co-family-leave",
+        "item:people.family-and-medical-leave-insurance"
+      ]
+    },
+    {
+      "id": "unemployment-insurance",
+      "path": "startup-forms",
+      "need": "Unemployment insurance account and premiums",
+      "source": "https://olls.info/crs/crs2026-title-08.htm",
+      "checked": "2026-11-02",
+      "covered_by": [
+        "unit:co-unemployment",
+        "item:people.unemployment-insurance-account"
+      ]
+    },
+    {
+      "id": "workers-compensation",
+      "path": "startup-forms",
+      "need": "Workers' compensation insurance",
+      "source": "https://olls.info/crs/crs2026-title-08.htm",
+      "checked": "2026-11-02",
+      "covered_by": [
+        "unit:co-workers-comp",
+        "item:compliance-and-governance.workers-compensation-insurance"
+      ]
+    },
+    {
+      "id": "contractor-test-colorado",
+      "path": "startup-forms",
+      "need": "Whether a worker is a contractor in Colorado",
+      "source": "https://olls.info/crs/crs2026-title-08.htm",
+      "checked": "2026-11-13",
+      "covered_by": [
+        "unit:co-wage-act",
+        "unit:co-unemployment-general",
+        "unit:co-workers-comp-general",
+        "item:people.contractor-agreements"
+      ]
+    },
+    {
+      "id": "contractor-test-federal",
+      "path": "startup-forms",
+      "need": "Whether a worker is a contractor in federal wage law",
+      "source": "https://www.govinfo.gov/link/cfr/29/795?sectionnum=110&year=mostrecent&link-type=pdf",
+      "checked": "2026-11-13",
+      "covered_by": [
+        "unit:us-flsa-rules",
+        "item:people.contractor-agreements"
+      ]
+    },
+    {
+      "id": "new-hire-report",
+      "path": "startup-forms",
+      "need": "Reporting each new hire to the state",
+      "source": "https://olls.info/crs/crs2026-title-26.htm",
+      "checked": "2026-11-13",
+      "covered_by": [
+        "unit:co-new-hire",
+        "item:people.new-hire-reports"
+      ],
+      "flags": [
+        {
+          "kind": "deadline",
+          "text": "within twenty calendar days after the date the employer hires the employee"
+        }
+      ]
+    },
+    {
+      "id": "form-i-9",
+      "path": "startup-forms",
+      "need": "Form I-9 for each new employee",
+      "source": "https://www.govinfo.gov/bulkdata/ECFR/title-8/ECFR-title8.xml",
+      "checked": "2026-11-13",
+      "covered_by": [
+        "unit:us-i9",
+        "item:people.form-i-9"
+      ],
+      "flags": [
+        {
+          "kind": "deadline",
+          "text": "within three business days of the hire"
+        }
+      ]
+    },
+    {
+      "id": "workplace-notices",
+      "path": "startup-forms",
+      "need": "Wage, leave and insurance notices for employees",
+      "source": "https://www.govinfo.gov/bulkdata/ECFR/title-29/ECFR-title29.xml",
+      "checked": "2026-11-02",
+      "covered_by": [
+        "unit:us-flsa-act",
+        "unit:co-family-leave",
+        "unit:co-comps-order",
+        "unit:co-unemployment",
+        "unit:co-workers-comp",
+        "item:people.workplace-posters"
+      ]
+    },
+    {
+      "id": "noncompete-rules",
+      "path": "startup-forms",
+      "need": "When a non-compete or nonsolicit is void",
+      "source": "https://olls.info/crs/crs2026-title-08.htm",
+      "checked": "2026-11-13",
+      "covered_by": [
+        "unit:co-noncompete",
+        "item:people.restrictive-covenants",
+        "item:people.offer-letters"
+      ],
+      "flags": [
+        {
+          "kind": "deadline",
+          "text": "at least fourteen days before the earlier of"
+        }
+      ]
+    },
+    {
+      "id": "noncompete-pay-line",
+      "path": "startup-forms",
+      "need": "This year's pay line for a lawful non-compete",
+      "source": "https://cdle.colorado.gov/sites/cdle/files/adopted_2026_pay_calc_order_7_ccr_1103-14_12.8.25.pdf",
+      "checked": "2026-11-02",
+      "covered_by": [
+        "unit:co-pay-calc-order",
+        "unit:co-noncompete"
+      ]
+    },
+    {
+      "id": "past-employer-agreements",
+      "path": "startup-forms",
+      "need": "A founder's past employer covenants",
+      "source": "https://olls.info/crs/crs2026-title-08.htm",
+      "checked": "2026-11-02",
+      "covered_by": [
+        "unit:co-noncompete",
+        "item:founders.prior-employer-agreements"
+      ]
+    },
+    {
+      "id": "wage-claims",
+      "path": "fights",
+      "need": "Wage claims, penalties and retaliation",
+      "source": "https://olls.info/crs/crs2026-title-08.htm",
+      "checked": "2026-11-13",
+      "covered_by": [
+        "unit:co-wage-act",
+        "item:people.colorado-wage-rules"
+      ],
+      "flags": [
+        {
+          "kind": "deadline",
+          "text": "within fourteen days after a written demand is sent"
+        }
+      ]
+    },
+    {
+      "id": "misclassification-fines",
+      "path": "fights",
+      "need": "Fines for treating an employee as a contractor",
+      "source": "https://olls.info/crs/crs2026-title-08.htm",
+      "checked": "2026-11-13",
+      "covered_by": [
+        "unit:co-wage-act",
+        "unit:co-unemployment-general"
+      ]
+    },
+    {
+      "id": "noncompete-enforcement",
+      "path": "fights",
+      "need": "Whether a non-compete holds, and where it's decided",
+      "source": "https://olls.info/crs/crs2026-title-08.htm",
+      "checked": "2026-11-02",
+      "covered_by": [
+        "unit:co-noncompete"
+      ]
+    },
+    {
+      "id": "executive-overtime",
+      "path": "fights",
+      "need": "Whether a founder or executive is owed overtime",
+      "source": "https://www.govinfo.gov/bulkdata/ECFR/title-29/ECFR-title29.xml",
+      "checked": "2026-11-02",
+      "covered_by": [
+        "unit:us-flsa",
+        "unit:co-comps-order"
+      ]
+    },
+    {
+      "id": "federal-noncompete-ban",
+      "path": "fights",
+      "need": "Whether the federal non-compete ban applies",
+      "source": "https://www.govinfo.gov/content/pkg/FR-2026-02-12/pdf/2026-02866.pdf",
+      "checked": "2026-11-02",
+      "covered_by": [
+        "unit:us-ftc-noncompete"
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "employment-law-final-pay-discharge",
+      "question": "If we fire an employee in Colorado, how soon do we have to give them their final paycheck?",
+      "expect": [
+        "C.R.S. § 8-4-109(1)(a)"
+      ]
+    },
+    {
+      "id": "employment-law-final-pay-resignation",
+      "question": "One of our Colorado employees just gave notice that she is quitting. When is her last paycheck due?",
+      "expect": [
+        "C.R.S. § 8-4-109(1)(b)"
+      ]
+    },
+    {
+      "id": "employment-law-unpaid-wage-demand-penalty",
+      "question": "A former employee sent us a written demand saying we owe her an unpaid bonus. What happens under Colorado law if we don't pay within two weeks?",
+      "expect": [
+        "C.R.S. § 8-4-109(3)(b)"
+      ]
+    },
+    {
+      "id": "employment-law-local-minimum-wage",
+      "question": "Our office is in Denver. Can a Colorado city make us pay a higher minimum wage than the state minimum?",
+      "expect": [
+        "C.R.S. § 8-6-101(3)"
+      ]
+    },
+    {
+      "id": "employment-law-federal-exempt-salary-floor",
+      "question": "Our first software engineer will be on a salary. Under federal law, what is the lowest salary we can pay and still treat them as exempt from overtime?",
+      "expect": [
+        "29 C.F.R. § 541.600",
+        "29 C.F.R. § 541.400"
+      ]
+    },
+    {
+      "id": "employment-law-colorado-contractor-test",
+      "question": "We want to pay a Colorado developer as an independent contractor instead of hiring them. What test does Colorado use to decide whether they are really a contractor?",
+      "expect": [
+        "C.R.S. § 8-70-115(1)(b)",
+        "C.R.S. § 8-70-115(1)(c)",
+        "C.R.S. § 8-4-101(5)"
+      ]
+    },
+    {
+      "id": "employment-law-misclassification-fines",
+      "question": "What fines can Colorado charge us if it finds we treated an employee as a contractor?",
+      "expect": [
+        "C.R.S. § 8-4-113(1)(a)"
+      ]
+    },
+    {
+      "id": "employment-law-flsa-contractor-test",
+      "question": "Under federal wage and hour law, how do we tell whether our freelance designer is legally an employee who is owed minimum wage and overtime?",
+      "expect": [
+        "29 C.F.R. § 795.105",
+        "29 C.F.R. § 795.110"
+      ]
+    },
+    {
+      "id": "employment-law-workers-comp-first-employee",
+      "question": "We are about to hire our first and only employee in Colorado. Do we already need workers' compensation insurance?",
+      "expect": [
+        "C.R.S. § 8-44-101",
+        "C.R.S. § 8-40-203(1)(b)"
+      ]
+    },
+    {
+      "id": "employment-law-noncompete-junior-staff",
+      "question": "Can we make every new Colorado employee sign a non-compete, including junior engineers?",
+      "expect": [
+        "C.R.S. § 8-2-113(2)"
+      ]
+    },
+    {
+      "id": "employment-law-noncompete-separate-notice",
+      "question": "We want a senior Colorado hire who earns well above the state's threshold to sign a non-compete. What notice do we have to give, and by when?",
+      "expect": [
+        "C.R.S. § 8-2-113(4)"
+      ]
+    },
+    {
+      "id": "employment-law-noncompete-acquired-founder",
+      "question": "We are buying a small startup. One founder owns a minority stake she got as equity for her work. How long can the non-compete in the purchase agreement last for her?",
+      "expect": [
+        "C.R.S. § 8-2-113(3)(c)"
+      ]
+    },
+    {
+      "id": "employment-law-trap-federal-noncompete-ban",
+      "question": "I read that the FTC banned non-competes nationwide. Does that mean we no longer have to worry about Colorado's non-compete rules for our employees?",
+      "expect": [
+        "C.R.S. § 8-2-113"
+      ],
+      "mustNot": [
+        "FTC'?s? (non-?compete )?(rule|ban) (is|remains|has been|went) (now )?(in effect|in force|effective|into effect)",
+        "non-?competes? (are|is) (now )?(banned|illegal|prohibited|void) (nationwide|nationally|everywhere|under federal law|across the (country|united states))",
+        "(no longer|don'?t|do not) (need|have) to (worry about|follow|comply with) (colorado|the state)"
+      ]
+    },
+    {
+      "id": "employment-law-trap-delaware-choice-of-law",
+      "question": "We are a Delaware corporation and our employment agreements say Delaware law governs. Can we enforce a non-compete under Delaware law against an engineer who lives and works in Colorado?",
+      "expect": [
+        "C.R.S. § 8-2-113(6)"
+      ],
+      "mustNot": [
+        "delaware law (governs|controls|will govern|will control|would govern|would control) (the|this|your|her|his|their|that) (non-?compete|covenant|restrictive covenant)",
+        "(choice[- ]of[- ]law|governing[- ]law) (clause|provision|term) (is|will be|would be) (enforceable|enforced|upheld|honored|respected|valid|controlling)",
+        "can enforce (the|this|her|his|your|that|a) non-?compete under delaware law"
+      ]
+    },
+    {
+      "id": "employment-law-i9-deadline",
+      "question": "Our first hire starts Monday. How many days do we have to check their work authorization documents and finish the I-9?",
+      "expect": [
+        "8 U.S.C. § 1324a(b)"
+      ]
+    },
+    {
+      "id": "employment-law-new-hire-report-deadline",
+      "question": "How many days do we have to report a new Colorado employee to the state new hire directory?",
+      "expect": [
+        "C.R.S. § 26-13-125(6)",
+        "42 U.S.C. § 653a(b)(2)"
+      ]
+    },
+    {
+      "id": "employment-law-contractor-new-hire-report",
+      "question": "We just signed a freelancer who works from Colorado. Do we have to report contractors to the state new hire directory too, or only employees?",
+      "expect": [
+        "C.R.S. § 26-13-125(9)"
+      ]
+    },
+    {
+      "id": "employment-law-job-posting-pay-range",
+      "question": "We are posting our first job opening for a role based in Colorado. Do we have to put the salary in the posting?",
+      "expect": [
+        "C.R.S. § 8-5-201(2)"
+      ]
+    },
+    {
+      "id": "employment-law-paid-sick-leave-accrual",
+      "question": "How much paid sick leave do we have to give a part-time employee in Colorado?",
+      "expect": [
+        "C.R.S. § 8-13.3-403(2)(a)"
+      ]
+    },
+    {
+      "id": "employment-law-application-age-questions",
+      "question": "Can our online job application ask candidates for their date of birth or the year they graduated?",
+      "expect": [
+        "C.R.S. § 8-2-131(3)(a)"
+      ]
+    }
+  ]
+}

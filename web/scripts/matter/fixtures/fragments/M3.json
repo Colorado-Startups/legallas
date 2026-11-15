@@ -1,0 +1,15 @@
+{
+  "card": "M3",
+  "claims": [
+    {
+      "id": "count-1", "count": 1, "type": "breachContract", "label": "Breach of the stock agreement", "against": ["org-harbor"],
+      "cites": [{ "path": "08-Court-Pleadings/Complaint_FAC__20130409__Jane-Doe__First-Amended.pdf", "page": 12 }],
+      "elements": [
+        { "id": "count-1-el-1", "text": "A stock agreement existed", "authority": "Example v. Example, 1 P.3d 1 (Example 2000)",
+          "proof": [{ "cite": { "path": "01-Corporate-Records/Stock_Agreement_SA__20110607__Harbor-Labs__Countersigned.pdf", "page": 1 }, "strength": "direct", "note": null }] },
+        { "id": "count-1-el-2", "text": "The defendant breached it", "authority": "Example v. Example, 1 P.3d 1 (Example 2000)",
+          "proof": [{ "cite": { "path": "04-Letters/Email_EML__20120507__Mark-Moe__Meeting-Plan.pdf", "page": 1 }, "strength": "circumstantial", "note": "The email plans a meeting for two days later." }] }
+      ]
+    }
+  ]
+}

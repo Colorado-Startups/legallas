@@ -1,0 +1,4 @@
+[
+  { "id": "daily", "runner": "linux", "cadence": "daily", "collector": "collect/collect.ts", "args": ["daily"] },
+  { "id": "links", "runner": "linux", "cadence": "weekly", "collector": "collect/collect.ts", "args": ["weekly"] }
+]

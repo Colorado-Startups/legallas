@@ -1,0 +1,200 @@
+# Applies this repository's settings from the Settings page's source of truth,
+# quality-speed/pages/settings/expected-settings.json on main, so a reviewed
+# change to that file is how a repository setting changes. Runs by hand
+# (workflow_dispatch) and on a push to main that changes the file.
+#
+# Applies only values that keep each gate at least as strict: it never loosens one.
+#
+# Scope: only the file's repo-level settings (`"read": "repo"`) named in the
+# `allow` list below, each with the values it may take, and only through
+# PATCH /repos/{owner}/{repo}. Those in `skip`, and every entry that isn't
+# repo-level, stay read-only on the Settings page: it never calls a ruleset,
+# branch protection, required check or collaborator endpoint. Any other
+# repo-level entry, or a value outside its list, stops the run before the write
+# token is minted, and the summary says which.
+#
+# The tokens are the org's GitHub App, "Legallas Automation" (`legallas-automation`),
+# minted for this one job and this repository only: one with only
+# `contents: read`, to read the file, then one with only `administration: write`,
+# to read and change the settings. The job's own GITHUB_TOKEN gets no scope at
+# all. The key is in the `settings` environment, which allows `main` only, so a
+# branch's copy of this file can't reach it.
+#
+# Write scopes: one owner merge for board-card.yml and this file, the owner's
+# decision of 2026-11-05 in #393. The App and environment setup is recorded in
+# #393 comment 6648846691.
+#
+# The job summary shows the dry-run diff, each setting now and wanted, before
+# anything is applied. Each change is its own PATCH, checked against GitHub's
+# answer, turning settings on before others off; any that fails fails the job.
+name: Settings apply
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - quality-speed/pages/settings/expected-settings.json
+
+permissions: {}
+
+# One run at a time, and none cancelled halfway.
+concurrency:
+  group: settings-apply
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: github.ref == 'refs/heads/main'
+    # Holds the App's key, so GitHub-hosted (CLAUDE.md, "Tests run in the cloud").
+    runs-on: ubuntu-latest
+    environment: settings
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Read token
+        id: read
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.CS_APP_CLIENT_ID }}
+          private-key: ${{ secrets.CS_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: read
+      - name: Plan
+        env:
+          GH_TOKEN: ${{ steps.read.outputs.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          FILE: quality-speed/pages/settings/expected-settings.json
+        run: |
+          set -euo pipefail
+          # Escaped as workflow commands need, so a value with a line break can't start a command of its own.
+          fail() {
+            local message="${1//'%'/%25}"
+            message="${message//$'\r'/%0D}"
+            echo "::error title=Settings apply::${message//$'\n'/%0A}" >&2
+            exit 1
+          }
+
+          file="$RUNNER_TEMP/expected.json"
+          gh api -H 'Accept: application/vnd.github.raw+json' "repos/$REPO/contents/$FILE?ref=$SHA" >"$file" ||
+            fail "$FILE could not be read at $SHA"
+
+          # plan: the repo-level settings to apply. problems: why not to apply any. left, other: what stays with the Settings page.
+          jq --arg target "$REPO" '
+            # Each repo-level field this may set: its place in GET and PATCH /repos/{owner}/{repo} (default [id]), and only
+            # the values that keep its gate at least as strict.
+            def allow: {
+              default_branch: {values: ["main"]},
+              web_commit_signoff_required: {values: [true]},
+              allow_squash_merge: {values: [true]},
+              allow_merge_commit: {values: [false]},
+              allow_rebase_merge: {values: [false]},
+              delete_branch_on_merge: {values: [true]},
+              allow_update_branch: {values: [false]},
+              squash_merge_commit_message: {values: ["COMMIT_MESSAGES"]},
+              # On only: the merge queue needs it.
+              allow_auto_merge: {values: [true]}
+            };
+            # Repo-level fields in the file that this never sets.
+            # Visibility is set by the owner, made once at cut-over; this never flips it either way.
+            def skip: ["repo_visibility", "allow_forking", "dependabot_security_updates", "has_discussions", "has_issues", "has_projects", "has_wiki"];
+            def safe($re; $else): if type == "string" and test($re) then . else $else end;
+            if type != "object" or (.settings | type) != "array" then {problems: ["the file has no settings list"], plan: [], left: [], other: []}
+            else
+              allow as $allow
+              | [.settings[] | select(type == "object")] as $all
+              | [$all[] | select(.read == "repo")] as $repo
+              | (
+                  (if .repo == $target then [] else ["the file is not for \($target)"] end)
+                  + [$repo[] | .id as $id | (.expect | if type == "object" then . else {} end) as $e | ($id | safe("^[a-z][a-z0-9_]{0,79}$"; "an entry with a bad id")) as $name
+                      | if ($id | type) != "string" then "\($name): not a repo-level field this workflow knows"
+                        elif any(skip[]; . == $id) then empty
+                        elif $allow[$id] == null then "\($name): not a repo-level field this workflow knows"
+                        elif ([$repo[] | select(.id == $id)] | length) > 1 then "\($name): listed more than once"
+                        elif $e.op != "equals" then "\($name): only an equals value can be applied"
+                        elif any($allow[$id].values[]; . == $e.value) | not then "\($name): the value is not one this workflow applies"
+                        else empty end]
+                  | unique
+                ) as $problems
+              | {
+                  problems: $problems,
+                  # Built only from a file with no problems, so every id is in allow or skip.
+                  plan: (if $problems == [] then [$repo[] | select($allow[.id] != null) | {id, path: ($allow[.id].path // [.id]), want: .expect.value}] else [] end),
+                  left: (if $problems == [] then [$repo[] | select($allow[.id] == null) | .id] | unique else [] end),
+                  other: ([$all[] | select(.read != "repo") | .area | safe("^[a-z][a-z0-9_]{0,39}$"; "other")] | group_by(.) | map({area: .[0], count: length}))
+                }
+            end' "$file" >"$RUNNER_TEMP/plan.json" || fail "$FILE is not valid JSON"
+
+          if jq -e '.problems | length > 0' "$RUNNER_TEMP/plan.json" >/dev/null; then
+            {
+              printf '### Settings apply: stopped, nothing applied\n\n'
+              jq -r '.problems[] | "- \(.)"' "$RUNNER_TEMP/plan.json"
+            } >>"$GITHUB_STEP_SUMMARY"
+            fail "stopped before applying anything: $(jq -r '.problems | join("; ")' "$RUNNER_TEMP/plan.json")"
+          fi
+      - name: Admin token
+        id: admin
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.CS_APP_CLIENT_ID }}
+          private-key: ${{ secrets.CS_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-administration: write
+      - name: Apply
+        env:
+          GH_TOKEN: ${{ steps.admin.outputs.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          FILE: quality-speed/pages/settings/expected-settings.json
+        run: |
+          set -euo pipefail
+          # Escaped as workflow commands need, so a value with a line break can't start a command of its own.
+          fail() {
+            local message="${1//'%'/%25}"
+            message="${message//$'\r'/%0D}"
+            echo "::error title=Settings apply::${message//$'\n'/%0A}" >&2
+            exit 1
+          }
+
+          # The response stays in a file and is never printed.
+          gh api "repos/$REPO" >"$RUNNER_TEMP/live.json" || fail "$REPO could not be read"
+          jq --slurpfile live "$RUNNER_TEMP/live.json" '[.plan[] | .path as $p | . + {now: ($live[0] | getpath($p))}]' "$RUNNER_TEMP/plan.json" >"$RUNNER_TEMP/diff.json"
+
+          # The dry-run diff, before anything is applied.
+          {
+            # shellcheck disable=SC2016 # Markdown's backticks, single-quoted on purpose.
+            printf '### Settings apply: dry run\n\nFrom `%s` at `%s`.\n\n| Setting | Now | Want | |\n|---|---|---|---|\n' "$FILE" "$SHA"
+            jq -r '.[] | "| `\(.id)` | \(.now | tojson) | \(.want | tojson) | \(if .now == null then "unread" elif .now == .want then "same" else "**change**" end) |"' "$RUNNER_TEMP/diff.json"
+            printf '\nLeft to the Settings page, never applied here: %s.\n' "$(jq -r '[(.left[] | "`\(.)`"), (.other[] | "\(.area) \(.count)")] | join(", ") | if . == "" then "none" else . end' "$RUNNER_TEMP/plan.json")"
+          } >>"$GITHUB_STEP_SUMMARY"
+
+          # A setting that can't be read can't be diffed, so nothing is applied.
+          unread="$(jq -r '[.[] | select(.now == null) | .id] | join(", ")' "$RUNNER_TEMP/diff.json")"
+          [[ -z "$unread" ]] || fail "stopped before applying anything: could not read $unread"
+
+          # Turning on before turning off, so a merge method is never left with none.
+          mapfile -t changes < <(jq -c '[.[] | select(.now != .want)] | sort_by(.want != true) | .[]' "$RUNNER_TEMP/diff.json")
+          same="$(jq '[.[] | select(.now == .want)] | length' "$RUNNER_TEMP/diff.json")"
+          if (( ${#changes[@]} == 0 )); then
+            echo "::notice title=Settings apply::nothing to change; $same settings already match"
+            exit 0
+          fi
+
+          failed=()
+          printf '\n### Settings apply: applied\n\n| Setting | Result |\n|---|---|\n' >>"$GITHUB_STEP_SUMMARY"
+          for change in "${changes[@]}"; do
+            id="$(jq -r '.id' <<<"$change")"
+            if answer="$(jq -c '. as $c | {} | setpath($c.path; $c.want)' <<<"$change" | gh api -X PATCH "repos/$REPO" --input -)" &&
+              jq -e --argjson c "$change" 'getpath($c.path) == $c.want' <<<"$answer" >/dev/null; then
+              echo "| \`$id\` | done |" >>"$GITHUB_STEP_SUMMARY"
+            else
+              echo "| \`$id\` | **failed** |" >>"$GITHUB_STEP_SUMMARY"
+              failed+=("$id")
+            fi
+          done
+
+          (( ${#failed[@]} == 0 )) || fail "${#failed[@]} of ${#changes[@]} changes failed: ${failed[*]}"
+          echo "::notice title=Settings apply::applied ${#changes[@]} changes; $same settings already matched"

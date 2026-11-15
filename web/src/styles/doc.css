@@ -1,0 +1,370 @@
+/*
+  The document page as an exhibit (card P6; web/design/doc-viewer/): breadcrumb by data-room index, Previous and
+  Next in the folder, the exhibit header, one viewer per kind, and the discussion beside it. Composes c-* blocks;
+  page classes carry the doc- prefix. Nothing decorative inside the viewer.
+*/
+
+.doc-ready:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.doc-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-5);
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Breadcrumb: Documents / 04 Letters / 04.2 Sent */
+.doc-crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+  list-style: none;
+}
+
+.doc-crumbs li + li::before {
+  margin-right: var(--space-2);
+  color: var(--ink-3);
+  content: '/';
+}
+
+.doc-crumbs a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--brass-rule);
+  text-underline-offset: 3px;
+}
+
+.doc-crumbs a:hover {
+  color: var(--forest-hover);
+  text-decoration-color: currentColor;
+}
+
+.doc-crumb-index {
+  color: var(--brass-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+}
+
+/* Previous and Next in the folder, with fletched arrows */
+.doc-pager:not([hidden]) {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.doc-pager-place {
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.doc-arrow {
+  flex: none;
+  width: 24px;
+  height: 24px;
+}
+
+.doc-chevron--back {
+  transform: scaleX(-1);
+}
+
+/* Exhibit header */
+.doc-exhibit {
+  padding: var(--space-5);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.doc-exhibit-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-5);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.doc-exhibit-name {
+  flex: 1 1 24rem;
+  min-width: 0;
+}
+
+.doc-control {
+  margin: 0 0 var(--space-1);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-18);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5rem;
+}
+
+.doc-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-26);
+  font-weight: 600;
+  line-height: 2rem;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.doc-file {
+  margin: var(--space-1) 0 0;
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+  overflow-wrap: anywhere;
+}
+
+.doc-summary {
+  max-width: var(--measure);
+  margin: var(--space-2) 0 0;
+  color: var(--ink-2);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1.625rem;
+}
+
+.doc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.doc-key-badge {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--brass-mark);
+}
+
+.doc-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
+  margin: var(--space-5) 0 0;
+}
+
+.doc-fact dt {
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+}
+
+.doc-fact dd {
+  margin: var(--space-1) 0 0;
+  color: var(--ink);
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+}
+
+.doc-fact .doc-fact-quiet {
+  color: var(--ink-3);
+}
+
+.doc-key-status {
+  margin: var(--space-3) 0 0;
+  color: var(--ink-2);
+}
+
+.doc-key-status:empty {
+  display: none;
+}
+
+/* Viewer and discussion side by side from 64rem */
+.doc-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(20rem, 24rem);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.doc-main {
+  min-width: 0;
+}
+
+.doc-view:not([hidden]) {
+  display: block;
+}
+
+.doc-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-3);
+}
+
+.doc-bar-group,
+.doc-bar-page {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.doc-bar-page {
+  color: var(--ink-2);
+}
+
+.doc-bar-page .c-input,
+.doc-bar-select {
+  width: auto;
+  min-height: 2rem;
+  padding: var(--space-1) var(--space-2);
+}
+
+.doc-bar-page .c-input {
+  width: 4.5rem;
+  font-family: var(--font-mono);
+  text-align: right;
+}
+
+.doc-bar-status {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+
+.doc-chevron {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* PDF: PDF.js needs an absolutely positioned scroll container. */
+.doc-view--pdf:not([hidden]),
+.doc-image-stage {
+  padding: var(--space-3);
+  background: var(--panel);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.doc-pdf-frame {
+  position: relative;
+  height: max(30rem, calc(100dvh - 14rem));
+  overflow: hidden;
+}
+
+.doc-pdf-scroll {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+}
+
+.doc-pdf-scroll:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+/* Below 64rem: one column, the pager after the viewer, the discussion last. */
+@media (max-width: 64rem) {
+  .doc-top,
+  .doc-layout {
+    display: contents;
+  }
+
+  .doc-crumbs {
+    order: 1;
+  }
+
+  .doc-exhibit {
+    order: 2;
+  }
+
+  .doc-main {
+    order: 3;
+  }
+
+  .doc-pager:not([hidden]) {
+    order: 4;
+    justify-content: space-between;
+  }
+
+  .doc-aside {
+    order: 5;
+    margin-top: var(--space-3);
+  }
+}
+
+@media (max-width: 48rem) {
+  /* The breadcrumb keeps Documents and the folder itself. */
+  .doc-crumbs li:not(:first-child, :last-child) {
+    display: none;
+  }
+
+  .doc-exhibit {
+    padding: var(--space-4);
+  }
+
+  /* The pager keeps the arrows and the next control number; "Previous" stays for screen readers. */
+  .doc-pager-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .doc-title {
+    font-size: var(--text-21);
+    line-height: 1.75rem;
+  }
+
+  .doc-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3) var(--space-4);
+  }
+
+  .doc-actions {
+    width: 100%;
+  }
+
+  .doc-actions .c-button {
+    flex: 1 1 auto;
+  }
+
+  .doc-view--pdf:not([hidden]) {
+    margin-inline: calc(-1 * var(--gutter));
+    border-inline: 0;
+    border-radius: 0;
+  }
+
+  /* As tall as the rendered pages (doc-page.ts sets --doc-pdf-fit), never more than 80vh (R87). */
+  .doc-pdf-frame {
+    height: min(80vh, var(--doc-pdf-fit, 80vh));
+    min-height: 12rem;
+  }
+}
+
+@media print {
+  .doc-pager,
+  .doc-actions,
+  .doc-bar,
+  .doc-aside {
+    display: none !important;
+  }
+
+  .doc-layout {
+    display: block;
+  }
+
+  .doc-pdf-frame {
+    height: auto;
+  }
+}

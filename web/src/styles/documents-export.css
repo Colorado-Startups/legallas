@@ -1,0 +1,20 @@
+/* Documents: the Download index button under the tabs (D17), and its one-line note. Tokens only (DESIGN.md). */
+.docs-export {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+  margin: var(--space-2) 0 0;
+}
+
+.docs-export__note {
+  color: var(--ink-3);
+  font-size: var(--text-12);
+  line-height: 1rem;
+}
+
+@media print {
+  .docs-export {
+    display: none;
+  }
+}

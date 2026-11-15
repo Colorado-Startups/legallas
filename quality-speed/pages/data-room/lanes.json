@@ -1,0 +1,6 @@
+[
+  { "id": "lab-forming", "runner": "linux-hosted", "cadence": "nightly", "collector": "collect-forming.ts" },
+  { "id": "lab-dispute", "runner": "linux-hosted", "cadence": "nightly", "collector": "collect-dispute.ts" },
+  { "id": "vc", "runner": "linux", "cadence": "daily", "collector": "collect-deal.ts", "args": ["vc"], "install": true },
+  { "id": "angel", "runner": "linux", "cadence": "weekly", "collector": "collect-deal.ts", "args": ["angel"] }
+]

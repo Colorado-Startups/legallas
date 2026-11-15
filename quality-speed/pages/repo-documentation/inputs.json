@@ -1,0 +1,24 @@
+{
+  "about": "Every number and list outside manifest.json that sets a score. Pinned in inputs.lock.json with questions.json and not-in-tree.json. readability_excluded_pattern, entry, unreached_minutes, sentence_limit, min_comment_words and lag_window_days feed the checks the Code page imports from this folder.",
+  "corpus_excluded": [
+    "quality-speed/"
+  ],
+  "readme": "README.md",
+  "community": [
+    "CONTRIBUTING.md",
+    "SECURITY.md"
+  ],
+  "community_visual_min": 50,
+  "words_per_minute": 238,
+  "min_definite_share": 0.9,
+  "main_commits": 100,
+  "readability_excluded_pattern": "^templates/(founders|investors)/(?!README\\.md$)",
+  "entry": {
+    "agent": "CLAUDE.md",
+    "person": "README.md"
+  },
+  "unreached_minutes": 60,
+  "sentence_limit": 25,
+  "min_comment_words": 3,
+  "lag_window_days": 30
+}

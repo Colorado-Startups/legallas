@@ -1,0 +1,17 @@
+{
+  "measured": "Job records 2026-11-01 19:02 to 2026-11-02 04:55 UTC, replayed with each change: 38 merges in 9.9 hours",
+  "changes": [
+    { "id": "slim-small", "label": "1-core jobs", "state": "merged", "pull": 82, "merged_at": "2026-11-02T05:47:17Z", "usd_day": 3.9, "effect": { "ci_usd_per_merge": -0.0424 } },
+    { "id": "relax-behind", "label": "0-behind rule", "state": "no", "why": "rule stays; its cost", "pull": null, "usd_day": 3.4 },
+    { "id": "ci-ok-slim", "label": "ci-ok 1-core", "state": "open", "pull": 187, "usd_day": 1.53, "effect": { "ci_usd_per_merge": -0.0166 } },
+    { "id": "mac-drafts", "label": "Mac skips drafts", "state": "no", "why": "gate", "pull": null, "usd_day": 0.68 },
+    { "id": "rebase-ready", "label": "Rebase, then ready", "state": "merged", "pull": 160, "merged_at": "2026-11-02T06:13:00Z", "usd_day": 0.58 },
+    { "id": "office-fold", "label": "Fold office-mac", "state": "no", "why": "2 runs", "pull": null, "usd_day": 0.29 },
+    { "id": "npm-cache", "label": "npm cache", "state": "no", "why": "6 s", "pull": null, "usd_day": 0.16 },
+    { "id": "ready-rerun", "label": "No ready rerun", "state": "open", "pull": 187, "usd_day": 0.12, "effect": { "repeat_runs_per_merge": -0.711, "ci_usd_per_merge": -0.0013 } },
+    { "id": "docs-skip", "label": "Skip Markdown", "state": "no", "why": "tests read it", "pull": null, "usd_day": 0.11 },
+    { "id": "check-once", "label": "Check once", "state": "merged", "pull": 160, "merged_at": "2026-11-02T06:13:00Z", "usd_day": 0 },
+    { "id": "cancel-old", "label": "Cancel superseded", "state": "no", "why": "already on", "pull": null, "usd_day": 0 },
+    { "id": "law-blacksmith", "label": "Law pack to Blacksmith", "state": "no", "why": "pool full", "pull": null, "usd_day": 0 }
+  ]
+}

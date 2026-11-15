@@ -1,0 +1,47 @@
+/*
+  Card F8. The mark in the room (src/components/LegallasMark.astro): the brand pack's mark in one ink,
+  currentColor throughout, static (R48). door.css draws the same markup in two inks on the front door.
+  Strokes are a little heavier than the door's, so the rings hold at the 36px empty-state size.
+*/
+.legallas-mark {
+  display: block;
+  overflow: visible;
+  /* F1's c-empty__glyph sets crispEdges; the rings are curves. */
+  shape-rendering: geometricPrecision;
+}
+
+.legallas-mark .seal-ring {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+
+.legallas-mark .seal-ripple {
+  display: none;
+}
+
+.legallas-mark .seal-dot,
+.legallas-mark .seal-head,
+.legallas-mark .seal-leaf {
+  fill: currentColor;
+}
+
+.legallas-mark .seal-shaft {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 2;
+}
+
+/* Empty states (LegallasEmpty.astro): the seal, quiet, at 36px, inside F1's c-empty__glyph slot. */
+.c-empty__glyph.legallas-empty-seal {
+  width: 36px;
+  height: 36px;
+  color: var(--ink-3);
+}
+
+@media (forced-colors: active) {
+  .c-empty__glyph.legallas-empty-seal {
+    color: CanvasText;
+  }
+}

@@ -1,0 +1,593 @@
+# Every change: the secret guard, workflow lint, the counsel room
+# (web/), the Swift package (LegallasCore, LegallasMCP, the app, extraction), the
+# Legallas.app bundle and the Quality and Speed site (quality-speed/).
+#
+# `checks` runs on Linux, on GitHub-hosted ubuntu-latest. Blacksmith's free
+# minutes are off until Code-OS's org-wide meter exists (BLACKSMITH_ALLOWED in
+# .github/scripts/build_minutes_guard.py); `choose-runner` still counts them on
+# each push to main and manual run. A pull request skips it: with Blacksmith
+# off it would only name ubuntu-latest, the fallback, for a billed minute a push.
+# It stays on
+# GitHub-hosted because its token reads this repository's Actions records, on
+# the 1-core runner because it takes seconds and costs a third as much there.
+#
+# A push to main that `choose-runner` finds already passed (`tested`: `ci-ok` green on that very commit in the merge
+# queue, or on the merged pull request's head with the same tree) skips `checks` too, and so every job: it would only
+# repeat a pass on the same tree. `ci-ok` accepts that skip only there. The Security page then reads the pull
+# request's secret scan.
+# `ci-ok` only reads the other jobs' results, in seconds, so it runs on that
+# 1-core runner too and leaves Blacksmith's free minutes to `checks`, which
+# holds no secret or write scope.
+#
+# The macOS jobs run on GitHub-hosted arm64 VMs (5 CPUs, no Neural Engine),
+# whose minutes cost about 10x Linux minutes. So they run only when
+# their paths change, and the concurrency group below cancels a pull request's
+# superseded run. Each takes a few minutes: there is no .build cache, because
+# the package has no remote dependencies and SwiftPM recompiles every freshly
+# checked-out file anyway (it compares modification times), so a restored
+# .build would only add upload and download time.
+#
+# `swift` runs on `xcode-27` (macOS 27 and Xcode 27; still a GitHub preview image) only when Swift paths change, on pull
+# requests and on the push to main: lint, the Debug and Release builds, the
+# tests, the app bundle and LegallasCore for iOS. A push to main skips all three
+# macOS jobs when `choose-runner` finds it is exactly what CI already passed on
+# the pull request's head, because they would only repeat that run at 10x the cost.
+#
+# Vision's accurate OCR (LegallasExtraction) fails on hosted macOS 27 VMs
+# (checked 2026-10-31: "nilError", on the virtual GPU and on the CPU) but runs
+# on hosted macOS 26 VMs. So `swift` skips LegallasExtractionTests with a notice
+# when its probe fails, and `swift-ocr` runs them on `macos-26`, where a failed
+# probe fails the job: every test runs on one of the two images. `swift-ocr`
+# also checks that the extractor still reads the sample room's fictional files
+# as committed in quality-speed/pages/data-room/extract-cache, which is what lets
+# that room seed on Linux.
+#
+# `office-mac` runs two web test files on hosted macOS when web/scripts or a file
+# their test imports changes (office= in changed-paths.sh): the office reader
+# (web/scripts/office.ts) reads Word, RTF and OpenDocument files with macOS's
+# /usr/bin/textutil, which Linux lacks, so `checks` skips those tests there.
+# Node runs the one test file directly (no npm install), in seconds.
+#
+# `sync-windows` runs the sync engine's tests on hosted Windows when the engine
+# changes (sync= in changed-paths.sh), because a founder's OneDrive folder is on
+# Windows, whose minutes cost more than Linux's. These include the real Windows
+# OCR API, and a failure there fails the job, so OCR never skips silently.
+#
+# The merge queue (S4) runs all of this again on its merge group: the pull
+# request's head merged onto main and any pull requests ahead of it in the queue.
+# That run is what lands on main, so it is the one that has to pass on main's
+# real next tree. changed-paths.sh compares the group's head with its base.
+#
+# A pull request runs `office-mac` and `sync-windows` once per version of the
+# files they test. `checks` skips one when the Actions API shows it
+# passed in an earlier run of this workflow on this pull request whose head had
+# those files, this workflow and `changed-paths.sh` as this run has them
+# (.github/scripts/inputs_passed.py says how). Nothing a run writes counts, so a
+# workflow the pull request adds and later deletes can't fake a pass. Manual
+# runs and main run them as before. Anything it can't check runs them.
+#
+# `ci-ok` is the required check here: it passes only when `checks` succeeded
+# and `swift`, `swift-ocr`, `office-mac` and `sync-windows` each succeeded or
+# were skipped (nothing in their area changed; a skipped job costs nothing), and
+# `swift-ocr` passed whenever `swift` did. A web step with nothing to do for a
+# change is skipped inside `checks`.
+name: CI
+
+on:
+  pull_request:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches: [main]
+  # A manual run checks every area and scans the full history for secrets.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A new push to a pull request cancels the run it supersedes, macOS jobs
+# included. GitHub keeps one running and one pending run per group, so a
+# shared group on main let a burst of merges cancel a pending run. Each push
+# to main gets a group of its own commit instead, so every commit's run
+# finishes. ci_concurrency_test.py checks both.
+concurrency:
+  group: ci-${{ github.ref }}${{ github.event_name == 'push' && format('-{0}', github.sha) || '' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # Not a check: a failure here never stops CI (continue-on-error), and the jobs
+  # below then fall back to GitHub-hosted and run the Mac jobs as usual. All
+  # read scopes. The ledger cache keeps the count between runs; only main saves
+  # it, so a pull request reads main's count and cannot change it.
+  # Not on a pull request or in the merge queue: there it would only pick the runner, and with Blacksmith off
+  # (BLACKSMITH_ALLOWED in build_minutes_guard.py) that is always GitHub-hosted, the fallback below. Skipping it saves
+  # a billed minute on every push to a pull request. build_minutes_guard_test.py fails if Blacksmith turns back on while
+  # pull requests still skip this. Only main saves the ledger, and `tested` is a push's alone.
+  choose-runner:
+    if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
+    runs-on: ubuntu-slim
+    # Room for main to rebuild a lost ledger, up to 300 reads on one CPU. A timeout here would run the Mac jobs again.
+    timeout-minutes: 5
+    continue-on-error: true
+    permissions:
+      actions: read
+      checks: read
+      contents: read
+      pull-requests: read
+    outputs:
+      runner: ${{ steps.guard.outputs.runner }}
+      tested: ${{ steps.guard.outputs.tested }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/scripts
+      - name: Restore the ledger
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: build-minutes-ledger.json
+          key: build-minutes-ledger-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: build-minutes-ledger-
+      - name: Build minutes guard
+        id: guard
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_RUNNER: ${{ vars.CI_RUNNER }}
+        run: python3 .github/scripts/build_minutes_guard.py
+      - name: Save the ledger
+        if: github.ref == 'refs/heads/main'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: build-minutes-ledger.json
+          key: build-minutes-ledger-${{ github.run_id }}-${{ github.run_attempt }}
+
+  checks:
+    needs: choose-runner
+    # Branches of this repo only; code from a fork never runs on a
+    # third-party runner (Blacksmith's). !cancelled(): a failed choose-runner
+    # must not skip the checks.
+    if: >-
+      !cancelled() &&
+      !(github.event_name == 'push' && needs.choose-runner.outputs.tested == 'true') &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ${{ fromJSON(needs.choose-runner.outputs.runner || '"ubuntu-latest"') }}
+    # The only job here that can run on Blacksmith, so this timeout is WORST_CASE_MINUTES in build_minutes_guard.py
+    # (build_minutes_guard_test.py checks they agree).
+    timeout-minutes: 20
+    # actions and pull-requests: read for inputs_passed.py alone, the one step given the token.
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    outputs:
+      office: ${{ steps.changed.outputs.office }}
+      sync: ${{ steps.changed.outputs.sync }}
+      swift: ${{ steps.changed.outputs.swift }}
+      office_passed: ${{ steps.passed.outputs.office }}
+      sync_passed: ${{ steps.passed.outputs.sync }}
+    steps:
+      # Tools that read their config from HOME (gh, wrangler, Claude Code,
+      # npm) start without anyone's logins, on whichever runner choose-runner
+      # names.
+      - name: Private HOME
+        run: |
+          mkdir -p "$RUNNER_TEMP/home"
+          echo "HOME=$RUNNER_TEMP/home" >> "$GITHUB_ENV"
+      # Node's compile cache, new each run: every later Node process in this job,
+      # and each of the web suite's 434 test files and the processes they start,
+      # reuses the TypeScript and package code an earlier one compiled.
+      - name: Compile cache
+        run: echo "NODE_COMPILE_CACHE=$RUNNER_TEMP/node-compile-cache" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Changed areas
+        id: changed
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          MERGE_GROUP_BASE_SHA: ${{ github.event.merge_group.base_sha }}
+          MERGE_GROUP_HEAD_SHA: ${{ github.event.merge_group.head_sha }}
+        run: .github/scripts/changed-paths.sh
+      # Whether office-mac and sync-windows already passed on this pull request, on these files (inputs_passed.py
+      # reads the trees of its earlier heads, from this full-history checkout). Before any step that runs the pull
+      # request's code, and this job restores no cache, so nothing a run wrote touches the checkout first. Only when
+      # one of those areas changed: otherwise neither job runs, and its reads are saved.
+      - name: Mac and Windows jobs already passed on these files
+        id: passed
+        if: >-
+          github.event_name == 'pull_request' &&
+          (steps.changed.outputs.office == 'true' || steps.changed.outputs.sync == 'true')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: python3 .github/scripts/inputs_passed.py
+      # The gitleaks CLI, pinned and checksum-verified: gitleaks-action needs a
+      # paid licence on an organization's repository. Which commits it scans per
+      # event is decided in the script.
+      - name: Secret scan
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: .github/scripts/secret-scan.sh
+      - name: Lint workflows
+        if: steps.changed.outputs.workflows == 'true'
+        run: .github/scripts/lint-workflows.sh
+      - name: Build minutes guard tests
+        if: steps.changed.outputs.workflows == 'true'
+        run: python3 .github/scripts/build_minutes_guard_test.py
+      - name: Inputs passed tests
+        if: steps.changed.outputs.workflows == 'true'
+        run: python3 .github/scripts/inputs_passed_test.py
+      - name: App lanes tests
+        if: steps.changed.outputs.workflows == 'true'
+        run: python3 .github/scripts/app_lanes_test.py
+      - name: Screens routes tests
+        if: steps.changed.outputs.workflows == 'true'
+        run: python3 .github/scripts/screens_routes_test.py
+      - name: CI concurrency tests
+        if: steps.changed.outputs.workflows == 'true'
+        run: python3 .github/scripts/ci_concurrency_test.py
+      - name: Secret scan tests
+        if: steps.changed.outputs.workflows == 'true'
+        run: .github/scripts/secret-scan-test.sh
+      - name: Claude release fetch tests
+        if: steps.changed.outputs.workflows == 'true'
+        run: .github/scripts/claude-release-fetch-test.sh
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        if: steps.changed.outputs.web == 'true' || steps.changed.outputs.quality_speed == 'true'
+        with:
+          node-version: 24
+      # The Quality and Speed site (quality-speed/). Its tests and folder check
+      # import only node: built-ins, so they run with no install; the type check
+      # installs TypeScript alone, from its own lockfile, with no install scripts.
+      - name: Quality and Speed tests
+        if: steps.changed.outputs.quality_speed == 'true'
+        run: node --test "quality-speed/**/*.test.ts"
+      - name: Quality and Speed page folders
+        if: steps.changed.outputs.quality_speed == 'true'
+        run: node quality-speed/contract/check-pages.ts
+      - name: Quality and Speed goal check
+        if: steps.changed.outputs.quality_speed == 'true'
+        env:
+          GOAL_CHECK_BASE: ${{ steps.changed.outputs.base }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: node quality-speed/core/goal-check.ts
+      - name: Quality and Speed build and publish guard
+        if: steps.changed.outputs.quality_speed == 'true'
+        run: |
+          node quality-speed/core/build.ts --synthetic --out "$RUNNER_TEMP/quality-speed-site"
+          node quality-speed/core/guard.ts --site "$RUNNER_TEMP/quality-speed-site" --allow-synthetic
+      - name: Quality and Speed type check
+        if: steps.changed.outputs.quality_speed == 'true'
+        working-directory: quality-speed
+        run: |
+          npm ci --ignore-scripts
+          npm run check
+      # No install scripts: they would run on the runner before anyone reads a
+      # dependency change. The
+      # only ones in the lockfile (esbuild, workerd, fsevents) just place or
+      # check a binary their platform package already ships; check, test, build
+      # and wrangler work without them.
+      - name: Web install
+        if: steps.changed.outputs.web == 'true'
+        working-directory: web
+        run: npm ci --ignore-scripts
+      - name: Web check
+        if: steps.changed.outputs.web == 'true'
+        working-directory: web
+        run: npm run check
+      # No coverage: the Code page cut its coverage metrics and nothing reads the
+      # table, which cost every run time. NODE_TEST_FLAGS in web/package.json's
+      # test script still takes flags for a run by hand.
+      - name: Web test
+        if: steps.changed.outputs.web == 'true'
+        working-directory: web
+        run: npm test
+      # The Claude plugin /connect serves (web/mcp/claude-plugin.ts), checked by Claude Code's own validator. Only when
+      # its sources change, or the base is unknown: the CLI is a 300 MB download. Its native binary straight from the
+      # pinned platform package, so no install script runs.
+      - name: Claude plugin validate
+        if: steps.changed.outputs.web == 'true'
+        working-directory: web
+        env:
+          BASE: ${{ steps.changed.outputs.base }}
+          CLAUDE_CODE_VERSION: 2.1.318
+          DISABLE_AUTOUPDATER: "1"
+          CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+        run: |
+          if [[ -n "$BASE" ]] && ! git diff --name-only "$BASE" HEAD -- connect/skill mcp/claude-plugin.ts | grep -q .; then
+            echo "The plugin's sources are unchanged."
+            exit 0
+          fi
+          node connect/skill/write-plugin.ts "$RUNNER_TEMP/claude-plugin"
+          case "$(uname -m)" in aarch64|arm64) arch=arm64 ;; *) arch=x64 ;; esac
+          npm pack "@anthropic-ai/claude-code-linux-$arch@$CLAUDE_CODE_VERSION" --pack-destination "$RUNNER_TEMP" --silent
+          mkdir -p "$RUNNER_TEMP/claude-code"
+          tar -xzf "$RUNNER_TEMP"/anthropic-ai-claude-code-linux-*.tgz -C "$RUNNER_TEMP/claude-code"
+          chmod +x "$RUNNER_TEMP/claude-code/package/claude"
+          "$RUNNER_TEMP/claude-code/package/claude" plugin validate --strict "$RUNNER_TEMP/claude-plugin"
+      - name: Web build
+        if: steps.changed.outputs.web == 'true'
+        working-directory: web
+        env:
+          LEGALLAS_METAFILE: ${{ runner.temp }}/meta/site.json
+        run: npm run build
+      # Bundles the three Workers (room, MCP server, backup) exactly as a
+      # release would and checks their config, without uploading or any
+      # Cloudflare login.
+      - name: Worker dry runs
+        if: steps.changed.outputs.web == 'true'
+        working-directory: web
+        env:
+          WRANGLER_SEND_METRICS: "false"
+        run: |
+          npx wrangler deploy -c wrangler.example.jsonc --dry-run --outdir "$RUNNER_TEMP/worker-web" --metafile "$RUNNER_TEMP/meta/web.json"
+          npx wrangler deploy -c wrangler.mcp.example.jsonc --dry-run --outdir "$RUNNER_TEMP/worker-mcp" --metafile "$RUNNER_TEMP/meta/mcp.json"
+          npx wrangler deploy -c wrangler.backup.example.jsonc --dry-run --outdir "$RUNNER_TEMP/worker-backup" --metafile "$RUNNER_TEMP/meta/backup.json"
+      # The release's third-party notices, from what the build and the three Workers
+      # drew on: fails when a package that reaches a bundle has no licence text.
+      - name: Third-party notices
+        if: steps.changed.outputs.web == 'true'
+        working-directory: web
+        run: node scripts/notices.ts "$RUNNER_TEMP/THIRD-PARTY-NOTICES.txt" dist "$RUNNER_TEMP"/meta/*.json
+
+  swift:
+    needs: [choose-runner, checks]
+    if: >-
+      !cancelled() && needs.checks.result == 'success' &&
+      needs.checks.outputs.swift == 'true' && needs.choose-runner.outputs.tested != 'true' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: xcode-27
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # The images ship no SwiftLint. This one is pinned and checked against
+      # the sha256 GitHub records for the release asset (`gh api
+      # repos/realm/SwiftLint/releases/tags/<version>` lists it as digest);
+      # Dependabot cannot bump it, so change the two together.
+      - name: Install SwiftLint
+        env:
+          SWIFTLINT_VERSION: 0.65.1
+          SWIFTLINT_SHA256: c1e429b0599cf1b516f369a2d9ec04eaf0e436f3c12b637df8851fa52ff694d0
+        run: |
+          dir="$RUNNER_TEMP/swiftlint"
+          mkdir -p "$dir"
+          curl -fsSL --retry 3 -o "$dir/portable_swiftlint.zip" \
+            "https://github.com/realm/SwiftLint/releases/download/$SWIFTLINT_VERSION/portable_swiftlint.zip"
+          echo "$SWIFTLINT_SHA256  $dir/portable_swiftlint.zip" | shasum -a 256 -c -
+          unzip -q "$dir/portable_swiftlint.zip" -d "$dir"
+          test "$("$dir/swiftlint" version)" = "$SWIFTLINT_VERSION"
+          echo "$dir" >> "$GITHUB_PATH"
+      - name: Toolchain
+        run: |
+          sw_vers
+          xcodebuild -version
+          swift --version
+          swiftlint version
+      # Lint errors block the merge here (the owner, 2026-10-01). --strict
+      # also fails on warnings; .swiftlint.yml is read from the repo root.
+      - name: SwiftLint
+        run: swiftlint lint --strict --quiet
+      - name: Build (Debug)
+        run: swift build
+      - name: Build (Release)
+        run: swift build -c release
+      # The E2E subprocess test skips itself when this binary is missing, so a
+      # missing binary fails here instead of passing silently.
+      - name: MCP binary present
+        run: test -x .build/debug/LegallasMCP
+      # Vision's accurate OCR fails on hosted macOS 27 VMs (no Neural Engine).
+      # Then LegallasExtractionTests are skipped here with a notice and
+      # `swift-ocr` runs them on macOS 26; if the probe ever passes here, they
+      # run here too.
+      - name: Probe Vision accurate OCR
+        id: ocr
+        run: |
+          if swift .github/ci/vision-accurate-probe.swift; then
+            echo "accurate=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "accurate=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=OCR tests run in swift-ocr::Vision's accurate OCR does not run on this macOS VM, so LegallasExtractionTests are skipped here; the swift-ocr job runs them on macOS 26."
+          fi
+      - name: Test
+        env:
+          ACCURATE_OCR: ${{ steps.ocr.outputs.accurate }}
+        run: |
+          if [ "$ACCURATE_OCR" = true ]; then
+            swift test --enable-code-coverage
+          else
+            swift test --enable-code-coverage --skip LegallasExtractionTests
+          fi
+      # Line coverage of each production Swift file (Sources/, LegallasApp/),
+      # kept 90 days for the Code page of the Quality and Speed site, which
+      # reads it only from a run on the current Swift tree.
+      - name: Coverage summary
+        run: bash .github/ci/swift-coverage-summary.sh swift-coverage.json
+      - name: Upload coverage summary
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: swift-coverage
+          path: swift-coverage.json
+          retention-days: 90
+          if-no-files-found: error
+      # Legallas.app from LegallasApp/Legallas.xcodeproj, signed ad hoc (no signing
+      # secrets here) and checked without launching it.
+      - name: App bundle
+        run: |
+          app="$(bash LegallasApp/Scripts/build-app.sh Release)"
+          bash LegallasApp/Scripts/verify-app.sh "$app"
+      # Keeps the shared code buildable for the iPhone destination to come.
+      - name: LegallasCore for iOS
+        run: xcodebuild build -scheme LegallasCore -destination 'generic/platform=iOS' -derivedDataPath .build/xcode-ios -quiet
+
+  # LegallasExtractionTests (PDF text and Vision's accurate OCR) on hosted
+  # macOS 26, where the accurate recognizer runs without a Neural Engine. The
+  # rest of the package is tested in `swift` on macOS 27 only: on macOS 26
+  # four ProposalApplier tests fail (SwiftData's rollback, 2026-10-31).
+  swift-ocr:
+    needs: [choose-runner, checks]
+    if: >-
+      !cancelled() && needs.checks.result == 'success' &&
+      needs.checks.outputs.swift == 'true' && needs.choose-runner.outputs.tested != 'true' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Toolchain
+        run: |
+          sw_vers
+          xcodebuild -version
+          swift --version
+      # Here a failed probe fails the job, so the OCR tests never skip silently.
+      - name: Probe Vision accurate OCR
+        run: swift .github/ci/vision-accurate-probe.swift
+      # ExtractCommandTests run the LegallasExtract binary built beside them.
+      - name: Build (Debug)
+        run: swift build
+      # A filter that matched nothing would pass with no tests run, so at
+      # least one test must have run.
+      - name: LegallasExtraction tests
+        run: |
+          set -o pipefail
+          swift test --enable-code-coverage --filter LegallasExtractionTests 2>&1 | tee "$RUNNER_TEMP/test.log"
+          if ! grep -Eq 'Test run with [1-9][0-9]* tests?' "$RUNNER_TEMP/test.log"; then
+            echo "::error title=No OCR tests ran::swift test --filter LegallasExtractionTests ran no tests"
+            exit 1
+          fi
+      # The same summary for the OCR tests, which `swift` skips on macOS 27.
+      - name: Coverage summary
+        run: bash .github/ci/swift-coverage-summary.sh swift-ocr-coverage.json
+      - name: Upload coverage summary
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: swift-ocr-coverage
+          path: swift-ocr-coverage.json
+          retention-days: 90
+          if-no-files-found: error
+      # The sample room seeds on Linux from what this extractor read from its
+      # fictional files (quality-speed/pages/data-room/extract-cache). A change
+      # that reads them differently fails here, and the "Sample room extract"
+      # workflow makes the new cache. Here, not in `swift`, because macOS 26 is
+      # where the cache is made and where Vision's accurate OCR runs.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Sample room text still matches
+        run: node quality-speed/pages/data-room/lab/extract-cache.ts check --binary .build/debug/LegallasExtract
+
+  office-mac:
+    needs: [choose-runner, checks]
+    if: >-
+      !cancelled() && needs.checks.result == 'success' &&
+      needs.checks.outputs.office == 'true' && needs.choose-runner.outputs.tested != 'true' &&
+      needs.checks.outputs.office_passed != 'true' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: xcode-27
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # The same node as `checks`, 24, as web/package.json's engines say; it
+      # runs the .ts test directly (type stripping).
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # A missing textutil fails here, so the tests never skip silently.
+      - name: Toolchain
+        run: |
+          test -x /usr/bin/textutil || { echo "::error title=textutil missing::/usr/bin/textutil is not on this runner"; exit 1; }
+          sw_vers -productVersion
+          node --version
+      # Imports only node: built-ins, so no npm install.
+      - name: Office reader tests (textutil)
+        working-directory: web
+        run: node --test scripts/office-index.test.ts scripts/docx-side.test.ts
+
+  sync-windows:
+    needs: [choose-runner, checks]
+    if: >-
+      !cancelled() && needs.checks.result == 'success' &&
+      needs.checks.outputs.sync == 'true' && needs.choose-runner.outputs.tested != 'true' &&
+      needs.checks.outputs.sync_passed != 'true' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      # Files as they are in git, not with Windows line endings: the tests read
+      # some of them byte for byte.
+      - name: Keep line endings
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # The same node as `checks`; it runs the .ts tests directly.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # For pdf.js, which reads a PDF's text layer here. No install scripts, as in `checks`.
+      - name: Install
+        working-directory: web
+        run: npm ci --ignore-scripts
+      - name: Sync engine tests
+        working-directory: web
+        run: node --test scripts/sync-windows.test.ts scripts/office-read.test.ts scripts/snapshot.test.ts scripts/room-sync.test.ts scripts/extract-windows.test.ts scripts/extract-windows-api.test.ts worker/sync-saveback.test.ts scripts/iwork.test.ts
+
+  ci-ok:
+    if: always()
+    needs: [choose-runner, checks, swift, swift-ocr, office-mac, sync-windows]
+    # Seconds of bash over the results above, so the 1-core runner: it bills a third of an ubuntu-latest minute and
+    # spends none of Blacksmith's free minutes.
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Checks passed; macOS and Windows jobs passed or had nothing to do
+        env:
+          CHECKS: ${{ needs.checks.result }}
+          SWIFT: ${{ needs.swift.result }}
+          SWIFT_OCR: ${{ needs.swift-ocr.result }}
+          OFFICE_MAC: ${{ needs.office-mac.result }}
+          SYNC_WINDOWS: ${{ needs.sync-windows.result }}
+          # Only a push to main whose commit or tree already passed `ci-ok` may skip `checks`.
+          RERUN_SKIPPED: ${{ github.event_name == 'push' && needs.choose-runner.outputs.tested == 'true' }}
+        run: |
+          echo "Job results: checks=$CHECKS swift=$SWIFT swift-ocr=$SWIFT_OCR office-mac=$OFFICE_MAC sync-windows=$SYNC_WINDOWS"
+          if [ "$RERUN_SKIPPED" = true ] && [ "$CHECKS" = skipped ]; then
+            echo "::notice title=Already passed::ci-ok passed on this tree in the merge queue or on the pull request, so this push skipped checks"
+            exit 0
+          fi
+          if [ "$CHECKS" != "success" ]; then
+            echo "::error title=CI failed::checks ended as $CHECKS"
+            exit 1
+          fi
+          for job in "swift=$SWIFT" "swift-ocr=$SWIFT_OCR" "office-mac=$OFFICE_MAC" "sync-windows=$SYNC_WINDOWS"; do
+            case "${job#*=}" in
+              success|skipped) ;;
+              *)
+                echo "::error title=CI failed::${job%%=*} ended as ${job#*=}"
+                exit 1
+                ;;
+            esac
+          done
+          # `swift` may skip LegallasExtractionTests and leave them to
+          # `swift-ocr`, so a `swift` that ran needs a `swift-ocr` that ran,
+          # even if the two jobs' `if` conditions ever drift apart.
+          if [ "$SWIFT" = "success" ] && [ "$SWIFT_OCR" != "success" ]; then
+            echo "::error title=CI failed::swift ran but swift-ocr ended as $SWIFT_OCR, so LegallasExtractionTests may not have run"
+            exit 1
+          fi

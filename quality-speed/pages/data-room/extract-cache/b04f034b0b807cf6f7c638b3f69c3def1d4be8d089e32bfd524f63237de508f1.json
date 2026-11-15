@@ -1,0 +1,16 @@
+{
+ "version": 3,
+ "sha256": "b04f034b0b807cf6f7c638b3f69c3def1d4be8d089e32bfd524f63237de508f1",
+ "pages": [
+  {
+   "n": 1,
+   "ocr": false,
+   "text": "DOE v. HARBOR LABS, INC.\nBank-Statement\nPage 1 of 2\nStatement showing the bridge top-up and the first interest on the note.\nBridge top-up wire.\nFirst interest on the bridge note.\nAcme Bank, N.A.\nbanks with.\nFirst interest on the note.\nBridge top-up.\nWire in, reference SEAT-RENEWALS 3,127.40\nTransfer out, reference NORTHGATE-INTEREST 9,137.80\nService fee 17.25\nInterest 0.84\nClosing balance 12,719.54\nOpening balance 18,746.35\nWire in, reference SEAT-RENEWALS 3,127.40\nTransfer out, reference NORTHGATE-INTEREST 9,137.80\nService fee 17.25"
+  },
+  {
+   "n": 2,
+   "ocr": false,
+   "text": "DOE v. HARBOR LABS, INC.\nBank-Statement\nPage 2 of 2\nBridge top-up reaches the bank.\nTransfer out, reference NORTHGATE-INTEREST 9,137.80\nService fee 17.25\nInterest 0.84\nClosing balance 12,719.54\nOpening balance 18,746.35\nWire in, reference SEAT-RENEWALS 3,127.40\nTransfer out, reference NORTHGATE-INTEREST 9,137.80\nService fee 17.25\nInterest 0.84"
+  }
+ ]
+}

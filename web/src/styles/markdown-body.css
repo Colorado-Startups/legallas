@@ -1,0 +1,100 @@
+/* Rendered Markdown: folder guides and .md documents. Alignment comes as classes (no style attributes). */
+
+.markdown-body {
+  overflow-wrap: anywhere;
+}
+
+.markdown-body :is(h1, h2, h3, h4, h5, h6) {
+  margin: var(--space-5) 0 var(--space-2);
+}
+
+.markdown-body :is(h1, h2, h3, h4, h5, h6):first-child {
+  margin-top: var(--space-2);
+}
+
+/*
+  Headings on the type scale (DESIGN.md section 4), serif like every heading. A folder guide keeps the file's own
+  levels: its h1 is the guide's title. The /doc/ viewer and the exhibit pane sit under a page h1, so they shift the
+  file's headings down one level (R83) and mark the body --shifted: there the file's title is an h2.
+*/
+.markdown-body :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+.markdown-body h1 {
+  font-size: var(--text-21);
+  line-height: 1.75rem;
+}
+
+.markdown-body h2 {
+  font-size: var(--text-18);
+  line-height: 1.625rem;
+}
+
+.markdown-body :is(h3, h4, h5, h6) {
+  font-size: var(--text-16);
+  line-height: 1.5rem;
+}
+
+/* Shifted (after the rules above, same specificity): the file's title is its h2. */
+.markdown-body--shifted h2 {
+  font-size: var(--text-21);
+  line-height: 1.75rem;
+}
+
+.markdown-body--shifted h3 {
+  font-size: var(--text-18);
+  line-height: 1.625rem;
+}
+
+.markdown-body blockquote {
+  margin: var(--space-3) 0;
+  padding: var(--space-1) var(--space-4);
+  color: var(--ink-2);
+  border-left: 3px solid var(--brass-rule);
+}
+
+.markdown-body code {
+  padding: 0.1em 0.3em;
+  background: var(--panel);
+  font-size: 0.9em;
+  border-radius: 4px;
+}
+
+.markdown-body pre {
+  overflow: auto;
+  padding: var(--space-3);
+  background: var(--panel);
+  border-radius: var(--radius-chip);
+}
+
+.markdown-body pre code {
+  padding: 0;
+  background: none;
+}
+
+.markdown-body table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.markdown-body :is(th, td) {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--rule);
+}
+
+.markdown-body .align-center {
+  text-align: center;
+}
+
+.markdown-body .align-right {
+  text-align: right;
+}
+
+.markdown-body hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+}

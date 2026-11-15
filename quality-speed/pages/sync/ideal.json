@@ -1,0 +1,23 @@
+{
+  "ideal": "Every file in the company folder, on Mac or Windows, is read or named within ten seconds; agreements return as new files; nothing else changes.",
+  "sources": [
+    {
+      "title": "Cloudflare R2 pricing",
+      "url": "https://developers.cloudflare.com/r2/pricing/",
+      "date": "2026-10-30"
+    },
+    {
+      "title": "Microsoft Learn: Indexing process in Windows Search",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/search/-search-indexing-process-overview",
+      "date": "2021-06-30"
+    },
+    {
+      "title": "web.dev: Measure performance with the RAIL model",
+      "url": "https://web.dev/articles/rail",
+      "date": "2020-06-10"
+    }
+  ],
+  "quality": "Every file read or named, never skipped; an approved agreement saved back as one new file; every other file byte for byte the same.",
+  "speed": "A new or edited file is findable within 10 seconds, before a founder gives up on the task.",
+  "consumption": "The sync uploads each changed document to R2 once, and nothing that did not change."
+}

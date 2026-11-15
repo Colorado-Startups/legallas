@@ -1,0 +1,16 @@
+{
+ "version": 3,
+ "sha256": "33db17e2d8f89df4507a00249ab57a65f61b2cc3c63e11fa8e6984e204bfdbbd",
+ "pages": [
+  {
+   "n": 1,
+   "ocr": false,
+   "text": "DOE v. HARBOR LABS, INC.\nCard-Statement, 2012-02-29\nPage 1 of 2\nCompany card statement listing the charges later flagged as personal.\nCard statement lists charges later flagged as personal.\nWire in, reference SEAT-RENEWALS 3,127.40\nTransfer out, reference NORTHGATE-INTEREST 9,137.80\nService fee 17.25\nInterest 0.84\nClosing balance 12,719.54\nOpening balance 18,746.35\nWire in, reference SEAT-RENEWALS 3,127.40\nTransfer out, reference NORTHGATE-INTEREST 9,137.80\nService fee 17.25"
+  },
+  {
+   "n": 2,
+   "ocr": false,
+   "text": "DOE v. HARBOR LABS, INC.\nCard-Statement, 2012-02-29\nPage 2 of 2\nTransfer out, reference NORTHGATE-INTEREST 9,137.80\nService fee 17.25\nInterest 0.84\nClosing balance 12,719.54\nOpening balance 18,746.35\nWire in, reference SEAT-RENEWALS 3,127.40\nTransfer out, reference NORTHGATE-INTEREST 9,137.80\nService fee 17.25\nInterest 0.84"
+  }
+ ]
+}

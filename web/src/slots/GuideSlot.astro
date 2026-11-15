@@ -1,0 +1,15 @@
+---
+// The page guide's slot. The band itself, LegallasGuide.astro with
+// the companion's stills, is the litigation pack's: the glob matches it when the pack is in the tree and nothing in a
+// core-only room, which renders no band (the optional-file glob room-config.ts uses for the gitignored config).
+// Nothing else is imported here, so the band's styles keep their place in the page's CSS: Room.astro imports this
+// file where it imported the band.
+import type { GuidePage } from '../scripts/guide-bus.ts';
+
+interface Props {
+  page: GuidePage;
+}
+const [Band] = Object.values(import.meta.glob<(props: Props) => any>('../components/LegallasGuide.astro', { eager: true, import: 'default' }));
+---
+
+{Band && <Band page={Astro.props.page} />}

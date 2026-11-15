@@ -1,0 +1,13 @@
+{
+  "ideal": "Every Mac app change on main builds, passes its tests and makes a sandboxed app that passes its bundle check, within ten minutes.",
+  "sources": [
+    {
+      "title": "DevOps Research and Assessment: Continuous integration",
+      "url": "https://dora.dev/capabilities/continuous-integration/",
+      "date": "2026-01-14"
+    }
+  ],
+  "quality": "Every Swift job on main's code passes, and each app it builds has the right identity, its entitlements and a signature that verifies.",
+  "speed": "A Swift job answers, pass or fail, within ten minutes, the upper limit for build and test feedback.",
+  "consumption": "Each Swift job costs as few macOS dollars as it can, since a macOS minute costs about ten Linux minutes."
+}

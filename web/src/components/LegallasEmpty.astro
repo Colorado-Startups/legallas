@@ -1,0 +1,21 @@
+---
+// Card F8. Empty and not-found states (DESIGN.md "Empty state"): the seal in --ink-3, one plain sentence,
+// at most one action in the default slot. The seal is the brand mark here, never the small Legallas (R68).
+import LegallasMark from './LegallasMark.astro';
+
+interface Props {
+  /** The one sentence: a plain statement ending in a period ("No open discussions."). */
+  title: string;
+  /** Heading level, so the state fits the page outline (h1 on a page of its own, h2 inside a section). */
+  level?: 1 | 2 | 3;
+}
+
+const { title, level = 2 } = Astro.props;
+const Heading = `h${level}` as 'h1' | 'h2' | 'h3';
+---
+
+<section class="c-empty">
+  <span class="c-empty__glyph legallas-empty-seal" aria-hidden="true"><LegallasMark /></span>
+  <Heading class="c-empty__text">{title}</Heading>
+  <slot />
+</section>

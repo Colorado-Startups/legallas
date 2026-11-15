@@ -1,0 +1,193 @@
+/*
+  The owner's activity ledger (src/pages/activity.astro, card P9). Composes c-table, c-input, c-button and
+  c-empty; page classes are act-*. Tokens only, no literal colors.
+*/
+
+.act .t-h1 {
+  margin: 0 0 var(--space-2);
+}
+
+.act-lede {
+  max-width: var(--measure);
+  margin: 0 0 var(--space-4);
+  color: var(--ink-2);
+}
+
+/* Filters: one compact toolbar row that wraps on narrow screens. */
+.act-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: flex-end;
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3);
+  background: var(--panel);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.act-field {
+  display: grid;
+  flex: 1 1 9rem;
+  gap: var(--space-1);
+  min-width: 0;
+  color: var(--ink-2);
+}
+
+.act-field--person {
+  flex-basis: 14rem;
+}
+
+.act-field .c-input {
+  min-height: 2rem;
+  padding-block: var(--space-1);
+}
+
+.act-filters__actions {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+/* Sparkline (F5b's viz-spark) over the last 30 UTC days, its sentence beside it. */
+.act-spark {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: flex-end;
+  margin: 0 0 var(--space-3);
+}
+
+.act-spark__chart {
+  flex: 0 1 18.75rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.act-spark__chart > svg {
+  width: 100%;
+  height: auto;
+}
+
+.act-spark__caption {
+  display: grid;
+  flex: 1 1 16rem;
+  gap: var(--space-1);
+  color: var(--ink-3);
+}
+
+.act-spark__caption .t-label {
+  color: var(--ink-2);
+}
+
+.act-status:not(:empty) {
+  margin: 0 0 var(--space-2);
+  color: var(--ink-3);
+}
+
+/* The ledger: c-table rows, mono for times, control numbers and addresses. */
+.act-table td {
+  white-space: nowrap;
+}
+
+.act-what {
+  color: var(--ink);
+}
+
+.act-table tr[data-action='sign_in'] .act-what {
+  font-weight: 600;
+}
+
+.act-table td.act-doc {
+  min-width: 14rem;
+  max-width: 28rem;
+  white-space: normal;
+}
+
+.act-doc__link {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-2);
+  align-items: baseline;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.act-doc__link:hover .act-doc__name {
+  color: var(--forest-hover);
+  text-decoration: underline;
+}
+
+.act-doc__control {
+  color: var(--forest);
+}
+
+.act-doc__name {
+  overflow-wrap: anywhere;
+}
+
+.act-doc__gone {
+  color: var(--ink-3);
+}
+
+/* Phones (R58): one line per row; a long document name ends in an ellipsis (its title holds the full name). */
+@media (max-width: 48rem) {
+  .act-table td.act-doc {
+    min-width: 0;
+    max-width: 15rem;
+    white-space: nowrap;
+  }
+
+  .act-doc__link {
+    display: flex;
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+
+  .act-doc__control {
+    flex: none;
+  }
+
+  .act-doc__name {
+    min-width: 0;
+    overflow: hidden;
+    overflow-wrap: normal;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Action then the AI client; control number then name or "Removed document"; country then address. */
+.act-what > * + *,
+.act-doc > * + *,
+.act-from > * + * {
+  margin-left: var(--space-2);
+}
+
+.act-via {
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+
+.act-ip {
+  color: var(--ink-3);
+  font-size: var(--text-13);
+}
+
+.act-more {
+  margin: var(--space-3) 0 0;
+  text-align: center;
+}
+
+.act-note {
+  margin: var(--space-3) 0 0;
+  color: var(--ink-3);
+}
+
+/* The Full notice panel (notice-ticks.ts): each member's last tick, below the ledger. */
+.act-notice {
+  margin-top: var(--space-6);
+}
+
+.act-notice .t-h2 {
+  margin: 0 0 var(--space-2);
+}

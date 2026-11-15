@@ -1,0 +1,167 @@
+---
+// /doc/?id=<id>: one document as an exhibit (card P6; web/design/doc-viewer/). scripts/doc-early.ts, in <head>, asks
+// /api/doc/:id (which logs the one `view` audit row) and, for #page=N, starts the PDF viewer. scripts/doc-page.ts reads
+// that answer, fills the exhibit header, adds the matter's facts when /api/matter has them, and reveals the viewer for
+// the document's kind. #page=N opens a PDF at a page.
+import Room from '../layouts/Room.astro';
+import CommentThread from '../components/CommentThread.astro';
+import LegallasEmpty from '../components/LegallasEmpty.astro';
+import ArrowNext from '@brand/brand/arrow-next.svg';
+import ArrowPrev from '@brand/brand/arrow-prev.svg';
+import KeyBadge from '@brand/brand/target-direct.svg';
+import '../styles/markdown-body.css';
+import '../styles/doc.css';
+import '../styles/doc-views.css';
+---
+
+<Room title="Document" guide="doc">
+  <Fragment slot="head"><script src="../scripts/doc-early.ts"></script></Fragment>
+  <article class="doc" data-doc>
+    <div class="doc-ready" data-doc-ready hidden>
+      <div class="doc-top">
+        <nav class="doc-crumbs" aria-label="Breadcrumb">
+          <ol data-doc-crumbs></ol>
+        </nav>
+        <nav class="doc-pager" aria-label="This folder" data-doc-pager hidden>
+          <a class="c-button" data-doc-prev aria-disabled="true">
+            <ArrowPrev class="doc-arrow" aria-hidden="true" focusable="false" />
+            <span class="doc-pager-label">Previous</span>
+          </a>
+          <span class="doc-pager-place t-small" data-doc-place></span>
+          <a class="c-button" data-doc-next aria-disabled="true">
+            <span class="u-mono" data-doc-next-label>Next</span>
+            <ArrowNext class="doc-arrow" aria-hidden="true" focusable="false" />
+          </a>
+        </nav>
+      </div>
+
+      <header class="doc-exhibit">
+        <div class="doc-exhibit-head">
+          <div class="doc-exhibit-name">
+            <p class="doc-control" data-doc-control hidden></p>
+            <h1 class="doc-title" data-doc-title></h1>
+            <p class="doc-file" data-doc-file hidden></p>
+            <p class="doc-summary" data-doc-summary hidden></p>
+          </div>
+          <div class="doc-actions">
+            <button type="button" class="c-button" aria-pressed="false" data-doc-key data-needs="flag">
+              <KeyBadge class="doc-key-badge" aria-hidden="true" focusable="false" />
+              Key
+            </button>
+            <a class="c-button" data-doc-open href="/" target="_blank" rel="noopener">Open</a>
+            <a class="c-button" data-doc-download href="/">Download</a>
+            <a class="c-button doc-ask" data-doc-ask href="/ask">Ask about this document</a>
+          </div>
+        </div>
+        <dl class="doc-facts" data-doc-facts></dl>
+        <p class="doc-key-status t-small" role="status" data-doc-key-status></p>
+      </header>
+
+      <div class="doc-layout">
+        <div class="doc-main">
+          <section class="doc-view doc-view--pdf" data-view="pdf" aria-label="PDF" hidden>
+            <div class="doc-bar" role="toolbar" aria-label="Pages and zoom">
+              <div class="doc-bar-group">
+                <button type="button" class="c-button" data-pdf-prev aria-label="Previous page">
+                  <svg class="doc-chevron doc-chevron--back" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" /></svg>
+                </button>
+                <label class="doc-bar-page">
+                  <span>Page</span>
+                  <input class="c-input" type="number" min="1" value="1" inputmode="numeric" data-pdf-page />
+                  <span data-pdf-count></span>
+                </label>
+                <button type="button" class="c-button" data-pdf-next aria-label="Next page">
+                  <svg class="doc-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" /></svg>
+                </button>
+              </div>
+              <div class="doc-bar-group">
+                <button type="button" class="c-button" data-pdf-zoom-out aria-label="Zoom out">&minus;</button>
+                <select class="c-input doc-bar-select" data-pdf-scale aria-label="Zoom">
+                  <option value="page-width">Fit width</option>
+                  <option value="page-fit">Whole page</option>
+                  <option value="0.5">50%</option>
+                  <option value="0.75">75%</option>
+                  <option value="1">100%</option>
+                  <option value="1.25">125%</option>
+                  <option value="1.5">150%</option>
+                  <option value="2">200%</option>
+                  <option value="3">300%</option>
+                  <option value="custom" data-pdf-custom hidden></option>
+                </select>
+                <button type="button" class="c-button" data-pdf-zoom-in aria-label="Zoom in">+</button>
+              </div>
+              <p class="doc-bar-status" role="status" data-pdf-status>Opening the PDF.</p>
+            </div>
+            <div class="doc-pdf-frame" data-pdf-frame>
+              <div class="doc-pdf-scroll" data-pdf-container tabindex="0" aria-label="PDF pages">
+                <div class="pdfViewer" data-pdf-viewer></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="doc-view" data-view="image" aria-label="Image" hidden>
+            <div class="doc-bar" role="toolbar" aria-label="Zoom">
+              <div class="doc-bar-group">
+                <button type="button" class="c-button" data-image-out aria-label="Zoom out">&minus;</button>
+                <span class="doc-bar-status u-num" data-image-zoom>Fit</span>
+                <button type="button" class="c-button" data-image-in aria-label="Zoom in">+</button>
+                <button type="button" class="c-button" data-image-fit>Fit</button>
+                <button type="button" class="c-button" data-image-actual>Actual size</button>
+              </div>
+            </div>
+            <div class="doc-image-stage"><img data-image alt="" class="is-fit" /></div>
+          </section>
+
+          <section class="doc-view doc-view--sheet" data-view="markdown" aria-label="Document" hidden>
+            <p class="doc-note" data-view-note hidden></p>
+            <div class="markdown-body t-prose" data-md></div>
+          </section>
+
+          <section class="doc-view" data-view="csv" aria-label="Table" hidden>
+            <p class="doc-note" data-view-note hidden></p>
+            <div class="c-table-wrap doc-csv-wrap">
+              <table class="c-table doc-csv" data-csv><caption class="u-vh" data-csv-caption></caption></table>
+            </div>
+          </section>
+
+          <section class="doc-view" data-view="text" aria-label="Text" hidden>
+            <p class="doc-note" data-view-note hidden></p>
+            <pre class="doc-text" data-text tabindex="0"></pre>
+          </section>
+
+          <section class="doc-view" data-view="visual" aria-label="Visual" hidden>
+            <iframe class="doc-visual" data-visual sandbox="allow-scripts" referrerpolicy="no-referrer" title="Visual"></iframe>
+          </section>
+
+          <section class="doc-view" data-view="download" hidden>
+            <LegallasEmpty title="This file opens in its own app.">
+              <p class="doc-download-what" data-download-what></p>
+              <a class="c-button c-button--primary" data-doc-download href="/">Download</a>
+            </LegallasEmpty>
+          </section>
+
+          <div data-view-failed hidden>
+            <LegallasEmpty title="This file cannot be shown here; the download still works.">
+              <a class="c-button c-button--primary" data-doc-download href="/">Download</a>
+            </LegallasEmpty>
+          </div>
+        </div>
+
+        <aside class="doc-aside" aria-label="Discussion" data-needs="readComments">
+          <CommentThread />
+        </aside>
+      </div>
+    </div>
+
+    <div data-doc-missing hidden>
+      <LegallasEmpty title="That document is not in the room." level={1}>
+        <a class="c-button" href="/documents/">Browse the documents</a>
+      </LegallasEmpty>
+    </div>
+    <div data-doc-error hidden>
+      <LegallasEmpty title="That document did not load; reload the page to try again." level={1} />
+    </div>
+  </article>
+</Room>
+
+<script src="../scripts/doc-page.ts"></script>

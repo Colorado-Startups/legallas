@@ -1,0 +1,17 @@
+---
+// Where Cloudflare Access sends someone who signs in but fails the room's identity rules (the app's
+// custom deny URL). Same words as the Worker's 403 page for a signed-in non-member (worker/index.ts).
+import Door from '../../../layouts/Door.astro';
+import DoorSeal from '../../../components/DoorSeal.astro';
+import { names } from '../../../scripts/room-config.ts';
+---
+
+<Door title={names.instanceName} compact>
+  <DoorSeal />
+  <h1 class="door-title door-title-small">This room is private.</h1>
+  <p class="door-lede">
+    If you were invited, ask the person who invited you to add the email address you signed in with.
+  </p>
+  <hr class="door-rule" />
+  <a class="door-button" href="/cdn-cgi/access/logout">Sign out</a>
+</Door>

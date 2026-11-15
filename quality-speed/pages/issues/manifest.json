@@ -1,0 +1,29 @@
+{
+  "page": "issues",
+  "signoff_comment": 6643850928,
+  "metrics": [
+    {"id": "missing_parts", "lens": "quality", "unit": "count", "direction": "lower", "floor": 10, "goal": 0, "weight": 2, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms"},
+    {"id": "closed_by_hand", "lens": "quality", "unit": "count", "direction": "lower", "floor": 5, "goal": 0, "weight": 3, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue"},
+    {"id": "unranked", "lens": "quality", "unit": "count", "direction": "lower", "floor": 10, "goal": 0, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://github.com/kubernetes/community/blob/master/contributors/guide/issue-triage.md"},
+    {"id": "reopened", "lens": "quality", "unit": "count", "direction": "lower", "floor": 5, "goal": 0, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue"},
+    {"id": "untyped", "lens": "quality", "unit": "count", "direction": "lower", "floor": 10, "goal": 0, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/managing-issue-types-in-an-organization"},
+    {"id": "unused_labels", "lens": "quality", "unit": "count", "direction": "lower", "floor": 5, "goal": 0, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels"},
+    {"id": "stale", "lens": "speed", "unit": "count", "direction": "lower", "floor": 5, "goal": 0, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://github.com/actions/stale"},
+    {"id": "overdue", "lens": "speed", "unit": "count", "direction": "lower", "floor": 5, "goal": 0, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://handbook.gitlab.com/handbook/product-development/how-we-work/issue-triage/"},
+    {"id": "launch_open", "lens": "speed", "unit": "count", "direction": "lower", "floor": 10, "goal": 0, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/about-milestones"},
+    {"id": "lane_minutes", "lens": "consumption", "unit": "minutes", "direction": "lower", "floor": 10, "goal": 5, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"}
+  ],
+  "changes": [
+    {"date": "2026-11-05", "metric": "lane_minutes", "field": "added", "from": null, "to": "lane_minutes", "reason": "added_toward_ideal", "issue": 449, "signoff_comment": 6646879552},
+    {"date": "2026-11-06", "metric": "template_complete", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 846},
+    {"date": "2026-11-06", "metric": "closed_by_pr", "field": "retired", "from": null, "to": null, "reason": "superseded", "issue": 846},
+    {"date": "2026-11-06", "metric": "missing_parts", "field": "added", "from": null, "to": "missing_parts", "reason": "added_toward_ideal", "issue": 846},
+    {"date": "2026-11-06", "metric": "closed_by_hand", "field": "added", "from": null, "to": "closed_by_hand", "reason": "added_toward_ideal", "issue": 846},
+    {"date": "2026-11-06", "metric": "unranked", "field": "added", "from": null, "to": "unranked", "reason": "added_toward_ideal", "issue": 846},
+    {"date": "2026-11-09", "metric": "reopened", "field": "added", "from": null, "to": "reopened", "reason": "added_toward_ideal", "issue": 947},
+    {"date": "2026-11-09", "metric": "untyped", "field": "added", "from": null, "to": "untyped", "reason": "added_toward_ideal", "issue": 947},
+    {"date": "2026-11-09", "metric": "unused_labels", "field": "added", "from": null, "to": "unused_labels", "reason": "added_toward_ideal", "issue": 947},
+    {"date": "2026-11-09", "metric": "overdue", "field": "added", "from": null, "to": "overdue", "reason": "added_toward_ideal", "issue": 947},
+    {"date": "2026-11-09", "metric": "launch_open", "field": "added", "from": null, "to": "launch_open", "reason": "added_toward_ideal", "issue": 947}
+  ]
+}

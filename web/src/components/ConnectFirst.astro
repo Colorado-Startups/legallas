@@ -1,0 +1,99 @@
+---
+// Step 1 on the Overview: connect your own AI (counsel onboarding, part A). The cards (AI_CARDS) in the default order
+// (Claude, Microsoft 365 Copilot, Harvey) or, once the member's AI is connected, one line. The links are real without
+// any script. The Worker draws the member's shape as the page leaves (worker/overview-ai.ts, #204); when it could not
+// in time, the page is as built: drawn as data-state="unset", the panel
+// and everything after it stay invisible until the script below lays the panel out in the shape this browser saw
+// last (a first paint can come before any module runs), then scripts/connect-first.ts, loaded only for a member who
+// may connect, orders and reveals it.
+// The Email your IT team buttons live on /connect, which these cards link to; the room keeps no mailto copies.
+import '../styles/connect-first.css';
+import { AI_CARDS, MANAGE_URL } from '../scripts/connect-first.ts';
+---
+
+<section class="ov-ai" data-connect-first data-state="unset" aria-busy="true" aria-labelledby="ov-ai-title">
+  <div class="ov-ai__open">
+    <h2 class="t-h3 ov-ai__title" id="ov-ai-title">Step 1: connect your own AI</h2>
+    <p class="ov-ai__lead">Ask about the room from the AI you already use. It reads the room live and read-only, as you.</p>
+    <ul class="ov-ai__cards" data-ov-ai-cards>
+      {
+        AI_CARDS.map((card) => (
+          <li class="ov-ai__card" data-ai={card.app}>
+            <h3 class="ov-ai__name">{card.name}</h3>
+            <p class="ov-ai__who">{card.who}</p>
+            <a
+              class:list={['c-button', { 'c-button--primary': card.primary }, 'ov-ai__go']}
+              href={card.href}
+              target={card.newTab ? '_blank' : undefined}
+              rel={card.newTab ? 'noopener noreferrer' : undefined}
+            >
+              {card.action}
+              {card.newTab && <span class="u-vh"> (opens in a new tab)</span>}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+  <p class="ov-ai__line" id="ov-ai-line">
+    Connected: <span data-ov-ai-via></span>. <a href={MANAGE_URL}>Manage</a>
+  </p>
+</section>
+
+<script>
+  // Eager, and kept small (R20). The Worker usually draws the panel in the member's shape already (data-shaped="server");
+  // when it could not in time, this lays the panel out in the shape this browser saw last, asks /api/me/ai alongside
+  // /api/me, then loads the panel's module only for a member who may connect. An unknown /api/me counts as yes, as
+  // meCan does; the MCP server checks every sign-in.
+  import { loadAi, loadMe } from '../scripts/room-me.ts';
+
+  // A literal from the build (worker/stored-name.ts), so this eager script imports nothing more.
+  declare const ROOM_STORED_NAME: string;
+  const SHAPE_KEY = `${ROOM_STORED_NAME}.connect-first.shape`;
+  const root = document.querySelector<HTMLElement>('[data-connect-first]');
+
+  function keep(shape: string): void {
+    try {
+      localStorage.setItem(SHAPE_KEY, shape);
+    } catch {
+      /* not kept: the next load holds the full panel */
+    }
+  }
+
+  if (root?.dataset.shaped === 'server') {
+    // The Worker drew the panel in the member's shape (worker/overview-ai.ts), so nothing is held: keep the shape for a
+    // load it cannot shape. It does so only in the default card order; orderCards strips a ?ai= the address still has,
+    // and in a browser that kept a custom order before this cookie existed, reorders once and sets the cookie.
+    keep(root.dataset.state ?? 'open');
+    if (root.dataset.state !== 'none') void import('../scripts/connect-first.ts').then(({ orderCards }) => orderCards(root), () => undefined);
+  } else if (root) {
+    let last: string | null = null;
+    try {
+      last = localStorage.getItem(SHAPE_KEY);
+    } catch {
+      /* storage blocked: hold the full panel */
+    }
+    root.dataset.state = last === 'connected' || last === 'none' ? last : 'open';
+    root.hidden = last === 'none';
+    const ai = loadAi();
+    void loadMe()
+      .then(async (me) => {
+        if (me?.can?.connect === false) {
+          root.hidden = true;
+          root.dataset.state = 'none';
+          root.removeAttribute('aria-busy');
+          keep('none');
+          return;
+        }
+        const [{ mountConnectFirst }, status] = await Promise.all([import('../scripts/connect-first.ts'), ai]);
+        root.hidden = false;
+        keep(mountConnectFirst(root, status));
+      })
+      .catch(() => {
+        // The module did not load: the drawn cards and their links still work.
+        root.hidden = false;
+        root.dataset.state = 'open';
+        root.removeAttribute('aria-busy');
+      });
+  }
+</script>

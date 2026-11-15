@@ -1,0 +1,172 @@
+/*
+  /documents/ at phone width, in forced colors and in print (card P5a). Imported after documents.css: below 48rem the
+  index becomes a folder select, the facets and key hints go, and each table row becomes a card (mockup
+  documents-390).
+*/
+
+/* Phone: a folder select instead of the tree, no facets, and each row becomes a card. */
+@media (max-width: 48rem) {
+  .docs-side,
+  .docs-scope,
+  .docs-keys,
+  .docs-filter__kbd {
+    display: none;
+  }
+
+  .docs-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .docs-top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .docs-tools__find {
+    order: -1;
+  }
+
+  .docs-folder {
+    display: grid;
+    gap: var(--space-1);
+    font-size: var(--text-13);
+  }
+
+  .docs-table-wrap {
+    max-height: none;
+    background: transparent;
+    border: 0;
+  }
+
+  .docs-table,
+  .docs-table tbody {
+    display: block;
+  }
+
+  .docs-row {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--space-2);
+    row-gap: var(--space-1);
+    align-items: center;
+    padding: var(--space-3) 0;
+    border-bottom: var(--hairline) solid var(--rule);
+  }
+
+  .docs-row > .docs-cell {
+    height: auto;
+    padding: 0;
+    border: 0;
+  }
+
+  .docs-cell--date {
+    order: 1;
+    color: var(--ink-2);
+  }
+
+  .docs-cell--privilege {
+    order: 2;
+  }
+
+  .docs-cell--key {
+    order: 3;
+  }
+
+  .docs-cell--pages {
+    order: 4;
+    margin-left: auto;
+    font-size: 0;
+  }
+
+  .docs-cell--pages::after {
+    content: attr(data-pages);
+    color: var(--ink-2);
+    font-size: var(--text-13);
+  }
+
+  .docs-cell--summary {
+    order: 5;
+    flex-basis: 100%;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .docs-summary-line {
+    flex-wrap: wrap;
+    max-width: none;
+  }
+
+  .docs-summary {
+    font-size: var(--text-16);
+    line-height: 1.5rem;
+    white-space: normal;
+  }
+
+  .docs-cell--type,
+  .docs-cell--parties {
+    order: 6;
+    color: var(--ink-2);
+    font-size: var(--text-13);
+  }
+
+  .docs-cell--parties {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .docs-clip {
+    max-width: none;
+    white-space: normal;
+  }
+
+  .docs-cell--type:has(+ .docs-cell--parties .docs-clip:not(:empty)) .docs-clip::after {
+    content: ',';
+  }
+
+  .docs-cell--privilege:has(.docs-none),
+  .docs-cell--bates {
+    display: none;
+  }
+
+  .docs-key {
+    width: var(--target-min);
+    height: var(--target-min);
+  }
+}
+
+@media (forced-colors: active) {
+  .docs-tabs__tab[aria-current='page'] {
+    border-bottom-color: Highlight;
+  }
+
+  .docs-index__link[aria-current='true'] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  .docs-key[aria-pressed='true'] {
+    outline: 2px solid Highlight;
+  }
+}
+
+@media print {
+  .docs-side,
+  .docs-tools,
+  .docs-foot,
+  .docs-intake {
+    display: none;
+  }
+
+  .docs-layout {
+    display: block;
+  }
+
+  .docs-table-wrap {
+    max-height: none;
+    overflow: visible;
+  }
+}

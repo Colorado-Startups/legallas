@@ -1,0 +1,11 @@
+{
+ "version": 3,
+ "sha256": "d0de7a6c55abe83f460e3f959d8500d8d0fe9ee02460fd69f8ce1143eb9da09c",
+ "pages": [
+  {
+   "n": 1,
+   "ocr": false,
+   "text": "HARBOR LABS SAMPLE RECORD. Fictional: every name, date and number is invented.\nPage 1 of 1\nMember ledger of Harbor Labs, LLC, as of February 15, 2011\nJane Doe: 5,000 units, $2,500 contributed by check on February 15, 2011.\nRichard Roe: 5,000 units, $2,500 contributed by check on February 15, 2011.\nTotal: 10,000 units issued and $5,000 contributed.\nNo other person holds units, options or rights to units."
+  }
+ ]
+}

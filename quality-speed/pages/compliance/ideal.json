@@ -1,0 +1,23 @@
+{
+  "ideal": "A firm's security team gets every document it asks for, current, true to the code, the same day.",
+  "sources": [
+    {
+      "title": "NIST CSWP 29: The NIST Cybersecurity Framework (CSF) 2.0",
+      "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf",
+      "date": "2024-02-26"
+    },
+    {
+      "title": "Martin Fowler: Continuous Integration",
+      "url": "https://martinfowler.com/articles/continuousIntegration.html",
+      "date": "2024-01-18"
+    },
+    {
+      "title": "NIST AI 100-1: AI Risk Management Framework 1.0",
+      "url": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf",
+      "date": "2023-01-26"
+    }
+  ],
+  "quality": "Every control area has a dated policy, and every file and symbol a policy cites is in the code.",
+  "speed": "Every policy reviewed within 12 months, and a restore drill passed within the last quarter.",
+  "consumption": "This page's CI lane runs in 5 minutes or less."
+}

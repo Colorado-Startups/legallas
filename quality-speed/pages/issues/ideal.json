@@ -1,0 +1,33 @@
+{
+  "ideal": "Every bug is filed with four parts, one rank and one type, closed in time by its merged pull request, never reopened.",
+  "sources": [
+    {
+      "title": "GitLab Handbook: Issue Triage, Severity SLOs",
+      "url": "https://handbook.gitlab.com/handbook/product-development/how-we-work/issue-triage/",
+      "date": "2026-11-09"
+    },
+    {
+      "title": "GitHub Docs: Syntax for issue forms",
+      "url": "https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms",
+      "date": "2026-09-29"
+    },
+    {
+      "title": "actions/stale: inputs and defaults",
+      "url": "https://github.com/actions/stale",
+      "date": "2026-09-10"
+    },
+    {
+      "title": "GitHub Docs: Linking a pull request to an issue",
+      "url": "https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue",
+      "date": "2026-03-18"
+    },
+    {
+      "title": "Kubernetes community: Issue triage guidelines, Define priority",
+      "url": "https://github.com/kubernetes/community/blob/master/contributors/guide/issue-triage.md",
+      "date": "2025-07-20"
+    }
+  ],
+  "quality": "Every open issue has four parts, one P and one type; a merged pull request closes it for good; every label is used.",
+  "speed": "No open issue idles 60 days or outlives its rank close target, and the Public launch milestone empties before the make-public gate.",
+  "consumption": "The daily read stays a short lane: a few calls per 100 issues, within 5 job minutes."
+}

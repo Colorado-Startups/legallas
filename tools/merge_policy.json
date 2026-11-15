@@ -1,0 +1,193 @@
+{
+  "_README": [
+    "Legallas's AI merge policy for tools/merge_policy.py (Git Crafter templates/open/merge_policy.json,",
+    "skills/merging/outside.md). An outside PR may change only tests, design notes, connector guides and",
+    "page plans with no maintainer. Everything that runs in the room, builds or installs, defines a gate",
+    "or states the rules waits for a maintainer, who rebuilds it with the contributor credited.",
+    "Default deny: a path on neither list is not AI-mergeable. maintainer_only wins",
+    "over ai_mergeable: a test under web/worker/ or web/mcp/ waits, and so does the connect skill folder,",
+    "which a member's AI reads as instructions.",
+    "samples: each group is a list of PR path lists; --self-test checks them, and",
+    "a policy with an empty group fails it."
+  ],
+  "maintainer_only": [
+    ".github/**",
+    ".githooks/**",
+    ".husky/**",
+    ".claude/**",
+    ".devcontainer/**",
+    ".mcp.json",
+    "tools/**",
+    "scripts/**",
+    "web/worker/**",
+    "web/mcp/**",
+    "web/migrations/**",
+    "web/connect/skill/**",
+    "templates/**",
+    "docs/checklist/**",
+    "docs/legal/**",
+    "**/migrations/**",
+    "**/package*.json",
+    "**/npm-shrinkwrap.json",
+    "**/pnpm-lock.yaml",
+    "**/yarn.lock",
+    "**/pyproject.toml",
+    "**/uv.lock",
+    "**/requirements*.txt",
+    "**/Pipfile*",
+    "**/Dockerfile*",
+    "**/*.config.js",
+    "**/*.config.cjs",
+    "**/*.config.mjs",
+    "**/*.config.ts",
+    "**/wrangler.toml",
+    "**/wrangler.json",
+    "**/wrangler.jsonc",
+    "**/.npmrc",
+    "**/.nvmrc",
+    "**/.gitignore",
+    "**/.gitattributes",
+    "**/.env*",
+    "**/Package.resolved",
+    ".swiftlint.yml",
+    "Package.swift",
+    "merge_policy.json",
+    "labels.json",
+    "LICENSE",
+    "NOTICE",
+    "TRADEMARKS.md",
+    "CODEOWNERS",
+    "**/AGENTS.md",
+    "**/CLAUDE.md",
+    "CODE_OF_CONDUCT.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "**/_worker.js",
+    "**/_headers",
+    "**/_redirects",
+    "**/conftest.py",
+    "**/*.svg"
+  ],
+  "ai_mergeable": [
+    "Tests/**",
+    "web/**/*.test.ts",
+    "docs/design/**",
+    "web/connect/**/*.md",
+    "quality-speed/pages/*/PLAN.md"
+  ],
+  "samples": {
+    "ai_mergeable": [
+      [
+        "Tests/LegallasCoreTests/CaseModelTests.swift"
+      ],
+      [
+        "web/scripts/visualprep.test.ts",
+        "web/src/scripts/guide-copy.test.ts"
+      ],
+      [
+        "docs/design/rooms-and-grants.md",
+        "docs/design/sync-endpoints.md"
+      ],
+      [
+        "web/connect/claude-ai.md"
+      ],
+      [
+        "quality-speed/pages/data-room/PLAN.md"
+      ]
+    ],
+    "maintainer_only": [
+      [
+        ".github/workflows/ci.yml"
+      ],
+      [
+        "web/worker/auth.ts"
+      ],
+      [
+        "web/worker/privilege.test.ts"
+      ],
+      [
+        "web/mcp/contract.ts"
+      ],
+      [
+        "web/migrations/0004_example.sql"
+      ],
+      [
+        "templates/founders/example.md"
+      ],
+      [
+        "docs/checklist/baseline.toml"
+      ],
+      [
+        "docs/legal/product-notices.md"
+      ],
+      [
+        "web/package.json"
+      ],
+      [
+        "docs/design/rooms-and-grants.md",
+        "web/package-lock.json"
+      ],
+      [
+        "Package.swift"
+      ],
+      [
+        "web/connect/skill/legallas/SKILL.md"
+      ],
+      [
+        "LICENSE"
+      ],
+      [
+        "NOTICE"
+      ],
+      [
+        "SECURITY.md"
+      ],
+      [
+        "CLAUDE.md"
+      ],
+      [
+        "docs/design/CLAUDE.md"
+      ],
+      [
+        "tools/merge_policy.json"
+      ],
+      [
+        ".claude/settings.json"
+      ],
+      [
+        "web/public/logo.svg"
+      ]
+    ],
+    "default_deny": [
+      [
+        "README.md"
+      ],
+      [
+        "web/src/pages/index.astro"
+      ],
+      [
+        "web/scripts/sync.ts"
+      ],
+      [
+        "LegallasApp/LegallasApp.swift"
+      ],
+      [
+        "docs/security/README.md"
+      ]
+    ],
+    "refused": [
+      [
+        "docs/design/../../.github/workflows/ci.yml"
+      ],
+      [
+        "/etc/hosts"
+      ],
+      [
+        "docs//design/x.md"
+      ],
+      [
+        "docs\\design\\x.md"
+      ]
+    ]
+  }
+}

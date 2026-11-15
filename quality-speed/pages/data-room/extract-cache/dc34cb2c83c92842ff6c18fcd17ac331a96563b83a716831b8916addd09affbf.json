@@ -1,0 +1,16 @@
+{
+ "version": 3,
+ "sha256": "dc34cb2c83c92842ff6c18fcd17ac331a96563b83a716831b8916addd09affbf",
+ "pages": [
+  {
+   "n": 1,
+   "ocr": false,
+   "text": "HARBOR LABS SAMPLE RECORD. Fictional: every name, date and number is invented.\nPage 1 of 2\nUnaudited financial statements of Harbor Labs, LLC, prepared by Ada Auditor, CPA, as\nof May 31, 2011\nBalance sheet. Cash: $60,600. Total assets: $60,600.\nConvertible notes payable: $150,000. Accrued interest: $1,208.22. Members' deficit:\n$90,608.22.\nIncome statement, February 8 to May 31, 2011. Revenue: $34,320. Operating expenses:\n$128,720. Interest: $1,208.22.\nNet loss for the period: $95,608.22."
+  },
+  {
+   "n": 2,
+   "ocr": false,
+   "text": "HARBOR LABS SAMPLE RECORD. Fictional: every name, date and number is invented.\nPage 2 of 2\nNotes to the statements\nThese statements have not been audited or reviewed.\nRevenue is recorded monthly as subscriptions are billed. Prices are in the\nSubscription Terms.\nBank reconciliation: the Acme Bank account ending 4417 reconciles to the $60,600\nshown."
+  }
+ ]
+}

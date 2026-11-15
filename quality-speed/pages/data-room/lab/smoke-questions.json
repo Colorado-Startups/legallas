@@ -1,0 +1,43 @@
+{
+  "note": "Enough to prove the lab runs, written from the fictional fixture. The Data room page's scored question set comes from its own author and is passed with --questions.",
+  "filter": {
+    "id": "filter-bylaws",
+    "query": "Bylaws",
+    "path": "01-Corporate-Records/Bylaws__20110609__Harbor-Labs.pdf"
+  },
+  "documents": [
+    {
+      "id": "doc-open",
+      "path": "01-Corporate-Records/Bylaws__20110609__Harbor-Labs.pdf",
+      "page": 1
+    },
+    {
+      "id": "doc-open-deep",
+      "path": "09-Discovery/Deposition__20130814__Mark-Moe.pdf",
+      "page": 38
+    }
+  ],
+  "questions": [
+    {
+      "id": "smoke-notice",
+      "question": "How many days of notice do the bylaws require for a board meeting?",
+      "paths": [
+        "01-Corporate-Records/Bylaws__20110609__Harbor-Labs.pdf"
+      ]
+    },
+    {
+      "id": "smoke-repurchase",
+      "question": "Was the repurchase notice for the unvested shares served at cost?",
+      "paths": [
+        "04-Letters/Repurchase-Notice__20120612__Harbor-Labs.pdf"
+      ]
+    },
+    {
+      "id": "smoke-bridge",
+      "question": "Who received the convertible bridge note?",
+      "paths": [
+        "03-Investor-Agreements/Bridge-Note__20120214__Alder-Peak.pdf"
+      ]
+    }
+  ]
+}

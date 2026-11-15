@@ -1,0 +1,115 @@
+/*
+  Step 1 on the Overview: connect your own AI (components/ConnectFirst.astro). Page classes are ov-ai*; they compose
+  the c-* blocks and never restyle them. Tokens only.
+
+  No layout shift (R89): while aria-busy the panel is laid out but invisible, in the shape this browser saw last
+  (data-state, set by the panel's script before /api/me answers): the cards, or the one Connected line. The
+  module reveals it in place. Invisible boxes never count as shifted, so putting the cards in order moves nothing.
+  Until that script runs (data-state="unset"; a first paint can come before any module), the page after the panel
+  is invisible too, so it first shows where it stays. It stays invisible while the panel is laid out as the one
+  line or as nothing ("connected", "none") until /api/me answers, since growing back into the cards would push
+  it down. The boot guard ends aria-busy if scripts fail, which shows it; if nothing ends it, the hold lapses after
+  1.5 s on its own (ov-ai-failsafe).
+  When it was laid out as the cards and the member is connected, it keeps that height for the one load
+  (--ov-ai-hold, set by connect-first.ts) and shows the one line at its top; the next load holds just the line.
+*/
+
+.ov-ai {
+  min-height: var(--ov-ai-hold, 0);
+  /* The case header below pulls itself up by --space-4 into the page padding; this keeps --space-4 between them. */
+  margin: 0 0 calc(var(--space-6) + var(--space-4));
+}
+
+.ov-ai[aria-busy='true'],
+.ov-ai[aria-busy='true']:not([data-state='open']) ~ * {
+  visibility: hidden;
+  /*
+    Failsafe: if the panel's script never runs (a chunk that fails to load, a blocker, an early error), the hold
+    ends by itself after 1.5 s, so the cards and the Overview show anyway. A discrete visibility step, not motion.
+  */
+  animation: ov-ai-failsafe 0s linear 1.5s forwards;
+}
+
+@keyframes ov-ai-failsafe {
+  to {
+    visibility: visible;
+  }
+}
+
+.ov-ai:not([data-state='connected']) .ov-ai__line,
+.ov-ai[data-state='connected'] .ov-ai__open {
+  display: none;
+}
+
+.ov-ai__title {
+  margin: 0 0 var(--space-2);
+}
+
+.ov-ai__lead {
+  max-width: var(--measure);
+  margin: 0 0 var(--space-4);
+  color: var(--ink-2);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1.5rem;
+}
+
+.ov-ai__cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ov-ai__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.ov-ai__name {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-18);
+  font-weight: 600;
+  line-height: 1.5rem;
+}
+
+.ov-ai__who {
+  margin: 0 0 var(--space-3);
+  color: var(--ink-2);
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+}
+
+/* The action sits at the foot of every card, so the cards line up whatever their text. */
+.ov-ai__go {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.ov-ai__line {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-14);
+  line-height: 1.5rem;
+}
+
+@media (max-width: 48rem) {
+  .ov-ai__cards {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+}
+
+@media (forced-colors: active) {
+  .ov-ai__card {
+    border-color: CanvasText;
+  }
+}

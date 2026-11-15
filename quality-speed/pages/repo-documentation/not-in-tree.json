@@ -1,0 +1,62 @@
+[
+  {
+    "name": "web/scripts/law/packs.json",
+    "reason": "A room's own law pack list; web/README.md says a room without it builds the default pack, so the repository never holds one"
+  },
+  {
+    "name": "packs.json",
+    "reason": "The same room law pack list, named without its folder in web/README.md"
+  },
+  {
+    "name": "docs/legal/review.md",
+    "reason": "In a private repository; the docs that name it say so"
+  },
+  {
+    "name": "templates/v4/create/da/mcp-server",
+    "reason": "In Microsoft's OfficeDev/microsoft-365-agents-toolkit repository; web/connect/copilot.md names that repository"
+  },
+  {
+    "name": "opencode.json",
+    "reason": "OpenCode's own settings file on a member's machine"
+  },
+  {
+    "name": "README.txt",
+    "reason": "Written into the counsel pack at run time (npm run counsel-pack)"
+  },
+  {
+    "name": "output.json",
+    "reason": "The output argument of .github/scripts/claude-settings.sh, written at run time"
+  },
+  {
+    "name": "report.json",
+    "reason": "Written by npm run dev:shoot at run time and uploaded as an artifact"
+  },
+  {
+    "name": "ERR_MODULE_NOT_FOUND",
+    "reason": "Node.js's error code"
+  },
+  {
+    "name": "MAX_MCP_OUTPUT_TOKENS",
+    "reason": "Claude Code's setting"
+  },
+  {
+    "name": "OPENCODE_DISABLE_MODELS_FETCH",
+    "reason": "OpenCode's setting"
+  },
+  {
+    "name": "NODEJS_COMPAT_DEFAULT_ON_DATE",
+    "reason": "Cloudflare workerd's constant"
+  },
+  {
+    "name": "LICENSE_OPENJPEG",
+    "reason": "A licence file shipped inside the pdfjs-dist npm package"
+  },
+  {
+    "name": "LICENSE_LIBERATION",
+    "reason": "A licence file shipped inside the pdfjs-dist npm package"
+  },
+  {
+    "name": "LICENSE_FOXIT",
+    "reason": "A licence file shipped inside the pdfjs-dist npm package"
+  }
+]

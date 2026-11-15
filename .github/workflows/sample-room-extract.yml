@@ -1,0 +1,59 @@
+# Reads the fictional sample room's PDFs and images with LegallasExtract on hosted
+# macOS 26, by hand, and uploads the result as an artifact. Its contents replace
+# quality-speed/pages/data-room/extract-cache, in a pull request: this workflow
+# writes nothing to the repository. With that cache, the room seeds on Linux, so a
+# daily run needs no Mac (quality-speed/pages/data-room/lab/README.md).
+#
+# Run it only when a fixture document is new or changed, or when `swift-ocr` in
+# ci.yml says the extractor now reads them differently. Hosted macOS minutes count
+# 10x against the included minutes, so there is no automatic trigger:
+#
+#   gh workflow run sample-room-extract.yml -R Colorado-Startups/legallas --ref <branch>
+#
+# macOS 26 because Vision's accurate OCR runs there, as in `swift-ocr`: the probe
+# fails the run rather than letting a page's text go missing. Fictional files only,
+# from web/scripts/dev-fixture.ts, and no secrets.
+name: Sample room extract
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One Mac at a time per branch, as in sample-room-lab.yml: a second run waits instead of starting another 10x VM.
+concurrency:
+  group: sample-room-extract-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  extract:
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Toolchain
+        run: |
+          sw_vers
+          swift --version
+          node --version
+      - name: Probe Vision accurate OCR
+        run: swift .github/ci/vision-accurate-probe.swift
+      - name: Build LegallasExtract
+        run: swift build --product LegallasExtract
+      # The fixture's writers need no packages, so no npm install.
+      - name: Read the fictional files
+        run: node quality-speed/pages/data-room/lab/extract-cache.ts write --binary .build/debug/LegallasExtract --out "$RUNNER_TEMP/extract-cache"
+      - name: Read them again and compare
+        run: node quality-speed/pages/data-room/lab/extract-cache.ts check --binary .build/debug/LegallasExtract --dir "$RUNNER_TEMP/extract-cache"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: sample-room-extract-${{ github.run_id }}
+          path: ${{ runner.temp }}/extract-cache/
+          if-no-files-found: error
+          retention-days: 30

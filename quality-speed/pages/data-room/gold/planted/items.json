@@ -1,0 +1,485 @@
+[
+ {
+  "id": "p-missed-83b",
+  "kind": "missed-deadline",
+  "rooms": [
+   "forming",
+   "raising-vc",
+   "dispute"
+  ],
+  "checklist": "founders.section-83b-election",
+  "flag": "Richard Roe mailed his election on July 19, 2011, 12 days after the July 7, 2011 deadline for the June 7, 2011 transfer.",
+  "values": {
+   "transfer": "2011-06-07",
+   "deadline": "2011-07-07",
+   "mailed": "2011-07-19",
+   "daysLate": 12
+  },
+  "evidence": [
+   {
+    "doc": "13-Founders/Election-83b__20110719__Richard-Roe.pdf",
+    "page": 1,
+    "quote": "Date of transfer: June 7, 2011."
+   },
+   {
+    "doc": "13-Founders/Election-83b__20110719__Richard-Roe.pdf",
+    "page": 2,
+    "quote": "mailed July 19, 2011"
+   },
+   {
+    "doc": "13-Founders/Election-83b__20110620__Jane-Doe.pdf",
+    "page": 2,
+    "quote": "The thirtieth day after the June 7, 2011 transfer is July 7, 2011."
+   }
+  ]
+ },
+ {
+  "id": "p-disclosure-83b",
+  "kind": "contradiction",
+  "rooms": [
+   "raising-vc",
+   "dispute"
+  ],
+  "checklist": "founders.section-83b-election",
+  "flag": "The purchase agreement says each founder made a timely election and the schedule discloses nothing, yet at the June 21, 2011 closing Roe had not mailed his.",
+  "evidence": [
+   {
+    "doc": "21-Investor-Room-VC/Stock-Purchase-Agreement__20110621__Alder-Peak.pdf",
+    "page": 2,
+    "quote": "Each founder made a timely election under Section 83(b)"
+   },
+   {
+    "doc": "21-Investor-Room-VC/Disclosure-Schedule__20110621__Harbor-Labs.docx",
+    "page": null,
+    "quote": "Schedule 3.12, Tax elections. None."
+   },
+   {
+    "doc": "13-Founders/Election-83b__20110719__Richard-Roe.pdf",
+    "page": 2,
+    "quote": "mailed July 19, 2011"
+   }
+  ]
+ },
+ {
+  "id": "p-missing-roe-technology-assignment",
+  "kind": "missing-document",
+  "rooms": [
+   "forming",
+   "raising-vc",
+   "dispute"
+  ],
+  "checklist": "intellectual-property.founder-technology-assignment",
+  "flag": "The consent requires a technology assignment from each founder and the data room index lists Roe's, but only Doe's is in the record.",
+  "absent": "Technology-Assignment__.*Richard-Roe",
+  "evidence": [
+   {
+    "doc": "12-Formation/Organizational-Consent__20110603__Harbor-Labs.pdf",
+    "page": 1,
+    "quote": "each founder must sign a technology assignment"
+   },
+   {
+    "doc": "21-Investor-Room-VC/Data-Room-Index__20110503__Jane-Doe.pdf",
+    "page": 1,
+    "quote": "technology assignment from Richard Roe"
+   }
+  ]
+ },
+ {
+  "id": "p-missing-sam-questionnaire",
+  "kind": "missing-document",
+  "rooms": [
+   "raising-angel",
+   "raising-vc",
+   "dispute"
+  ],
+  "checklist": "financing.investor-accreditation",
+  "flag": "Three note holders, two questionnaires. Sam Seed's is not in the record.",
+  "absent": "Accreditation__.*Sam-Seed",
+  "evidence": [
+   {
+    "doc": "20-Investor-Room-Angels/Note-Purchase-Agreement__20110412__Harbor-Labs-LLC.pdf",
+    "page": 1,
+    "quote": "Sam Seed, $21,000."
+   },
+   {
+    "doc": "20-Investor-Room-Angels/Investor-Interest__20110405__Gus-Group.xlsx",
+    "page": null,
+    "quote": "Questionnaire to follow"
+   }
+  ]
+ },
+ {
+  "id": "p-missing-delaware-good-standing",
+  "kind": "missing-document",
+  "rooms": [
+   "raising-vc",
+   "dispute"
+  ],
+  "checklist": "compliance-and-governance.good-standing-certificates",
+  "flag": "The closing certificate says a Delaware certificate dated June 17, 2011 was delivered. It is not in the record.",
+  "absent": "Good-Standing__.*Delaware",
+  "evidence": [
+   {
+    "doc": "21-Investor-Room-VC/Closing-Certificate__20110621__Harbor-Labs.pdf",
+    "page": 1,
+    "quote": "a Delaware good standing certificate dated June 17, 2011"
+   },
+   {
+    "doc": "21-Investor-Room-VC/Data-Room-Index__20110503__Jane-Doe.pdf",
+    "page": 1,
+    "quote": "good standing certificate from Delaware"
+   }
+  ]
+ },
+ {
+  "id": "p-missing-february-minutes",
+  "kind": "missing-document",
+  "rooms": [
+   "dispute"
+  ],
+  "checklist": "compliance-and-governance.minute-book",
+  "flag": "The notice log shows a February 7, 2012 meeting that approved the bridge note. No minutes of it are in the record.",
+  "absent": "Minutes__20120207",
+  "evidence": [
+   {
+    "doc": "02-Board-Minutes/Notice-Log__20121019__Nina-Note.pdf",
+    "page": 1,
+    "quote": "Board approves a bridge note on twelve days' notice."
+   },
+   {
+    "doc": "09-Discovery/Deposition__20130919__Richard-Roe.pdf",
+    "page": 4,
+    "quote": "I have never seen minutes of that meeting."
+   }
+  ]
+ },
+ {
+  "id": "p-prior-employer-risk",
+  "kind": "contradiction",
+  "rooms": [
+   "forming",
+   "raising-vc",
+   "dispute"
+  ],
+  "checklist": "founders.prior-employer-agreements",
+  "flag": "The founders told the investor no former employer has a claim, yet Roe wrote the prototype while at Brightline under an invention clause, kept it out of his assignment and never got a release.",
+  "evidence": [
+   {
+    "doc": "13-Founders/Prior-Employer-Review__20110207__Richard-Roe.pdf",
+    "page": 1,
+    "quote": "assigns to Brightline any invention"
+   },
+   {
+    "doc": "13-Founders/Prior-Employer-Review__20110207__Richard-Roe.pdf",
+    "page": 1,
+    "quote": "no release from Brightline has been requested or received"
+   },
+   {
+    "doc": "14-Intellectual-Property/Invention-Assignment__20110607__Richard-Roe.pdf",
+    "page": 1,
+    "quote": "the shift-matching scheduling prototype written in November 2010"
+   },
+   {
+    "doc": "21-Investor-Room-VC/Investor-QA__20110520__Mark-Moe.pdf",
+    "page": 1,
+    "quote": "No former employer has any claim to the code."
+   }
+  ]
+ },
+ {
+  "id": "p-domain-founder-name",
+  "kind": "missing-document",
+  "rooms": [
+   "forming",
+   "raising-angel",
+   "raising-vc",
+   "dispute"
+  ],
+  "checklist": "intellectual-property.domain-names",
+  "flag": "The checklist item is a domain registered to the company. This one is still in Jane Doe's own name.",
+  "absent": "Domain-Transfer__",
+  "evidence": [
+   {
+    "doc": "14-Intellectual-Property/Domain-Receipt__20110112__Jane-Doe.pdf",
+    "page": 1,
+    "quote": "Registrant of record: Jane Doe, personally."
+   },
+   {
+    "doc": "14-Intellectual-Property/Technology-Assignment__20110607__Jane-Doe.pdf",
+    "page": 1,
+    "quote": "will move it to the company on request"
+   }
+  ]
+ },
+ {
+  "id": "p-trademark-stale-owner",
+  "kind": "outdated",
+  "rooms": [
+   "forming",
+   "raising-angel",
+   "raising-vc",
+   "dispute"
+  ],
+  "checklist": "intellectual-property.trademark-registration",
+  "flag": "The application names Harbor Labs, LLC, which converted to a corporation on June 2, 2011. No change of owner is recorded.",
+  "evidence": [
+   {
+    "doc": "14-Intellectual-Property/Trademark-Application__20110411__USPTO.pdf",
+    "page": 1,
+    "quote": "Applicant: Harbor Labs, LLC"
+   },
+   {
+    "doc": "12-Formation/Certificate-of-Incorporation__20110602__Delaware-SOS.pdf",
+    "page": 1,
+    "quote": "Filed with the Delaware Secretary of State on June 2, 2011."
+   }
+  ]
+ },
+ {
+  "id": "p-angel-teaser-contradiction",
+  "kind": "contradiction",
+  "rooms": [
+   "raising-angel",
+   "raising-vc",
+   "dispute"
+  ],
+  "flag": "The March 10 teaser claims 52 paying kitchens. The March 31 update reports 37.",
+  "values": {
+   "claimed": 52,
+   "reported": 37
+  },
+  "evidence": [
+   {
+    "doc": "20-Investor-Room-Angels/Teaser__20110310__Harbor-Labs-LLC.pdf",
+    "page": 1,
+    "quote": "Traction: 52 paying kitchens in Colorado."
+   },
+   {
+    "doc": "20-Investor-Room-Angels/Investor-Update__20110331__Jane-Doe.pdf",
+    "page": 1,
+    "quote": "Paying kitchens at March 31, 2011: 37."
+   }
+  ]
+ },
+ {
+  "id": "p-deck-vs-model-kitchens",
+  "kind": "deck-contradiction",
+  "rooms": [
+   "raising-vc",
+   "dispute"
+  ],
+  "flag": "The deck claims 86 kitchens and $247,680 of annual recurring revenue at April 30, 2011. The model and customer list show 41 and $118,080.",
+  "values": {
+   "deckKitchens": 86,
+   "modelKitchens": 41,
+   "deckRecurring": 247680,
+   "modelRecurring": 118080
+  },
+  "evidence": [
+   {
+    "doc": "21-Investor-Room-VC/Deck__20110502__Harbor-Labs-LLC__v3.pdf",
+    "page": 4,
+    "quote": "86 paying kitchens as of April 30, 2011."
+   },
+   {
+    "doc": "21-Investor-Room-VC/Deck__20110502__Harbor-Labs-LLC__v3.pdf",
+    "page": 4,
+    "quote": "Annual recurring revenue of $247,680."
+   },
+   {
+    "doc": "21-Investor-Room-VC/Financial-Model__20110430__Jane-Doe.xlsx",
+    "page": null,
+    "quote": "$118,080"
+   },
+   {
+    "doc": "21-Investor-Room-VC/Customer-List__20110430__Jane-Doe.xlsx",
+    "page": null,
+    "quote": "Total"
+   }
+  ]
+ },
+ {
+  "id": "p-deck-vs-model-burn",
+  "kind": "deck-contradiction",
+  "rooms": [
+   "raising-vc",
+   "dispute"
+  ],
+  "flag": "The deck gives monthly net burn of $28,000. The model shows $46,300.",
+  "values": {
+   "deck": 28000,
+   "model": 46300
+  },
+  "evidence": [
+   {
+    "doc": "21-Investor-Room-VC/Deck__20110502__Harbor-Labs-LLC__v3.pdf",
+    "page": 9,
+    "quote": "Monthly net burn of $28,000."
+   },
+   {
+    "doc": "21-Investor-Room-VC/Financial-Model__20110430__Jane-Doe.xlsx",
+    "page": null,
+    "quote": "$46,300"
+   }
+  ]
+ },
+ {
+  "id": "p-deck-vs-model-breakeven",
+  "kind": "deck-contradiction",
+  "rooms": [
+   "raising-vc",
+   "dispute"
+  ],
+  "flag": "The deck expects breakeven by March 2012. The model forecasts September 2012.",
+  "evidence": [
+   {
+    "doc": "21-Investor-Room-VC/Deck__20110502__Harbor-Labs-LLC__v3.pdf",
+    "page": 9,
+    "quote": "Breakeven expected by March 2012."
+   },
+   {
+    "doc": "21-Investor-Room-VC/Financial-Model__20110430__Jane-Doe.xlsx",
+    "page": null,
+    "quote": "September 2012"
+   }
+  ]
+ },
+ {
+  "id": "p-cap-ledger-vs-table",
+  "kind": "cap-table-inconsistency",
+  "rooms": [
+   "raising-vc",
+   "dispute"
+  ],
+  "checklist": "equity.stock-ledger",
+  "flag": "The ledger shows Sam Seed with 17,000 shares and 1,681,850 issued. The conversion schedule and cap table show 7,000, which makes 1,671,850.",
+  "values": {
+   "ledgerSamSeed": 17000,
+   "capTableSamSeed": 7000,
+   "ledgerIssued": 1681850,
+   "capTableIssued": 1671850
+  },
+  "evidence": [
+   {
+    "doc": "21-Investor-Room-VC/Stock-Ledger__20110630__Nina-Note.pdf",
+    "page": 1,
+    "quote": "PS-4: Sam Seed, 17,000 shares"
+   },
+   {
+    "doc": "21-Investor-Room-VC/Stock-Ledger__20110630__Nina-Note.pdf",
+    "page": 1,
+    "quote": "Total shares issued: 1,681,850."
+   },
+   {
+    "doc": "20-Investor-Room-Angels/Note-Conversion__20110621__Harbor-Labs.pdf",
+    "page": 1,
+    "quote": "$21,000 principal converts into 7,000 shares"
+   },
+   {
+    "doc": "21-Investor-Room-VC/Cap-Table__20110621__Nina-Note.xlsx",
+    "page": null,
+    "quote": "7,000"
+   }
+  ]
+ },
+ {
+  "id": "p-cap-pool-vs-plan",
+  "kind": "cap-table-inconsistency",
+  "rooms": [
+   "raising-vc",
+   "dispute"
+  ],
+  "checklist": "equity.equity-incentive-plan",
+  "flag": "The plan reserves 250,000 shares. The cap tables show a pool of 233,615.",
+  "values": {
+   "plan": 250000,
+   "pool": 233615
+  },
+  "evidence": [
+   {
+    "doc": "21-Investor-Room-VC/Equity-Plan__20110615__Harbor-Labs.pdf",
+    "page": 1,
+    "quote": "Shares reserved under the plan: 250,000 shares of common stock."
+   },
+   {
+    "doc": "13-Founders/Founder-Cap-Table__20110607__Jane-Doe.pdf",
+    "page": 1,
+    "quote": "Option pool reserved: 233,615 shares"
+   },
+   {
+    "doc": "21-Investor-Room-VC/Cap-Table__20110621__Nina-Note.xlsx",
+    "page": null,
+    "quote": "233,615"
+   }
+  ]
+ },
+ {
+  "id": "p-outdated-deck",
+  "kind": "outdated",
+  "rooms": [
+   "raising-vc",
+   "dispute"
+  ],
+  "flag": "Version 1 of the deck, with older numbers and a $1.0 million ask, sits beside Version 3, which replaces it.",
+  "evidence": [
+   {
+    "doc": "21-Investor-Room-VC/Deck__20110314__Harbor-Labs-LLC__v1.pptx",
+    "page": 1,
+    "quote": "Seed deck, Version 1, March 14, 2011"
+   },
+   {
+    "doc": "21-Investor-Room-VC/Deck__20110502__Harbor-Labs-LLC__v3.pdf",
+    "page": 1,
+    "quote": "Replaces all earlier versions."
+   }
+  ]
+ },
+ {
+  "id": "p-outdated-term-sheet",
+  "kind": "outdated",
+  "rooms": [
+   "raising-vc",
+   "dispute"
+  ],
+  "flag": "An unsigned April draft at $4.10 sits beside the signed May term sheet at $3.75.",
+  "evidence": [
+   {
+    "doc": "21-Investor-Room-VC/Term-Sheet-Draft__20110425__Alder-Peak.pdf",
+    "page": 1,
+    "quote": "This draft is not signed and binds nobody."
+   },
+   {
+    "doc": "21-Investor-Room-VC/Term-Sheet__20110509__Alder-Peak.pdf",
+    "page": 1,
+    "quote": "Price per share: $3.75."
+   }
+  ]
+ },
+ {
+  "id": "p-outdated-good-standing",
+  "kind": "outdated",
+  "rooms": [
+   "raising-vc",
+   "dispute"
+  ],
+  "checklist": "compliance-and-governance.good-standing-certificates",
+  "flag": "The only good standing certificate is dated March 8, 2011 and names the former LLC, outside the 10-day window the agreement requires.",
+  "evidence": [
+   {
+    "doc": "21-Investor-Room-VC/Good-Standing__20110308__Colorado-SOS.pdf",
+    "page": 1,
+    "quote": "Entity: Harbor Labs, LLC, a Colorado limited liability company."
+   },
+   {
+    "doc": "21-Investor-Room-VC/Good-Standing__20110308__Colorado-SOS.pdf",
+    "page": 1,
+    "quote": "as of March 8, 2011"
+   },
+   {
+    "doc": "21-Investor-Room-VC/Stock-Purchase-Agreement__20110621__Alder-Peak.pdf",
+    "page": 2,
+    "quote": "dated within 10 days before the closing"
+   }
+  ]
+ }
+]

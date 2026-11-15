@@ -1,0 +1,118 @@
+---
+// The owner's activity ledger: sign-ins and every audited action, newest first. The page shell is static
+// like every page; the data comes from GET /api/activity, which answers counsel with 403.
+// Filters are a plain GET form, so a filtered view is a bookmarkable URL. Below the ledger, each member's last tick of
+// the full notice (GET /api/activity/notice; worker/notice-gate.ts), filled by notice-ticks.ts.
+import Room from '../layouts/Room.astro';
+import { ACTIVITY_ACTIONS } from '../../worker/audit.ts';
+import { filterActions } from '../scripts/activity-model.ts';
+import '../scripts/viz/charts.css';
+import '../styles/activity.css';
+
+// Only actions the API accepts as a filter today; the model also labels some it may not send yet.
+const actions = filterActions(ACTIVITY_ACTIONS);
+---
+
+<Room title="Activity">
+  <section class="act" aria-labelledby="act-title">
+    <h1 id="act-title" class="t-h1">Activity</h1>
+
+    <div class="act-body" data-activity-panel hidden>
+      <p class="t-small act-lede">
+        Sign-ins and every opened, downloaded, uploaded, keyed or discussed document. Never what anyone wrote or asked.
+      </p>
+
+      <form class="act-filters" method="get" action="/activity/" role="search" aria-label="Filter activity" data-activity-filters>
+        <label class="act-field act-field--person">
+          <span class="t-caption">Person</span>
+          <input class="c-input" type="email" name="email" list="act-people" autocomplete="off" placeholder="Anyone" />
+          <datalist id="act-people" data-activity-people></datalist>
+        </label>
+        <label class="act-field">
+          <span class="t-caption">Action</span>
+          <select class="c-input" name="action">
+            <option value="">Everything</option>
+            {actions.map(([value, label]) => <option value={value}>{label}</option>)}
+          </select>
+        </label>
+        <label class="act-field">
+          <span class="t-caption">From</span>
+          <input class="c-input u-mono" type="date" name="from" />
+        </label>
+        <label class="act-field">
+          <span class="t-caption">To</span>
+          <input class="c-input u-mono" type="date" name="to" />
+        </label>
+        <div class="act-filters__actions">
+          <button type="submit" class="c-button c-button--primary">Filter</button>
+          <a href="/activity/" class="c-button c-button--quiet">Clear</a>
+        </div>
+      </form>
+
+      <figure class="act-spark" data-activity-spark hidden>
+        <div class="act-spark__chart" data-activity-spark-chart></div>
+        <figcaption class="t-caption act-spark__caption">
+          <span class="t-label" data-activity-spark-title>Per day</span>
+          <span data-activity-spark-summary></span>
+        </figcaption>
+      </figure>
+
+      <p class="t-caption act-status" data-activity-status role="status"></p>
+
+      <div class="c-table-wrap" data-activity-results hidden>
+        <table class="c-table act-table">
+          <caption class="u-vh">Room activity, newest first. Dates are UTC days; times are in your browser's time zone.</caption>
+          <thead>
+            <tr>
+              <th scope="col">When</th>
+              <th scope="col">Who</th>
+              <th scope="col">What</th>
+              <th scope="col">Document</th>
+              <th scope="col">From</th>
+              <th scope="col">Browser</th>
+            </tr>
+          </thead>
+          <tbody data-activity-rows></tbody>
+        </table>
+      </div>
+      <div class="act-more">
+        <button type="button" class="c-button" data-activity-more hidden>Show older activity</button>
+      </div>
+      <p class="t-caption act-note">Filter dates are UTC days. Times are in your browser's time zone.</p>
+    </div>
+
+    <section class="act-notice" aria-labelledby="act-notice-title" data-notice-panel hidden>
+      <h2 id="act-notice-title" class="t-h2">Full notice</h2>
+      <p class="t-small act-lede">
+        Each member ticks the full notice before first use, and again when its words change. Current version
+        <span class="u-mono" data-notice-current></span>.
+      </p>
+      <div class="c-table-wrap">
+        <table class="c-table">
+          <caption class="u-vh">Each member's last tick of the full notice. Times are in your browser's time zone.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Who</th>
+              <th scope="col">Version ticked</th>
+              <th scope="col">When</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody data-notice-rows></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="c-empty" data-activity-empty hidden>
+      <p class="c-empty__text">No activity matches these filters.</p>
+      <a class="c-button" href="/activity/">Clear filters</a>
+    </section>
+    <section class="c-empty" data-activity-denied hidden>
+      <p class="c-empty__text">This ledger is for the room's owner.</p>
+      <a class="c-button" href="/">Overview</a>
+    </section>
+  </section>
+</Room>
+
+<script src="../scripts/activity.ts"></script>
+<script src="../scripts/notice-ticks.ts"></script>

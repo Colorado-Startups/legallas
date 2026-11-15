@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Doe v. Harbor Labs, Inc.: seats sold</title>
+<link rel="stylesheet" href="https://fonts.example.com/css?family=Serif">
+<style>
+body { margin: 0; font-family: Georgia, serif; background: #ffffff; color: #111827; }
+section { padding: 24px; }
+.bar { fill: #1f3a2e; }
+.value { font-size: 12px; fill: #111827; }
+td, th { padding: 4px 8px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+</style></head>
+<body>
+<section>
+<h1>Scheduling seats sold by Harbor Labs</h1>
+<p>Harbor Labs sold seats to restaurants and hotels; see <a href="#legallas-cite=DOE-000412@3">the board packet</a>.</p>
+<svg id="chart" role="img" aria-label="Seats sold by quarter" viewBox="0 0 320 160" width="320" height="160"></svg>
+<table id="ledger"><thead><tr><th>Quarter</th><th>Customers</th><th>Sold</th></tr></thead><tbody></tbody></table>
+<canvas id="spark" width="200" height="40"></canvas>
+<p>Next: <a href="#legallas=doe-timeline">the timeline</a>.</p>
+<img src="https://example.com/pixel.png" alt="">
+</section>
+<script>
+(function () {
+  var data = [['Q4 2011', 'Restaurant seats', 193], ['Q1 2012', 'Hotel seats', 268]];
+  var svg = document.getElementById('chart');
+  var ns = 'http://www.w3.org/2000/svg';
+  data.forEach(function (row, i) {
+    var bar = document.createElementNS(ns, 'rect');
+    bar.setAttribute('class', 'bar');
+    bar.setAttribute('x', String(40 + i * 120));
+    bar.setAttribute('y', String(140 - row[2] * 0.35));
+    bar.setAttribute('width', '60');
+    bar.setAttribute('height', String(row[2] * 0.35));
+    var tip = document.createElementNS(ns, 'title');
+    tip.textContent = row[1] + ': ' + row[2] + ' seats';
+    bar.appendChild(tip);
+    svg.appendChild(bar);
+    var label = document.createElementNS(ns, 'text');
+    label.setAttribute('x', String(50 + i * 120));
+    label.setAttribute('y', '156');
+    label.textContent = row[0];
+    svg.appendChild(label);
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + row[0] + '</td><td>' + row[1] + '</td><td>' + row[2] + ' seats</td>';
+    document.querySelector('#ledger tbody').appendChild(tr);
+  });
+  try { fetch('https://example.com/beacon'); } catch (e) {}
+})();
+</script>
+</body></html>

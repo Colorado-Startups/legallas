@@ -1,0 +1,10 @@
+{
+  "ideal": "Code as small and plain as the job allows: short files, no dead or copied code, and lean bundles.",
+  "sources": [
+    { "title": "Cloudflare Workers limits", "url": "https://developers.cloudflare.com/workers/platform/limits/", "date": "2026-10-29" },
+    { "title": "Google Engineering Practices: What to look for in a code review", "url": "https://google.github.io/eng-practices/review/reviewer/looking-for.html", "date": "2026-11-03" }
+  ],
+  "quality": "No function past complexity 10 or 50 lines, no file past 300, nothing unused or copied.",
+  "speed": "Requests served well inside a good time to first byte, and a bundle that builds in seconds.",
+  "consumption": "Server CPU per request under the free plan's limit, and page scripts inside a 307 KiB budget."
+}

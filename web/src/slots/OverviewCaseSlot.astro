@@ -1,0 +1,10 @@
+---
+// The Overview's case slot: the campaign map's styles and the
+// violations ribbon, OverviewCase.astro, are the litigation pack's. The glob matches it when the pack is in the tree
+// and nothing in a core-only room, whose Overview keeps its documents, discussions and uploads. Nothing else is
+// imported here, so index.astro imports this file where it imported the map's styles (their place in the page's
+// CSS) and renders it where the ribbon's script stood.
+const [OverviewCase] = Object.values(import.meta.glob<() => any>('../components/OverviewCase.astro', { eager: true, import: 'default' }));
+---
+
+{OverviewCase && <OverviewCase />}

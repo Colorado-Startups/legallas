@@ -1,0 +1,371 @@
+/*
+  Card P1a: the Overview's case header, "Since your last visit" and Key documents (web/design/overview/). The
+  objective cards in the header are overview-map.css. Page classes are ov-*; they compose the c-* blocks in
+  components.css and never restyle them. Tokens only.
+*/
+
+/* Case header, the campaign map: court line, caption (c-case__caption), Glossary, the track cards. */
+.ov-case {
+  position: relative;
+  isolation: isolate;
+  margin-top: calc(-1 * var(--space-4));
+  padding-bottom: var(--space-6);
+}
+
+/* The hex texture (4% ink) sits under the campaign map only (DESIGN.md section 8). */
+.ov-case::before {
+  position: absolute;
+  inset: 0 calc(-1 * var(--gutter));
+  z-index: -1;
+  background-image: var(--hex-texture);
+  content: '';
+  pointer-events: none;
+}
+
+.ov-case__court {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-5);
+  margin-bottom: var(--space-3);
+  font-size: var(--text-13);
+}
+
+.ov-case__note {
+  margin: var(--space-4) 0 0;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1.5rem;
+}
+
+/* Glossary: the defined terms, closed by default. */
+.ov-glossary {
+  margin-top: var(--space-4);
+}
+
+.ov-glossary__summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+  color: var(--forest);
+  font-size: var(--text-13);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ov-glossary__summary:hover {
+  color: var(--forest-hover);
+}
+
+.ov-terms {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  gap: var(--space-4) var(--space-6);
+  margin: var(--space-4) 0 0;
+  padding: var(--space-4);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.ov-term__name {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  font-weight: 600;
+  line-height: 1.375rem;
+}
+
+.ov-term__means {
+  margin: var(--space-1) 0 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  line-height: 1.5rem;
+}
+
+.ov-case .c-cite {
+  vertical-align: baseline;
+}
+
+/* Sections under the header. */
+.ov-section {
+  padding-block: var(--space-6);
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+/* The case picture below opens with its own rule on every block; one rule between the halves, not two. */
+.ov-news > .ov-section:last-child {
+  border-bottom: 0;
+}
+
+/*
+  The page gave up (overview-news.ts, or boot-guard.ts when no script ran): the error line under the caption stands
+  alone. The static frame, zero counts and "Loading." lists, would say there is nothing new when nothing is known.
+*/
+main:has([data-ov-failed]:not([hidden])) .ov-news {
+  display: none;
+}
+
+.ov-section__title {
+  margin: 0 0 var(--space-5);
+}
+
+.ov-section__aside {
+  margin-left: var(--space-2);
+  color: var(--ink-3);
+  font-family: var(--font-sans);
+  font-size: var(--text-13);
+  font-weight: 400;
+}
+
+/* Since your last visit: one row of three counts; each opens its list below the row. */
+.ov-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.ov-count {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  min-height: 2.25rem;
+  padding: var(--space-1) var(--space-4);
+  background: var(--surface);
+  color: var(--ink);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease);
+}
+
+.ov-count:hover {
+  border-color: var(--forest);
+}
+
+.ov-count[aria-expanded='true'] {
+  background: var(--forest-tint);
+  border-color: var(--forest);
+}
+
+.ov-count__n {
+  font-family: var(--font-serif);
+  font-size: var(--text-21);
+  font-weight: 600;
+}
+
+.ov-count__label {
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+
+.ov-column {
+  margin-top: var(--space-4);
+  max-width: var(--measure);
+}
+
+.ov-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ov-item {
+  padding-block: var(--space-3);
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.ov-item--dot {
+  position: relative;
+  padding-left: var(--space-4);
+}
+
+.ov-item--dot::before {
+  position: absolute;
+  top: calc(var(--space-3) + 0.4rem);
+  left: 0;
+  width: 0.4375rem;
+  height: 0.4375rem;
+  background: var(--brass-mark);
+  border-radius: 50%;
+  content: '';
+}
+
+.ov-item__title {
+  color: var(--ink);
+  text-decoration: none;
+  font-size: var(--text-14);
+  line-height: 1.25rem;
+}
+
+.ov-item__quote {
+  display: block;
+  text-decoration: none;
+  margin-top: var(--space-1);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1.5rem;
+}
+
+.ov-item__title:hover,
+.ov-item__quote:hover {
+  color: var(--forest-hover);
+  text-decoration: underline;
+}
+
+.ov-item__meta,
+.ov-item__by {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+  margin: var(--space-1) 0 0;
+  color: var(--ink-3);
+  font-size: var(--text-12);
+  line-height: 1rem;
+}
+
+.ov-control {
+  color: var(--ink-2);
+  font-size: var(--text-12);
+}
+
+.ov-more {
+  display: inline-block;
+  margin-top: var(--space-3);
+  font-size: var(--text-13);
+}
+
+.ov-empty,
+.ov-loading {
+  margin: 0;
+  padding-block: var(--space-3);
+  color: var(--ink-2);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+}
+
+/* Key documents: cards with the target badge and control number. */
+.ov-keys {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ov-keys > .ov-empty,
+.ov-keys > .ov-loading {
+  grid-column: 1 / -1;
+}
+
+.ov-key__link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  height: 100%;
+  padding: var(--space-3);
+  background: var(--surface);
+  color: var(--ink);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition: border-color var(--dur-1) var(--ease);
+}
+
+.ov-key__link:hover {
+  border-color: var(--forest);
+}
+
+.ov-key__head {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  color: var(--brass-text);
+  font-size: var(--text-12);
+}
+
+.ov-key__head .ov-control {
+  color: var(--brass-text);
+}
+
+.ov-badge {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--brass-mark);
+}
+
+.ov-key__title {
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  font-weight: 600;
+  line-height: 1.375rem;
+  text-wrap: balance;
+}
+
+.ov-key__meta {
+  color: var(--ink-2);
+  font-size: var(--text-12);
+  line-height: 1rem;
+}
+
+.ov-more--key[data-state='narrow'] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ov-key__link,
+  .ov-count {
+    transition: none;
+  }
+}
+
+@media (max-width: 48rem) {
+  .ov-case {
+    margin-top: calc(-1 * var(--space-2));
+  }
+
+  .ov-case__court {
+    gap: 0 var(--space-3);
+  }
+
+  .ov-keys > .ov-key:nth-child(n + 4) {
+    display: none;
+  }
+
+  .ov-keys {
+    grid-template-columns: 1fr;
+  }
+
+  .ov-more--key[data-state='narrow']:not([hidden]) {
+    display: inline-block;
+  }
+}
+
+@media (forced-colors: active) {
+  .ov-item--dot::before {
+    background: CanvasText;
+  }
+
+  .ov-key__link,
+  .ov-count {
+    border-color: CanvasText;
+  }
+}
+
+@media print {
+  .ov-more,
+  .ov-glossary__summary {
+    display: none;
+  }
+
+  /* Paper cannot open a disclosure: every list prints (room.css hides [hidden] with !important). */
+  .ov-column[hidden] {
+    display: block !important;
+  }
+}

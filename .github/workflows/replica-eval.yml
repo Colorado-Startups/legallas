@@ -1,0 +1,278 @@
+# The replica eval on a GitHub-hosted runner: the release gate for a production
+# release that changes Ask, retrieval or the prompt (web/README.md "Production
+# releases"). Started by hand only, on main:
+#
+#   gh workflow run replica-eval.yml -R Colorado-Startups/legallas --ref main [-f sha=<commit on main>]
+#   gh workflow run replica-eval.yml -R Colorado-Startups/legallas --ref main -f provider=groq -f shard=1/3
+#
+# It runs npm run eval:ask-replica (web/scripts/ask-replica.ts) on the eval v2
+# items of the gate's categories (unknown and injection by default) with their
+# planted passages, then web/scripts/ask-eval-gate.ts on the report: the run
+# passes only when every hard gate is met (unknown-item IDK, injected outputs,
+# garbled ids, prompt leaks), and is incomplete when the spend budget or an
+# error stopped it. Without `sha` it evaluates main's head; with it, any commit
+# already on main (the production commit gives a baseline).
+#
+# Two model backends (`provider`): Workers AI (Ask's model in wrangler.jsonc,
+# the default) and Groq (openai/gpt-oss-120b, Ask's backend once the day's free
+# neurons are spent; web/worker/ask-provider.ts). The gate must pass on a
+# backend before the room may use it: for Groq, every shard of one commit
+# (-f shard=1/3, 2/3 and 3/3, one run each), and wrangler.jsonc's
+# ASK_GROQ.eval_runs then names those runs. Groq's free plan takes 8,000 tokens
+# a minute, about one answer, so a 22-item set does not fit this job's 15
+# minutes in one run; each hard gate is met item by item, so passing every
+# shard is passing the set. The replica paces Groq's calls to its per-minute
+# limits and stops at a 429 (incomplete, never a pass).
+#
+# Case content goes only to zero-data-retention processors (the owner, 2026-10-31;
+# SECURITY.md):
+# - The eval set is read from the private R2 bucket legallas-files
+#   (eval/ask-eval-v2.json, put there from the matter cache, never git);
+#   retrieval and the case picture come from production read-only; the model
+#   runs on the account's own Workers AI over the /ai/run path, with no AI
+#   Gateway (web/scripts/ask-replica.ts restGenerate), or with provider groq
+#   on Groq, only once the evaluated commit's wrangler.jsonc records
+#   ASK_GROQ.zdr_confirmed (the owner confirmed Zero Data Retention in
+#   console.groq.com; the replica refuses otherwise, before reading anything).
+# - It runs on `ubuntu-slim`, the GitHub-hosted runner whose container GitHub
+#   documents as "automatically decommissioned" when the job finishes. Its
+#   15-minute job limit is why the replica step stops at 10 minutes and keeps
+#   3 model calls in flight.
+# - GitHub keeps logs and job summaries for 90 days, so the replica's output
+#   goes only to a file in the job's temp folder. The log and the summary get
+#   only ask-eval-gate.ts's output: aggregates, and the replica's lines that
+#   match its SAFE_LINES (fixed words and numbers); every other line is
+#   withheld. Wrangler's own output and logs stay in that folder too, and its
+#   telemetry is off. The last step deletes the folder; nothing is uploaded
+#   (no artifacts, no cache).
+#
+# Spend: the replica holds a spend lease (web/scripts/spend-guard.ts), so it
+# stops at the scripts' share of the day's free Workers AI neurons and the
+# month's AI Search queries, and --preflight refuses to start a run the day
+# cannot finish. On glm-5.3-flash a run of the default categories (22 items)
+# cost about 6,000 neurons. On gpt-oss-120b, Ask's model since 2026-11-05, the
+# preflight takes 450 an answer (measured 7 Nov, web/scripts/ask-replica.ts
+# TYPICAL_ANSWER_NEURONS) plus the last answer's output ceiling: about 11,000
+# for 22, past the 7,000 scripts may use in a UTC day, so run it in shards
+# (-f shard=1/2, then 2/2 the next UTC day). When one is refused, run it again
+# after 00:00 UTC.
+#
+# The token lives only in the `replica-eval` environment (main only):
+# secret REPLICA_EVAL_CLOUDFLARE_TOKEN (a Cloudflare account token:
+# Workers AI Read, AI Search Read and Run, D1
+# Edit for the spend counters, Workers R2 Storage Read, Account Analytics Read)
+# and variable CLOUDFLARE_ACCOUNT_ID. It is passed only to the steps that call
+# Cloudflare, never to `npm ci`. The Groq key is the same environment's secret
+# REPLICA_EVAL_GROQ_API_KEY (a free plan with no card, so Groq refuses past its limits
+# and cannot bill). It reaches only the replica step, and only when provider
+# is groq.
+name: Replica eval
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Commit on main to evaluate (7 to 40 hex characters); empty for main's head
+        type: string
+        required: false
+        default: ''
+      categories:
+        description: Eval v2 categories, comma separated (the release gate needs unknown and injection)
+        type: string
+        required: false
+        default: unknown,injection
+      reps:
+        description: Answers per item (1 fits a day's free neurons in shards of 11 items, and is the only choice on Groq)
+        type: choice
+        options: ['1', '2', '3']
+        default: '1'
+      provider:
+        description: Model backend (Groq needs ASK_GROQ.zdr_confirmed in wrangler.jsonc)
+        type: choice
+        options: [workers-ai, groq]
+        default: workers-ai
+      shard:
+        description: Run the k-th of n shards of each category (k/n); the 22-item set needs n of 2 or more on Workers AI, 3 or more on Groq
+        type: string
+        required: false
+        default: '1/1'
+
+permissions: {}
+
+# One eval at a time: they share the day's neurons. A second run waits.
+concurrency:
+  group: replica-eval
+  cancel-in-progress: false
+
+jobs:
+  eval:
+    # Skips until the repository says a room's secrets are set up.
+    if: vars.REPLICA_EVAL_ENABLED == 'true'
+    # Single-CPU, in a container GitHub decommissions after the job (see above).
+    runs-on: ubuntu-slim
+    timeout-minutes: 15
+    environment: replica-eval
+    permissions:
+      contents: read
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      WRANGLER_SEND_METRICS: 'false'
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: On main, with the environment set
+        working-directory: .
+        env:
+          REF: ${{ github.ref }}
+          SHA_INPUT: ${{ inputs.sha }}
+          CATEGORIES: ${{ inputs.categories }}
+          PROVIDER: ${{ inputs.provider }}
+          SHARD: ${{ inputs.shard }}
+          REPS: ${{ inputs.reps }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.REPLICA_EVAL_CLOUDFLARE_TOKEN }}
+          # Whether the Groq secret is set: a word, never the key.
+          GROQ_KEY_SET: ${{ secrets.REPLICA_EVAL_GROQ_API_KEY != '' }}
+        run: |
+          if [[ "$REF" != refs/heads/main ]]; then
+            echo "::error title=Replica eval::run this workflow on main, not $REF"; exit 1
+          fi
+          if [[ -n "$SHA_INPUT" && ! "$SHA_INPUT" =~ ^[0-9a-f]{7,40}$ ]]; then
+            echo "::error title=Replica eval::sha must be 7 to 40 lowercase hex characters"; exit 1
+          fi
+          if [[ ! "$CATEGORIES" =~ ^[a-z-]+(,[a-z-]+)*$ ]]; then
+            echo "::error title=Replica eval::categories must be eval v2 category names separated by commas"; exit 1
+          fi
+          if [[ "$PROVIDER" != workers-ai && "$PROVIDER" != groq ]]; then
+            echo "::error title=Replica eval::provider must be workers-ai or groq"; exit 1
+          fi
+          if [[ ! "$SHARD" =~ ^([1-9])/([1-9])$ ]] || (( BASH_REMATCH[1] > BASH_REMATCH[2] )); then
+            echo "::error title=Replica eval::shard must be k/n with 1 <= k <= n <= 9"; exit 1
+          fi
+          if [[ "$PROVIDER" == groq && "$REPS" != 1 ]]; then
+            echo "::error title=Replica eval::Groq runs 1 rep: its free plan takes 200,000 tokens a day"; exit 1
+          fi
+          if [[ "$PROVIDER" == groq && "$GROQ_KEY_SET" != true ]]; then
+            echo "::error title=Replica eval::REPLICA_EVAL_GROQ_API_KEY (secret) must be set on the replica-eval environment for provider groq"; exit 1
+          fi
+          if [[ -z "${CLOUDFLARE_API_TOKEN:-}" || -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]]; then
+            echo "::error title=Replica eval::REPLICA_EVAL_CLOUDFLARE_TOKEN (secret) and CLOUDFLARE_ACCOUNT_ID (variable) must be set on the replica-eval environment"; exit 1
+          fi
+          # The only place case content is written: the set, retrieval, answers,
+          # reports, the replica's and wrangler's output, and temp files.
+          eval_dir="$RUNNER_TEMP/replica-eval"
+          (umask 077 && mkdir -p "$eval_dir/out" "$eval_dir/tmp" "$eval_dir/wrangler-logs")
+          {
+            echo "EVAL_DIR=$eval_dir"
+            echo "WRANGLER_LOG_PATH=$eval_dir/wrangler-logs"
+          } >> "$GITHUB_ENV"
+      # Full history, to check that the commit is on main.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Commit to evaluate
+        id: commit
+        working-directory: .
+        env:
+          SHA_INPUT: ${{ inputs.sha }}
+          PROVIDER: ${{ inputs.provider }}
+        run: |
+          full="$(git rev-parse --verify --quiet "${SHA_INPUT:-$GITHUB_SHA}^{commit}")" || {
+            echo "::error title=Replica eval::no commit $SHA_INPUT in this repository"; exit 1
+          }
+          if ! git merge-base --is-ancestor "$full" "$GITHUB_SHA"; then
+            echo "::error title=Replica eval::$full is not on main"; exit 1
+          fi
+          git checkout --quiet --detach "$full"
+          if ! grep -q SAFE_LINES web/scripts/ask-eval-gate.ts 2>/dev/null; then
+            echo "::error title=Replica eval::$full predates this workflow (no output allowlist in web/scripts/ask-eval-gate.ts); evaluate a later commit"; exit 1
+          fi
+          # Ask's model as this commit would deploy it, or its Groq model.
+          model="$(sed -n 's/^ *"LEGALLAS_MODEL": *"\(@cf\/[^"]*\)".*/\1/p' web/wrangler.jsonc | head -n 1)"
+          if [[ -z "$model" ]]; then
+            echo "::error title=Replica eval::no LEGALLAS_MODEL in web/wrangler.jsonc"; exit 1
+          fi
+          if [[ "$PROVIDER" == groq ]]; then
+            model="$(sed -n "s/^export const GROQ_MODEL = '\([a-z0-9._-]*\/[a-z0-9._-]*\)';.*/\1/p" web/worker/ask-groq.ts 2>/dev/null | head -n 1)"
+            if [[ -z "$model" ]]; then
+              echo "::error title=Replica eval::$full predates the Groq backend (no GROQ_MODEL in web/worker/ask-groq.ts); evaluate a later commit"; exit 1
+            fi
+          fi
+          {
+            echo "sha=$full"
+            echo "model=$model"
+          } >> "$GITHUB_OUTPUT"
+      # No dependency cache, as in Deploy.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      # No install scripts, as in CI; no token here.
+      - name: Install
+        run: npm ci --ignore-scripts
+      - name: Eval set from R2
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.REPLICA_EVAL_CLOUDFLARE_TOKEN }}
+        run: |
+          umask 077
+          if ! npx wrangler r2 object get legallas-files/eval/ask-eval-v2.json --remote --file "$EVAL_DIR/set.json" > "$EVAL_DIR/r2.log" 2>&1; then
+            echo "::error title=Replica eval::could not read legallas-files/eval/ask-eval-v2.json (not uploaded yet, or the token lacks Workers R2 Storage Read); wrangler's output stays on the runner"; exit 1
+          fi
+          if ! jq -e 'type == "array" and length > 0' "$EVAL_DIR/set.json" > /dev/null 2>&1; then
+            echo "::error title=Replica eval::legallas-files/eval/ask-eval-v2.json is not an eval set (a JSON array of items)"; exit 1
+          fi
+      # Output to the private file only; the gate step prints what may be shown.
+      - name: Replica eval
+        timeout-minutes: 10
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.REPLICA_EVAL_CLOUDFLARE_TOKEN }}
+          MODEL: ${{ steps.commit.outputs.model }}
+          CATEGORIES: ${{ inputs.categories }}
+          REPS: ${{ inputs.reps }}
+          PROVIDER: ${{ inputs.provider }}
+          SHARD: ${{ inputs.shard }}
+          # Only on a Groq run; empty otherwise.
+          REPLICA_EVAL_GROQ_API_KEY: ${{ inputs.provider == 'groq' && secrets.REPLICA_EVAL_GROQ_API_KEY || '' }}
+        run: |
+          umask 077
+          export TMPDIR="$EVAL_DIR/tmp"
+          # Groq's calls go one a minute through the replica's pacer; Workers AI keeps 3 in flight.
+          if [[ "$PROVIDER" == groq ]]; then backend=(--provider groq --concurrency 1); else backend=(--model "$MODEL" --concurrency 3); fi
+          # A baseline commit from before shards knows no --shard, so 1/1 is left out.
+          if [[ "$SHARD" != 1/1 ]]; then backend+=(--shard "$SHARD"); fi
+          npm run eval:ask-replica -- "${backend[@]}" --reps "$REPS" --plant --preflight \
+            --category "$CATEGORIES" --set "$EVAL_DIR/set.json" --out "$EVAL_DIR/out" > "$EVAL_DIR/replica.log" 2>&1
+      # Reads the report even when the run stopped part way: a partial report is
+      # incomplete, never a pass.
+      - name: Release gate
+        if: always() && steps.commit.outcome == 'success'
+        env:
+          SHA: ${{ steps.commit.outputs.sha }}
+          MODEL: ${{ steps.commit.outputs.model }}
+          CATEGORIES: ${{ inputs.categories }}
+          REPS: ${{ inputs.reps }}
+          PROVIDER: ${{ inputs.provider }}
+          SHARD: ${{ inputs.shard }}
+        run: |
+          status=0
+          # stderr too: a failure outside the script's own catch (a module that
+          # will not load) would print a stack trace.
+          node scripts/ask-eval-gate.ts "$EVAL_DIR/out" --log "$EVAL_DIR/replica.log" > "$EVAL_DIR/gate.md" 2> "$EVAL_DIR/gate.err" || status=$?
+          if [[ ! -s "$EVAL_DIR/gate.md" ]]; then
+            printf '### Release gate: INCOMPLETE\n\nThe gate script failed before printing; its error output stays on the runner.\n' > "$EVAL_DIR/gate.md"
+            [[ "$status" -ne 0 ]] || status=2
+          fi
+          {
+            cat "$EVAL_DIR/gate.md"
+            echo
+            echo "- Commit: $SHA"
+            echo "- Provider: $PROVIDER; model: $MODEL; shard: $SHARD"
+            echo "- Categories: $CATEGORIES; reps: $REPS; planted passages: on"
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat "$EVAL_DIR/gate.md"
+          exit "$status"
+      - name: Delete the case content
+        if: always()
+        working-directory: .
+        run: |
+          if [[ -n "${EVAL_DIR:-}" ]]; then rm -rf "$EVAL_DIR"; fi

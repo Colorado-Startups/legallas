@@ -1,0 +1,76 @@
+/*
+  The timeline's table twin, grouped by year (card F5a; Q3, R59). Wide screens keep the plain six-column table and
+  hide the year rows. Below 48rem it is compact: the year heads each group, and each event stacks its ISO date
+  beside the title, with type, parties and cites under the title. The lane column drops (the shape carries it).
+*/
+.tl-table__year {
+  display: none;
+}
+
+/* One tbody per year: only the table's last row goes without a rule (c-table drops it per tbody). */
+@media print, (min-width: 48.0625rem) {
+  .tl-table tbody:not(:last-child) tr:last-child td {
+    border-bottom: var(--hairline) solid var(--rule);
+  }
+}
+
+@media screen and (max-width: 48rem) {
+  .tl-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .tl-table,
+  .tl-table tbody {
+    display: block;
+    min-width: 0;
+  }
+
+  .tl-table .tl-table__year {
+    display: block;
+  }
+
+  .tl-table .tl-table__year > th {
+    display: block;
+    position: static;
+    height: auto;
+    padding: var(--space-2) var(--space-3);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tl-table tbody tr:not(.tl-table__year) {
+    display: grid;
+    grid-template-columns: 6.25rem minmax(0, 1fr);
+    gap: var(--space-1) var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border-bottom: var(--hairline) solid var(--rule);
+  }
+
+  .tl-table tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .tl-table td {
+    height: auto;
+    padding: 0;
+    border: 0;
+  }
+
+  .tl-table .tl-table__type,
+  .tl-table .tl-table__parties,
+  .tl-table .tl-table__cites {
+    grid-column: 2;
+    color: var(--ink-2);
+    font-size: var(--text-13);
+  }
+
+  .tl-table .tl-table__parties:empty,
+  .tl-table .tl-table__lane {
+    display: none;
+  }
+}

@@ -1,0 +1,341 @@
+/*
+  Track pages (/complaint/ and /regulator/). Page-scoped classes only (track-*), built from tokens; the c-* blocks
+  (c-objective, c-meter, c-select, c-fog, c-mark, c-chip, c-cite) and the chart styles (scripts/viz/charts.css)
+  are composed, never restyled. Light only; no literal colors.
+*/
+
+.track {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  padding-top: var(--space-5);
+}
+
+.track-loading {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.track-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-7);
+  min-width: 0;
+}
+
+/* Regulator tabs: one per filing */
+.track-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.track-tab {
+  min-height: var(--target-min);
+  padding: var(--space-2) var(--space-3);
+  color: var(--ink-2);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+  cursor: pointer;
+}
+
+.track-tab:hover {
+  color: var(--ink);
+  background: var(--panel);
+}
+
+.track-tab[aria-selected='true'] {
+  color: var(--forest);
+  background: var(--forest-tint);
+  box-shadow: inset 0 -2px 0 var(--forest);
+}
+
+/* Head: title, forum, who it is against */
+.track-head {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.track-head__title {
+  margin: 0;
+}
+
+.track-head__facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+  margin: 0;
+}
+
+.track-head__facts dt {
+  color: var(--ink-2);
+}
+
+.track-head__facts dd {
+  margin: 0;
+}
+
+.track-head__parties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.track-party {
+  --shape-size: 12px;
+
+  gap: var(--space-1);
+}
+
+/* Objective strip: one card per violation */
+.track-objectives {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.track-objectives > h2 {
+  margin: 0;
+}
+
+.track-objectives__strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: var(--space-4);
+}
+
+/* A violation: head, summary, then its blocks */
+.track-violation {
+  display: grid;
+  gap: var(--space-5);
+  min-width: 0;
+  padding-top: var(--space-5);
+  border-top: var(--hairline) solid var(--rule);
+  scroll-margin-top: var(--space-6);
+}
+
+.track-violation__head {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.track-violation__title {
+  margin: 0;
+}
+
+.track-block {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.track-block > h3 {
+  margin: 0;
+}
+
+.track-block__body {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.track-blank {
+  margin: 0;
+}
+
+.track-cites {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+}
+
+/* Story stepper: steps in a row, the selected one bracketed (c-select) */
+.track-steps {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-1) var(--space-2);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.track-step {
+  display: grid;
+  flex: 1 0 11rem;
+  gap: var(--space-1);
+  align-content: start;
+  max-width: 18rem;
+  min-height: var(--target-min);
+  padding: var(--space-2) var(--space-3);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  background: var(--surface);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.track-step:hover {
+  background: var(--panel);
+}
+
+.track-step[aria-selected='true'] {
+  background: var(--forest-tint);
+  border-color: var(--forest);
+}
+
+.track-step__date {
+  color: var(--ink-2);
+  font-size: var(--text-12);
+}
+
+.track-step__label {
+  font-size: var(--text-14);
+  line-height: 1.35;
+}
+
+.track-step-panel {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.track-step-panel__cites:empty {
+  display: none;
+}
+
+/* Cap chart: the limit rule */
+.track-cap__limit {
+  stroke: var(--ink-2);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+
+.track-cap__limit-label {
+  fill: var(--ink-2);
+}
+
+/* Proof checklist: ring and word, the point, its cites */
+.track-proof {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.track-proof__row {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr) minmax(0, max-content);
+  gap: var(--space-2) var(--space-4);
+  align-items: start;
+  padding: var(--space-3) var(--space-2);
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.track-proof__mark {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  color: var(--forest);
+  font-size: var(--text-13);
+}
+
+.track-proof__row[data-strength='gap'] .track-proof__mark {
+  color: var(--ink-3);
+}
+
+.track-proof__word {
+  color: var(--ink-2);
+}
+
+.track-proof__body {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.track-proof__text {
+  margin: 0;
+}
+
+.track-proof__authority {
+  margin: 0;
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+}
+
+.track-proof__cites:empty {
+  display: none;
+}
+
+/* Foot: the prior case and the provenance line */
+.track-foot {
+  display: grid;
+  gap: var(--space-2);
+  padding-top: var(--space-4);
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.track-foot__prior {
+  justify-self: start;
+}
+
+@media (max-width: 48rem) {
+  .track-head__facts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1);
+  }
+
+  .track-head__facts dd + dt {
+    margin-top: var(--space-2);
+  }
+
+  .track-proof__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (forced-colors: active) {
+  .track-tab[aria-selected='true'],
+  .track-step[aria-selected='true'] {
+    border: 2px solid CanvasText;
+  }
+
+  .track-cap__limit {
+    stroke: CanvasText;
+  }
+}
+
+@media print {
+  .track-tabs,
+  .track-loading {
+    display: none;
+  }
+
+  .track-steps {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  .track-violation,
+  .track-proof__row {
+    break-inside: avoid;
+  }
+
+  /* "Print guide" prints the head and the guide only (track-guide.css lays the guide out for paper). */
+  .track[data-state='print-guide'] .track-body > :not(.track-head, .track-guide),
+  .track[data-state='print-guide'] .track-foot__prior {
+    display: none;
+  }
+}

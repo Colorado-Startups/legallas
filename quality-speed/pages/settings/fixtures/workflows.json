@@ -1,0 +1,18 @@
+{
+ "uses": [
+  "actions/checkout@1111111111111111111111111111111111111111",
+  "anthropics/claude-code-action@2222222222222222222222222222222222222222"
+ ],
+ "secrets": [
+  "CLAUDE_CODE_OAUTH_TOKEN",
+  "DEPLOY_KEY"
+ ],
+ "environments": [
+  "deploy-site"
+ ],
+ "all_uses": [
+  "actions/checkout@1111111111111111111111111111111111111111",
+  "anthropics/claude-code-action@2222222222222222222222222222222222222222",
+  "oven-sh/setup-bun@3333333333333333333333333333333333333333"
+ ]
+}

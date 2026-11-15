@@ -1,0 +1,4 @@
+[
+  { "id": "law", "runner": "linux", "cadence": "daily", "collector": "../../core/law/collect.ts", "args": ["delaware-business-law"] },
+  { "id": "lag", "runner": "linux", "cadence": "daily", "collector": "lag.ts" }
+]

@@ -1,0 +1,20 @@
+/*
+  Card P1b, Q3 polish (CLS). The ribbon loads its timeline module only as it nears the viewport (#190), so its
+  host used to sit empty and then grow. The host reserves the height the ribbon is drawn at, per width, so nothing
+  below moves when it arrives. The numbers follow the drawing code (timeline-layout.ts METRICS, 'ribbon'): 24px
+  per side lane (overview-case-ribbon.ts sets --ov-ribbon-lanes), the 24px axis and the figure's frame.
+*/
+.ov-block[data-ov-block='ribbon'] {
+  container-type: inline-size;
+}
+
+.ov-ribbon {
+  min-height: calc(var(--ov-ribbon-lanes, 5) * 1.5rem + 2.625rem);
+}
+
+/* Below 480px the ribbon drops its label column and keys the sides in a legend above the lanes. */
+@container (max-width: 30rem) {
+  .ov-ribbon {
+    min-height: calc((var(--ov-ribbon-lanes, 5) + var(--ov-ribbon-legend, 2)) * 1.5rem + 2.875rem);
+  }
+}

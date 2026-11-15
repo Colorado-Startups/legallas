@@ -1,0 +1,226 @@
+/*
+  Overlays and answers: exhibit pane, passage highlight, Ask drawer, answer blocks, callouts, empty state,
+  provenance (DESIGN.md section 7; card F1). Only overlays cast a shadow.
+*/
+
+/* Exhibit pane: right half of a split view at 64rem and wider; a full-screen sheet below. */
+.c-pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--panel);
+  border-left: var(--hairline) solid var(--rule);
+}
+
+.c-pane__head {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.c-pane__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.c-pane__control {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.c-pane__meta {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+}
+
+.c-pane__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.c-pane__body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+@media (max-width: 64rem) {
+  .c-pane {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-pane);
+    border-left: 0;
+    box-shadow: var(--shadow-overlay);
+  }
+}
+
+/* The quoted passage: forest tint with a 2px forest underline, never yellow. */
+.c-hit {
+  background: var(--forest-tint);
+  color: inherit;
+  box-shadow: inset 0 -2px 0 var(--forest);
+}
+
+/* Ask drawer: a modal dialog at the right edge, full screen below 64rem. */
+.c-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: var(--z-drawer);
+  display: flex;
+  flex-direction: column;
+  width: min(36rem, 100%);
+  background: var(--surface);
+  border-left: var(--hairline) solid var(--border);
+  box-shadow: var(--shadow-overlay);
+}
+
+.c-drawer__head {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.c-drawer__title {
+  margin: 0 auto 0 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-21);
+  font-weight: 600;
+  line-height: 1.75rem;
+}
+
+.c-drawer__body {
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-4);
+  overflow: auto;
+}
+
+.c-drawer__foot {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-end;
+  padding: var(--space-3) var(--space-4);
+  background: var(--panel);
+  border-top: var(--hairline) solid var(--rule);
+}
+
+@media (max-width: 64rem) {
+  .c-drawer {
+    inset: 0;
+    width: 100%;
+    border-left: 0;
+  }
+}
+
+/* Answer blocks: fact (cited), read (a reading of a cited page), inference (uncited). Serif. */
+.c-claim {
+  margin: 0 0 var(--space-3);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--text-18);
+  line-height: 1.75rem;
+}
+
+.c-claim[data-kind='inference'] {
+  color: var(--ink-2);
+  font-style: italic;
+}
+
+.c-claim__tag {
+  margin-right: var(--space-2);
+  color: var(--ink-3);
+  font-family: var(--font-sans);
+  font-size: var(--text-13);
+  font-style: normal;
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.04em;
+}
+
+/* Callouts: "Not in the record" (oxblood, reserved) and general background (dashed, always last). */
+.c-callout {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  color: var(--ink);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius);
+}
+
+.c-callout > :last-child {
+  margin-bottom: 0;
+}
+
+.c-callout--absent {
+  background: var(--oxblood-tint);
+  border-color: var(--oxblood);
+  border-left-width: 3px;
+}
+
+.c-callout--background {
+  color: var(--ink-2);
+  border: var(--hairline) dashed var(--rule);
+}
+
+/* Empty state: one serif sentence, at most one button, the glyph at rest. */
+.c-empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  align-items: center;
+  max-width: 40rem;
+  margin: var(--space-6) auto;
+  padding: var(--space-6) var(--space-5);
+  background: var(--surface);
+  border: var(--hairline) dashed var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.c-empty__glyph {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  color: var(--forest);
+  shape-rendering: crispEdges;
+  image-rendering: pixelated;
+}
+
+.c-empty__glyph > svg,
+.c-empty__glyph > img {
+  width: 100%;
+  height: 100%;
+}
+
+.c-empty__text {
+  max-width: var(--measure);
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--text-18);
+  line-height: 1.75rem;
+}
+
+/* Provenance: once per summary page, at its foot. */
+.c-provenance {
+  max-width: var(--measure);
+  margin: var(--space-6) 0 0;
+  color: var(--ink-3);
+  font-size: var(--text-12);
+  line-height: 1rem;
+}

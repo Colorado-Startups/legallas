@@ -1,0 +1,23 @@
+{
+ "measured_at": "2026-11-02T06:24:19Z",
+ "sha": "26c741d26b6948e54d507bd1b82a5a1d370b8a30",
+ "checks": {
+  "migrations_numbered": true,
+  "migrations_unchanged": true,
+  "third_party_notices": false,
+  "no_gpl_fonts": false,
+  "cloudflare_limits": true
+ },
+ "parts": {
+  "site": 1905171,
+  "pdfjs": 1342520,
+  "rive": 986363,
+  "liberation": 358917,
+  "maps": 1013098,
+  "worker_mcp": 371919,
+  "worker_web": 47056,
+  "other": 18302
+ },
+ "compared": 420,
+ "differ": 0
+}

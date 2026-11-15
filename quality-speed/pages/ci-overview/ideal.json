@@ -1,0 +1,9 @@
+{
+  "ideal": "Every push gets a trustworthy result within ten minutes, runs only the checks its change needs, once, cheaply, with every gate intact.",
+  "sources": [
+    { "title": "Martin Fowler: Continuous Integration", "url": "https://martinfowler.com/articles/continuousIntegration.html", "date": "2024-01-18" }
+  ],
+  "quality": "Every gate intact on every merge, about two pushes and one review a merge, and no run on an unchanged head.",
+  "speed": "A merge lands within three minutes of its final push.",
+  "consumption": "Each merge costs no more than 12 cents of CI at list price."
+}

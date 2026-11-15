@@ -1,0 +1,26 @@
+---
+// Card F8 (R68), plan PR-L2. The small Legallas: the rig's miniature (@brand/miniature.webp, a round
+// head-and-shoulders render of the same rig as the bust, so one drawing at every size) in a round paper window with
+// a 1px forest ring. Resized at build time by astro:assets to 1x and 2x the shown size. Script changes its state
+// (src/scripts/glyph.ts, setGlyph) and glyph.css shows it on the ring. For the header brand (32px, static: nothing
+// sets its state), the Ask button, the drawer head (cloned from Room.astro's template) and the phone avatars; the
+// seal stays the mark for the favicon, the front door and empty states. Decorative: always aria-hidden, alt=""; the
+// work it mirrors announces itself in text.
+import { Image } from 'astro:assets';
+import '../styles/glyph.css';
+import miniature from '@brand/miniature.webp';
+import { GLYPH_SIZES, type GlyphSize } from '../scripts/glyph.ts';
+
+interface Props {
+  /** Rendered size in CSS pixels: 32 for the header brand, 20 on the Ask button, 24 in the drawer, 32 and 40 on a phone. */
+  size?: GlyphSize;
+}
+
+const { size = 16 } = Astro.props;
+if (!(GLYPH_SIZES as readonly number[]).includes(size)) throw new Error(`glyph size ${size} is not one of ${GLYPH_SIZES.join(', ')}`);
+// Never read the import's width, height or src, or spread it: astro:assets would keep the original in the build.
+---
+
+<span class="c-glyph" data-glyph data-state="idle" data-size={size} aria-hidden="true">
+  <Image src={miniature} widths={[size, size * 2]} sizes={`${size}px`} width={size} height={size} alt="" decoding="async" loading="lazy" class="c-glyph__art" />
+</span>

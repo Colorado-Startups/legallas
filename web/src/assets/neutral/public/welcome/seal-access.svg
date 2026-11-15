@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="104" height="104">
+  <!-- The neutral mark (worker/mark.ts) for the Cloudflare Access login page (logo_path). Access shows the logo on
+       its white card, so this uses the light mark colors. The Worker serves this one file with
+       Cross-Origin-Resource-Policy: cross-origin so the team's cloudflareaccess.com page can show it. -->
+  <rect x="9" y="9" width="30" height="30" rx="5" fill="none" stroke="#a98b4f" stroke-width="1.4"/>
+  <path d="M18 39V24a6 6 0 0 1 12 0v15" fill="none" stroke="#1f3a2e" stroke-width="1.4"/>
+  <circle cx="26.5" cy="31" r="1.4" fill="#1f3a2e"/>
+</svg>

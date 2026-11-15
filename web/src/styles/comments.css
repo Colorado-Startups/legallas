@@ -1,0 +1,245 @@
+/*
+  The discussion panel (CommentThread.astro; card P6). Items are built by src/scripts/comments.ts. Open comments
+  are cards on --surface; resolved ones fold under a summary. Composes c-button, c-input and c-cite.
+*/
+
+.doc-discuss {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.doc-discuss-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.doc-discuss-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-21);
+  font-weight: 600;
+  line-height: 1.75rem;
+}
+
+.doc-discuss-count,
+.doc-discuss-status {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+}
+
+.doc-discuss-status:empty,
+.doc-discuss-count:empty {
+  display: none;
+}
+
+.doc-discuss-list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.doc-discuss-list[hidden] {
+  display: none;
+}
+
+/* One comment */
+.doc-comment {
+  padding: var(--space-4);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.doc-comment-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.doc-comment-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--forest);
+  color: var(--on-forest);
+  font-size: var(--text-12);
+  font-weight: 600;
+  border-radius: 50%;
+}
+
+.doc-comment-who {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-width: 0;
+}
+
+.doc-comment-author {
+  color: var(--ink);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.doc-comment-when,
+.doc-comment-state {
+  color: var(--ink-3);
+  font-size: var(--text-12);
+  line-height: 1rem;
+}
+
+.doc-comment-when a {
+  white-space: nowrap;
+}
+
+.doc-comment-body {
+  margin: var(--space-3) 0 0;
+  color: var(--ink);
+  line-height: 1.375rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.doc-comment-state {
+  margin: var(--space-2) 0 0;
+}
+
+.doc-comment[data-state='resolved'] {
+  background: transparent;
+}
+
+.doc-comment[data-state='resolved'] .doc-comment-body {
+  color: var(--ink-2);
+}
+
+/* Replies: one level, under a rule */
+.doc-replies {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-3) 0 0;
+  padding: 0 0 0 var(--space-3);
+  list-style: none;
+  border-left: var(--hairline) solid var(--rule);
+}
+
+.doc-comment-head--reply {
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-2);
+}
+
+.doc-comment-head--reply .doc-comment-avatar {
+  width: 22px;
+  height: 22px;
+  font-size: 0.625rem;
+}
+
+.doc-reply .doc-comment-body {
+  margin-top: var(--space-2);
+}
+
+.doc-reply-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  align-items: start;
+  margin-top: var(--space-3);
+}
+
+.doc-reply-form textarea {
+  min-height: 2rem;
+  resize: vertical;
+}
+
+.doc-reply-form .doc-discuss-error {
+  grid-column: 1 / -1;
+}
+
+/* Resolved comments fold away */
+.doc-discuss-resolved {
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.doc-discuss-resolved[hidden] {
+  display: none;
+}
+
+.doc-discuss-resolved summary {
+  min-height: var(--target-min);
+  padding: var(--space-3) var(--space-4);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.doc-discuss-resolved summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.doc-discuss-resolved .doc-discuss-list {
+  padding: 0 var(--space-3) var(--space-3);
+}
+
+/* Composer */
+.doc-discuss-form:not([hidden]) {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: var(--hairline) solid var(--rule);
+}
+
+.doc-discuss-label {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+
+.doc-discuss-form textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+.doc-discuss-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.doc-discuss-hint {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: var(--text-12);
+  line-height: 1rem;
+}
+
+.doc-discuss-error:not([hidden]) {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  color: var(--ink);
+  font-size: var(--text-13);
+  border: var(--hairline) solid var(--oxblood);
+  border-radius: var(--radius);
+}
+
+@media (max-width: 48rem) {
+  .doc-discuss-row .c-button {
+    width: 100%;
+  }
+}

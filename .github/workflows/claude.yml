@@ -1,0 +1,173 @@
+# @claude on issues and pull requests: the owner mentions @claude in an issue, a
+# comment or a review, and Claude answers there; asked for a change, it pushes
+# commits to a `claude/` branch and links a pull request for the owner to open.
+#
+# Only the owner's two GitHub accounts can start it, matched by numeric user
+# id (the organization's two admins, read 2026-11-06), and the action also
+# requires write access. Not author_association == 'OWNER': in an
+# organization's repository a person's comment reads MEMBER, so it never ran
+# (#234). It never runs for Claude's own comments. It runs on a fresh
+# GitHub-hosted Ubuntu VM, with the Claude Code version the
+# action pins, a private HOME and Claude config folder, and hooks off. On top
+# of that, Claude's file tools read only the checkout and its shell commands
+# run in Claude Code's sandbox (bubblewrap; .github/scripts/claude-settings.sh),
+# which fails closed: if the sandbox cannot start, no shell command runs.
+# Commits go through the GitHub API, so GitHub signs them as the main ruleset
+# requires.
+name: Claude
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+  issues:
+    types: [opened, assigned]
+
+permissions: {}
+
+concurrency:
+  group: claude-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  claude:
+    if: >-
+      vars.CLAUDE_ENABLED == 'true' && (
+      (github.event_name == 'issue_comment' &&
+        contains(fromJSON('[292968908, 268432743]'), github.event.comment.user.id) &&
+        github.event.comment.user.login != 'claude[bot]' &&
+        contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' &&
+        contains(fromJSON('[292968908, 268432743]'), github.event.comment.user.id) &&
+        github.event.comment.user.login != 'claude[bot]' &&
+        contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' &&
+        contains(fromJSON('[292968908, 268432743]'), github.event.review.user.id) &&
+        contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' &&
+        contains(fromJSON('[292968908, 268432743]'), github.event.issue.user.id) &&
+        (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+      )
+    # GitHub-hosted on purpose, not vars.CI_RUNNER: the sandbox needs
+    # unprivileged user namespaces for bubblewrap, which container runners
+    # cannot provide. Pinned, not ubuntu-latest: move it only after
+    # claude-confinement.yml passes on the new image (#794).
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      # Claude's branch and commits.
+      contents: write
+      # Replies and review comments on pull requests.
+      pull-requests: write
+      # Replies on issues.
+      issues: write
+      # Exchanged for the Claude GitHub App token.
+      id-token: write
+      # Lets Claude read CI results.
+      actions: read
+    steps:
+      # Never on a pull request from a fork: Claude would build and run its
+      # code next to the write token. A deleted fork reads null and stops too.
+      - name: Not a fork pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number || (github.event.issue.pull_request && github.event.issue.number) || '' }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ -z "$PR" ]; then exit 0; fi
+          head="$(gh api "repos/$REPO/pulls/$PR" --jq '.head.repo.full_name')"
+          if [ "$head" != "$REPO" ]; then
+            echo "::error::Pull request $PR comes from ${head}, not $REPO: @claude runs only on this repository's branches"
+            exit 1
+          fi
+      # HOME and Claude's config live in the job's temp folder, the one place
+      # besides the checkout the sandbox lets commands write (npm's cache), and
+      # the action installs Claude Code there. GIT_TERMINAL_PROMPT=0 fails any
+      # credential prompt fast.
+      - name: Private HOME
+        run: |
+          mkdir -p "$RUNNER_TEMP/home/.claude"
+          {
+            echo "HOME=$RUNNER_TEMP/home"
+            echo "CLAUDE_CONFIG_DIR=$RUNNER_TEMP/home/.claude"
+            echo "GIT_TERMINAL_PROMPT=0"
+            # Astro writes telemetry settings outside the sandbox's write area.
+            echo "ASTRO_TELEMETRY_DISABLED=1"
+          } >> "$GITHUB_ENV"
+      # fetch-depth 0 also fetches origin/main for the confinement script.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      # For the web commands Claude may run.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # Claude Code's sandbox on Linux is bubblewrap, with socat for its
+      # network proxy. Ubuntu's AppArmor blocks the unprivileged user
+      # namespaces bubblewrap needs; this VM serves one job and is then thrown
+      # away, so lifting that here is safe. The probe proves bubblewrap runs
+      # a command. If the sandbox still cannot start, failIfUnavailable stops
+      # every shell command rather than running it unsandboxed.
+      - name: Sandbox prerequisites
+        run: |
+          for attempt in 1 2 3; do
+            if sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends bubblewrap socat; then
+              break
+            fi
+            if [ "$attempt" = 3 ]; then exit 1; fi
+            sleep 5
+          done
+          if [ -f /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+          # Ubuntu 26.04 also ships an AppArmor profile for bwrap itself (its
+          # apparmor package; 24.04's lacks it). Unloaded for the same reason (#794).
+          if [ -e /etc/apparmor.d/bwrap-userns-restrict ]; then
+            sudo apparmor_parser -R /etc/apparmor.d/bwrap-userns-restrict
+          fi
+          # A real command, not only `true`: a shell in the full sandbox writes
+          # a file to its own /tmp and reads it back.
+          if ! probe="$(bwrap --new-session --die-with-parent --unshare-all --ro-bind / / \
+              --dev /dev --proc /proc --tmpfs /tmp \
+              sh -c 'echo bwrap-ok > /tmp/probe && cat /tmp/probe')" || [ "$probe" != bwrap-ok ]; then
+            echo "::error::bubblewrap ran no command (output: ${probe:-none})"
+            sudo journalctl -k --no-pager | grep -i apparmor | tail -n 50 || true
+            exit 1
+          fi
+      # Confines Claude: file tools read only the checkout, and its shell
+      # commands run in Claude Code's sandbox (no reads of the runner's home
+      # outside the checkout and the job's temp folder, writes only there,
+      # network only to the npm registry). The script comes from main.
+      - name: Confinement from main
+        run: |
+          git show origin/main:.github/scripts/claude-settings.sh > "$RUNNER_TEMP/claude-settings.sh"
+          bash "$RUNNER_TEMP/claude-settings.sh" agent "$GITHUB_WORKSPACE" "$RUNNER_TEMP/claude-settings.json"
+          jq -e '.permissions.blockReadsOutsideWorkingDirectories == true and .sandbox.enabled == true and .sandbox.failIfUnavailable == true and .sandbox.allowUnsandboxedCommands == false' "$RUNNER_TEMP/claude-settings.json" >/dev/null
+          # main's rules as user memory: --setting-sources user below skips the checkout's own CLAUDE.md.
+          git show origin/main:CLAUDE.md > "$CLAUDE_CONFIG_DIR/CLAUDE.md"
+      # No path_to_claude_code_executable: the action installs the Claude
+      # Code version it pins into the private HOME.
+      - name: Claude
+        uses: anthropics/claude-code-action@d535f5172dec02b204866b393d6b20b9b2aaf98d # v1.0.266
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          settings: ${{ runner.temp }}/claude-settings.json
+          use_commit_signing: true
+          # Only these shell commands, all inside the sandbox. Swift is left to
+          # CI: this Linux VM has no Xcode, and CI's swift job
+          # builds and tests every Swift change.
+          # --setting-sources user: the action writes the confinement into the
+          # user settings, and project settings outrank user settings. Without
+          # this a pull request's own .claude/settings.json could turn the
+          # sandbox, the read fence or the hook ban off, or widen the tools
+          # (#390). The action defaults to user,project,local.
+          claude_args: |
+            --setting-sources user
+            --max-turns 60
+            --strict-mcp-config
+            --allowedTools "Bash(npm --prefix web ci --ignore-scripts),Bash(npm --prefix web run check),Bash(npm --prefix web test),Bash(npm --prefix web run build),Bash(git status:*),Bash(git diff:*),Bash(git log:*)"
+            --disallowedTools "WebFetch,WebSearch"

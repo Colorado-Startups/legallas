@@ -1,0 +1,20 @@
+# Copy to .dev.vars for `npm run dev`. .dev.vars is gitignored and never deployed.
+# The dev identity is honoured only on localhost AND only when ALLOW_DEV_IDENTITY=1 (see worker/auth.ts).
+ALLOW_DEV_IDENTITY=1
+DEV_IDENTITY_EMAIL=dev-owner@example.test
+# Ask Legallas: canned retrieval and answers on localhost, because the AI bindings bill even in dev.
+# Like the dev identity it is honoured only on localhost; it must never appear in wrangler.jsonc.
+ASK_MOCK=1
+# A room with no published matter opens on its company (worker/room-shape.ts).
+COMPANY_ROOM_ENABLED=1
+# The company checklist (worker/checklist.ts), on for local dev.
+CHECKLIST_ENABLED=1
+# Sign-in emails stay off locally. (The dev identity has no Access session, so none are recorded anyway.)
+ALERTS_ENABLED=0
+# legallas-mcp (npm run mcp:dev): the origin its OAuth metadata names locally. Honoured only for localhost.
+MCP_DEV_ORIGIN=http://localhost:8790
+# legallas-mcp: a keyword scan of the local index instead of AI Search (remote-only, reads production). Localhost only.
+MCP_SEARCH_MOCK=1
+# legallas-mcp local only: open registration and allow loopback redirects, so npm run mcp:smoke can register.
+DCR_ENABLED=1
+MCP_REDIRECT_ALLOW=http://127.0.0.1,http://localhost

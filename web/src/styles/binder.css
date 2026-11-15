@@ -1,0 +1,197 @@
+/*
+  The binder home (card P8; web/DESIGN.md and the Overview mockup's binder tiles): a sober header, then one
+  tile per tab. Tab accents and the icon sprite: visuals.css.
+*/
+@import './visuals.css';
+
+.binder-head {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.binder-head__title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  align-items: baseline;
+}
+
+.binder-head__title h1 {
+  margin: 0;
+}
+
+.binder-head__count {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-14);
+  font-variant-numeric: tabular-nums;
+}
+
+.binder-head__lede {
+  max-width: var(--measure);
+  margin: 0;
+  color: var(--ink-2);
+  font-family: var(--font-serif);
+  font-size: var(--text-16);
+  line-height: 1.625rem;
+}
+
+.binder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.binder-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.binder-tile__head {
+  display: grid;
+  gap: var(--space-1);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.binder-tile__label {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  color: var(--brass-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+}
+
+.binder-tile__label .binder-icon {
+  color: var(--tab-accent);
+}
+
+.binder-tile__title {
+  font-family: var(--font-serif);
+  font-size: var(--text-18);
+  font-weight: 600;
+  line-height: 1.5rem;
+  text-wrap: balance;
+}
+
+.binder-tile__head:hover .binder-tile__title {
+  color: var(--forest-hover);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.binder-tile__summary {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+}
+
+.binder-tile__pages {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0;
+  margin: 0;
+  padding: var(--space-2) 0 0;
+  list-style: none;
+  border-top: var(--hairline) solid var(--rule);
+}
+
+/* Rows share the list's two columns, so the number column is as wide as its widest label. */
+.binder-tile__pages li,
+.binder-tile__pages a {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}
+
+.binder-tile__pages a {
+  column-gap: var(--space-3);
+  align-items: baseline;
+  min-height: var(--target-min);
+  padding: var(--space-1) var(--space-2);
+  color: var(--ink);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+  text-decoration: none;
+  border-radius: var(--radius-chip);
+}
+
+.binder-tile__pages a:hover {
+  background: var(--forest-tint);
+  color: var(--forest-hover);
+}
+
+.binder-tile__n {
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  font-variant-numeric: tabular-nums;
+}
+
+.binder-tile__pages a[data-read] .binder-tile__page {
+  color: var(--ink-2);
+}
+
+.binder-tile__more a {
+  color: var(--forest);
+  font-weight: 600;
+}
+
+.binder-tile__more a::before {
+  content: '';
+}
+
+.binder-tile__progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  margin: auto 0 0;
+  color: var(--ink-3);
+  font-size: var(--text-12);
+  line-height: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* One segment per page: an outlined cell, filled in the tab's accent once read. */
+.binder-tile__bar {
+  display: flex;
+  flex: 1 1 6rem;
+  gap: 2px;
+  max-width: 12rem;
+}
+
+.binder-tile__bar i {
+  flex: 1;
+  height: 6px;
+  border: var(--hairline) solid var(--border);
+  border-radius: 1px;
+}
+
+.binder-tile__bar i[data-read] {
+  background: var(--tab-accent);
+  border-color: var(--tab-accent);
+}
+
+@media (forced-colors: active) {
+  .binder-tile {
+    border-color: CanvasText;
+  }
+
+  .binder-tile__bar i[data-read] {
+    background: CanvasText;
+  }
+}

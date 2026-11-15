@@ -1,0 +1,211 @@
+/*
+  Exhibit pane placement and body (card F7; DESIGN.md section 7, "Exhibit pane"). The c-pane blocks and
+  mark.c-hit come from components.css; this file only places the pane, lays out its viewers, and colors
+  PDF.js find highlights like c-hit (also on the /doc/ page, which imports it through doc-pdf.ts).
+  State: :root[data-exhibit] is "split" or "sheet" while the pane is open.
+*/
+
+.exhibit {
+  /* Set from script: the header's bottom edge while it is on screen, so the split starts under it. */
+  --exhibit-top: 0px;
+}
+
+/* Wider than 64rem: the right half of a split view, beside the page, which gives up that half. */
+@media screen and (width > 64rem) {
+  .exhibit {
+    position: fixed;
+    top: var(--exhibit-top);
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-pane);
+    width: 50%;
+  }
+
+  :root[data-exhibit='split'] body > main,
+  :root[data-exhibit='split'] body > footer {
+    width: 50%;
+    margin-inline: 0;
+  }
+}
+
+/*
+  The sheet keeps Close at the top right and gives the actions their own row beneath; "Back to question"
+  (R66) leads the head on its own row, where a phone's back link sits.
+*/
+@media (max-width: 64rem) {
+  .exhibit__back {
+    order: -1;
+    flex-basis: 100%;
+    justify-content: flex-start;
+    padding-inline: 0;
+  }
+
+  .exhibit__close {
+    order: 1;
+    margin-left: auto;
+  }
+
+  .exhibit__actions {
+    order: 2;
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+}
+
+.exhibit__title {
+  margin: var(--space-1) 0 0;
+  overflow-wrap: anywhere;
+}
+
+.exhibit__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+
+.exhibit__date {
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+  font-variant-numeric: tabular-nums;
+}
+
+.exhibit__badge {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--brass-mark);
+}
+
+/* The note under the head: "Passage highlighted", or why only the page shows. */
+.exhibit__status {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  background: var(--panel);
+  border-bottom: var(--hairline) solid var(--rule);
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  line-height: 1.125rem;
+}
+
+.exhibit__status:empty {
+  display: none;
+}
+
+.exhibit__count {
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  white-space: nowrap;
+}
+
+.exhibit__view {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* PDF.js needs an absolutely positioned scroll container. */
+.exhibit__frame {
+  position: relative;
+  flex: 1;
+  min-height: 20rem;
+}
+
+.exhibit__scroll {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+}
+
+.exhibit__scroll:focus-visible,
+.exhibit__text:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.exhibit__sheet {
+  margin: var(--space-4);
+  padding: var(--space-5);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.exhibit__text {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+  line-height: 1.25rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.exhibit__note {
+  margin: 0 0 var(--space-3);
+  color: var(--ink-2);
+  font-size: var(--text-13);
+}
+
+.exhibit__table {
+  border-collapse: collapse;
+  font-size: var(--text-13);
+}
+
+.exhibit__table th,
+.exhibit__table td {
+  padding: var(--space-1) var(--space-2);
+  border-bottom: var(--hairline) solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+.exhibit__table th {
+  background: var(--panel);
+}
+
+.exhibit__wide {
+  overflow-x: auto;
+}
+
+.exhibit__image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-inline: auto;
+}
+
+.exhibit__visual {
+  flex: 1;
+  width: 100%;
+  min-height: 30rem;
+  background: var(--surface);
+  border: 0;
+}
+
+/*
+  PDF.js find highlights read as c-hit: a forest wash with a forest underline, never the stock yellow or pink.
+  They sit over the page canvas, so the wash is translucent; the page itself is always white paper.
+*/
+.textLayer .highlight {
+  --highlight-bg-color: color-mix(in srgb, var(--forest) 22%, transparent);
+  --highlight-selected-bg-color: color-mix(in srgb, var(--forest) 22%, transparent);
+
+  box-shadow: inset 0 -2px 0 var(--forest);
+}
+
+@media (forced-colors: active) {
+  .textLayer .highlight {
+    --highlight-bg-color: Mark;
+    --highlight-selected-bg-color: Mark;
+  }
+}
+
+@media print {
+  .exhibit {
+    display: none;
+  }
+}

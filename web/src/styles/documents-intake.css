@@ -1,0 +1,300 @@
+/*
+  Card P5b (Documents, intake): the From counsel and Send to client buttons, the upload queue, the From counsel
+  list (#from-counsel) and the heatmap's place on /documents/. Composes the c-* blocks (web/DESIGN.md); the
+  heatmap's own look is card F5b's (viz/charts.css). Dynamic widths come in as --progress through CSSOM.
+*/
+
+.docs-intake__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.docs-intake__icon {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.docs-intake__count {
+  min-width: 1.25rem;
+  padding: 0 var(--space-1);
+  font-size: var(--text-12);
+  line-height: 1rem;
+  text-align: center;
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius-chip);
+}
+
+/* Dragging files over the page outlines the actions, where they will be sent from. */
+.docs-intake[data-drop='over'] .docs-intake__actions {
+  outline: 2px dashed var(--forest);
+  outline-offset: var(--space-1);
+  border-radius: var(--radius);
+}
+
+/* The queue: one row per file, newest last. */
+.docs-intake__queue {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-intake__queue:empty {
+  display: none;
+}
+
+.docs-intake__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, auto) auto minmax(6rem, 1fr) 3rem auto;
+  grid-template-areas:
+    'icon name size track pct action'
+    '. status status status status status';
+  gap: 0 var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.docs-intake__item[data-state='error'] {
+  border-color: var(--oxblood);
+}
+
+.docs-intake__file {
+  grid-area: icon;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.docs-intake__name {
+  grid-area: name;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.docs-intake__size {
+  grid-area: size;
+  color: var(--ink-2);
+  font-size: var(--text-13);
+  white-space: nowrap;
+}
+
+.docs-intake__track {
+  grid-area: track;
+  height: 4px;
+  overflow: hidden;
+  background: var(--rule);
+  border-radius: var(--radius-chip);
+}
+
+.docs-intake__bar {
+  width: var(--progress, 0%);
+  height: 100%;
+  background: var(--forest);
+}
+
+.docs-intake__pct {
+  grid-area: pct;
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  text-align: right;
+}
+
+.docs-intake__action {
+  grid-area: action;
+}
+
+.docs-intake__status {
+  grid-area: status;
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.docs-intake__status:empty {
+  display: none;
+}
+
+.docs-intake__item:is([data-state='done'], [data-state='error'], [data-state='canceled']) :is(.docs-intake__track, .docs-intake__pct) {
+  visibility: hidden;
+}
+
+.docs-intake__item[data-state='error'] .docs-intake__status {
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .docs-intake__bar {
+    transition: width var(--dur-1) var(--ease);
+  }
+}
+
+/* From counsel (#from-counsel) */
+.docs-counsel {
+  margin: var(--space-4) 0 0;
+  padding: var(--space-4);
+  background: var(--surface);
+  border: var(--hairline) solid var(--rule);
+  border-radius: var(--radius);
+  scroll-margin-top: var(--space-6);
+}
+
+.docs-counsel__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: var(--space-3);
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.docs-counsel__title {
+  margin: 0;
+}
+
+.docs-counsel__limits {
+  margin: 0;
+  color: var(--ink-3);
+}
+
+.docs-counsel__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-counsel__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 var(--space-4);
+  align-items: center;
+  min-height: var(--row-h);
+  padding: var(--space-2) 0;
+  border-bottom: var(--hairline) solid var(--rule);
+}
+
+.docs-counsel__item:last-child {
+  border-bottom: 0;
+}
+
+.docs-counsel__name {
+  overflow-wrap: anywhere;
+}
+
+.docs-counsel__meta {
+  display: flex;
+  flex-wrap: wrap;
+  grid-column: 1;
+  gap: 0 var(--space-3);
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.docs-counsel__status {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+}
+
+.docs-counsel__status[data-state='synced'] {
+  color: var(--forest);
+}
+
+.docs-counsel__icon {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.docs-counsel__note {
+  margin: var(--space-3) 0 0;
+  color: var(--ink-2);
+}
+
+/* The heatmap's own place, when the page gives it none: compact, as in the mockup. */
+.docs-intake__heat {
+  max-width: 30rem;
+  margin-top: var(--space-5);
+}
+
+.docs-intake__heat-note {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+@media (max-width: 48rem) {
+  .docs-intake__actions > .c-button {
+    flex: 1 1 0;
+  }
+
+  .docs-intake__actions > .c-button--primary {
+    order: -1;
+  }
+
+  .docs-intake__item {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      'name pct action'
+      'track track track'
+      'status status status';
+    gap: var(--space-2) var(--space-3);
+    padding: var(--space-3);
+  }
+
+  .docs-intake__file,
+  .docs-intake__size {
+    display: none;
+  }
+
+  .docs-counsel {
+    padding: var(--space-3);
+  }
+
+  .docs-counsel__item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .docs-counsel__status {
+    grid-row: auto;
+    grid-column: 1;
+    justify-self: start;
+    margin-top: var(--space-1);
+  }
+}
+
+@media (forced-colors: active) {
+  .docs-intake__track {
+    border: 1px solid CanvasText;
+  }
+
+  .docs-intake__bar {
+    background: Highlight;
+  }
+}
+
+@media print {
+  .docs-intake__actions,
+  .docs-intake__queue {
+    display: none;
+  }
+}

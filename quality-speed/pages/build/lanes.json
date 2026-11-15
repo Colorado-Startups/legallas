@@ -1,0 +1,3 @@
+[
+  { "id": "release", "runner": "linux", "cadence": "daily", "collector": "collect.ts", "install": true }
+]

@@ -1,0 +1,14 @@
+{
+ "comment": "Legallas's Process page for Git Crafter actions/pages (scope: Git Crafter tools/org_scope.mjs; page: pages/build.mjs PAGE_DEFAULTS). Run adapt.ts first.",
+ "repos": ["legallas"],
+ "docs": { "maps": "quality-speed/process/maps.json", "process": "quality-speed/process/process.json" },
+ "quality_config": "quality-speed/process/quality.json",
+ "data": "quality-speed/process/out/org.json",
+ "history": null,
+ "out": "quality-speed/process/dist",
+ "pages": { "process": "index.html" },
+ "tabs": ["build"],
+ "heading": "Legallas",
+ "collector": "Git Crafter actions/pages",
+ "nav": [{ "page": "process", "label": "Process", "icon": "plan" }]
+}

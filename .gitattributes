@@ -1,0 +1,7 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Generated or binary files: no line diffs, collapsed in GitHub's diff view.
+web/package-lock.json linguist-generated=true -diff
+*.riv binary
+web/mcp/template-text.generated.ts linguist-generated=true

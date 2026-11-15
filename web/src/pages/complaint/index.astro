@@ -1,0 +1,31 @@
+---
+// The current complaint as a drafting brief: one page a lawyer new to the matter can read in five minutes, from the
+// track of kind 'complaint'. The shell is static; src/scripts/brief/page.ts fills it from GET /api/matter, so the
+// source names no party. /regulator/ keeps the track renderer (src/scripts/track.ts).
+import Room from '../../layouts/Room.astro';
+import LegallasEmpty from '../../components/LegallasEmpty.astro';
+import '../../styles/track.css';
+import '../../styles/track-control.css';
+import '../../styles/track-guide.css';
+import '../../styles/brief.css';
+import '../../scripts/viz/charts.css';
+import { priorCaseLabel } from '../../../worker/room-settings.ts';
+---
+
+<Room title="Complaint" guide="complaint">
+  <div class="brief" data-brief-page>
+    <p class="brief-loading" data-brief-loading data-load-pending role="status">Loading the complaint.</p>
+    <div data-brief-empty hidden><LegallasEmpty title="No complaint track is in the record yet." level={1} /></div>
+    <div data-brief-error data-load-failed hidden><LegallasEmpty title="The complaint did not load; reload the page to try again." level={1} /></div>
+    <article class="brief-body" data-brief-root data-brief-ready hidden></article>
+    <footer class="brief-foot" data-brief-ready hidden>
+      <a class="brief-foot__prior" href="/claims/">{priorCaseLabel}</a>
+      <p class="c-provenance">
+        Prepared by the client from the record with AI assistance. Every entry cites its source; verify before relying
+        on it.
+      </p>
+    </footer>
+  </div>
+</Room>
+
+<script src="../../scripts/brief/page.ts"></script>
