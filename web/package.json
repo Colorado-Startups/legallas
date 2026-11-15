@@ -87,7 +87,7 @@
     "esbuild": "0.28.2",
     "subset-font": "2.9.0",
     "smol-toml": "1.9.1",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "wrangler": "^4.158.0"
   }
 }
