@@ -8,7 +8,7 @@ Part of the [security policies](README.md). Version 1.1, 2026-11-17.
 | Questionnaire | CSA CAIQ v4.1.0 (CCM v4.1.1): 283 questions, 17 domains |
 | Source | [CSA, CCM and CAIQ v4.1](https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4-1), released 2026-01-27; workbook generated 2026-10-02 |
 | Read | 2026-11-06 |
-| Basis | Policies 1.0 (#657), `SECURITY.md`, `main` at `52c50fe8`; IAM, STA-09, DSP-16 and TVM-03 rows updated in PR #41 |
+| Basis | Policies 1.0 (#657), `SECURITY.md`, `main` at `52c50fe8`; IAM, STA-09, DSP-16 and TVM-03 rows updated in PR #41; TVM-04 rows after the threat model (#42) |
 | Licence | CSA: personal, non-commercial use; no changes; no redistribution. So IDs and our answers only. Questions: CSA's workbook |
 | Claims | No certification, audit or penetration test ([Attestations](README.md#attestations)) |
 | Review | With the policies, every 12 months. An answer changes in its control's PR |
@@ -26,8 +26,8 @@ Part of the [security policies](README.md). Version 1.1, 2026-11-17.
 
 ```mermaid
 pie showData title All 283 answers
-  "Yes" : 156
-  "No" : 93
+  "Yes" : 158
+  "No" : 91
   "NA" : 34
 ```
 
@@ -48,9 +48,9 @@ pie showData title All 283 answers
 | LOG | Logging and monitoring | 14 | 4 | 1 | 19 |
 | SEF | Incidents, e-discovery and forensics | 11 | 5 | 0 | 16 |
 | STA | Supply chain and shared responsibility | 15 | 4 | 0 | 19 |
-| TVM | Threat and vulnerability management | 12 | 3 | 0 | 15 |
+| TVM | Threat and vulnerability management | 14 | 1 | 0 | 15 |
 | UEM | Endpoint management | 1 | 14 | 0 | 15 |
-| | **All** | **156** | **93** | **34** | **283** |
+| | **All** | **158** | **91** | **34** | **283** |
 
 | Domain | Name | Asks about (our words) |
 |---|---|---|
@@ -92,6 +92,5 @@ pie showData title All 283 answers
 | A customer agreement with service, change and exit terms | 3 | Lives with licensing and sales, outside this repository | CCC-05.1, IPY-04.1, STA-11.1 |
 | A yearly review of Cloudflare's reports and terms, and written supplier requirements | 3 | Free | STA-12.1, STA-14.1, STA-15.1 |
 | A private incident record store, incident metrics and authority contacts | 5 | Free | SEF-05.1, SEF-09.1, SEF-09.2, SEF-10.1, SEF-10.2 |
-| A threat model | 2 | Free | TVM-04.1, TVM-04.2 |
 | A staff programme: screening, agreements, training, acceptable use, remote work, equipment disposal | 22 | Free to write. Applies once there is staff | HRS-01.1, HRS-01.2, HRS-01.3, HRS-02.1, HRS-02.2, HRS-03.1, HRS-03.2, HRS-04.1, HRS-04.2, HRS-05.1, HRS-06.1, HRS-07.1, HRS-08.1, HRS-10.1, HRS-11.1, HRS-11.2, HRS-12.1, HRS-12.2, HRS-13.1, DCS-02.1, DCS-02.2, DCS-02.3 |
 | An endpoint policy and device management | 14 | Policy free. Managing devices needs a tool | UEM-01.1, UEM-01.2, UEM-03.1, UEM-04.1, UEM-05.1, UEM-06.1, UEM-07.1, UEM-08.1, UEM-09.1, UEM-10.1, UEM-11.1, UEM-12.1, UEM-13.1, UEM-14.1 |
