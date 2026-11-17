@@ -65,9 +65,28 @@ jobs:
       - name: Web install
         working-directory: web
         run: npm ci --ignore-scripts
+      # The nightly scan's Semgrep, same image, rules and flags (security/scan.sh), with each open finding's severity.
+      - name: Semgrep detail
+        if: ${{ always() }}
+        run: |
+          set -euo pipefail
+          W="$RUNNER_TEMP/sg"; mkdir -p "$W/rules" "$W/out" "$RUNNER_TEMP/dast"; chmod 777 "$W/out"
+          IMG="semgrep/semgrep@sha256:451b3d875c00dac7ed5db5293e584a07de11449a409c10b3c2d2652f429630b6"
+          docker pull --quiet "$IMG"
+          git -C "$W/rules" init --quiet
+          git -C "$W/rules" fetch --quiet --depth 1 https://github.com/semgrep/semgrep-rules 16b9e6d45f10649f6a531ec4838ed9924372c3bc
+          git -C "$W/rules" checkout --quiet FETCH_HEAD
+          rm -rf "$W/rules/.git"
+          cfg=(); for d in javascript typescript python bash swift html yaml/github-actions generic/secrets; do cfg+=(--config "/rules/$d"); done
+          docker run --rm --network=none --user "$(id -u):$(id -g)" -e HOME=/tmp -e SEMGREP_SEND_METRICS=off \
+            -v "$PWD:/src:ro" -v "$W/rules:/rules:ro" -v "$W/out:/out" -w /src "$IMG" \
+            semgrep scan --metrics=off --disable-version-check --disable-nosem --no-git-ignore --json --output /out/sg.json "${cfg[@]}" /src > /dev/null 2>&1 || true
+          node quality-speed/pages/security/semgrep-detail.ts "$W/out/sg.json" "$RUNNER_TEMP/dast/semgrep-open.tsv"
+          cut -f1,2 "$RUNNER_TEMP/dast/semgrep-open.tsv" | sort | uniq -c
       # Branch claude/wstg-internal only: 25 OWASP WSTG v4.2 checks on the fictional room instead of ZAP, for an
       # internal, AI-assisted assessment. Not a penetration test.
       - name: WSTG checks
+        if: ${{ always() }}
         env:
           SCAN_COMMIT: ${{ github.sha }}
         run: node quality-speed/pages/security/dast/wstg.ts --out "$RUNNER_TEMP/dast" --room "$RUNNER_TEMP/dast-room"
@@ -91,6 +110,7 @@ jobs:
             ${{ runner.temp }}/dast/wstg.md
             ${{ runner.temp }}/dast/wstg.json
             ${{ runner.temp }}/dast/secrets-names.tsv
+            ${{ runner.temp }}/dast/semgrep-open.tsv
             ${{ runner.temp }}/dast/logs/
           if-no-files-found: warn
           retention-days: 90
