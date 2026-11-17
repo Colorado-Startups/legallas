@@ -40,7 +40,7 @@ test('every map step names one metric, at most 6 steps a map', () => {
 test('every map of our own opens with an ideal of 25 words at most and a dated source', () => {
   const maps = JSON.parse(readFileSync(new URL('maps.json', import.meta.url), 'utf8'));
   const own = maps.maps.filter((m: { id?: string }) => m.id);
-  assert.equal(own.length, 9);
+  assert.equal(own.length, 7);
   for (const m of own) {
     assert.ok(typeof m.ideal === 'string' && m.ideal.split(/\s+/).length <= IDEAL_MAX_WORDS, m.id);
     assert.ok(Array.isArray(m.sources) && m.sources.length > 0, m.id);
@@ -48,15 +48,15 @@ test('every map of our own opens with an ideal of 25 words at most and a dated s
   }
 });
 
-test('one step is dropped for want of a measurement, and only that one', () => {
+test('a library step is dropped only for want of a public measurement', () => {
   const maps = JSON.parse(readFileSync(new URL('maps.json', import.meta.url), 'utf8'));
   const dropped = maps.maps.flatMap((m: { id?: string; use?: string; steps: Record<string, { drop?: boolean }> }) =>
     m.id ? [] : Object.entries(m.steps ?? {}).filter(([, s]) => s.drop).map(([id]) => `${m.use}.${id}`),
   );
-  assert.deepEqual(dropped, ['adopt.update']);
+  assert.deepEqual(dropped, ['board.split', 'board.finish', 'contribute.review', 'contribute.merge', 'contribute.rebuild', 'adopt.copy', 'adopt.check', 'adopt.update']);
 });
 
-test('every step metric is defined by its page, dotted ids included, and every page but the law pages sits on a map', () => {
+test('every step metric is defined by its page, no step names a private page, and every public page but the law pages sits on a map', () => {
   const state = mkdtempSync(path.join(tmpdir(), 'qs-process-'));
   const { defs, metrics } = adapt(state, path.join(state, 'out'));
   assert.equal(defs.length, Object.keys(metrics).length);
@@ -64,12 +64,15 @@ test('every step metric is defined by its page, dotted ids included, and every p
   assert.ok(Object.values(metrics).every((e) => 'could_not_check' in e), 'an empty state measures nothing');
   const mapped = new Set(defs.map((d) => String(d.id).split('.')[1]));
   const unmapped = PAGES.filter((p) => !mapped.has(p));
-  assert.deepEqual(unmapped, PAGE_GROUPS.law.filter((p) => p !== 'sec' && p !== 'templates'));
+  // The private pages (contract/pages.ts, PUBLIC_PAGES, #20) never run in this public repository, so no step may name one.
+  const PRIVATE = ['agents', 'claude-code', 'claude-documentation', 'claude-settings', 'actions', 'ci-overview', 'pull-requests'];
+  assert.deepEqual([...mapped].filter((p) => PRIVATE.includes(p)), []);
+  assert.deepEqual(unmapped.filter((p) => !PRIVATE.includes(p)), PAGE_GROUPS.law.filter((p) => p !== 'sec' && p !== 'templates'));
 });
 
 test('every link the maps carry passes the publish guard, so the Process page can go out', () => {
   const text = readFileSync(new URL('maps.json', import.meta.url), 'utf8') + readFileSync(new URL('process.json', import.meta.url), 'utf8');
   const links = [...text.matchAll(/https:\/\/[^"\s]+/g)].map((m) => m[0]);
-  assert.ok(links.length >= 12, `${links.length} links`);
+  assert.ok(links.length >= 10, `${links.length} links`);
   assert.deepEqual(links.filter((url) => !processLink(url)), []);
 });
