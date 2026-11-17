@@ -130,7 +130,7 @@ Both computers work the same way: the helper works on the local folder, and iClo
 server reads the customer's cloud account. Apple's pages show no public server API for reading someone's iCloud Drive, and reading
 OneDrive from a server with no signed-in user needs an administrator's grant, tenant-wide or item by item.
 
-What's left of saving back and reading iWork files is on the [Legallas board](https://github.com/orgs/Colorado-Startups/projects/1).
+What's left of saving back and reading iWork files is on the [Legallas board](https://github.com/orgs/Colorado-Startups/projects/6).
 
 ## How it's built
 
