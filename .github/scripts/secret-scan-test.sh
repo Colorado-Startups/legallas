@@ -114,6 +114,28 @@ scan_all; found "a secret in old history, on a whole-history scan" $?
 new_repo; echo "$secret" >notes.txt; save "secret"
 EVENT_NAME=push PUSH_BEFORE="$base" bash "$script" >"$log" 2>&1; found "a push's secret" $?
 
+scan_queue() {
+    EVENT_NAME=merge_group MERGE_GROUP_BASE_SHA="${1:-$base}" MERGE_GROUP_HEAD_SHA="$(git rev-parse HEAD)" bash "$script" >"$log" 2>&1
+}
+
+new_repo; echo "$secret" >notes.txt; save "secret"
+scan_queue; found "a merge queue run's secret" $?
+
+new_repo; git switch -q -c stray; echo "$secret" >stray.txt; save "stray secret"; git switch -q main
+echo "Still nothing" >notes.txt; save "queued"
+scan_queue; passed "a merge queue run reads only its own range, not a stray branch" $? "Read 1 commits"
+
+new_repo; echo "Still nothing" >notes.txt; save "notes"
+scan_queue "0123456789012345678901234567890123456789"; refused "a merge group's base that doesn't resolve" $? "isn't a commit"
+
+# The script excuses a finding only by its fingerprint: a copy of it names this test's own.
+excusing="$work/excusing.sh"
+new_repo; echo "$secret" >notes.txt; save "secret"; scan_all
+sed "s|^excused=.*|excused=(\"$(sed -n 's/^Fingerprint: *//p' "$log" | head -n 1)\")|" "$script" >"$excusing"
+env -u EVENT_NAME bash "$excusing" >"$log" 2>&1; passed "a whole-history scan skips the one finding the script excuses" $? "no leaks found"
+echo "ghp_$(openssl rand -hex 18)" >notes.txt; save "another secret on the same line"
+env -u EVENT_NAME bash "$excusing" >"$log" 2>&1; found "the same file, rule and line in a later commit" $?
+
 # A comment or a file in the pull request can't excuse it.
 new_repo; echo "token = \"$secret\" # gitleaks"":allow" >notes.txt; save "secret"
 scan_pr; found "an inline allow comment" $?

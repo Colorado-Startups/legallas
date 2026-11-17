@@ -14,9 +14,9 @@ import { LIST, metIn, render, road } from './page.ts';
 const now = new Date('2026-11-20T06:00:00Z');
 const manifest: Manifest = JSON.parse(readFileSync(new URL('manifest.json', import.meta.url), 'utf8'));
 const run = 'https://github.com/Colorado-Startups/legallas/actions/runs/1';
-// Two conditions met: the new description and the notices.
-const list: Conditions = { ...LIST, conditions: LIST.conditions.map((c) => (c.id === 'description' ? { ...c, evidence: 1 } : c.id === 'notices' ? { ...c, evidence: 2 } : c)) };
-const rows = detail(list, new Map([['issue:1', '2026-11-13T00:00:00Z'], ['issue:2', '2026-11-20T05:00:00Z']]));
+// Two conditions met: the new description and the notices. Their numbers are ones no real row uses.
+const list: Conditions = { ...LIST, conditions: LIST.conditions.map((c) => (c.id === 'description' ? { ...c, evidence: 901 } : c.id === 'notices' ? { ...c, evidence: 902 } : c)) };
+const rows = detail(list, new Map([['issue:901', '2026-11-13T00:00:00Z'], ['issue:902', '2026-11-20T05:00:00Z']]));
 const recs = records(list, rows, now, run);
 const signed = { ...manifest, signoff_comment: 1 };
 const history: HistoryLine[] = [

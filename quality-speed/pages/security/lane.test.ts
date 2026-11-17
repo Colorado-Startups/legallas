@@ -7,6 +7,8 @@ import { validateRecords } from '../../contract/validate.ts';
 import { githubList, noEvents, reading, record, runContext } from './lane.ts';
 
 process.env.GITHUB_RUN_ID = '12345';
+// The contract allows only this repo's links, and CI on a fork or a renamed repo sets another name.
+process.env.GITHUB_REPOSITORY = 'Colorado-Startups/legallas';
 const context = runContext(new Date('2031-03-20T01:02:03.456Z'));
 const manifest = JSON.parse(readFileSync(new URL('./manifest.json', import.meta.url), 'utf8'));
 

@@ -8,8 +8,8 @@
     { "id": "states", "group": "regulatory", "label": "Launch states named", "owner": true, "from": "brief", "evidence": null },
     { "id": "lookups", "group": "regulatory", "label": "Lookup safeguards built", "owner": false, "from": "review", "evidence": { "card": 290656536 } },
 
-    { "id": "description", "group": "claims", "label": "New description used everywhere", "owner": false, "from": "gate", "evidence": null },
-    { "id": "copy", "group": "claims", "label": "Wording rules applied everywhere", "owner": false, "from": "review", "evidence": 791 },
+    { "id": "description", "group": "claims", "label": "New description used everywhere", "owner": false, "from": "gate", "evidence": 12 },
+    { "id": "copy", "group": "claims", "label": "Wording rules applied everywhere", "owner": false, "from": "review", "evidence": 12 },
     { "id": "nonprofit", "group": "claims", "label": "No nonprofit wording", "owner": false, "from": "review", "evidence": null },
     { "id": "claims_file", "group": "claims", "label": "Dated test behind each performance claim", "owner": false, "from": "review", "evidence": null },
 
@@ -17,17 +17,17 @@
     { "id": "use_policy", "group": "ai", "label": "Acceptable use policy published", "owner": false, "from": "review", "evidence": null },
     { "id": "people_guard", "group": "ai", "label": "Guard on decisions about a person", "owner": false, "from": "review", "evidence": null, "eval": "web/scripts/ask-eval.people.json" },
     { "id": "rules_card", "group": "ai", "label": "Rules card for each AI", "owner": false, "from": "review", "evidence": null },
-    { "id": "name_filter", "group": "ai", "label": "Assistant name filter", "owner": false, "from": "review", "evidence": 725 },
-    { "id": "sources_dates", "group": "ai", "label": "Sources checked, due dates warned", "owner": false, "from": "review", "evidence": 775 },
+    { "id": "name_filter", "group": "ai", "label": "Assistant name filter", "owner": false, "from": "review", "evidence": 12 },
+    { "id": "sources_dates", "group": "ai", "label": "Sources checked, due dates warned", "owner": false, "from": "review", "evidence": 12 },
 
     { "id": "trademark", "group": "ip", "label": "Full trademark search done", "owner": false, "from": "gate", "evidence": null },
     { "id": "trademark_filed", "group": "ip", "label": "Trademark application filed", "owner": true, "from": "review", "evidence": null },
     { "id": "templates", "group": "ip", "label": "Every shipped template cleared", "owner": false, "from": "review", "evidence": { "card": 290655931 } },
-    { "id": "marks", "group": "ip", "label": "Neutral marks confirmed", "owner": false, "from": "gate", "evidence": null },
-    { "id": "licences", "group": "ip", "label": "Licence review rerun on the launch commit", "owner": false, "from": "gate", "after": "go_ahead", "evidence": null },
+    { "id": "marks", "group": "ip", "label": "Neutral marks confirmed", "owner": false, "from": "gate", "evidence": 12 },
+    { "id": "licences", "group": "ip", "label": "Licence review rerun on the launch commit", "owner": false, "from": "gate", "after": "go_ahead", "evidence": 12 },
 
     { "id": "merchant", "group": "third_party", "label": "Merchant of record accepts in writing", "owner": true, "from": "review", "evidence": null },
-    { "id": "go_ahead", "group": "third_party", "label": "Owner's go-ahead", "owner": true, "from": "gate", "evidence": 993 },
+    { "id": "go_ahead", "group": "third_party", "label": "Owner's go-ahead", "owner": true, "from": "gate", "evidence": null },
     { "id": "first_sale", "group": "third_party", "label": "Business account, books, reseller-only sales", "owner": true, "from": "review", "evidence": null },
 
     { "id": "terms", "group": "contracts", "label": "Short terms accepted at install", "owner": false, "from": "review", "evidence": null },
@@ -37,17 +37,17 @@
     { "id": "retention", "group": "privacy", "label": "Retention card for each AI", "owner": false, "from": "review", "evidence": { "card": 290656345 } },
     { "id": "egress", "group": "privacy", "label": "Release test: no data leaves", "owner": false, "from": "review", "evidence": null },
     { "id": "case_room", "group": "privacy", "label": "No-AI class, legal hold, counsel record", "owner": false, "from": "review", "evidence": null },
-    { "id": "history_scan", "group": "privacy", "label": "Case-word scan of the whole history", "owner": false, "from": "gate", "after": "go_ahead", "evidence": null },
+    { "id": "history_scan", "group": "privacy", "label": "Case-word scan of the whole history", "owner": false, "from": "gate", "after": "go_ahead", "evidence": 1 },
 
     { "id": "consent", "group": "filing", "label": "Consent record for Colorado filings", "owner": false, "from": "review", "evidence": null },
     { "id": "approval", "group": "filing", "label": "Named person approves each filing", "owner": false, "from": "review", "evidence": null },
     { "id": "ink", "group": "filing", "label": "Form D signed in ink by default", "owner": false, "from": "review", "evidence": null },
 
-    { "id": "security_read", "group": "security", "label": "Security read of the launch commit", "owner": false, "from": "review", "after": "go_ahead", "evidence": null },
-    { "id": "tree_read", "group": "security", "label": "Full tree read with CI green", "owner": false, "from": "gate", "after": "go_ahead", "evidence": null },
-    { "id": "pointers", "group": "security", "label": "Private paths and pointers removed", "owner": false, "from": "gate", "after": "go_ahead", "evidence": null },
-    { "id": "private_site", "group": "security", "label": "Private site removed first", "owner": false, "from": "gate", "after": "go_ahead", "evidence": null },
-    { "id": "fresh_repo", "group": "security", "label": "Fresh repository, one first commit", "owner": true, "from": "gate", "evidence": null },
+    { "id": "security_read", "group": "security", "label": "Security read of the launch commit", "owner": false, "from": "review", "after": "go_ahead", "evidence": 12 },
+    { "id": "tree_read", "group": "security", "label": "Full tree read with CI green", "owner": false, "from": "gate", "after": "go_ahead", "evidence": 12 },
+    { "id": "pointers", "group": "security", "label": "Private paths and pointers removed", "owner": false, "from": "gate", "after": "go_ahead", "evidence": 12 },
+    { "id": "private_site", "group": "security", "label": "Old private site stays private", "owner": false, "from": "gate", "after": "go_ahead", "evidence": 12 },
+    { "id": "fresh_repo", "group": "security", "label": "Fresh repository, one first commit", "owner": true, "from": "gate", "evidence": 2 },
     { "id": "repo_setup", "group": "security", "label": "Rules on the new repository, no bypass", "owner": false, "from": "gate", "after": "go_ahead", "evidence": null }
   ]
 }
