@@ -207,4 +207,11 @@ test('htmlText drops a script or comment that only forms once an inner one is re
   assert.equal(htmlText('<p>Hello</p><<script></script>script>steal()</script>'), 'Hello');
   assert.equal(htmlText('<p>Hello</p><!<script></script>-- note <b>hidden</b> -->'), 'Hello');
   assert.equal(htmlText('<p>Hello</p><script>steal()</script foo>'), 'Hello');
+  assert.equal(htmlText('<p>Hello</p><!<!--- comment -->-- -->'), 'Hello');
+  assert.equal(htmlText('<p>Hello</p><<!---->!--x-->'), 'Hello');
+});
+
+test('htmlText leaves no raw "<": an unclosed tag or comment loses its bracket', () => {
+  assert.equal(htmlText('<p>Hello <!-- cut off</p>'), 'Hello !-- cut off');
+  assert.equal(htmlText('<p>Hello</p><script'), 'Hello\nscript');
 });

@@ -145,7 +145,7 @@ function partText(entity: Entity): string {
 
 /** HTML as plain text: no head, scripts, styles or comments; blocks and breaks become lines; entities decoded. */
 export function htmlText(html: string): string {
-  // Each removal repeats until nothing changes: removing one piece can join its neighbours into a new comment or tag.
+  // Comment and hidden-block removal repeats until nothing changes: removing one can join its neighbours into another.
   let text = html;
   let previous: string;
   do {
@@ -157,11 +157,11 @@ export function htmlText(html: string): string {
     .replace(/<li\b[^>]*>/gi, '\n- ')
     .replace(/<\/?(?:p|div|tr|h[1-6]|blockquote|table|ul|ol|pre|section|article|header|footer)\b[^>]*>/gi, '\n')
     .replace(/<\/t[dh]\s*>/gi, ' ');
-  do {
-    previous = text;
-    text = text.replace(/<[^>]*>/g, '');
-  } while (text !== previous);
+  // Then every '<' left (an unclosed tag or comment) goes too: the text is shown with textContent (doc-views.ts), and
+  // a '<' the email meant as text arrives as &lt;, decoded below.
   return text
+    .replace(/<[^>]*>/g, '')
+    .replace(/</g, '')
     .replace(/&(#x[0-9a-f]{1,6}|#[0-9]{1,7}|[a-z]+);/gi, (whole, ref: string) => {
       if (ref[0] !== '#') return HTML_ENTITIES[ref.toLowerCase()] ?? whole;
       const code = ref[1] === 'x' || ref[1] === 'X' ? parseInt(ref.slice(2), 16) : Number(ref.slice(1));
