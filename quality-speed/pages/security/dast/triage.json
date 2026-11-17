@@ -131,6 +131,16 @@
    "decided": "2026-11-07"
   },
   {
+   "alert": "6-5",
+   "targets": [
+    "room-member"
+   ],
+   "paths": "^/api/hold/release$",
+   "status": "accepted",
+   "reason": "ZAP sent the route's own last segment (release) as the reason and saw a different answer. The reason only reaches a D1 bound parameter (?4 in web/worker/hold.ts releaseHold), never a file, R2 key, fetch or redirect, and a Worker has no file system; the answer flips because the first request releases the hold and later ones get 409 no_hold (web/worker/routes/hold.ts step).",
+   "decided": "2026-11-17"
+  },
+  {
    "alert": "10027",
    "targets": [
     "mcp-member"
