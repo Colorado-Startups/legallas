@@ -59,6 +59,16 @@
    "decided": "2026-11-17"
   },
   {
+   "alert": "40018",
+   "targets": [
+    "room-member"
+   ],
+   "paths": "^/api/hold/custodians$",
+   "status": "accepted",
+   "reason": "False positive. `name` is a bound parameter (?3 in web/worker/hold.ts addCustodian); the two responses differ because the first request adds the custodian, so the second adds none (ON CONFLICT DO NOTHING) and returns another status.",
+   "decided": "2026-11-17"
+  },
+  {
    "alert": "40014-2",
    "targets": [
     "room-member"
