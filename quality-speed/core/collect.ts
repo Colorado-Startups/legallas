@@ -51,10 +51,11 @@ export function collectLane(slug: PageSlug, laneId: string, outDir: string, page
     // This folder is uploaded as a public artifact: a private measurement goes out as missing, and a page whose detail
     // holds an owner-account figure sends no detail at all (contract/pages.ts).
     writeFileSync(path.join(outDir, slug, `${lane.id}.json`), `${JSON.stringify(publicRecords(checked.records))}\n`);
-    if (PRIVATE_DETAIL.includes(slug)) rmSync(DETAIL_DIR, { recursive: true, force: true });
     return checked.errors;
   } finally {
     rmSync(work, { recursive: true, force: true });
+    // On every way out, a failure or a throw included: the workflow uploads this folder even after a failed lane.
+    if (PRIVATE_DETAIL.includes(slug)) rmSync(path.join(outDir, slug, laneId), { recursive: true, force: true });
   }
 }
 

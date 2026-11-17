@@ -205,7 +205,7 @@ test('past the most the guard allows for, a Linux lane goes to GitHub-hosted', (
 });
 
 test('a private page plans no lane on any event, and a public page keeps its own', () => {
-  for (const slug of ['agents', 'claude-code', 'claude-documentation', 'claude-settings'] as const) {
+  for (const slug of ['agents', 'claude-code', 'claude-documentation', 'claude-settings', 'actions', 'ci-overview'] as const) {
     assert.equal(PUBLIC_PAGES.includes(slug), false, slug);
     const dir = page([good], slug);
     assert.deepEqual(matrixFor('workflow_dispatch', 7, dir), { rows: [], errors: [] }, slug);
@@ -226,6 +226,6 @@ test('the real plan holds no private page, no private lane and no lane that take
   // quality-speed.yml's admin-read runs only for an admin lane outside the App's pages (.github/scripts/app_lanes.py).
   assert.deepEqual(rows.filter((row) => row.admin && !['settings', 'projects', 'github-app'].includes(row.slug)), []);
   // Fail closed: a page is public only by being named, so every page is one or the other.
-  assert.equal(PUBLIC_PAGES.length, 31);
-  assert.equal(PAGES.length - PUBLIC_PAGES.length, 4);
+  assert.equal(PUBLIC_PAGES.length, 29);
+  assert.equal(PAGES.length - PUBLIC_PAGES.length, 6);
 });

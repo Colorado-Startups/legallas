@@ -40,6 +40,8 @@ export type PageSlug = (typeof PAGES)[number];
  * | Left out | Why |
  * |---|---|
  * | `agents`, `claude-code`, `claude-documentation`, `claude-settings` | Private pages (the owner, 2026-11-17) |
+ * | `actions`, `ci-overview` | Their page code shows dollars from constants and committed baselines (the organization's included
+ * amount, a push's cost). Each joins once its page shows none; its measurements and detail are already handled below |
  *
  * A public page can still hold a private part: a lane (PRIVATE_LANES), a measurement (PRIVATE_METRICS), or its lanes'
  * detail (PRIVATE_DETAIL).
@@ -51,8 +53,6 @@ export const PUBLIC_PAGES: readonly PageSlug[] = PAGES.filter((page) =>
       'projects',
       'code',
       'pull-requests',
-      'actions',
-      'ci-overview',
       'repo-documentation',
       'issues',
       'testing',
