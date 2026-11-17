@@ -135,8 +135,8 @@ async function main(): Promise<void> {
     const add = (id: string, area: string, tried: string, pass: boolean, evidence: string) => checks.push({ id, area, tried, pass, evidence });
 
     // ---- Authentication
-    const room = await webModule<{ roomRoutes(env: Record<string, string>): readonly { method: string; path: string }[] }>('worker/index.ts');
-    const routes = room.roomRoutes({ PROPOSALS_ENABLED: '1', CHECKLIST_ENABLED: '1' });
+    const roomMod = await webModule<{ roomRoutes(env: Record<string, string>): readonly { method: string; path: string }[] }>('worker/index.ts');
+    const routes = roomMod.roomRoutes({ PROPOSALS_ENABLED: '1', CHECKLIST_ENABLED: '1' });
     let refused = 0;
     const leaks: string[] = [];
     for (const r of routes) {
