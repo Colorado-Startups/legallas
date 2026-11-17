@@ -202,3 +202,32 @@ test('deep nesting and an mbox "From " line are handled without error', () => {
 test('htmlText keeps text that only looks like markup once entities are decoded', () => {
   assert.equal(htmlText('<p>&lt;script&gt;not run&lt;/script&gt;</p>'), '<script>not run</script>');
 });
+
+test('htmlText reads tags as a browser does: hidden bodies go and no raw "<" is left', () => {
+  const cases: [string, string][] = [
+    ['<p>Hello</p><<script></script>script>steal()</script>', 'Hello\nscript>steal()'],
+    ['<p>Hello</p><!<script></script>-- note <b>hidden</b> -->', 'Hello\n-- note hidden -->'],
+    ['<p>Hello</p><script>steal()</script foo>', 'Hello'],
+    ['<p>Hello</p><STYLE>p{}</style\t\n bar>', 'Hello'],
+    ['<p>Hello</p><!<!--- comment -->-- -->', 'Hello\n-- -->'],
+    ['<p>Hello</p><<!---->!--x-->', 'Hello\n!--x-->'],
+    ['<p>Hello <!-- cut off</p>', 'Hello'],
+    ['<p>Hello</p><script>never closed', 'Hello'],
+    ['<p>Hello</p><script', 'Hello\nscript'],
+    ['<!doctype html><p>a < b</p>', 'a b'],
+  ];
+  for (const [html, text] of cases) {
+    assert.equal(htmlText(html), text, html);
+    assert.equal(htmlText(html).includes('<'), false, html);
+  }
+});
+
+test('htmlText stays linear on a long run of "<" with no ">"', () => {
+  const started = performance.now();
+  assert.equal(htmlText('<'.repeat(100_000)), '');
+  assert.ok(performance.now() - started < 1000, 'finishes in well under a second');
+});
+
+test('htmlText keeps its place after a character whose lowercase is longer', () => {
+  assert.equal(htmlText('<p>\u0130stanbul</p><script>steal()</script><p>after</p>'), '\u0130stanbul\n\nafter');
+});

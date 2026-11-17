@@ -67,7 +67,8 @@ export const BRIDGE_SCRIPT = bridgeScript();
 const oldBridge = (name: string) => new RegExp(`<script>/\\* ${bridgeMarker(name)} \\*/[\\s\\S]*?</script>`, 'g');
 const ARTIFACT_URL = /^https:\/\/claude\.ai\/(?:code\/)?artifact\/([A-Za-z0-9_-]+)\/?([^?#]*)/;
 const SCHEME = /^[a-z][a-z0-9+.-]*:/i;
-const PROTECTED = /(<script\b[^>]*>[\s\S]*?<\/script\s*>|<style\b[^>]*>[\s\S]*?<\/style\s*>)/gi;
+// An end tag as a browser reads it: the name, then ">", "/" or whitespace and anything up to ">" ("</script foo>").
+const PROTECTED = /(<script\b[^>]*>[\s\S]*?<\/script(?:[\s/][^>]*)?>|<style\b[^>]*>[\s\S]*?<\/style(?:[\s/][^>]*)?>)/gi;
 const HREF = /(\s(?:xlink:)?href\s*=\s*)("([^"]*)"|'([^']*)')/gi;
 const REMOTE_LINK_TAG = /<link\b[^>]*\bhref\s*=\s*["']\s*(?:https?:)?\/\/[^"']*["'][^>]*>\s*/gi;
 const REMOTE_RESOURCE = /\b(?:src|srcset|poster)\s*=\s*["']\s*(?:https?:)?\/\/|url\(\s*["']?\s*(?:https?:)?\/\//i;
