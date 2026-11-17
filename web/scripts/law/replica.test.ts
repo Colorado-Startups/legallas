@@ -6,7 +6,7 @@ import path from 'node:path';
 import { test } from 'node:test';
 import { SpendStop } from '../spend-guard.ts';
 import { sha256 } from './plan.ts';
-import { embedParts, type Part } from './replica.ts';
+import { CHECKPOINT_BATCHES, embedParts, type Part } from './replica.ts';
 
 test('a stopped embed keeps what it embedded, so the next run embeds only the rest', async () => {
   const dir = await mkdtemp(path.join(tmpdir(), 'law-replica-'));
@@ -63,6 +63,27 @@ test('a rate limit left after the retries ends the run at once and stores no zer
     await assert.rejects(embedParts(dir, parts, limited, () => {}), /embedding_http_429/);
     assert.equal(calls, 1, 'no halving while rate-limited');
     await assert.rejects(readFile(path.join(dir, 'replica', 'embeddings.json'), 'utf8'), { code: 'ENOENT' });
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('a long embed writes its cache as it goes, so a run killed mid-way keeps its progress', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'law-replica-'));
+  try {
+    const batches = CHECKPOINT_BATCHES + 2;
+    const parts: Part[] = Array.from({ length: batches * 50 }, (_, i) => ({ key: `law/both/p-${i}.md`, text: `part ${i}` }));
+    let calls = 0;
+    let seenOnDisk = 0;
+    const watching = async (texts: string[]) => {
+      // The batch after the checkpoint looks at the file, as a run killed there would leave it.
+      if (++calls === CHECKPOINT_BATCHES + 1) seenOnDisk = Object.keys(JSON.parse(await readFile(path.join(dir, 'replica', 'embeddings.json'), 'utf8'))).length;
+      return texts.map(() => [1, 0]);
+    };
+    await embedParts(dir, parts, watching, () => {});
+    assert.equal(seenOnDisk, CHECKPOINT_BATCHES * 50);
+    const kept = JSON.parse(await readFile(path.join(dir, 'replica', 'embeddings.json'), 'utf8')) as Record<string, number[]>;
+    assert.equal(Object.keys(kept).length, batches * 50);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
