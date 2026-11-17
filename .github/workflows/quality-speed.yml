@@ -144,8 +144,12 @@ jobs:
   # never their values, which the built-in token can't read. No checkout, so no repository code runs beside the
   # key. Each read-out keeps its status line, so a refusal never reads as "off". Until the key exists this does
   # nothing, and the keys metric reads as missing. Settings and Projects read with the App's token (collect-app).
+  #
+  # Secret names and dates are private (quality-speed/contract/pages.ts, PRIVATE_LANES), and this repository's artifacts
+  # are public. So this runs only when the plan holds a lane that takes the read-out, and today it holds none.
   admin-read:
-    if: github.ref == 'refs/heads/main'
+    needs: plan
+    if: github.ref == 'refs/heads/main' && contains(needs.plan.outputs.hosted, '"admin":true')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     environment: quality-speed

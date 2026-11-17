@@ -7,7 +7,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PAGES } from '../contract/pages.ts';
+import { PAGES, PUBLIC_PAGES } from '../contract/pages.ts';
 import { buildSite, frameWords, readHistory } from './build.ts';
 import { countWords, guardSite, SYNTHETIC_MARK } from './guard.ts';
 
@@ -30,7 +30,8 @@ async function inSite(run: (dirs: { pages: string; state: string; out: string })
 test('a synthetic build makes every page, marks itself, and the guard refuses it unless told', async () => {
   await inSite(async ({ pages, out }) => {
     await buildSite({ pagesDir: pages, state: null, out, now: NOW });
-    for (const page of PAGES) assert.ok(existsSync(path.join(out, page, 'index.html')), page);
+    for (const page of PUBLIC_PAGES) assert.ok(existsSync(path.join(out, page, 'index.html')), page);
+    for (const page of PAGES.filter((p) => !PUBLIC_PAGES.includes(p))) assert.equal(existsSync(path.join(out, page)), false, `${page} is private`);
     assert.deepEqual(guardSite(out, { allowSynthetic: true }), []);
     assert.ok(readFileSync(path.join(out, 'index.html'), 'utf8').includes(SYNTHETIC_MARK));
     assert.match(guardSite(out).join(), /invented numbers/);

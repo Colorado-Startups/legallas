@@ -10,7 +10,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import type { Manifest } from '../contract/format.ts';
-import { PAGES, type PageSlug } from '../contract/pages.ts';
+import { isPublicLane, PAGES, type PageSlug } from '../contract/pages.ts';
 import { validateManifest } from '../contract/validate.ts';
 
 export const PAGES_DIR = fileURLToPath(new URL('../pages', import.meta.url));
@@ -109,9 +109,14 @@ export function runsNow(lane: Pick<Lane, 'runner' | 'cadence'>, event: string, w
   return false;
 }
 
-/** This run's matrix, plus any problem found on the way. */
+/** A page's lanes that may run in this public repository's workflow: none for a private page (pages.ts, PUBLIC_PAGES). */
+export function publicLanes(slug: PageSlug, pagesDir = PAGES_DIR): Lane[] {
+  return loadLanes(slug, pagesDir).lanes.filter((lane) => isPublicLane(slug, lane.id));
+}
+
+/** This run's matrix, plus any problem found on the way. A private page's lanes.json is still checked, but no lane of it is planned. */
 export function matrixFor(event: string, weekday: number, pagesDir = PAGES_DIR, touched: Set<string> | null = null) {
-  const declared = PAGES.map((slug) => ({ slug, ...loadLanes(slug, pagesDir) }));
+  const declared = PAGES.map((slug) => ({ slug, lanes: publicLanes(slug, pagesDir), errors: loadLanes(slug, pagesDir).errors }));
   let onBlacksmith = 0;
   const runnerOf = (lane: Lane) => {
     if (lane.runner !== 'linux') return RUNNERS[lane.runner];

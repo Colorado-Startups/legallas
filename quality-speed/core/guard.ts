@@ -17,7 +17,7 @@ import { lstatSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { PAGES, REPO } from '../contract/pages.ts';
+import { isPublicPage, PUBLIC_PAGES, REPO } from '../contract/pages.ts';
 import { validateIdeal } from '../contract/validate.ts';
 import { wordsIn } from '../contract/words.ts';
 
@@ -236,7 +236,7 @@ export function guardSite(site: string, options: GuardOptions = {}): string[] {
   const pagesDir = options.pagesDir ?? fileURLToPath(new URL('../pages', import.meta.url));
   const sources = new Map<string, Set<string>>();
   const files = walk(site, errors);
-  const required = ['index.html', 'history.json', ...Object.keys(ASSETS), ...PAGES.map((page) => `${page}/index.html`)];
+  const required = ['index.html', 'history.json', ...Object.keys(ASSETS), ...PUBLIC_PAGES.map((page) => `${page}/index.html`)];
   if (required.some((file) => !files.includes(file))) errors.push('site: a page or file the build always writes is missing');
   for (const file of files) {
     if (file.startsWith('process/')) {
@@ -249,7 +249,7 @@ export function guardSite(site: string, options: GuardOptions = {}): string[] {
       continue;
     }
     const match = PAGE_FILE.exec(file);
-    const named = file === 'index.html' || file === 'history.json' || (match && (PAGES as readonly string[]).includes(match[1] ?? '') && SAFE_NAME.test(match[2] ?? '') && !SECRET.test(match[2] ?? ''));
+    const named = file === 'index.html' || file === 'history.json' || (match && isPublicPage(match[1] ?? '') && SAFE_NAME.test(match[2] ?? '') && !SECRET.test(match[2] ?? ''));
     if (!named) {
       errors.push('site: a file is not on the list');
       continue;

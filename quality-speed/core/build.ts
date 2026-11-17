@@ -16,7 +16,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import type { HistoryLine, Ideal, Manifest, Metric, MetricRecord } from '../contract/format.ts';
-import { PAGE_GROUPS, PAGES, RENAMED, REPO, type PageSlug } from '../contract/pages.ts';
+import { isPublicPage, PAGE_GROUPS, PUBLIC_PAGES, RENAMED, REPO, type PageSlug } from '../contract/pages.ts';
 import { isPublicUrl, joinMetrics, validateHistoryLine, validateIdeal, validateManifest, validateRecords } from '../contract/validate.ts';
 import { dataTable, esc, fmtDate, historyRows, missingTile, ring, ringGrid, tileRow, timeline, type RingProps, type TimelineRow, type TimelineScore } from './charts/index.ts';
 import { pageDetail, type Detail } from './detail.ts';
@@ -134,7 +134,9 @@ export function readHistory(state: string | null): HistoryLine[] {
       const page = (parsed as { page?: unknown } | null)?.page;
       const renamed = typeof page === 'string' && Object.hasOwn(RENAMED, page) ? { ...(parsed as object), page: RENAMED[page] } : parsed;
       return validateHistoryLine(renamed).value ?? [];
-    });
+    })
+    // A page that is private now may have score lines from before it was: they stay out of the site and history.json.
+    .filter((line) => isPublicPage(line.page));
 }
 
 /** A row per metric, for a page with no page.ts yet. A table, because a long list would pass the word limit as tiles. */
@@ -238,7 +240,7 @@ function writeHome(pages: readonly Loaded[], rows: readonly TimelineRow[], { out
   const item = (page: PageSlug) => ({ ...ringOf(pages.find((p) => p.page === page) as Loaded), href: `${page}/` });
   const groups = Object.entries(PAGE_GROUPS).map(([group, list]) => ({
     label: titleOf(group),
-    rings: list.filter((page) => page !== 'data-room').map(item),
+    rings: list.filter((page) => page !== 'data-room' && isPublicPage(page)).map(item),
   }));
   const home = homeOf(Object.fromEntries(pages.map((p) => [p.page, { q: p.score.quality, s: p.score.speed, c: p.score.consumption, total: p.score.total }])));
   const line = rows.length ? timeline({ history: [...rows], main: 'home', src: 'history.json' }) : '';
@@ -256,7 +258,8 @@ export async function buildSite(options: BuildOptions): Promise<void> {
   mkdirSync(options.out, { recursive: true });
   for (const asset of ASSETS) copyFileSync(asset, path.join(options.out, path.basename(fileURLToPath(asset))));
   const history = readHistory(options.state);
-  const pages = PAGES.map((page) => loadPage(page, history, options));
+  // Public pages only (pages.ts, PUBLIC_PAGES): a private page gets no folder, no ring and no line.
+  const pages = PUBLIC_PAGES.map((page) => loadPage(page, history, options));
   const others = Object.fromEntries(pages.map(({ page, score }) => [page, { quality: score.quality, speed: score.speed, consumption: score.consumption, total: score.total }]));
   for (const loaded of pages) await writePage(loaded, others, options);
   writeHome(pages, historyRows(history, homeOf), options);

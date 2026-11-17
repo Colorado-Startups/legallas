@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { PAGES, type PageSlug } from '../contract/pages.ts';
+import { isPublicLane, PAGES, PRIVATE_LANES, PUBLIC_PAGES, type PageSlug } from '../contract/pages.ts';
 import { loadLanes, matrixFor, planOutputs, runsNow, touchedPages } from './lanes.ts';
 
 const MANIFEST = readFileSync(new URL('../contract/example/manifest.json', import.meta.url), 'utf8');
@@ -202,4 +202,30 @@ test('past the most the guard allows for, a Linux lane goes to GitHub-hosted', (
   assert.equal(rows.filter((row) => row.runner === 'choose-runner').length, 30);
   assert.equal(rows.at(-1)?.runner, 'ubuntu-latest');
   rmSync(dir, { recursive: true });
+});
+
+test('a private page plans no lane on any event, and a public page keeps its own', () => {
+  for (const slug of ['agents', 'claude-code', 'claude-documentation', 'claude-settings', 'actions', 'ci-overview', 'pull-requests'] as const) {
+    assert.equal(PUBLIC_PAGES.includes(slug), false, slug);
+    const dir = page([good], slug);
+    assert.deepEqual(matrixFor('workflow_dispatch', 7, dir), { rows: [], errors: [] }, slug);
+    rmSync(dir, { recursive: true });
+  }
+  const broken = page('not a list', 'claude-code');
+  assert.deepEqual(matrixFor('schedule', 7, broken).errors, ['pages/claude-code: lanes.json must be a list'], 'a private page is still checked');
+  rmSync(broken, { recursive: true });
+});
+
+test('the real plan holds no private page, no private lane and no lane that takes the secret read-out', () => {
+  const { rows, errors } = matrixFor('workflow_dispatch', 7);
+  assert.deepEqual(errors, []);
+  assert.ok(rows.length > 20);
+  for (const row of rows) assert.ok(isPublicLane(row.slug, row.lane), `${row.slug}/${row.lane}`);
+  assert.deepEqual(PRIVATE_LANES, ['security/keys']);
+  assert.equal(rows.some((row) => row.slug === 'security' && row.lane === 'keys'), false);
+  // quality-speed.yml's admin-read runs only for an admin lane outside the App's pages (.github/scripts/app_lanes.py).
+  assert.deepEqual(rows.filter((row) => row.admin && !['settings', 'projects', 'github-app'].includes(row.slug)), []);
+  // Fail closed: a page is public only by being named, so every page is one or the other.
+  assert.equal(PUBLIC_PAGES.length, 28);
+  assert.equal(PAGES.length - PUBLIC_PAGES.length, 7);
 });

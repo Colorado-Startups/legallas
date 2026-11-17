@@ -17,11 +17,11 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import type { HistoryLine, Manifest, MetricRecord } from '../contract/format.ts';
-import { PAGES, type PageSlug } from '../contract/pages.ts';
+import { PUBLIC_PAGES, type PageSlug } from '../contract/pages.ts';
 import { validateRecords } from '../contract/validate.ts';
 import { carryDetail, carryFacts, copyPageFiles } from './detail.ts';
-import { HISTORY_FILE } from './history-fetch.ts';
-import { loadLanes, loadManifest, PAGES_DIR } from './lanes.ts';
+import { HISTORY_FILE, publicHistory } from './history-fetch.ts';
+import { loadManifest, PAGES_DIR, publicLanes } from './lanes.ts';
 import { scorePage } from './score.ts';
 
 /** A record that says only that the metric failed. A null value, so an error can't read as a zero. */
@@ -78,12 +78,13 @@ export function merge(fresh: string, state: string, out: string, planned: Readon
   const lines: HistoryLine[] = [];
   let kept = 0;
   let dropped = 0;
-  for (const slug of PAGES) {
+  // Public pages and lanes only (pages.ts): a private page's last records, detail and lanes are not carried into the new state.
+  for (const slug of PUBLIC_PAGES) {
     const manifest = loadManifest(slug, pagesDir);
     const all: MetricRecord[] = [];
     // Only declared lanes carry over, so a retired lane's numbers don't linger. This run's lanes go first: when two lanes
     // report a metric the first one counts, and a carried number must not outrank this run's reading or its failure.
-    const lanes = loadLanes(slug, pagesDir).lanes;
+    const lanes = publicLanes(slug, pagesDir);
     const key = (id: string) => (planned.has(`${slug}/${id}`) ? 0 : 1);
     for (const lane of [...lanes].sort((a, b) => key(a.id) - key(b.id))) {
       const name = `${lane.id}.json`;
@@ -105,7 +106,8 @@ export function merge(fresh: string, state: string, out: string, planned: Readon
     lines.push(historyLine(slug, manifest, checked.records, now));
   }
   const olderFile = path.join(state, HISTORY_FILE);
-  const older = existsSync(olderFile) ? readFileSync(olderFile, 'utf8') : '';
+  // A private page's earlier score lines are dropped (publicHistory); history-fetch.ts compares public lines only, so this never reads as shrinking.
+  const older = existsSync(olderFile) ? publicHistory(readFileSync(olderFile)) : '';
   writeFileSync(path.join(out, HISTORY_FILE), `${older}${lines.map((line) => JSON.stringify(line)).join('\n')}\n`);
   return { kept, dropped };
 }
@@ -119,6 +121,6 @@ if (import.meta.main) {
     process.exit(1);
   }
   const { kept, dropped } = merge(values.fresh, values.state, values.out, plannedLanes(values.planned), new Date());
-  if (values['copy-page-files']) copyPageFiles(values.out, PAGES, PAGES_DIR);
-  console.log(`State: ${kept} records kept, ${dropped} dropped, ${PAGES.length} score lines added.`);
+  if (values['copy-page-files']) copyPageFiles(values.out, PUBLIC_PAGES, PAGES_DIR);
+  console.log(`State: ${kept} records kept, ${dropped} dropped, ${PUBLIC_PAGES.length} score lines added.`);
 }
