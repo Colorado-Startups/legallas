@@ -34,7 +34,19 @@ const fresh = (): Expected => JSON.parse(readFileSync(EXPECTED, 'utf8')) as Expe
 test('the expected settings file loads, and every setting has an extractor', () => {
   const e = loadExpected(EXPECTED);
   assert.ok(e.settings.length >= 70);
-  assert.deepEqual(e.changes.map((c) => `${c.field}:${c.setting}`), ['expect:branch_required_checks']);
+  assert.deepEqual(e.changes.map((c) => `${c.field}:${c.setting}`), [
+    'expect:branch_required_checks',
+    'expect:repo_visibility',
+    'expect:allow_forking',
+    'expect:has_discussions',
+    'expect:allow_auto_merge',
+    'removed:actions_access_level',
+    'expect:branch_bypass',
+    'removed:push_ruleset_case_paths',
+    'removed:push_ruleset_max_file_mb',
+    'removed:push_ruleset_bypass',
+    'removed:pages_private',
+  ]);
 });
 
 test('a malformed expected file is refused', () => {
@@ -219,7 +231,7 @@ test('the guard fails a loosening with no change entry and passes a tightening',
 
   const tighter = fresh();
   tighter.settings.find((s) => s.id === 'stop_budgets')!.expect.value = 5;
-  tighter.settings.find((s) => s.id === 'push_ruleset_max_file_mb')!.expect.value = 2;
+  tighter.settings.find((s) => s.id === 'admin_count')!.expect.value = 0;
   tighter.push_ruleset.restricted_file_paths.push('**/*.sqlite');
   tighter.settings.push({ ...tighter.settings[0]!, id: 'new_setting' });
   assert.deepEqual(uncovered(base, tighter), []);
@@ -276,7 +288,7 @@ test('stop budgets count whole products at organization or enterprise scope only
   assert.deepEqual(await status([b('actions', 'ProductPricing', 'repository'), b('packages'), b('codespaces'), b('git_lfs')]), { stops: 'drift', actions: 'drift' });
 });
 
-test('no Pages site counts as private, and the review variable reads as GitHub compares it', async () => {
+test('no Pages site reads as build type none, and the review variable reads as GitHub compares it', async () => {
   const wf = load<WorkflowFacts>('workflows.json');
   const e = loadExpected(EXPECTED);
   const api = load<Api>('clean-api.json');
@@ -284,14 +296,13 @@ test('no Pages site counts as private, and the review variable reads as GitHub c
   applyChange(api, wf, {}, { path: R, op: 'set', at: ['body', 'has_pages'], value: false });
   const snap = await takeSnapshot(fixtureFetcher(api), new Date(LONG_AGO), { known: wf, claudeEnabled: 'True' });
   const r = evaluate(e, snap, wf, new Date(LONG_AGO));
-  assert.equal(r.find((x) => x.id === 'pages_private')?.status, 'match');
   assert.equal(r.find((x) => x.id === 'pages_build_type')?.status, 'drift');
   assert.equal(r.find((x) => x.id === 'claude_review_enabled')?.status, 'match');
   const refused = load<Api>('clean-api.json');
   refused[`${R}/pages`] = { status: 404, body: null };
   const snap2 = await takeSnapshot(fixtureFetcher(refused), new Date(LONG_AGO), { known: wf, claudeEnabled: 'false' });
   const r2 = evaluate(e, snap2, wf, new Date(LONG_AGO));
-  assert.equal(r2.find((x) => x.id === 'pages_private')?.status, 'unread', 'a 404 while the repository says it has a site may be a refused read');
+  assert.equal(r2.find((x) => x.id === 'pages_build_type')?.status, 'unread', 'a 404 while the repository says it has a site may be a refused read');
   assert.equal(r2.find((x) => x.id === 'claude_review_enabled')?.status, 'drift');
 });
 
@@ -301,9 +312,9 @@ test('Pages is read with the built-in token when the job gives one, so the key n
   const wf = load<WorkflowFacts>('workflows.json');
   const e = loadExpected(EXPECTED);
   const withBuiltin = await takeSnapshot(fixtureFetcher(keyApi), new Date(LONG_AGO), { known: wf, claudeEnabled: 'true', builtin: fixtureFetcher(api) });
-  assert.equal(evaluate(e, withBuiltin, wf, new Date(LONG_AGO)).find((x) => x.id === 'pages_private')?.status, 'match');
+  assert.equal(evaluate(e, withBuiltin, wf, new Date(LONG_AGO)).find((x) => x.id === 'pages_build_type')?.status, 'match');
   const keyOnly = await takeSnapshot(fixtureFetcher(keyApi), new Date(LONG_AGO), { known: wf, claudeEnabled: 'true' });
-  assert.equal(evaluate(e, keyOnly, wf, new Date(LONG_AGO)).find((x) => x.id === 'pages_private')?.status, 'unread');
+  assert.equal(evaluate(e, keyOnly, wf, new Date(LONG_AGO)).find((x) => x.id === 'pages_build_type')?.status, 'unread');
 });
 
 test('the merge settings come from one GraphQL query; a refused query leaves all seven unread, never false', async () => {

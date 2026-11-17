@@ -85,6 +85,9 @@ export const REPO_FIELDS = [
   'web_commit_signoff_required',
 ] as const;
 
+/** Each one's `status` under the repository's security_and_analysis: "enabled" or "disabled". */
+export const SECURITY_FIELDS = ['dependabot_security_updates', 'secret_scanning', 'secret_scanning_push_protection'] as const;
+
 /** The merge settings, by their REST names. REST left all seven out for the read-only key (8 Nov run); GraphQL shows them to any
  * reader, and gave the same values as REST for an admin (2026-11-09). */
 export const MERGE_FIELDS = {
@@ -205,10 +208,12 @@ export const SIMPLE_READS: Record<string, Simple> = {
     ok: [200],
     project: (b) => ({
       ...pick(b, REPO_FIELDS),
-      dependabot_security_updates:
-        isObj(b) && isObj(b.security_and_analysis) && isObj(b.security_and_analysis.dependabot_security_updates)
-          ? str(b.security_and_analysis.dependabot_security_updates.status)
-          : null,
+      ...Object.fromEntries(
+        SECURITY_FIELDS.map((f) => {
+          const all = isObj(b) && isObj(b.security_and_analysis) ? b.security_and_analysis[f] : null;
+          return [f, isObj(all) ? str(all.status) : null];
+        }),
+      ),
     }),
   },
   merge: { path: GRAPHQL, query: MERGE_QUERY, ok: [200], project: projectMerge },
@@ -224,12 +229,13 @@ export const SIMPLE_READS: Record<string, Simple> = {
     project: (b) => ({ ...pick(b, ['github_owned_allowed', 'verified_allowed']), patterns_allowed: isObj(b) ? strs(b.patterns_allowed) : null }),
   },
   actions_workflow: { path: `${R}/actions/permissions/workflow`, ok: [200], project: (b) => pick(b, ['default_workflow_permissions', 'can_approve_pull_request_reviews']) },
-  actions_access: { path: `${R}/actions/permissions/access`, ok: [200], project: (b) => pick(b, ['access_level']) },
+  // Who must be approved before a fork's pull request runs a workflow. Public repositories only.
+  fork_pr_approval: { path: `${R}/actions/permissions/fork-pr-contributor-approval`, ok: [200], project: (b) => pick(b, ['approval_policy']) },
   actions_retention: { path: `${R}/actions/permissions/artifact-and-log-retention`, ok: [200], project: (b) => pick(b, ['days']) },
   pages: {
     path: `${R}/pages`,
     ok: [200, 404],
-    project: (b, s): Json => (s === 404 ? { exists: false, public: null, build_type: null } : { exists: true, ...pick(b, ['public', 'build_type']) }),
+    project: (b, s): Json => (s === 404 ? { exists: false, build_type: null } : { exists: true, ...pick(b, ['build_type']) }),
   },
   collaborators_admin: {
     path: `${R}/collaborators?affiliation=all&permission=admin&per_page=${PAGE}`,

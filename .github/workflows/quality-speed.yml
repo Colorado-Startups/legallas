@@ -1,16 +1,24 @@
-# Measures this repository for the private Quality and Speed site: runs each page's collectors, validates what they
-# found, appends one score line per page to the history, builds the site and publishes it privately.
+# Measures this repository for the Quality and Speed site: runs each page's collectors, validates what they found,
+# appends one score line per page to the history, builds the site and deploys it to GitHub Pages.
+#
+# The repository is public, so its Pages site is public too, and so are this workflow's logs and artifacts to anyone
+# signed in to GitHub. The site is meant to hold counts, dates and the names of settings only, and
+# quality-speed/core/guard.ts checks the built site before it is uploaded. Nothing checks a log or a lane's artifact,
+# and a step's log prints every repository variable passed to it: keep anything personal out of both.
 #
 # `plan`, the lanes and `site` are read-only and leave only artifacts. The jobs that hold a publish right or a key run on
 # GitHub-hosted runners, on `main` only. Each key's job stays off until the repository variable named in its condition
 # is set, or, for what only an environment holds, until a job that reads it says so: a job's `if` can't read an
-# environment's variables or secrets (#905). The publish guard, failing closed: `preflight` and `signed-out` run
-# on every run, and anything short of a proven private site makes `containment` replace the site with a blank page,
-# because stopping would leave an exposed site standing. Either failure fails the run. Cancelling a run after it has made
-# its blank page does the same, and leaves the site blank until the next run.
+# environment's variables or secrets. The publish guard, failing closed: `preflight` checks that the Pages site's
+# visibility matches the repository's and `signed-out` that a signed-out request ends where that visibility says (the
+# page loads for a public site, GitHub's sign-in for a private one). Both run on every run, and a failure of either
+# makes `containment` replace the site with a blank page, because stopping would leave the wrong site standing. Either
+# failure fails the run. Cancelling a run after it has made its blank page does the same, and leaves the site blank
+# until the next run.
 #
-# The site stays a blank page until the QUALITY_SPEED_PUBLISH repository variable reads `pages`, so the first deploys
-# prove all of this with nothing to lose. Nothing ties that variable to a proven run, so set it only after a green one. To test containment on purpose, which blanks the site until the next run:
+# The site stays a blank page until the QUALITY_SPEED_PUBLISH repository variable reads `pages`. Setting it shows the
+# built site to everyone, which is the owner's decision; nothing ties the variable to a proven run, so set it only
+# after a green one. To test containment on purpose, which blanks the site until the next run:
 #
 #   gh workflow run quality-speed.yml -R Colorado-Startups/legallas -f containment-drill=true
 #
@@ -917,7 +925,7 @@ jobs:
     permissions:
       pages: read
     steps:
-      - name: The page doesn't come back signed out
+      - name: A signed-out request ends where the site's visibility says
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -948,9 +956,9 @@ jobs:
             if [ "$look" != 3 ]; then sleep 30; fi
           done
 
-  # Anything short of a proven private site: replace it. Same shape as `deploy`, and the job it reacts to has already failed
-  # the run. It needs this run's blank page, because it has no other page to publish: if `blank` fails, it can't fire, and
-  # the failed run is the signal.
+  # A site whose visibility doesn't match the repository's, or that doesn't answer as that visibility says: replace it.
+  # Same shape as `deploy`, and the job it reacts to has already failed the run. It needs this run's blank page, because it
+  # has no other page to publish: if `blank` fails, it can't fire, and the failed run is the signal.
   containment:
     needs: [preflight, signed-out, blank]
     if: >-

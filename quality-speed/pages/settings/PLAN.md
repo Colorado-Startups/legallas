@@ -152,6 +152,26 @@ Done, from the 8 November run's 13 unread:
 | 9 Nov | The seven merge settings read through one GraphQL query. REST left all seven out for the key; GraphQL gave the same values as REST for an admin | `reads.ts` `merge` | 13 to 6 |
 | 9 Nov | `CLAUDE_ENABLED_VAR` passed to the Collect step | `quality-speed.yml` | 6 to 5 |
 
+## Public repository, 2026-11-16 (#18)
+
+The repository opened on 2026-11-17 UTC. The expected file now describes it; each loosening has a `changes` entry.
+
+| Setting | Was | Now | Why |
+|---|---|---|---|
+| `repo_visibility` | private | public | Apache-2.0, open to contributors |
+| `allow_forking`, `has_discussions` | false | true | Contributors work from forks; ideas start in Discussions |
+| `allow_auto_merge` | true | false | A merge names the commit whose checks passed |
+| `branch_bypass` | admin role, by pull request | none | Read with an admin login: both branch rulesets list no bypass |
+| `push_ruleset_case_paths`, `push_ruleset_max_file_mb`, `push_ruleset_bypass` | scored | removed | GitHub offers push rulesets on private and internal repositories only (the rulesets source above). Fix 4 goes with them |
+| `actions_access_level` | none | removed | The API answers 422 on a public repository |
+| `pages_private` | true | removed | A public repository's site is public; `QUALITY_SPEED_PUBLISH` decides what it shows |
+| `secret_scanning`, `secret_scanning_push_protection` | dropped as paid | gates, enabled | Free on a public repository |
+| `fork_pr_approval` | not possible, forking off | gate, `all_external_contributors` | A fork's pull request runs nothing until approved |
+| `branch_rule_merge_queue` | none | gate, true | Ruleset `main-merge-queue` |
+
+Still drifting on the 16 November read, each a goal no one has applied yet: the four Actions policy settings, `branch_rule_linear_history`,
+`branch_checks_strict`, `branch_dismiss_stale_reviews`, `claude_review_enabled`, `dependabot_secrets` and four organization settings.
+
 ## Final
 
 Not reached yet.

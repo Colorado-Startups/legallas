@@ -21,7 +21,6 @@ const FIXES: RoadFixProps[] = [
   { id: 'key', label: 'Read-only key', q: 50, s: 33.3 },
   { id: 'actions', label: 'Actions policy', q: 11.25, s: 0 },
   { id: 'branch', label: 'Branch rules', q: 11.25, s: 0 },
-  { id: 'push', label: 'Push rules', q: 7.5, s: 0 },
   { id: 'signoff', label: 'Sign-off, releases', q: 7.5, s: 66.7 },
   { id: 'lane', label: 'Lane in 5 min', q: 0, s: 0, c: 100 },
 ];

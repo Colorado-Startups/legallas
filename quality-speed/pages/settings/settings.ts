@@ -25,7 +25,8 @@ export interface Expected {
   org: string;
   reviewed: string;
   settings: ExpectedSetting[];
-  push_ruleset: { name: string; restricted_file_paths: string[]; max_file_size_mb: number };
+  /** Not applied while the repository is public: GitHub offers push rulesets on private and internal ones only. guard.ts still keeps the list from shrinking. */
+  push_ruleset: { name: string; note?: string; restricted_file_paths: string[]; max_file_size_mb: number };
   not_scored: { id: string; why: string; source: string }[];
   baseline: { standard: string; exempt: { id: string; why: string }[] };
   changes: Change[];
@@ -220,10 +221,6 @@ function tagRulesets(ctx: Ctx): RulesetBody[] | null {
     (r) => (r.include ?? []).includes('~ALL') && ['creation', 'update', 'deletion'].every((t) => r.rules.some((x) => x.type === t)),
   );
 }
-const pushRulesets = (ctx: Ctx) => {
-  const all = rulesets(ctx);
-  return all ? activeOf(all, 'push') : null;
-};
 
 /** The actions policy as read, or null. `selected` is null when the policy isn't "selected" (the API answers 409). */
 function actionsPolicy(ctx: Ctx): { allowed: string; selected: Record<string, Json> | null } | null {
@@ -328,6 +325,8 @@ export const EXTRACTORS: Record<string, (ctx: Ctx) => Reading> = {
   delete_branch_on_merge: mergeField('delete_branch_on_merge'),
   squash_merge_commit_message: mergeField('squash_merge_commit_message'),
   dependabot_security_updates: repoField('dependabot_security_updates'),
+  secret_scanning: repoField('secret_scanning'),
+  secret_scanning_push_protection: repoField('secret_scanning_push_protection'),
   vulnerability_alerts: (ctx) => (ctx.snap.reads.actions_permissions?.status === 200 ? field(ctx, 'vulnerability_alerts', 'enabled', [204, 404]) : UNREAD),
   immutable_releases: (ctx) => field(ctx, 'immutable_releases', 'enabled'),
   actions_enabled: (ctx) => field(ctx, 'actions_permissions', 'enabled'),
@@ -342,8 +341,8 @@ export const EXTRACTORS: Record<string, (ctx: Ctx) => Reading> = {
   },
   workflow_default_permissions: (ctx) => field(ctx, 'actions_workflow', 'default_workflow_permissions'),
   workflow_can_approve_prs: (ctx) => field(ctx, 'actions_workflow', 'can_approve_pull_request_reviews'),
+  fork_pr_approval: (ctx) => field(ctx, 'fork_pr_approval', 'approval_policy'),
   claude_review_enabled: (ctx) => field(ctx, 'claude_enabled', 'value'),
-  actions_access_level: (ctx) => field(ctx, 'actions_access', 'access_level'),
   artifact_log_retention_days: (ctx) => field(ctx, 'actions_retention', 'days'),
   branch_ruleset_active: (ctx) => {
     const rs = branchRulesets(ctx);
@@ -359,6 +358,7 @@ export const EXTRACTORS: Record<string, (ctx: Ctx) => Reading> = {
     everyRule<{ allowed_merge_methods?: string[] | null }>(ctx, 'pull_request', (r) =>
       r.allowed_merge_methods ? r.allowed_merge_methods.length === 1 && r.allowed_merge_methods[0] === 'squash' : null,
     ),
+  branch_rule_merge_queue: (ctx) => hasBranchRule(ctx, 'merge_queue'),
   branch_rule_no_deletion: (ctx) => hasBranchRule(ctx, 'deletion'),
   branch_rule_no_force_push: (ctx) => hasBranchRule(ctx, 'non_fast_forward'),
   branch_rule_linear_history: (ctx) => hasBranchRule(ctx, 'required_linear_history'),
@@ -398,23 +398,6 @@ export const EXTRACTORS: Record<string, (ctx: Ctx) => Reading> = {
     const rs = tagRulesets(ctx);
     return rs ? bypassOf(rs) : UNREAD;
   },
-  push_ruleset_case_paths: (ctx) => {
-    const rs = pushRulesets(ctx);
-    if (!rs) return UNREAD;
-    const blocked = new Set(rs.flatMap((r) => r.rules.flatMap((x) => (x.type === 'file_path_restriction' ? (x.restricted_file_paths ?? []) : []))));
-    return val(ctx.expected.push_ruleset.restricted_file_paths.every((p) => blocked.has(p)));
-  },
-  push_ruleset_max_file_mb: (ctx) => {
-    const rs = pushRulesets(ctx);
-    if (!rs) return UNREAD;
-    const sizes = rs.flatMap((r) => r.rules.flatMap((x) => (x.type === 'max_file_size' && typeof x.max_file_size === 'number' ? [x.max_file_size] : [])));
-    // No rule: GitHub's own 100 MB limit is the only one.
-    return val(sizes.length ? Math.min(...sizes) : 100);
-  },
-  push_ruleset_bypass: (ctx) => {
-    const rs = pushRulesets(ctx);
-    return rs ? bypassOf(rs) : UNREAD;
-  },
   environments_main_only: (ctx) => {
     const envs = environments(ctx);
     if (!envs) return UNREAD;
@@ -427,8 +410,6 @@ export const EXTRACTORS: Record<string, (ctx: Ctx) => Reading> = {
     }
     return val(true);
   },
-  // No site exposes nothing, so it counts as private.
-  pages_private: (ctx) => pagesField(ctx, (p) => (typeof p.public === 'boolean' ? !p.public : null), true),
   pages_build_type: (ctx) => pagesField(ctx, (p) => (typeof p.build_type === 'string' ? p.build_type : null), 'none'),
   admin_count: (ctx) => count(ctx, 'collaborators_admin'),
   outside_collaborators: (ctx) => count(ctx, 'collaborators_outside'),
