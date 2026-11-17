@@ -2,9 +2,9 @@
 // The publish guard, on the built site. It works from allow-lists, so anything it doesn't recognise fails: only the files
 // the build writes, only the head the build writes, and only the markup, entities and links the charts use, in the one
 // plain form the kit writes, so a browser can't read it differently. Secret shapes are a last net. What
-// page code can reach is fenced at run time by build.ts, not checked here. The checks that need a token (repo private,
-// Pages private, the signed-out request) live in the deploy jobs. Output holds rules and allowed names only, because a
-// refused name could hold anything.
+// page code can reach is fenced at run time by build.ts, not checked here. The checks that need a token (Pages
+// visibility matching the repository's, the signed-out request) live in the deploy jobs. Output holds rules and allowed
+// names only, because a refused name could hold anything.
 //
 // A page links outside this repository only to the documents its reviewed ideal.json lists as sources, each URL exactly
 // as written there; the home page and every other outside link fail.

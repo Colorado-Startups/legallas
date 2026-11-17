@@ -165,7 +165,7 @@ export async function runDrill(score: Scorer, fixtures?: Partial<Fixtures>): Pro
 
   // 7. The clock: clean at T0, drift at T1, fixed at T2. The fix took 24 hours, and so did each gap between reads.
   const drift = clone(api);
-  applyChange(drift, wf, vars, { path: R, op: 'set', at: ['body', 'allow_forking'], value: true });
+  applyChange(drift, wf, vars, { path: R, op: 'set', at: ['body', 'has_wiki'], value: true });
   let log = advance(oldLog(), clean.results, T0);
   const d1 = await run(expected, drift, clone(wf), clone(vars), T1);
   log = advance(log, d1.results, T1);
