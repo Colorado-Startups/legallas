@@ -137,9 +137,9 @@ extension SeedMatter {
         )
     }
 
-    /// A fixed, real date for dated test fixtures: 2012-12-18 in Denver, the day the counsel
-    /// room's fictional fixture files its complaint. The sample itself is not filed, so it
-    /// does not use it.
+    /// A fixed, invented date for dated test fixtures: 2012-12-18, the day the fictional fixture
+    /// (`web/fixtures/matter.example.json`) files its complaint. Built in the app's court
+    /// calendar. The sample itself is not filed, so it does not use it.
     public static var fixtureDate: Date {
         var dc = DateComponents()
         dc.year = 2012
