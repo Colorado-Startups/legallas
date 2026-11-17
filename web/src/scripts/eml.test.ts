@@ -203,15 +203,21 @@ test('htmlText keeps text that only looks like markup once entities are decoded'
   assert.equal(htmlText('<p>&lt;script&gt;not run&lt;/script&gt;</p>'), '<script>not run</script>');
 });
 
-test('htmlText drops a script or comment that only forms once an inner one is removed', () => {
-  assert.equal(htmlText('<p>Hello</p><<script></script>script>steal()</script>'), 'Hello');
-  assert.equal(htmlText('<p>Hello</p><!<script></script>-- note <b>hidden</b> -->'), 'Hello');
-  assert.equal(htmlText('<p>Hello</p><script>steal()</script foo>'), 'Hello');
-  assert.equal(htmlText('<p>Hello</p><!<!--- comment -->-- -->'), 'Hello');
-  assert.equal(htmlText('<p>Hello</p><<!---->!--x-->'), 'Hello');
-});
-
-test('htmlText leaves no raw "<": an unclosed tag or comment loses its bracket', () => {
-  assert.equal(htmlText('<p>Hello <!-- cut off</p>'), 'Hello !-- cut off');
-  assert.equal(htmlText('<p>Hello</p><script'), 'Hello\nscript');
+test('htmlText reads tags as a browser does: hidden bodies go and no raw "<" is left', () => {
+  const cases: [string, string][] = [
+    ['<p>Hello</p><<script></script>script>steal()</script>', 'Hello\nscript>steal()'],
+    ['<p>Hello</p><!<script></script>-- note <b>hidden</b> -->', 'Hello\n-- note hidden -->'],
+    ['<p>Hello</p><script>steal()</script foo>', 'Hello'],
+    ['<p>Hello</p><STYLE>p{}</style\t\n bar>', 'Hello'],
+    ['<p>Hello</p><!<!--- comment -->-- -->', 'Hello\n-- -->'],
+    ['<p>Hello</p><<!---->!--x-->', 'Hello\n!--x-->'],
+    ['<p>Hello <!-- cut off</p>', 'Hello'],
+    ['<p>Hello</p><script>never closed', 'Hello'],
+    ['<p>Hello</p><script', 'Hello\nscript'],
+    ['<!doctype html><p>a < b</p>', 'a b'],
+  ];
+  for (const [html, text] of cases) {
+    assert.equal(htmlText(html), text, html);
+    assert.equal(htmlText(html).includes('<'), false, html);
+  }
 });
