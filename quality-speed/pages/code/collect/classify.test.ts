@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { classify, importersOf, type RepoView } from './classify.ts';
+import { classify, importersOf, relativeLoads, type RepoView } from './classify.ts';
 import { needsTs, ts } from './test-support.ts';
 
 // An invented repository: one Worker, one CLI, one Astro page, tests, a fixture and a forgotten file.
@@ -23,6 +23,13 @@ const FILES: Record<string, string> = {
   'web/src/scripts/page.ts': '',
   'web/src/scripts/slot-a.ts': '',
   'web/types.d.ts': 'declare const x: number;',
+  // A second Worker, a file read by URL, and views a build script bundles by path.
+  'web/wrangler.jobs.example.jsonc': '{ "main": "./worker/jobs.ts" }',
+  'web/worker/jobs.ts': "const asset = new URL('../assets/viewer.js', import.meta.url);",
+  'web/assets/viewer.js': '',
+  'web/scripts/build.ts': "const HERE = import.meta.dirname;\nconst a = join(HERE, 'view', 'a.ts');\nconst b = join(OTHER, 'view', 'b.ts');",
+  'web/scripts/view/a.ts': '',
+  'web/scripts/view/b.ts': '',
 };
 const view: RepoView = { files: Object.keys(FILES).sort(), read: (p) => FILES[p] ?? '' };
 
@@ -39,6 +46,13 @@ test('every web file gets one class from entry points derived from configuration
   const why = Object.fromEntries(c.entries.map((e) => [e.file, e.why]));
   assert.match(why['web/worker/main.ts'] ?? '', /main in web\/wrangler\.example\.jsonc/);
   assert.match(why['web/scripts/job.ts'] ?? '', /import\.meta\.main/);
+  assert.match(why['web/worker/jobs.ts'] ?? '', /main in web\/wrangler\.jobs\.example\.jsonc/);
+});
+
+test('a file loaded by a path relative to its loader is production; an unknown base is not followed', { skip: needsTs }, () => {
+  const c = classify(ts!, view);
+  assert.equal(c.classes.get('web/assets/viewer.js'), 'production');
+  assert.deepEqual(relativeLoads('web/scripts/build.ts', FILES['web/scripts/build.ts'] ?? ''), ['web/scripts/view/a.ts']);
 });
 
 test('importers are found directly and up to a depth', { skip: needsTs }, () => {

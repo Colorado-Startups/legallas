@@ -6,7 +6,8 @@
 //   orphan      reachable from nothing: dead, and counted as such
 // Entry points come from configuration, never a hand-kept list: the Workers' `main` in the example wrangler configs
 // (and the pro slot beside each, CLAUDE.md's `entry-pro.ts`), every .ts path in package.json scripts, every
-// `node <file>` in the workflows and the docs, astro.config.mjs, and every Astro page. Type declarations (.d.ts)
+// `node <file>` in the workflows and the docs, astro.config.mjs, and every Astro page. A file another loads by a
+// relative path (`new URL(..., import.meta.url)`, `join(import.meta.dirname, ...)`) is imported. Type declarations (.d.ts)
 // hold no behaviour and are left out everywhere.
 import type * as TS from 'typescript';
 import { dirname, join, posix } from 'node:path';
@@ -50,8 +51,7 @@ export function findEntries(view: RepoView): { file: string; why: string }[] {
     if (file && !entries.has(file)) entries.set(file, why);
   };
 
-  for (const config of ['web/wrangler.example.jsonc', 'web/wrangler.mcp.example.jsonc']) {
-    if (!tracked.has(config)) continue;
+  for (const config of view.files.filter((f) => /^web\/wrangler(\.[\w-]+)?\.example\.jsonc$/.test(f))) {
     const main = /"main"\s*:\s*"([^"]+)"/.exec(view.read(config))?.[1];
     if (!main) continue;
     const file = webPath(main, tracked);
@@ -87,6 +87,22 @@ export function findEntries(view: RepoView): { file: string; why: string }[] {
   return [...entries].map(([file, why]) => ({ file, why })).sort((a, b) => a.file.localeCompare(b.file));
 }
 
+/** Repo paths a module loads relative to its own folder, from string literals only. */
+export function relativeLoads(file: string, text: string): string[] {
+  const here = posix.dirname(file);
+  const out: string[] = [];
+  for (const m of text.matchAll(/new URL\(\s*['"]([\w./-]+\.(?:ts|mjs|js))['"]\s*,\s*import\.meta\.url\s*\)/g)) {
+    out.push(posix.join(here, m[1] ?? ''));
+  }
+  const dirNames = new Set(['import.meta.dirname', ...[...text.matchAll(/\b(?:const|let)\s+(\w+)\s*=\s*import\.meta\.dirname\b/g)].map((m) => m[1] ?? '')]);
+  for (const m of text.matchAll(/\bjoin\(\s*([\w.]+)\s*,\s*((?:['"][\w.-]+['"]\s*,\s*)*['"][\w.-]+\.(?:ts|mjs|js)['"])\s*\)/g)) {
+    if (!dirNames.has(m[1] ?? '')) continue;
+    const parts = [...(m[2] ?? '').matchAll(/['"]([^'"]+)['"]/g)].map((p) => p[1] ?? '');
+    out.push(posix.join(here, ...parts));
+  }
+  return out;
+}
+
 /** Script tags with a src attribute in an .astro file. */
 function astroScriptSources(text: string): string[] {
   return [...text.matchAll(/<script[^>]*\bsrc=["'](\.[^"']+)["']/g)].map((m) => m[1] ?? '');
@@ -120,6 +136,9 @@ export function classify(ts: typeof TS, view: RepoView): Classification {
       for (const m of text.matchAll(/['"`]((?:scripts|worker|mcp|src|connect|integrations)\/[\w./-]+\.(?:ts|mjs))['"`]/g)) {
         if (tracked.has(`web/${m[1]}`)) targets.add(`web/${m[1]}`);
       }
+      // A file loaded by a path relative to this one: new URL('../guest/viewer.js', import.meta.url), or
+      // join(HERE, 'view', 'grid.ts') where HERE is import.meta.dirname.
+      for (const t of relativeLoads(file, text)) if (tracked.has(t)) targets.add(t);
     }
     imports.set(file, targets);
   }
