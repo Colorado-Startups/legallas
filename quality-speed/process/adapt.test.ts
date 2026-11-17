@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 import type { MetricDef, MetricRecord } from '../contract/format.ts';
-import { PAGE_GROUPS, PAGES } from '../contract/pages.ts';
+import { isPublicPage, PAGE_GROUPS, PUBLIC_PAGES } from '../contract/pages.ts';
 import { IDEAL_MAX_WORDS } from '../contract/validate.ts';
 import { processLink } from '../core/guard.ts';
 import { adapt, stepMetrics, toDef, toEntry } from './adapt.ts';
@@ -62,12 +62,11 @@ test('every step metric is defined by its page, no step names a private page, an
   assert.equal(defs.length, Object.keys(metrics).length);
   assert.ok(defs.some((d) => d.id === 'legallas.data-room.forming.member.trust.exact_quotes'));
   assert.ok(Object.values(metrics).every((e) => 'could_not_check' in e), 'an empty state measures nothing');
-  const mapped = new Set(defs.map((d) => String(d.id).split('.')[1]));
-  const unmapped = PAGES.filter((p) => !mapped.has(p));
-  // The private pages (contract/pages.ts, PUBLIC_PAGES, #20) never run in this public repository, so no step may name one.
-  const PRIVATE = ['agents', 'claude-code', 'claude-documentation', 'claude-settings', 'actions', 'ci-overview', 'pull-requests'];
-  assert.deepEqual([...mapped].filter((p) => PRIVATE.includes(p)), []);
-  assert.deepEqual(unmapped.filter((p) => !PRIVATE.includes(p)), PAGE_GROUPS.law.filter((p) => p !== 'sec' && p !== 'templates'));
+  const mapped = new Set(defs.map((d) => String(d.id).split('.')[1] ?? ''));
+  // A private page never runs in this public repository (contract/pages.ts), so no step may name one.
+  assert.deepEqual([...mapped].filter((p) => !isPublicPage(p)), []);
+  const unmapped = PUBLIC_PAGES.filter((p) => !mapped.has(p));
+  assert.deepEqual(unmapped, PAGE_GROUPS.law.filter((p) => p !== 'sec' && p !== 'templates'));
 });
 
 test('every link the maps carry passes the publish guard, so the Process page can go out', () => {
