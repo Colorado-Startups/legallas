@@ -40,8 +40,9 @@ export type PageSlug = (typeof PAGES)[number];
  * | Left out | Why |
  * |---|---|
  * | `agents`, `claude-code`, `claude-documentation`, `claude-settings` | Private pages (the owner, 2026-11-17) |
- * | `actions`, `ci-overview` | Spend in dollars, from the organization's billing |
- * | `pull-requests` | `review_tokens_p50`: review tokens from a maintainer's Claude account |
+ *
+ * A public page can still hold a private part: a lane (PRIVATE_LANES), a measurement (PRIVATE_METRICS), or its lanes'
+ * detail (PRIVATE_DETAIL).
  */
 export const PUBLIC_PAGES: readonly PageSlug[] = PAGES.filter((page) =>
   (
@@ -49,6 +50,9 @@ export const PUBLIC_PAGES: readonly PageSlug[] = PAGES.filter((page) =>
       ...PAGE_GROUPS.product,
       'projects',
       'code',
+      'pull-requests',
+      'actions',
+      'ci-overview',
       'repo-documentation',
       'issues',
       'testing',
@@ -62,7 +66,25 @@ export const PUBLIC_PAGES: readonly PageSlug[] = PAGES.filter((page) =>
 );
 /** Lanes of a public page that stay private all the same, as `<page>/<lane>`: the Security page's secret names and dates. */
 export const PRIVATE_LANES: readonly string[] = ['security/keys'];
+/**
+ * Measurements of a public page that stay private, as `<page>/<metric>`: figures from an owner's account. Each always
+ * reads `missing` in this repository, never a value.
+ */
+export const PRIVATE_METRICS: readonly string[] = ['actions/allowance_forecast_usd', 'actions/usd_per_merge', 'pull-requests/review_tokens_p50'];
+/**
+ * Public pages whose lanes' detail (drill-downs, readings, the lane's memory in facts/) holds an owner-account figure:
+ * dollars a job or a month, or review tokens. Only their records go out; each run starts from no memory. Take a page off
+ * once its detail holds none.
+ */
+export const PRIVATE_DETAIL: readonly PageSlug[] = ['actions', 'ci-overview', 'pull-requests'];
 export const isPublicPage = (page: string): page is PageSlug => (PUBLIC_PAGES as readonly string[]).includes(page);
+export const isPublicMetric = (page: string, metric: string): boolean => isPublicPage(page) && !PRIVATE_METRICS.includes(`${page}/${metric}`);
+/** A page's records as this repository may publish them: a private measurement keeps its id and reads `missing`. */
+export function publicRecords<R extends { id: string; page: string; stage: unknown }>(records: readonly R[]): R[] {
+  return records.map((r) =>
+    isPublicMetric(r.page, r.id) ? r : ({ id: r.id, page: r.page, value: null, status: 'missing', stage: r.stage, measured_at: null, source_url: null, sample_size: null } as unknown as R),
+  );
+}
 export const isPublicLane = (page: string, lane: string): boolean => isPublicPage(page) && !PRIVATE_LANES.includes(`${page}/${lane}`);
 
 /**

@@ -88,3 +88,26 @@ test('a lane the page does not declare does not run', () => {
   assert.deepEqual(collectLane('code', 'other', out, pagesDir), ['this lane is not declared']);
   rmSync(path.dirname(out), { recursive: true });
 });
+
+test('a private measurement goes out missing, and a page with private detail sends none', () => {
+  const root = mkdtempSync(path.join(tmpdir(), 'collect-private-'));
+  const pagesDir = path.join(root, 'pages');
+  mkdirSync(path.join(pagesDir, 'actions'), { recursive: true });
+  // The example list, renamed to the Actions page with two of its real ids: one private (usd_per_merge), one public.
+  const manifest = MANIFEST.replaceAll('"code"', '"actions"').replace('"line_coverage"', '"usd_per_merge"').replace('"functions_over_60_lines"', '"main_green_pct"');
+  writeFileSync(path.join(pagesDir, 'actions', 'manifest.json'), manifest);
+  writeFileSync(path.join(pagesDir, 'actions', 'lanes.json'), JSON.stringify([LANE]));
+  const records = [
+    { ...RECORD, id: 'usd_per_merge', page: 'actions', value: 0.42 },
+    { ...RECORD, id: 'main_green_pct', page: 'actions', value: 3 },
+  ];
+  const body = `import { mkdirSync, writeFileSync } from 'node:fs';\nmkdirSync(process.env.DETAIL_DIR + '/page', { recursive: true });\nwriteFileSync(process.env.DETAIL_DIR + '/page/rows.json', '[{"usd":1}]');\nwriteFileSync(process.argv[process.argv.indexOf('--out') + 1], ${JSON.stringify(JSON.stringify(records))});\n`;
+  writeFileSync(path.join(pagesDir, 'actions', 'collect.ts'), body);
+  const out = path.join(root, 'out');
+  assert.deepEqual(collectLane('actions', 'github', out, pagesDir), []);
+  const [usd, green] = JSON.parse(readFileSync(path.join(out, 'actions', 'github.json'), 'utf8'));
+  assert.deepEqual([usd.id, usd.value, usd.status, usd.measured_at], ['usd_per_merge', null, 'missing', null]);
+  assert.equal(green.value, 3);
+  assert.equal(existsSync(path.join(out, 'actions', 'github')), false, 'no detail folder');
+  rmSync(root, { recursive: true });
+});
