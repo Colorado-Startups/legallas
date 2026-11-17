@@ -10,10 +10,11 @@
 // to fall back. An API error stops the run: it must never look like "no history yet" and start an empty one. A spent
 // quota is the one error it waits out, once: busy CI can use up the repository's hourly quota before the run starts.
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
+import { isPublicLane, isPublicPage } from '../contract/pages.ts';
 
 const ARTIFACT = 'quality-speed-history';
 export const HISTORY_FILE = 'history.jsonl';
@@ -112,6 +113,51 @@ function unpack(repo: string, id: number, dir: string): void {
   execFileSync('unzip', ['-q', '-o', zip, '-d', dir], { stdio: ['ignore', 'ignore', 'inherit'] });
 }
 
+/**
+ * Takes everything private out of an unpacked state (pages.ts, PUBLIC_PAGES and PRIVATE_LANES), before the workflow
+ * uploads it again as `state-in`, which anyone can download: a private page's records and lanes, and a private lane's
+ * file, detail and the records it reported. history.jsonl is left alone: it holds scores only and must only grow.
+ * Returns how many files and folders it removed.
+ */
+export function prunePrivate(state: string): number {
+  let removed = 0;
+  const drop = (target: string) => {
+    rmSync(target, { recursive: true, force: true });
+    removed += 1;
+  };
+  const names = (dir: string) => (existsSync(dir) ? readdirSync(dir) : []);
+  const records = path.join(state, 'records');
+  for (const name of names(records)) if (!isPublicPage(name.replace(/\.json$/, ''))) drop(path.join(records, name));
+  const lanes = path.join(state, 'lanes');
+  for (const slug of names(lanes)) {
+    if (!isPublicPage(slug)) {
+      drop(path.join(lanes, slug));
+      continue;
+    }
+    const gone = new Set<string>();
+    for (const name of names(path.join(lanes, slug))) {
+      if (isPublicLane(slug, name.replace(/\.json$/, ''))) continue;
+      // The ids this lane reported, so its records leave the page's merged list too. An unreadable file names none.
+      try {
+        if (name.endsWith('.json')) for (const r of JSON.parse(readFileSync(path.join(lanes, slug, name), 'utf8')) as { id?: unknown }[]) if (typeof r?.id === 'string') gone.add(r.id);
+      } catch {
+        // Removed below either way.
+      }
+      drop(path.join(lanes, slug, name));
+    }
+    const merged = path.join(records, `${slug}.json`);
+    if (!gone.size || !existsSync(merged)) continue;
+    try {
+      const kept = (JSON.parse(readFileSync(merged, 'utf8')) as { id?: unknown }[]).filter((r) => typeof r?.id !== 'string' || !gone.has(r.id));
+      writeFileSync(merged, `${JSON.stringify(kept)}\n`);
+    } catch {
+      // A merged list that can't be read can't be filtered, so it goes: merge.ts rebuilds it from the lanes.
+      drop(merged);
+    }
+  }
+  return removed;
+}
+
 function fetchState(out: string, repo: string, currentRun: number): string {
   const pages = JSON.parse(api('--paginate', '--slurp', `repos/${repo}/actions/artifacts?name=${ARTIFACT}&per_page=100`).toString()) as { artifacts: Artifact[] }[];
   const runOf = (id: number) => JSON.parse(api(`repos/${repo}/actions/runs/${id}`).toString()) as Run;
@@ -130,7 +176,8 @@ function fetchState(out: string, repo: string, currentRun: number): string {
       throw new Error(`Artifact ${newest.id} does not extend artifact ${previous.id}: history shrank or changed. ${refusal}`);
     }
   }
-  return `History from artifact ${newest.id}.`;
+  const pruned = prunePrivate(out);
+  return `History from artifact ${newest.id}.${pruned ? ` ${pruned} private files or folders left out.` : ''}`;
 }
 
 if (import.meta.main) {

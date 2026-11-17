@@ -2,7 +2,10 @@
 // Which copies of the history a run may trust, and what counts as shrinking. Ids and dates are invented.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { commitOnMain, extendsHistory, isTrustedRun, MAX_QUOTA_WAIT_MS, quotaWait, trustedCopies, type Artifact, type Run } from './history-fetch.ts';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { commitOnMain, extendsHistory, isTrustedRun, MAX_QUOTA_WAIT_MS, prunePrivate, quotaWait, trustedCopies, type Artifact, type Run } from './history-fetch.ts';
 
 const mainRun: Run = { event: 'schedule', path: '.github/workflows/quality-speed.yml', head_branch: 'main', head_sha: 'a1' };
 const onMain = () => true;
@@ -123,4 +126,33 @@ test('a spent quota waits until its reset plus 5 seconds; any other failure does
 test('a reset further off than the job can wait stops the run instead', () => {
   const now = Date.parse('2031-03-04T08:10:00Z');
   assert.equal(quotaWait({ remaining: 0, reset: (now + MAX_QUOTA_WAIT_MS) / 1000 }, now), null);
+});
+
+test('an earlier state loses every private page and lane before it is uploaded again, and nothing public', () => {
+  const state = mkdtempSync(path.join(tmpdir(), 'history-prune-'));
+  const put = (file: string, value: unknown) => {
+    mkdirSync(path.dirname(path.join(state, file)), { recursive: true });
+    writeFileSync(path.join(state, file), typeof value === 'string' ? value : JSON.stringify(value));
+  };
+  const history = '{"at":"2031-03-01T08:00:00Z","page":"claude-code","quality":1,"speed":1,"consumption":1,"total":1}\n';
+  put('history.jsonl', history);
+  put('records/claude-code.json', [{ id: 'tokens_per_merged_change' }]);
+  put('records/actions.json', [{ id: 'usd_per_merge' }]);
+  put('records/code.json', [{ id: 'long_files' }]);
+  put('records/security.json', [{ id: 'key_age_max_days' }, { id: 'sast_findings_open' }]);
+  put('lanes/claude-code/claude-code.json', [{ id: 'tokens_per_merged_change' }]);
+  put('lanes/claude-code/claude-code/detail.json', {});
+  put('lanes/security/keys.json', [{ id: 'key_age_max_days' }]);
+  put('lanes/security/keys/facts/names.json', {});
+  put('lanes/security/scan.json', [{ id: 'sast_findings_open' }]);
+  put('lanes/code/nightly.json', [{ id: 'long_files' }]);
+  assert.equal(prunePrivate(state), 5);
+  for (const gone of ['records/claude-code.json', 'records/actions.json', 'lanes/claude-code', 'lanes/security/keys.json', 'lanes/security/keys']) {
+    assert.equal(existsSync(path.join(state, gone)), false, gone);
+  }
+  for (const kept of ['records/code.json', 'lanes/code/nightly.json', 'lanes/security/scan.json']) assert.ok(existsSync(path.join(state, kept)), kept);
+  assert.deepEqual(JSON.parse(readFileSync(path.join(state, 'records/security.json'), 'utf8')), [{ id: 'sast_findings_open' }]);
+  assert.equal(readFileSync(path.join(state, 'history.jsonl'), 'utf8'), history, 'the history only grows');
+  assert.equal(prunePrivate(state), 0, 'a clean state is left as it is');
+  rmSync(state, { recursive: true });
 });
