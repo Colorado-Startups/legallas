@@ -6,7 +6,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import type { MetricRecord } from '../contract/format.ts';
-import { PAGES } from '../contract/pages.ts';
+import { PUBLIC_PAGES as PAGES } from '../contract/pages.ts';
 import { validateHistoryLine } from '../contract/validate.ts';
 import { extendsHistory } from './history-fetch.ts';
 import { loadLanes } from './lanes.ts';
@@ -283,4 +283,21 @@ test('tripwire: Blacksmith stays off for the lanes, which the accepted risk in t
     /^BLACKSMITH_ALLOWED = False$/m,
     'Blacksmith is allowed again: read the accepted risk in quality-speed/pages/security/PLAN.md again before changing this test',
   );
+});
+
+test("a private page's last state is not carried, and it gets no score line", () => {
+  const { root, pagesDir, fresh, state, out } = setUp();
+  mkdirSync(path.join(pagesDir, 'claude-code'), { recursive: true });
+  writeFileSync(path.join(pagesDir, 'claude-code', 'manifest.json'), MANIFEST.replace('"code"', '"claude-code"'));
+  writeFileSync(path.join(pagesDir, 'claude-code', 'collect.ts'), '');
+  writeFileSync(path.join(pagesDir, 'claude-code', 'lanes.json'), JSON.stringify([{ id: 'daily', runner: 'linux', cadence: 'daily', collector: 'collect.ts' }]));
+  put(path.join(state, 'lanes', 'claude-code', 'daily.json'), [{ ...reading('a', TODAY), page: 'claude-code' }]);
+  put(path.join(state, 'records', 'claude-code.json'), [{ ...reading('a', TODAY), page: 'claude-code' }]);
+  put(path.join(fresh, 'records-claude-code-daily', 'claude-code', 'daily.json'), [{ ...reading('a', TODAY), page: 'claude-code' }]);
+  merge(fresh, state, out, new Set(['claude-code/daily']), NOW, pagesDir);
+  assert.equal(existsSync(path.join(out, 'records', 'claude-code.json')), false);
+  assert.equal(existsSync(path.join(out, 'lanes', 'claude-code')), false);
+  assert.equal(historyLines(out).some((line) => line.includes('claude-code')), false);
+  assert.equal(historyLines(out).length, PAGES.length);
+  rmSync(root, { recursive: true });
 });

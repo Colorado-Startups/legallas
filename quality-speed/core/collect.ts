@@ -14,7 +14,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { PAGES, type PageSlug } from '../contract/pages.ts';
+import { isPublicLane, PAGES, type PageSlug } from '../contract/pages.ts';
 import { validateRecords } from '../contract/validate.ts';
 import { loadLanes, loadManifest, PAGES_DIR } from './lanes.ts';
 
@@ -59,6 +59,11 @@ if (import.meta.main) {
   const { values } = parseArgs({ options: { page: { type: 'string' }, lane: { type: 'string' }, out: { type: 'string' }, 'state-in': { type: 'string' } } });
   if (!values.page || !isPage(values.page) || !values.lane || !values.out) {
     console.error('usage: collect.ts --page <slug> --lane <id> --out <dir> [--state-in <dir>]');
+    process.exit(1);
+  }
+  // The plan never names a private lane (lanes.ts); this refuses one named by hand, before its collector can write a record.
+  if (process.env.GITHUB_ACTIONS === 'true' && !isPublicLane(values.page, values.lane)) {
+    console.error(`::error title=Quality and Speed collector::pages/${values.page} ${values.lane} is private and does not run in this workflow`);
     process.exit(1);
   }
   const errors = collectLane(values.page, values.lane, values.out, PAGES_DIR, COLLECTOR_TIMEOUT_MS, values['state-in'] ?? '');

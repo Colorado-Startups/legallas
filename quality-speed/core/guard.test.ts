@@ -8,7 +8,7 @@ import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, syml
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PAGES, REPO } from '../contract/pages.ts';
+import { PUBLIC_PAGES as PAGES, REPO } from '../contract/pages.ts';
 import { buildSite } from './build.ts';
 import { countWords, guardSite, MAX_FIRST_VIEW_BYTES, MAX_PROCESS_BYTES, MAX_WORDS, PAGE_END, pageHead, processLink, SITE_CSP, SYNTHETIC_MARK } from './guard.ts';
 
@@ -392,4 +392,9 @@ test('every link the Process maps cite passes, so a new host fails its own PR, n
   for (const file of files) {
     for (const url of readFileSync(path.join(dir, file), 'utf8').match(/https?:\/\/[^\s"'<>)]+/g) ?? []) assert.ok(processLink(url), `${file}: ${url}`);
   }
+});
+
+test("a private page's files are not on the list, so a site that holds one is refused", () => {
+  const site = plant({ 'claude-code/index.html': '<!doctype html>' });
+  assert.match(guardSite(site, { allowSynthetic: true }).join(), /a file is not on the list/);
 });
