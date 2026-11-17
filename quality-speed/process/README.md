@@ -17,7 +17,7 @@ flowchart LR
 
 | File | Is |
 |---|---|
-| `maps.json` | 11 maps (`ci` own, 10 from the Git Crafter library), 4 to 6 steps each, one metric a step |
+| `maps.json` | 20 maps (10 own, 10 from the Git Crafter library), 4 to 6 steps each, one metric a step |
 | `adapt.ts` | Legallas records and goals to Git Crafter's run format |
 | `quality.json` | The Quality config the action reads: `out/` |
 | `config.json` | The Process page config |
@@ -41,6 +41,22 @@ flowchart LR
 | `measure` | collect `settings.read_gap_hours` · page `reliability.failed_main_runs_with_issue` · goal `issues.unranked` · fix `issues.closed_by_hand` · score dropped (no Legallas metric) |
 | `deploy` | build `build.web_build_seconds_p50` · ship `insights.lead_time_p50` · verify `insights.change_failure_rate` · restore `insights.recovery_time_p50` |
 | `adopt` | copy `actions.unpinned_dependencies` · require `actions.gates_intact` · check `actions.green_minutes_p50` · current `code.dependencies_current` · update dropped (no Legallas metric) |
+| `room` | search `data-room.forming.member.find.search_round_trip_p95` · open `…find.document_open_p95` · cite `…trust.exact_quotes` · gate `…founder.leak.stranger_refused` · complete `…founder.complete.journey_end_to_end` · cost `…member.cost.search_result_tokens_p95` |
+| `law` | cover `sec.coverage` · verify `sec.verified` · rights `sec.rights` · refresh `sec.fresh` · lag `sec.change_lag` · look up `sec.law_lookup_tokens_p95` |
+| `sync` | read, Mac `sync.mac_files_read` · index, Mac `sync.mac_change_to_index_text_max` · read, Windows `sync.windows_files_read` · index, Windows `sync.windows_change_to_index_text_max` · untouched `sync.mac_folder_unchanged` · minutes `sync.mac_lane_minutes` |
+| `connect` | guide `ai-connectors.setup_steps_worst_ai` · connect `ai-connectors.supported_ais_connecting` · refuse `ai-connectors.unsupported_ai_refused` · tool list `ai-connectors.tool_list_tokens` |
+| `template` | need `templates.coverage` · rights `templates.right_to_ship` · fields `templates.fields_work` · wording `templates.wording` · fill `templates.fill_ms_p95` · size `templates.template_part_tokens_max` |
+| `test` | risk `testing.risks_proven` · mutate `testing.risk_mutation_score` · flaky `testing.flaky_tests` · fast `testing.web_test_step_p50` · CPU `testing.suite_cpu_minutes` |
+| `session` | allow `claude-settings.settings_match` · load `claude-settings.startup_tokens` · set up `agents.env_setup_seconds_p50` · open a PR `agents.session_to_pr_p50` · merge `agents.sessions_merged` · minutes `agents.minutes_per_merged_change` |
+| `release` | build `mac-app.swift_jobs_passing` · time `mac-app.swift_job_minutes_p50` · bundle `mac-app.app_bundle_verified` · repeat `build.release_reproducible` · conditions `launch-readiness.conditions_met` · minutes `launch-readiness.lane_minutes` |
+| `assure` | cover `compliance.policy_areas_covered` · evidence `compliance.evidence_refs_dead` · review `compliance.policy_review_age_days` · restore `compliance.restore_drill_age_days` · least access `github-app.app_permissions_off` · minutes `compliance.lane_minutes` |
+
+| Coverage | |
+|---|---|
+| Pages with a step on a map | 26 of 35 |
+| The other 9 | Law pages. They run the `law` map's process; `sec` stands for all 10 |
+| Steps with no metric | 2: `measure` score, `adopt` update |
+| Library maps not used | 2: `decide`, `guard`. Legallas has no blockers page for their metrics |
 
 | Legallas reading | On the Process page |
 |---|---|

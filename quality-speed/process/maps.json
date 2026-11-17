@@ -128,6 +128,663 @@
     "current": {"metric": "legallas.code.dependencies_current"},
     "update": {"drop": true}
    }
+  },
+  {
+   "id": "room",
+   "name": "The room",
+   "why": "A member's question, from search to a cited record they may see, with nothing leaking and nothing missing",
+   "critical_path": [
+    "search",
+    "open",
+    "cite",
+    "gate",
+    "complete",
+    "cost"
+   ],
+   "steps": [
+    {
+     "id": "search",
+     "name": "Search",
+     "tools": [
+      "Cloudflare AI Search",
+      "D1"
+     ],
+     "rule": "A search answers within 1 second at the 95th percentile.",
+     "rule_ref": "quality-speed/pages/data-room/manifest.json",
+     "metric": "legallas.data-room.forming.member.find.search_round_trip_p95"
+    },
+    {
+     "id": "open",
+     "name": "Open",
+     "tools": [
+      "R2",
+      "The room Worker"
+     ],
+     "rule": "The right document opens within 2.5 seconds.",
+     "rule_ref": "quality-speed/pages/data-room/manifest.json",
+     "metric": "legallas.data-room.forming.member.find.document_open_p95"
+    },
+    {
+     "id": "cite",
+     "name": "Cite",
+     "tools": [
+      "MCP tools",
+      "web/mcp/contract.ts"
+     ],
+     "rule": "98 of 100 quotes match the source word for word.",
+     "rule_ref": "quality-speed/pages/data-room/manifest.json",
+     "metric": "legallas.data-room.forming.member.trust.exact_quotes"
+    },
+    {
+     "id": "gate",
+     "name": "Gate",
+     "tools": [
+      "Cloudflare Access",
+      "web/worker gate"
+     ],
+     "rule": "A stranger is refused before any record is read.",
+     "rule_ref": "web/README.md",
+     "metric": "legallas.data-room.forming.founder.leak.stranger_refused"
+    },
+    {
+     "id": "complete",
+     "name": "Complete",
+     "tools": [
+      "The fictional fixture room",
+      "Playwright"
+     ],
+     "rule": "A founder walks the whole journey on the sample room with no dead end.",
+     "rule_ref": "quality-speed/pages/data-room/PLAN.md",
+     "metric": "legallas.data-room.forming.founder.complete.journey_end_to_end"
+    },
+    {
+     "id": "cost",
+     "name": "Cost",
+     "tools": [
+      "Token counter"
+     ],
+     "rule": "A search result costs an AI 10,000 tokens at most.",
+     "rule_ref": "quality-speed/pages/data-room/manifest.json",
+     "metric": "legallas.data-room.forming.member.cost.search_result_tokens_p95"
+    }
+   ]
+  },
+  {
+   "id": "law",
+   "name": "Law library",
+   "why": "A rule, form or deadline, from its official source to a dated answer an AI can look up cheaply",
+   "critical_path": [
+    "cover",
+    "verify",
+    "rights",
+    "refresh",
+    "lag",
+    "lookup"
+   ],
+   "steps": [
+    {
+     "id": "cover",
+     "name": "Cover",
+     "tools": [
+      "needs.json",
+      "web/scripts/law"
+     ],
+     "rule": "Every rule a founder or investor needs is in the pack.",
+     "rule_ref": "quality-speed/pages/sec/needs.json",
+     "metric": "legallas.sec.coverage"
+    },
+    {
+     "id": "verify",
+     "name": "Verify",
+     "tools": [
+      "Official sources"
+     ],
+     "rule": "Every entry is marked verified against its official source.",
+     "rule_ref": "quality-speed/pages/sec/PLAN.md",
+     "metric": "legallas.sec.verified"
+    },
+    {
+     "id": "rights",
+     "name": "Rights",
+     "tools": [
+      "docs/licences"
+     ],
+     "rule": "Every entry may be fetched or linked by an install.",
+     "rule_ref": "docs/licences",
+     "metric": "legallas.sec.rights"
+    },
+    {
+     "id": "refresh",
+     "name": "Refresh",
+     "tools": [
+      "law-pack.yml"
+     ],
+     "rule": "Every entry was checked against its source within 365 days.",
+     "rule_ref": ".github/workflows/law-pack.yml",
+     "metric": "legallas.sec.fresh"
+    },
+    {
+     "id": "lag",
+     "name": "Lag",
+     "tools": [
+      "law-pack.yml"
+     ],
+     "rule": "No amendment to a relied-on rule waits unreflected.",
+     "rule_ref": ".github/workflows/law-pack.yml",
+     "metric": "legallas.sec.change_lag"
+    },
+    {
+     "id": "lookup",
+     "name": "Look up",
+     "tools": [
+      "MCP law tools"
+     ],
+     "rule": "A lookup costs an AI 2,250 tokens at most.",
+     "rule_ref": "quality-speed/pages/sec/manifest.json",
+     "metric": "legallas.sec.law_lookup_tokens_p95"
+    }
+   ]
+  },
+  {
+   "id": "sync",
+   "name": "Folder sync",
+   "why": "A file in the company folder, on Mac or Windows, from saved to searchable, with the folder left as it was",
+   "critical_path": [
+    "read-mac",
+    "index-mac",
+    "read-windows",
+    "index-windows",
+    "untouched",
+    "minutes"
+   ],
+   "steps": [
+    {
+     "id": "read-mac",
+     "name": "Read, Mac",
+     "tools": [
+      "LegallasExtract",
+      "Vision OCR"
+     ],
+     "rule": "Every file's words reach the index, or the file is named.",
+     "rule_ref": "quality-speed/pages/sync/PLAN.md",
+     "metric": "legallas.sync.mac_files_read"
+    },
+    {
+     "id": "index-mac",
+     "name": "Index, Mac",
+     "tools": [
+      "web/scripts sync"
+     ],
+     "rule": "A change is searchable text within 10 seconds.",
+     "rule_ref": "quality-speed/pages/sync/manifest.json",
+     "metric": "legallas.sync.mac_change_to_index_text_max"
+    },
+    {
+     "id": "read-windows",
+     "name": "Read, Windows",
+     "tools": [
+      "Windows runner"
+     ],
+     "rule": "Every file's words reach the index, or the file is named.",
+     "rule_ref": "quality-speed/pages/sync/PLAN.md",
+     "metric": "legallas.sync.windows_files_read"
+    },
+    {
+     "id": "index-windows",
+     "name": "Index, Windows",
+     "tools": [
+      "web/scripts sync"
+     ],
+     "rule": "A change is searchable text within 10 seconds.",
+     "rule_ref": "quality-speed/pages/sync/manifest.json",
+     "metric": "legallas.sync.windows_change_to_index_text_max"
+    },
+    {
+     "id": "untouched",
+     "name": "Untouched",
+     "tools": [
+      "Folder hash"
+     ],
+     "rule": "Sync reads a clone, so the folder's own files never change.",
+     "rule_ref": "quality-speed/pages/sync/PLAN.md",
+     "metric": "legallas.sync.mac_folder_unchanged"
+    },
+    {
+     "id": "minutes",
+     "name": "Minutes",
+     "tools": [
+      "macOS runner"
+     ],
+     "rule": "The Mac lane runs in 5 minutes or less.",
+     "rule_ref": "quality-speed/pages/sync/manifest.json",
+     "metric": "legallas.sync.mac_lane_minutes"
+    }
+   ]
+  },
+  {
+   "id": "connect",
+   "name": "Connect an AI",
+   "why": "A customer's own AI, from the setup guide to answering from the room, and no other AI gets in",
+   "critical_path": [
+    "guide",
+    "connect",
+    "refuse",
+    "tools"
+   ],
+   "steps": [
+    {
+     "id": "guide",
+     "name": "Guide",
+     "tools": [
+      "web/connect guides"
+     ],
+     "rule": "The longest setup is 7 steps or fewer.",
+     "rule_ref": "web/connect",
+     "metric": "legallas.ai-connectors.setup_steps_worst_ai"
+    },
+    {
+     "id": "connect",
+     "name": "Connect",
+     "tools": [
+      "Remote MCP server",
+      "OAuth"
+     ],
+     "rule": "All 4 supported AIs pass every smoke stage.",
+     "rule_ref": "docs/design",
+     "metric": "legallas.ai-connectors.supported_ais_connecting"
+    },
+    {
+     "id": "refuse",
+     "name": "Refuse",
+     "tools": [
+      "web/mcp allow-list"
+     ],
+     "rule": "All 9 probes from an unlisted AI are refused.",
+     "rule_ref": "web/mcp/contract.ts",
+     "metric": "legallas.ai-connectors.unsupported_ai_refused"
+    },
+    {
+     "id": "tools",
+     "name": "Tool list",
+     "tools": [
+      "web/mcp/contract.ts"
+     ],
+     "rule": "The tool list costs an AI 10,000 tokens at most.",
+     "rule_ref": "web/mcp/contract.ts",
+     "metric": "legallas.ai-connectors.tool_list_tokens"
+    }
+   ]
+  },
+  {
+   "id": "template",
+   "name": "Templates",
+   "why": "A template, from needed to filled, that may ship and never claims a lawyer reviewed it",
+   "critical_path": [
+    "need",
+    "rights",
+    "fields",
+    "wording",
+    "fill",
+    "size"
+   ],
+   "steps": [
+    {
+     "id": "need",
+     "name": "Need",
+     "tools": [
+      "needed.json"
+     ],
+     "rule": "Every template a founder or investor needs exists.",
+     "rule_ref": "quality-speed/pages/templates/needed.json",
+     "metric": "legallas.templates.coverage"
+    },
+    {
+     "id": "rights",
+     "name": "Rights",
+     "tools": [
+      "docs/licences"
+     ],
+     "rule": "Every template carries a licence that lets it ship.",
+     "rule_ref": "docs/licences",
+     "metric": "legallas.templates.right_to_ship"
+    },
+    {
+     "id": "fields",
+     "name": "Fields",
+     "tools": [
+      "Template tests"
+     ],
+     "rule": "Every field fills, and none is left as a placeholder.",
+     "rule_ref": "quality-speed/pages/templates/PLAN.md",
+     "metric": "legallas.templates.fields_work"
+    },
+    {
+     "id": "wording",
+     "name": "Wording",
+     "tools": [
+      "Wording rules"
+     ],
+     "rule": "Every template says no lawyer has reviewed it, and makes no banned claim.",
+     "rule_ref": "quality-speed/pages/templates/PLAN.md",
+     "metric": "legallas.templates.wording"
+    },
+    {
+     "id": "fill",
+     "name": "Fill",
+     "tools": [
+      "The room Worker"
+     ],
+     "rule": "A template fills within 100 ms.",
+     "rule_ref": "quality-speed/pages/templates/manifest.json",
+     "metric": "legallas.templates.fill_ms_p95"
+    },
+    {
+     "id": "size",
+     "name": "Size",
+     "tools": [
+      "Token counter"
+     ],
+     "rule": "One template part costs an AI 10,000 tokens at most.",
+     "rule_ref": "quality-speed/pages/templates/manifest.json",
+     "metric": "legallas.templates.template_part_tokens_max"
+    }
+   ]
+  },
+  {
+   "id": "test",
+   "name": "Testing",
+   "why": "A real risk, from named to proven by a test that fails when it breaks, fast and never flaky",
+   "critical_path": [
+    "risk",
+    "mutate",
+    "flaky",
+    "fast",
+    "cpu"
+   ],
+   "steps": [
+    {
+     "id": "risk",
+     "name": "Risk",
+     "tools": [
+      "risks.ts"
+     ],
+     "rule": "Every named risk has a test.",
+     "rule_ref": "quality-speed/pages/testing/risks.ts",
+     "metric": "legallas.testing.risks_proven"
+    },
+    {
+     "id": "mutate",
+     "name": "Mutate",
+     "tools": [
+      "mutants.ts"
+     ],
+     "rule": "8 of 10 planted breaks in risky code fail a test.",
+     "rule_ref": "quality-speed/pages/testing/mutants.ts",
+     "metric": "legallas.testing.risk_mutation_score"
+    },
+    {
+     "id": "flaky",
+     "name": "Flaky",
+     "tools": [
+      "reporter.ts"
+     ],
+     "rule": "3 full suite runs on one commit agree.",
+     "rule_ref": "quality-speed/pages/testing/PLAN.md",
+     "metric": "legallas.testing.flaky_tests"
+    },
+    {
+     "id": "fast",
+     "name": "Fast",
+     "tools": [
+      "node --test",
+      "ci.yml"
+     ],
+     "rule": "The web test step runs in 60 seconds or less.",
+     "rule_ref": ".github/workflows/ci.yml",
+     "metric": "legallas.testing.web_test_step_p50"
+    },
+    {
+     "id": "cpu",
+     "name": "CPU",
+     "tools": [
+      "ci.yml"
+     ],
+     "rule": "The suite uses 2 CPU minutes or less.",
+     "rule_ref": "quality-speed/pages/testing/manifest.json",
+     "metric": "legallas.testing.suite_cpu_minutes"
+    }
+   ]
+  },
+  {
+   "id": "session",
+   "name": "Agent session",
+   "why": "A coding agent's session, from a ready environment to a merged change, with no owner clicks",
+   "critical_path": [
+    "allow",
+    "load",
+    "setup",
+    "open",
+    "merge",
+    "minutes"
+   ],
+   "steps": [
+    {
+     "id": "allow",
+     "name": "Allow",
+     "tools": [
+      ".claude/settings.json"
+     ],
+     "rule": "Every tool a session needs is pre-allowed in one checked file.",
+     "rule_ref": "quality-speed/pages/claude-settings/expected.json",
+     "metric": "legallas.claude-settings.settings_match"
+    },
+    {
+     "id": "load",
+     "name": "Load",
+     "tools": [
+      "CLAUDE.md",
+      "Skills"
+     ],
+     "rule": "The checkout's .claude folder adds 2,000 tokens or fewer to a session.",
+     "rule_ref": "quality-speed/pages/claude-settings/manifest.json",
+     "metric": "legallas.claude-settings.startup_tokens"
+    },
+    {
+     "id": "setup",
+     "name": "Set up",
+     "tools": [
+      "Cloud environment"
+     ],
+     "rule": "The environment is ready within 2 minutes.",
+     "rule_ref": "quality-speed/pages/agents/manifest.json",
+     "metric": "legallas.agents.env_setup_seconds_p50"
+    },
+    {
+     "id": "open",
+     "name": "Open a PR",
+     "tools": [
+      "Claude Code",
+      "Copilot cloud agent"
+     ],
+     "rule": "A session opens its pull request within 15 minutes.",
+     "rule_ref": "quality-speed/pages/agents/manifest.json",
+     "metric": "legallas.agents.session_to_pr_p50"
+    },
+    {
+     "id": "merge",
+     "name": "Merge",
+     "tools": [
+      "Merge queue"
+     ],
+     "rule": "9 of 10 sessions end in a merged change.",
+     "rule_ref": "quality-speed/pages/agents/manifest.json",
+     "metric": "legallas.agents.sessions_merged"
+    },
+    {
+     "id": "minutes",
+     "name": "Minutes",
+     "tools": [
+      "Actions minutes"
+     ],
+     "rule": "A merged change costs 20 agent minutes or fewer.",
+     "rule_ref": "quality-speed/pages/agents/manifest.json",
+     "metric": "legallas.agents.minutes_per_merged_change"
+    }
+   ]
+  },
+  {
+   "id": "release",
+   "name": "Mac app and launch",
+   "why": "A Mac app change, from building on main to a verified bundle, and the conditions to sell closing",
+   "critical_path": [
+    "build",
+    "time",
+    "bundle",
+    "repeat",
+    "conditions",
+    "minutes"
+   ],
+   "steps": [
+    {
+     "id": "build",
+     "name": "Build",
+     "tools": [
+      "swift build",
+      "macOS runner"
+     ],
+     "rule": "Every Swift job on main's code passes.",
+     "rule_ref": ".github/workflows/ci.yml",
+     "metric": "legallas.mac-app.swift_jobs_passing"
+    },
+    {
+     "id": "time",
+     "name": "Time",
+     "tools": [
+      "macOS runner"
+     ],
+     "rule": "A Swift job runs in 10 minutes or less.",
+     "rule_ref": "quality-speed/pages/mac-app/manifest.json",
+     "metric": "legallas.mac-app.swift_job_minutes_p50"
+    },
+    {
+     "id": "bundle",
+     "name": "Bundle",
+     "tools": [
+      "codesign",
+      "Sandbox entitlements"
+     ],
+     "rule": "The app has the right identity, entitlements and sandbox.",
+     "rule_ref": "quality-speed/pages/mac-app/PLAN.md",
+     "metric": "legallas.mac-app.app_bundle_verified"
+    },
+    {
+     "id": "repeat",
+     "name": "Repeat",
+     "tools": [
+      "Release build"
+     ],
+     "rule": "Two builds of one commit give identical bytes.",
+     "rule_ref": "quality-speed/pages/build/PLAN.md",
+     "metric": "legallas.build.release_reproducible"
+    },
+    {
+     "id": "conditions",
+     "name": "Conditions",
+     "tools": [
+      "conditions.json"
+     ],
+     "rule": "Every condition to sell is met by a merged change.",
+     "rule_ref": "quality-speed/pages/launch-readiness/conditions.json",
+     "metric": "legallas.launch-readiness.conditions_met"
+    },
+    {
+     "id": "minutes",
+     "name": "Minutes",
+     "tools": [
+      "ubuntu-slim"
+     ],
+     "rule": "The launch lane runs in 5 minutes or less.",
+     "rule_ref": "quality-speed/pages/launch-readiness/manifest.json",
+     "metric": "legallas.launch-readiness.lane_minutes"
+    }
+   ]
+  },
+  {
+   "id": "assure",
+   "name": "Assurance",
+   "why": "A firm's security questions, from a covered policy to live evidence, with the automation holding only what it uses",
+   "critical_path": [
+    "cover",
+    "evidence",
+    "review",
+    "restore",
+    "least",
+    "minutes"
+   ],
+   "steps": [
+    {
+     "id": "cover",
+     "name": "Cover",
+     "tools": [
+      "Policy docs",
+      "NIST CSF 2.0"
+     ],
+     "rule": "Every policy area a security team asks about has a document.",
+     "rule_ref": "quality-speed/pages/compliance/PLAN.md",
+     "metric": "legallas.compliance.policy_areas_covered"
+    },
+    {
+     "id": "evidence",
+     "name": "Evidence",
+     "tools": [
+      "Evidence links"
+     ],
+     "rule": "Every citation in the 7 policies resolves at HEAD.",
+     "rule_ref": "quality-speed/pages/compliance/PLAN.md",
+     "metric": "legallas.compliance.evidence_refs_dead"
+    },
+    {
+     "id": "review",
+     "name": "Review",
+     "tools": [
+      "Policy docs"
+     ],
+     "rule": "Every policy was reviewed within a year.",
+     "rule_ref": "quality-speed/pages/compliance/manifest.json",
+     "metric": "legallas.compliance.policy_review_age_days"
+    },
+    {
+     "id": "restore",
+     "name": "Restore",
+     "tools": [
+      "Restore drill"
+     ],
+     "rule": "A restore drill passed in the sample room within 90 days.",
+     "rule_ref": "quality-speed/pages/compliance/manifest.json",
+     "metric": "legallas.compliance.restore_drill_age_days"
+    },
+    {
+     "id": "least",
+     "name": "Least access",
+     "tools": [
+      "GitHub App",
+      "expected.json"
+     ],
+     "rule": "The App holds exactly the permissions its workflows use.",
+     "rule_ref": "quality-speed/pages/github-app/expected.json",
+     "metric": "legallas.github-app.app_permissions_off"
+    },
+    {
+     "id": "minutes",
+     "name": "Minutes",
+     "tools": [
+      "ubuntu-slim"
+     ],
+     "rule": "The compliance lane runs in 5 minutes or less.",
+     "rule_ref": "quality-speed/pages/compliance/manifest.json",
+     "metric": "legallas.compliance.lane_minutes"
+    }
+   ]
   }
  ]
 }

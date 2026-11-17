@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { test } from 'node:test';
 import type { MetricDef, MetricRecord } from '../contract/format.ts';
-import { stepMetrics, toDef, toEntry } from './adapt.ts';
+import { PAGE_GROUPS, PAGES } from '../contract/pages.ts';
+import { adapt, stepMetrics, toDef, toEntry } from './adapt.ts';
 
 const def: MetricDef = { id: 'pushes_per_merge', lens: 'quality', unit: 'ratio', direction: 'lower', floor: 6, goal: 2, weight: 1, max_age_hours: 48, min_samples: 10 };
 const now = Date.parse('2026-11-05T12:00:00Z');
@@ -27,7 +30,18 @@ test('every map step names one metric, at most 6 steps a map', () => {
   for (const m of maps.maps) {
     const steps = Object.values(m.steps as Record<string, { metric?: string }>);
     assert.ok(steps.length <= 6, m.id ?? m.use);
-    if (m.id) for (const s of steps) assert.match(s.metric ?? '', /^legallas\.[a-z-]+\.[a-z0-9_]+$/);
+    if (m.id) for (const s of steps) assert.match(s.metric ?? '', /^legallas\.[a-z-]+\.[a-z0-9_]+(?:\.[a-z0-9_]+)*$/);
   }
   assert.ok(stepMetrics(maps).length >= 15);
+});
+
+test('every step metric is defined by its page, dotted ids included, and every page but the law pages sits on a map', () => {
+  const state = mkdtempSync(path.join(tmpdir(), 'qs-process-'));
+  const { defs, metrics } = adapt(state, path.join(state, 'out'));
+  assert.equal(defs.length, Object.keys(metrics).length);
+  assert.ok(defs.some((d) => d.id === 'legallas.data-room.forming.member.trust.exact_quotes'));
+  assert.ok(Object.values(metrics).every((e) => 'could_not_check' in e), 'an empty state measures nothing');
+  const mapped = new Set(defs.map((d) => String(d.id).split('.')[1]));
+  const unmapped = PAGES.filter((p) => !mapped.has(p));
+  assert.deepEqual(unmapped, PAGE_GROUPS.law.filter((p) => p !== 'sec' && p !== 'templates'));
 });
