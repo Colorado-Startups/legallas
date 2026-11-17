@@ -7,7 +7,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PAGES, PUBLIC_PAGES } from '../contract/pages.ts';
+import { PAGE_GROUPS, PAGES, PUBLIC_PAGES } from '../contract/pages.ts';
 import { buildSite, frameWords, readHistory } from './build.ts';
 import { countWords, guardSite, SYNTHETIC_MARK } from './guard.ts';
 
@@ -256,4 +256,25 @@ test('a page cannot take the change log\'s name for its own page', async () => {
     writeFileSync(path.join(pages, 'code', 'page.ts'), `export const render = () => ({ body: '', pages: { changes: '<p>x</p>' } });`);
     await assert.rejects(buildSite({ pagesDir: pages, state: null, out, now: NOW }), /change log/);
   });
+});
+
+test('no public page shows a dollar figure, from records, detail or committed files', async () => {
+  // The real pages over an empty state: what a page shows when its records are missing and its detail is gone, so
+  // committed baselines and constants are what renders. Law pages may quote a legal amount, so they are left out.
+  const dir = mkdtempSync(path.join(tmpdir(), 'qs-dollars-'));
+  const state = path.join(dir, 'state');
+  const out = path.join(dir, 'out');
+  mkdirSync(path.join(state, 'records'), { recursive: true });
+  try {
+    await buildSite({ pagesDir: fileURLToPath(new URL('../pages', import.meta.url)), state, out, now: NOW });
+    const law: readonly string[] = PAGE_GROUPS.law;
+    const shown = PUBLIC_PAGES.filter((page) => !law.includes(page)).filter((page) => {
+      const html = readFileSync(path.join(out, page, 'index.html'), 'utf8');
+      // A figure, not the word: an ideal may say a job costs as few dollars as it can.
+      return /\$\s?\d|\d\s?(?:usd|dollars?)\b/i.test(html);
+    });
+    assert.deepEqual(shown, []);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });

@@ -17,7 +17,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import type { HistoryLine, Manifest, MetricRecord } from '../contract/format.ts';
-import { PUBLIC_PAGES, type PageSlug } from '../contract/pages.ts';
+import { PRIVATE_DETAIL, PUBLIC_PAGES, publicRecords, type PageSlug } from '../contract/pages.ts';
 import { validateRecords } from '../contract/validate.ts';
 import { carryDetail, carryFacts, copyPageFiles } from './detail.ts';
 import { HISTORY_FILE, publicHistory } from './history-fetch.ts';
@@ -91,15 +91,17 @@ export function merge(fresh: string, state: string, out: string, planned: Readon
       const own = path.join(fresh, laneArtifact(slug, lane.id), slug);
       const ran = readRecords(path.join(own, name));
       const isPlanned = planned.has(`${slug}/${lane.id}`);
-      const after = laneAfterRun(ran, readRecords(path.join(state, 'lanes', slug, name)) ?? [], isPlanned);
+      const after = publicRecords(laneAfterRun(ran, readRecords(path.join(state, 'lanes', slug, name)) ?? [], isPlanned));
       writeJson(path.join(out, 'lanes', slug, name), after);
       all.push(...after);
+      // A page whose detail holds an owner-account figure keeps none in the public state (contract/pages.ts).
+      if (PRIVATE_DETAIL.includes(slug)) continue;
       if (ran) carryDetail(path.join(own, lane.id), path.join(out, 'lanes', slug, lane.id));
       else if (!isPlanned) carryDetail(path.join(state, 'lanes', slug, lane.id), path.join(out, 'lanes', slug, lane.id));
       else carryFacts(path.join(state, 'lanes', slug, lane.id), path.join(out, 'lanes', slug, lane.id));
     }
     // A manifest can have changed since a carried record was measured, and two lanes can report one metric.
-    const checked = manifest ? validateRecords(all, manifest) : { records: [], errors: [] };
+    const checked = manifest ? validateRecords(publicRecords(all), manifest) : { records: [], errors: [] };
     kept += checked.records.length;
     dropped += all.length - checked.records.length;
     writeJson(path.join(out, 'records', `${slug}.json`), checked.records);
