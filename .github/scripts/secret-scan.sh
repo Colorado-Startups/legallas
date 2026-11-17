@@ -14,7 +14,8 @@
 # compressed, encrypted, or split across lines or commits).
 #
 # The workflow passes, through env: EVENT_NAME, PR_BASE_SHA and PR_HEAD_SHA
-# (pull_request), PUSH_BEFORE (push). The checkout must have full history.
+# (pull_request), PUSH_BEFORE (push), MERGE_GROUP_BASE_SHA and MERGE_GROUP_HEAD_SHA
+# (merge_group). The checkout must have full history.
 set -euo pipefail
 
 GITLEAKS_RELEASE="https://github.com/gitleaks/gitleaks/releases/download/v8.30.1"
@@ -145,8 +146,22 @@ case "${EVENT_NAME:-}" in
         if [[ -n "${PUSH_BEFORE:-}" && ! "$PUSH_BEFORE" =~ ^0+$ ]] && is_commit "$PUSH_BEFORE"; then
             range=("$PUSH_BEFORE..HEAD")
         fi ;;
+    merge_group)
+        # What the queue adds to main, not every branch: one stray branch holding a
+        # flagged commit once failed every queue run. Its own PR scans that branch.
+        is_commit "${MERGE_GROUP_BASE_SHA:?}" || refuse "The merge group's base $MERGE_GROUP_BASE_SHA isn't a commit here, so nothing could be read."
+        is_commit "${MERGE_GROUP_HEAD_SHA:?}" || refuse "The merge group's head $MERGE_GROUP_HEAD_SHA isn't a commit here, so nothing could be read."
+        range=("$MERGE_GROUP_BASE_SHA..$MERGE_GROUP_HEAD_SHA") ;;
     # workflow_dispatch (the manual run) and anything else: the full history.
 esac
+
+# Findings only a reviewed change here can excuse, each by its gitleaks fingerprint: one
+# commit, file, rule and line, so a later change to that file is still read. The launch
+# snapshot (#2) adds the whole tree in one commit, and run 43747961458 read it whole: a
+# test's fake key that only a whole-file read matches, reported twice on that line.
+excused=("f668214f58118acc870eefa0683aa3dc971ad9b3:web/scripts/iwork.test.ts:private-key:280")
+excused_file="$(mktemp)"
+printf '%s\n' "${excused[@]}" >"$excused_file"
 
 # How many commits in that range have a hunk that leaves lines, the only thing gitleaks
 # reads, which it must at least match. Deleting, moving, changing a mode and an empty commit
@@ -163,9 +178,11 @@ expected="$(git log "${range[@]}" --text -p --diff-merges=first-parent --diff-fi
 #   --diff-merges=first-parent: read what a merge commit adds; git log skips it otherwise.
 #   --ignore-gitleaks-allow: only a reviewed change to this scan can excuse a finding,
 #   never a comment on the line itself.
+#   --gitleaks-ignore-path: the excused list above; a tracked .gitleaksignore is refused earlier.
 log="$(mktemp)"
 status=0
 "$gitleaks" git --config "$rules" --redact --verbose --no-banner --exit-code 1 --ignore-gitleaks-allow \
+    --gitleaks-ignore-path "$excused_file" \
     --log-opts="--text --diff-merges=first-parent ${range[*]}" . 2>&1 | tee "$log" || status="${PIPESTATUS[0]}"
 [[ "$status" -eq 0 ]] || exit "$status"
 

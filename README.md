@@ -27,7 +27,7 @@ flowchart LR
 | What and why | [docs/product.md](docs/product.md) |
 | Contributing | [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md); agents also read [CLAUDE.md](CLAUDE.md) |
 | Bugs, quick fixes | [Issues](https://github.com/Colorado-Startups/legallas/issues) |
-| Ideas, questions | [Discussions](https://github.com/Colorado-Startups/legallas/discussions); accepted ideas become cards on the [Project board](https://github.com/orgs/Colorado-Startups/projects/1) |
+| Ideas, questions | [Discussions](https://github.com/Colorado-Startups/legallas/discussions); accepted ideas become cards on the [Project board](https://github.com/orgs/Colorado-Startups/projects/6) |
 | Security | [SECURITY.md](SECURITY.md): private reporting, never an issue |
 
 ## Layout
