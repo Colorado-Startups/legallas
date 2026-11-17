@@ -18,7 +18,7 @@ Part of the [security policies](README.md). Version 1.1, 2026-11-17. Supports [A
 | | |
 |---|---|
 | Default model | `@cf/openai/gpt-oss-120b` on Cloudflare Workers AI, since 2026-11-05. Open weights from OpenAI. No deprecation date listed |
-| Retired | `@cf/zai-org/glm-5.3-flash`, the default until 2026-11-05. Workers AI retired it on 2026-11-15; the config test refuses it (`DEPRECATED_MODELS`, `web/worker/budget.ts`) |
+| Retired | `@cf/zai-org/glm-5.3-flash`, the default until 2026-11-05. Workers AI's deprecation date for it was 2026-11-15 ([its Workers AI model page](https://developers.cloudflare.com/workers-ai/models/glm-5.3-flash/), read 2026-11-05); the config test refuses it (`DEPRECATED_MODELS`, `web/worker/budget.ts`) |
 | Why this model | The only model with a replica eval entry still served: 18 to 19 of 22 on 2026-10-04, 4 reps (`REASONING_EFFORT`, `web/worker/ask.ts`) |
 | Where it runs | Cloudflare Workers AI in the room owner's account. No AI Gateway for generation; AI Search attaches one with logs off |
 | Inputs | The member's question and retrieved passages, in data blocks |

@@ -8,7 +8,7 @@ owner adds their own settings, from their Cloudflare account, before sending. Ea
 | # | Question | Answer | Policy |
 |---|---|---|---|
 | 1 | SOC 2, ISO 27001 or ISO 42001 certification? | No. None held or under way | [README](README.md) |
-| 2 | Latest penetration test? | No third-party test yet. Automated: secret scan and CodeQL on every change; dependency and code scans nightly; a monthly dynamic scan of the fictional room (`scans/`). Fix deadlines apply | [Vulnerability management](vulnerability-management.md) |
+| 2 | Latest penetration test? | No third-party test yet. Automated: secret scan and CodeQL on every change; dependency and code scans nightly; a monthly dynamic scan of the fictional room (`.github/workflows/dynamic-scan.yml`). Fix deadlines apply | [Vulnerability management](vulnerability-management.md) |
 | 3 | Where is data hosted? | In the room owner's own Cloudflare account, in the region they choose. The vendor hosts nothing | [Data and network](data-and-network.md) |
 | 4 | Who are the subprocessors? | Cloudflare. Any outside AI backend only if the room owner turns it on, and only with zero data retention | [AI governance](ai-governance.md) |
 | 5 | Can the vendor see our data? | No. Colorado Startups has no access to any room or room account | [Access](access.md) |

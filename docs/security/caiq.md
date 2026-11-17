@@ -8,7 +8,7 @@ Part of the [security policies](README.md). Version 1.1, 2026-11-17.
 | Questionnaire | CSA CAIQ v4.1.0 (CCM v4.1.1): 283 questions, 17 domains |
 | Source | [CSA, CCM and CAIQ v4.1](https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4-1), released 2026-01-27; workbook generated 2026-10-02 |
 | Read | 2026-11-06 |
-| Basis | Policies 1.0 (#657), `SECURITY.md`, `main` at `52c50fe8`; IAM, STA-09, DSP-16 and TVM-03 rows updated at `00d3a3fc` |
+| Basis | Policies 1.0 (#657), `SECURITY.md`, `main` at `52c50fe8`; IAM, STA-09, DSP-16 and TVM-03 rows updated in PR #41 |
 | Licence | CSA: personal, non-commercial use; no changes; no redistribution. So IDs and our answers only. Questions: CSA's workbook |
 | Claims | No certification, audit or penetration test ([Attestations](README.md#attestations)) |
 | Review | With the policies, every 12 months. An answer changes in its control's PR |

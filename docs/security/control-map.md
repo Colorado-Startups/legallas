@@ -25,7 +25,7 @@ and nothing here is a certification. Its job is to make an audit shorter when on
 | Vulnerabilities | [Vulnerability management](vulnerability-management.md) | CC7.1 | 8.8 | |
 | Secure development and change | [Vulnerability management](vulnerability-management.md) | CC8.1 | 8.25, 8.28, 8.29, 8.32 | A.6 (verification, deployment) |
 | Cloud provider | [README](README.md), hosting row | CC9.2 | 5.23 | A.10 |
-| Physical security | Inherited from Cloudflare, which runs the data centers: its SOC 2 Type II and ISO/IEC 27001 reports, in the Cloudflare dashboard (Trust Hub). No premises of the vendor's own | CC6.4 | 7.1 to 7.14 | |
+| Physical security | Inherited from Cloudflare, which runs the data centers: its SOC 2 Type II and ISO/IEC 27001 reports, in the Cloudflare dashboard ([Trust Hub](https://www.cloudflare.com/trust-hub/compliance-resources/), read 2026-11-17). No premises of the vendor's own | CC6.4 | 7.1 to 7.14 | |
 
 ## Not covered by any policy yet
 
