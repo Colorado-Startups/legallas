@@ -4,7 +4,7 @@
 |---|---|
 | Applies to | The Legallas product and every room built from it |
 | Maintained by | Colorado Startups |
-| Version | 1.0, 2026-11-05 |
+| Version | 1.1, 2026-11-17 |
 | Reviewed | Every 12 months, and whenever a control a policy names changes |
 | Status | Written from the code as it is. No outside auditor has reviewed these policies |
 
