@@ -70,4 +70,9 @@ The checks behind the moved metrics stay in `collect/` (`findings`, `symbols`, `
 | `documentation`, the old list (the card) | 43 | 49 | 48 | 46 |
 | `repo-documentation`, projected | 80 | 100 | 100 | 93 |
 
-Short of 100: SECURITY.md is prose (`community_files_ok` 50), the About box has no topics or website (33), no custom property is set (0).
+| Short of 100 (2026-11-17) | Reading | Fix | State |
+|---|---|---|---|
+| `community_files_ok` | 50: SECURITY.md was prose | SECURITY.md in tables, 94.7 % visual | This pull request |
+| `about_box_set` | 66.67: no website | Website set to the Pages site | Done in repo settings |
+| `custom_properties_set` | 0 | An org property, `customer_data` = `none` | Needs a login with `admin:org` |
+| `main_via_pr` | 80, 5 of 50 commits | More merges | History |
