@@ -65,8 +65,12 @@ test('every step metric is defined by its page, no step names a private page, an
   const mapped = new Set(defs.map((d) => String(d.id).split('.')[1] ?? ''));
   // A private page never runs in this public repository (contract/pages.ts), so no step may name one.
   assert.deepEqual([...mapped].filter((p) => !isPublicPage(p)), []);
+  // The law pages share the `law` map through `sec`. actions, ci-overview and pull-requests lost their maps while they were
+  // private (#20); they may be public again without one until a map is made for them.
+  const mayLack: readonly string[] = [...PAGE_GROUPS.law.filter((p) => p !== 'sec' && p !== 'templates'), 'actions', 'ci-overview', 'pull-requests'];
   const unmapped = PUBLIC_PAGES.filter((p) => !mapped.has(p));
-  assert.deepEqual(unmapped, PAGE_GROUPS.law.filter((p) => p !== 'sec' && p !== 'templates'));
+  assert.deepEqual(unmapped.filter((p) => !mayLack.includes(p)), []);
+  for (const p of PAGE_GROUPS.law) if (p !== 'sec' && p !== 'templates') assert.ok(unmapped.includes(p), `${p} runs the law map through sec`);
 });
 
 test('every link the maps carry passes the publish guard, so the Process page can go out', () => {
