@@ -6,6 +6,7 @@ import path from 'node:path';
 import { test } from 'node:test';
 import type { MetricDef, MetricRecord } from '../contract/format.ts';
 import { PAGE_GROUPS, PAGES } from '../contract/pages.ts';
+import { IDEAL_MAX_WORDS } from '../contract/validate.ts';
 import { adapt, stepMetrics, toDef, toEntry } from './adapt.ts';
 
 const def: MetricDef = { id: 'pushes_per_merge', lens: 'quality', unit: 'ratio', direction: 'lower', floor: 6, goal: 2, weight: 1, max_age_hours: 48, min_samples: 10 };
@@ -33,6 +34,25 @@ test('every map step names one metric, at most 6 steps a map', () => {
     if (m.id) for (const s of steps) assert.match(s.metric ?? '', /^legallas\.[a-z-]+\.[a-z0-9_]+(?:\.[a-z0-9_]+)*$/);
   }
   assert.ok(stepMetrics(maps).length >= 15);
+});
+
+test('every map of our own opens with an ideal of 25 words at most and a dated source', () => {
+  const maps = JSON.parse(readFileSync(new URL('maps.json', import.meta.url), 'utf8'));
+  const own = maps.maps.filter((m: { id?: string }) => m.id);
+  assert.equal(own.length, 10);
+  for (const m of own) {
+    assert.ok(typeof m.ideal === 'string' && m.ideal.split(/\s+/).length <= IDEAL_MAX_WORDS, m.id);
+    assert.ok(Array.isArray(m.sources) && m.sources.length > 0, m.id);
+    for (const s of m.sources) assert.match(`${s.title}|${s.url}|${s.date}`, /^[^|]+\|https:\/\/[^|]+\|\d{4}-\d{2}-\d{2}$/, m.id);
+  }
+});
+
+test('one step is dropped for want of a measurement, and only that one', () => {
+  const maps = JSON.parse(readFileSync(new URL('maps.json', import.meta.url), 'utf8'));
+  const dropped = maps.maps.flatMap((m: { id?: string; use?: string; steps: Record<string, { drop?: boolean }> }) =>
+    m.id ? [] : Object.entries(m.steps ?? {}).filter(([, s]) => s.drop).map(([id]) => `${m.use}.${id}`),
+  );
+  assert.deepEqual(dropped, ['adopt.update']);
 });
 
 test('every step metric is defined by its page, dotted ids included, and every page but the law pages sits on a map', () => {

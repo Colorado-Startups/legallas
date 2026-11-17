@@ -38,7 +38,7 @@ flowchart LR
 | `secure` | keys `claude-documentation.deny_rules_kept` · scan `security.scan_minutes` · model `reliability.risky_areas_reviewed_in_time` · report `repo-documentation.community_files_ok` · alerts `security.time_to_fix_critical_high_hours` |
 | `code` | measure `code.long_files` · simplify `code.long_functions` · delete `code.dead_code` · explain `code.public_symbols_documented` · check `code.web_loop_seconds` · hold `build.release_gzip_bytes` |
 | `document` | write `repo-documentation.readme_visual_share` · lint `code.long_sentence_share` · map `code.doc_lag_hours_p90` · publish `code.broken_internal_links` · read `code.reading_minutes_p90` · load `claude-documentation.startup_tokens` |
-| `measure` | collect `settings.read_gap_hours` · page `reliability.failed_main_runs_with_issue` · goal `issues.unranked` · fix `issues.closed_by_hand` · score dropped (no Legallas metric) |
+| `measure` | collect `settings.read_gap_hours` · page `reliability.failed_main_runs_with_issue` · goal `issues.unranked` · fix `issues.closed_by_hand` · score `settings.planted_drift_detected` |
 | `deploy` | build `build.web_build_seconds_p50` · ship `insights.lead_time_p50` · verify `insights.change_failure_rate` · restore `insights.recovery_time_p50` |
 | `adopt` | copy `actions.unpinned_dependencies` · require `actions.gates_intact` · check `actions.green_minutes_p50` · current `code.dependencies_current` · update dropped (no Legallas metric) |
 | `room` | search `data-room.forming.member.find.search_round_trip_p95` · open `…find.document_open_p95` · cite `…trust.exact_quotes` · gate `…founder.leak.stranger_refused` · complete `…founder.complete.journey_end_to_end` · cost `…member.cost.search_result_tokens_p95` |
@@ -55,7 +55,8 @@ flowchart LR
 |---|---|
 | Pages with a step on a map | 26 of 35 |
 | The other 9 | Law pages. They run the `law` map's process; `sec` stands for all 10 |
-| Steps with no metric | 2: `measure` score, `adopt` update |
+| Steps with no metric | 1: `adopt` update. No page measures how long a dependency bump waits |
+| Maps with an ideal and a dated source | 20 of 20: 10 own in `maps.json`, 10 from the library |
 | Library maps not used | 2: `decide`, `guard`. Legallas has no blockers page for their metrics |
 
 | Legallas reading | On the Process page |

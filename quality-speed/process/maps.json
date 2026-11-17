@@ -6,6 +6,10 @@
    "id": "ci",
    "name": "CI",
    "why": "A push, from the cheapest lane that can run it to main, on free minutes first",
+   "ideal": "Every push takes the cheapest lane that can run it, turns green within ten minutes, and never spends past the included minutes.",
+   "sources": [
+    {"title": "GitHub Docs: Actions metrics", "url": "https://docs.github.com/en/actions/concepts/metrics", "date": "2026-11-09"}
+   ],
    "critical_path": ["route", "skip", "blacksmith", "ci-ok", "queue"],
    "steps": [
     {"id": "route", "name": "Route", "tools": ["Claude Code cloud session VM", "GitHub Codespaces", "Blacksmith", "GitHub-hosted"], "rule": "Heavy or one-off work runs on a cloud session's own VM, 0 Actions minutes; a job holding no secret on Blacksmith; a secret or write token on GitHub-hosted.", "rule_ref": "CLAUDE.md", "metric": "legallas.actions.usd_per_merge"},
@@ -107,7 +111,7 @@
     "page": {"metric": "legallas.reliability.failed_main_runs_with_issue"},
     "goal": {"metric": "legallas.issues.unranked"},
     "fix": {"metric": "legallas.issues.closed_by_hand"},
-    "score": {"drop": true}
+    "score": {"rule": "A planted drift is caught on every run, so a score can be trusted.", "rule_ref": "https://github.com/Colorado-Startups/legallas/blob/main/quality-speed/pages/settings/drill.ts", "metric": "legallas.settings.planted_drift_detected"}
    }
   },
   {
@@ -133,6 +137,10 @@
    "id": "room",
    "name": "The room",
    "why": "A member's question, from search to a cited record they may see, with nothing leaking and nothing missing",
+   "ideal": "A member finds any record they may see in seconds, trusts every cite, sees nothing they should not, and it costs an AI little.",
+   "sources": [
+    {"title": "SEC: data delivery standards", "url": "https://www.sec.gov/files/sec-dds-aug-2026.pdf", "date": "2026-08-01"}
+   ],
    "critical_path": [
     "search",
     "open",
@@ -213,6 +221,10 @@
    "id": "law",
    "name": "Law library",
    "why": "A rule, form or deadline, from its official source to a dated answer an AI can look up cheaply",
+   "ideal": "Every rule a founder or investor relies on is in the pack, verified at its official source, current, and cheap to look up.",
+   "sources": [
+    {"title": "Private placements under Rule 506(b)", "url": "https://www.sec.gov/resources-small-businesses/exempt-offerings/private-placements-rule-506b", "date": "2026-09-21"}
+   ],
    "critical_path": [
     "cover",
     "verify",
@@ -289,6 +301,10 @@
    "id": "sync",
    "name": "Folder sync",
    "why": "A file in the company folder, on Mac or Windows, from saved to searchable, with the folder left as it was",
+   "ideal": "Every file in the company folder is searchable within ten seconds, on Mac or Windows, and the folder itself never changes.",
+   "sources": [
+    {"title": "Cloudflare R2 pricing", "url": "https://developers.cloudflare.com/r2/pricing/", "date": "2026-10-30"}
+   ],
    "critical_path": [
     "read-mac",
     "index-mac",
@@ -365,6 +381,10 @@
    "id": "connect",
    "name": "Connect an AI",
    "why": "A customer's own AI, from the setup guide to answering from the room, and no other AI gets in",
+   "ideal": "A customer connects their own AI in a few steps, it sees a short tool list, and no other AI gets in.",
+   "sources": [
+    {"title": "Claude API docs: Tool search tool", "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool", "date": "2026-11-05"}
+   ],
    "critical_path": [
     "guide",
     "connect",
@@ -419,6 +439,10 @@
    "id": "template",
    "name": "Templates",
    "why": "A template, from needed to filled, that may ship and never claims a lawyer reviewed it",
+   "ideal": "Every template a founder or investor needs exists, may ship, fills cleanly, and never claims a lawyer reviewed it.",
+   "sources": [
+    {"title": "Claude Code docs: MCP output limits and warnings", "url": "https://code.claude.com/docs/en/mcp", "date": "2026-11-06"}
+   ],
    "critical_path": [
     "need",
     "rights",
@@ -494,6 +518,10 @@
    "id": "test",
    "name": "Testing",
    "why": "A real risk, from named to proven by a test that fails when it breaks, fast and never flaky",
+   "ideal": "Every real risk has a test that fails when it breaks, nothing is flaky, and the suite runs in about a minute.",
+   "sources": [
+    {"title": "Martin Fowler: Continuous Integration", "url": "https://martinfowler.com/articles/continuousIntegration.html", "date": "2024-01-18"}
+   ],
    "critical_path": [
     "risk",
     "mutate",
@@ -559,6 +587,10 @@
    "id": "session",
    "name": "Agent session",
    "why": "A coding agent's session, from a ready environment to a merged change, with no owner clicks",
+   "ideal": "An agent session starts ready, needs no owner clicks, opens a pull request in minutes, and ends in a merged change.",
+   "sources": [
+    {"title": "GitHub Docs: Creating automations with Copilot cloud agent", "url": "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/create-automations", "date": "2026-10-28"}
+   ],
    "critical_path": [
     "allow",
     "load",
@@ -636,6 +668,10 @@
    "id": "release",
    "name": "Mac app and launch",
    "why": "A Mac app change, from building on main to a verified bundle, and the conditions to sell closing",
+   "ideal": "Every Mac app change on main builds, tests and verifies within ten minutes, the same bytes each time, with every condition to sell met.",
+   "sources": [
+    {"title": "Cloudflare Workers limits", "url": "https://developers.cloudflare.com/workers/platform/limits/", "date": "2026-10-29"}
+   ],
    "critical_path": [
     "build",
     "time",
@@ -713,6 +749,10 @@
    "id": "assure",
    "name": "Assurance",
    "why": "A firm's security questions, from a covered policy to live evidence, with the automation holding only what it uses",
+   "ideal": "A firm's security team gets every document it asks for, current and true to the code, and the automation holds only what it uses.",
+   "sources": [
+    {"title": "NIST CSWP 29: The NIST Cybersecurity Framework (CSF) 2.0", "url": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf", "date": "2024-02-26"}
+   ],
    "critical_path": [
     "cover",
     "evidence",
