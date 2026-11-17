@@ -145,14 +145,22 @@ function partText(entity: Entity): string {
 
 /** HTML as plain text: no head, scripts, styles or comments; blocks and breaks become lines; entities decoded. */
 export function htmlText(html: string): string {
-  const text = html
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/<(head|script|style|title)\b[\s\S]*?<\/\1\s*>/gi, '')
+  // Each removal repeats until nothing changes: removing one piece can join its neighbours into a new comment or tag.
+  let text = html;
+  let previous: string;
+  do {
+    previous = text;
+    text = text.replace(/<!--[\s\S]*?-->/g, '').replace(/<(head|script|style|title)\b[\s\S]*?<\/\1(?:[\s/][^>]*)?>/gi, '');
+  } while (text !== previous);
+  text = text
     .replace(/<br\b[^>]*>/gi, '\n')
     .replace(/<li\b[^>]*>/gi, '\n- ')
     .replace(/<\/?(?:p|div|tr|h[1-6]|blockquote|table|ul|ol|pre|section|article|header|footer)\b[^>]*>/gi, '\n')
-    .replace(/<\/t[dh]\s*>/gi, ' ')
-    .replace(/<[^>]*>/g, '');
+    .replace(/<\/t[dh]\s*>/gi, ' ');
+  do {
+    previous = text;
+    text = text.replace(/<[^>]*>/g, '');
+  } while (text !== previous);
   return text
     .replace(/&(#x[0-9a-f]{1,6}|#[0-9]{1,7}|[a-z]+);/gi, (whole, ref: string) => {
       if (ref[0] !== '#') return HTML_ENTITIES[ref.toLowerCase()] ?? whole;
