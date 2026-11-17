@@ -298,25 +298,29 @@
    ]
   },
   {
-   "id": "sync",
-   "name": "Folder sync",
-   "why": "A file in the company folder, on Mac or Windows, from saved to searchable, with the folder left as it was",
-   "ideal": "Every file in the company folder is searchable within ten seconds, on Mac or Windows, and the folder itself never changes.",
+   "id": "setup",
+   "name": "Set up",
+   "why": "A company's folder and its own AI, from first sync to answering from the room, with nothing else let in",
+   "ideal": "Every company file is searchable within ten seconds, the customer's own AI connects in a few steps, and no other AI gets in.",
    "sources": [
-    {"title": "Cloudflare R2 pricing", "url": "https://developers.cloudflare.com/r2/pricing/", "date": "2026-10-30"}
+    {
+     "title": "Cloudflare R2 pricing",
+     "url": "https://developers.cloudflare.com/r2/pricing/",
+     "date": "2026-10-30"
+    }
    ],
    "critical_path": [
-    "read-mac",
-    "index-mac",
-    "read-windows",
-    "index-windows",
+    "read",
+    "index",
     "untouched",
-    "minutes"
+    "guide",
+    "refuse",
+    "tools"
    ],
    "steps": [
     {
-     "id": "read-mac",
-     "name": "Read, Mac",
+     "id": "read",
+     "name": "Read",
      "tools": [
       "LegallasExtract",
       "Vision OCR"
@@ -326,34 +330,14 @@
      "metric": "legallas.sync.mac_files_read"
     },
     {
-     "id": "index-mac",
-     "name": "Index, Mac",
+     "id": "index",
+     "name": "Index",
      "tools": [
       "web/scripts sync"
      ],
      "rule": "A change is searchable text within 10 seconds.",
      "rule_ref": "quality-speed/pages/sync/manifest.json",
      "metric": "legallas.sync.mac_change_to_index_text_max"
-    },
-    {
-     "id": "read-windows",
-     "name": "Read, Windows",
-     "tools": [
-      "Windows runner"
-     ],
-     "rule": "Every file's words reach the index, or the file is named.",
-     "rule_ref": "quality-speed/pages/sync/PLAN.md",
-     "metric": "legallas.sync.windows_files_read"
-    },
-    {
-     "id": "index-windows",
-     "name": "Index, Windows",
-     "tools": [
-      "web/scripts sync"
-     ],
-     "rule": "A change is searchable text within 10 seconds.",
-     "rule_ref": "quality-speed/pages/sync/manifest.json",
-     "metric": "legallas.sync.windows_change_to_index_text_max"
     },
     {
      "id": "untouched",
@@ -366,33 +350,6 @@
      "metric": "legallas.sync.mac_folder_unchanged"
     },
     {
-     "id": "minutes",
-     "name": "Minutes",
-     "tools": [
-      "macOS runner"
-     ],
-     "rule": "The Mac lane runs in 5 minutes or less.",
-     "rule_ref": "quality-speed/pages/sync/manifest.json",
-     "metric": "legallas.sync.mac_lane_minutes"
-    }
-   ]
-  },
-  {
-   "id": "connect",
-   "name": "Connect an AI",
-   "why": "A customer's own AI, from the setup guide to answering from the room, and no other AI gets in",
-   "ideal": "A customer connects their own AI in a few steps, it sees a short tool list, and no other AI gets in.",
-   "sources": [
-    {"title": "Claude API docs: Tool search tool", "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool", "date": "2026-11-05"}
-   ],
-   "critical_path": [
-    "guide",
-    "connect",
-    "refuse",
-    "tools"
-   ],
-   "steps": [
-    {
      "id": "guide",
      "name": "Guide",
      "tools": [
@@ -401,17 +358,6 @@
      "rule": "The longest setup is 7 steps or fewer.",
      "rule_ref": "web/connect",
      "metric": "legallas.ai-connectors.setup_steps_worst_ai"
-    },
-    {
-     "id": "connect",
-     "name": "Connect",
-     "tools": [
-      "Remote MCP server",
-      "OAuth"
-     ],
-     "rule": "All 4 supported AIs pass every smoke stage.",
-     "rule_ref": "docs/design",
-     "metric": "legallas.ai-connectors.supported_ais_connecting"
     },
     {
      "id": "refuse",
