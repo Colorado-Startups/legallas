@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { collect, reusable } from "../src/collect.ts";
 import { FACTS_VERSION } from "../src/facts.ts";
-import { type Getter, rateLimited, reason } from "../src/github.ts";
+import { type Getter, NotFound, fetchGetter, ghFailure, rateLimited, reason } from "../src/github.ts";
 
 const REPO = "example-org/example-repo";
 const NOW = new Date("2030-03-01T00:00:00Z");
@@ -49,7 +49,7 @@ const QUEUE_RUNS = [
   { id: 22, run_attempt: 1, status: "in_progress", conclusion: null, head_branch: QUEUE, created_at: "2030-02-27T10:12:30Z" },
 ];
 
-function api(calls: string[], failOn?: string): Getter {
+function api(calls: string[], failOn?: string, absent: string[] = []): Getter {
   const R = `repos/${REPO}`;
   const routes: Record<string, unknown> = {
     [`${R}/contents/.github/pull_request_template.md`]: { encoding: "base64", content: b64(TEMPLATE) },
@@ -100,6 +100,7 @@ function api(calls: string[], failOn?: string): Getter {
     calls.push(path);
     const bare = path.split("?")[0] ?? path;
     if (failOn && bare === failOn) throw new Error(`GET ${bare}: HTTP 500`);
+    if (absent.includes(bare)) throw new NotFound(bare);
     if (bare === `${R}/pulls` && path.includes("state=open")) return path.includes("page=1") || !path.includes("page=") ? [pull(9, null, null)] : [];
     if (bare === `${R}/activity`) {
       if (!path.includes("ref=refs/heads/main")) throw new Error("activity must be read for main");
@@ -144,6 +145,15 @@ test("collect: merged and closed pull requests in range, open ones, and direct p
 test("collect: a failed read throws, so the run writes every metric missing", async () => {
   await assert.rejects(collect(api([], `repos/${REPO}/pulls/2/comments`), REPO, NOW, OPTS));
   await assert.rejects(collect(api([], `repos/${REPO}/compare/p2...h2`), REPO, NOW, OPTS));
+});
+
+test("collect: a base with no template or .gitattributes leaves only template_complete unread", async () => {
+  const R = `repos/${REPO}`;
+  const out = await collect(api([], undefined, [`${R}/contents/.github/pull_request_template.md`, `${R}/contents/.gitattributes`]), REPO, NOW, OPTS);
+  const f = out.pulls[0]!;
+  assert.equal(f.template_complete, null, "nothing to complete, so not counted");
+  assert.equal(f.ci_green_first_time, false, "every other fact still reads");
+  await assert.rejects(collect(api([], `${R}/contents/.github/pull_request_template.md`), REPO, NOW, OPTS), "any other failure still fails the run");
 });
 
 test("collect: a merge missing from the clone is left for the next run if recent, an error if not", async () => {
@@ -256,4 +266,20 @@ test("collect: a day with more merge_group runs than one query lists throws, nev
     return { workflow_runs: page <= 10 ? full.map((r) => ({ ...r, id: r.id + page * 100 })) : [] };
   };
   await assert.rejects(collect(busy, REPO, NOW, OPTS), /a day holds more than one query lists/);
+});
+
+test("an HTTP 404 becomes NotFound in both getters; other failures stay plain errors", async () => {
+  const realFetch = globalThis.fetch;
+  try {
+    for (const [status, body] of [[404, '{"message":"Not Found"}'], [500, "{}"]] as const) {
+      globalThis.fetch = (async () => new Response(body, { status })) as typeof fetch;
+      const read = fetchGetter("token")("repos/o/r/contents/.github/pull_request_template.md?ref=abc");
+      if (status === 404) await assert.rejects(read, (e: unknown) => e instanceof NotFound && !String(e).includes("ref="));
+      else await assert.rejects(read, (e: unknown) => !(e instanceof NotFound));
+    }
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+  assert.ok(ghFailure("repos/o/r/contents/x?ref=abc", "gh: Not Found (HTTP 404)") instanceof NotFound);
+  assert.ok(!(ghFailure("repos/o/r/contents/x", "gh: Server Error (HTTP 500)") instanceof NotFound));
 });
