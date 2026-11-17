@@ -33,7 +33,7 @@ owner adds their own settings, from their Cloudflare account, before sending. Ea
 | 24 | Which AI tools can connect? | Claude, Microsoft 365 Copilot and Harvey by default; the room owner can allow others. Each lawyer signs in as themselves | [AI governance](ai-governance.md) |
 | 25 | Data retention and deletion? | Replaced files 30 days; research threads 90 days; sign-in records and the audit log on the room owner's schedule; the rest until close-out. A legal hold blocks every purge | [Data and network](data-and-network.md) |
 | 26 | Data location guarantee? | A region hint by default; a jurisdiction can be set when the room's stores are created | [Data and network](data-and-network.md) |
-| 27 | Malware scanning? | Uploads are limited to PDF, images, Office files, zip and plain text, each checked by its first bytes, 95 MB at most. No antivirus scan | [Data and network](data-and-network.md) |
+| 27 | Malware scanning? | Uploads are limited to PDF, images, Office files, zip and plain text, each checked by its first bytes, 95 MB at most. PDF scripts, Office macros or ActiveX and programs in a zip are refused (`web/worker/active-content.ts`). No antivirus scan | [Data and network](data-and-network.md) |
 | 28 | Insurance? | Not answered here. Ask the room owner | |
 
 ## Review

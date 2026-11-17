@@ -60,6 +60,7 @@ and in the database (migration 0022), and refuses `close-out --revoke` and `--de
 | Sync aborts on a symlink, a file outside the room's folder, or a private key | Built in | `web/scripts/guard.ts` |
 | Sync scans for Social Security numbers and blocks the upload unless that one file is allowed by its hash | Built in | `web/scripts/pii.ts`, `web/scripts/sync.ts` |
 | Uploads: an allowlist of types checked against the file's first bytes, 95 MB at most | Built in | `web/worker/files-upload.ts` |
+| Uploads and sync refuse active content: PDF scripts, Office macros or ActiveX, programs in a zip | Built in | `web/worker/active-content.ts` |
 
 ## Network
 
@@ -79,7 +80,7 @@ and in the database (migration 0022), and refuses `close-out --revoke` and `--de
 | Ask, tool-call and Copilot package limits pass if Cloudflare's limiter errors; daily caps still hold | Fail closed per route, as `/register` and `/token` do |
 | The MCP Origin check logs but doesn't refuse (`MCP_ORIGIN_ENFORCE` is `"0"`) | Turn it on once each AI vendor's Origin is confirmed |
 | No WAF rules of the room's own | Cloudflare WAF custom rules on the room owner's zone |
-| No malware scan of uploads | A scanning service, or limiting uploads to types that can't carry active content |
+| No antivirus scan of uploads; active content is refused, other malware isn't detected | A scanning service |
 | D1 and R2 regions are location hints, not a residency guarantee, unless a jurisdiction is set at creation | Create rooms with a jurisdiction where residency matters |
 
 ## Review
