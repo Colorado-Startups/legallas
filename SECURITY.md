@@ -32,7 +32,7 @@ Please do not open a public issue, pull request or commit. A person replies.
 |---|---|---|
 | Two locks on every request, static files included | Cloudflare Access proves who you are; the members table decides whether you are allowed in. A room with no Access team or audience refuses every request | `web/worker/auth.ts` |
 | Deal rooms (off unless `ROOMS_ENABLED` is "1") | Someone invited to a deal room but not a member reaches only that room's guest routes: never a member route or the room's static pages. They see the room's folders minus anything privileged, and every request re-reads their invitation | `web/worker/rooms.ts`, `docs/design/rooms-and-grants.md` |
-| An invited investor's own AI | With `ROOMS_ENABLED` on `legallas-mcp` too: read-only tools (`GUEST_TOOLS`), every query scoped to their rooms, never a privileged document | `web/worker/privilege.ts` |
+| An invited investor's AI, when the room enables it | With `ROOMS_ENABLED` on `legallas-mcp` too: read-only tools (`GUEST_TOOLS`), every query scoped to their rooms, never a privileged document | `web/worker/privilege.ts` |
 | Privileged paths | A document with "privileged" in any segment of its path is only for a role allowed to see it, on every route and MCP tool. To anyone else it answers like a missing document | `web/worker/privilege.ts` |
 | Content Security Policy | Set on every response. The build fails when a page breaks it | `web/worker/headers.ts`, `web/integrations/dist-audit.mjs` |
 | The MCP server is read-only | It writes who read what to the audit log, never the query or page text. `web/connect/security-brief.md` is written for a firm's security team | `web/mcp/contract.ts`, `web/mcp/audit.ts` |
@@ -75,7 +75,7 @@ A member's own AI tool (Claude, Microsoft 365 Copilot or Harvey) reads the room 
 | `swift`, `swift-ocr`, `office-mac` | GitHub-hosted macOS | |
 | `claude.yml` | GitHub-hosted `ubuntu-latest` | Confined to the checkout by `.github/scripts/claude-settings.sh`, taken from `main` |
 | `sbom.yml` | GitHub-hosted `ubuntu-slim`, by hand and on each release tag | No secret. The software bill of materials (CycloneDX JSON): `.github/scripts/sbom.ts` reads `web/package-lock.json` (both Workers) and any tracked `Package.resolved` (the Mac app has no remote packages today). The run keeps the files as an artifact |
-| Deploy | None | A room's owner deploys it |
+| Deploy | No deploy workflow in this repository. A room's owner deploys it | |
 
 ## If something leaks
 
