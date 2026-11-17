@@ -271,7 +271,7 @@ test('no public page shows a dollar figure, from records, detail or committed fi
     const shown = PUBLIC_PAGES.filter((page) => !law.includes(page)).filter((page) => {
       const html = readFileSync(path.join(out, page, 'index.html'), 'utf8');
       // A figure, not the word: an ideal may say a job costs as few dollars as it can.
-      return /\$\s?\d|\d\s?(?:usd|dollars?)\b/i.test(html.replace(/<script\b[\s\S]*?<\/script>/g, ''));
+      return /\$\s?\d|\d\s?(?:usd|dollars?)\b/i.test(html);
     });
     assert.deepEqual(shown, []);
   } finally {
