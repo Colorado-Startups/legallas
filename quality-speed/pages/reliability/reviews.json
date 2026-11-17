@@ -21,6 +21,21 @@
         178,
         267
       ]
+    },
+    {
+      "date": "2026-11-17",
+      "areas": [
+        "who-can-see-what",
+        "citations",
+        "sync-and-save-back",
+        "migrations",
+        "pii-guard",
+        "spend-guard",
+        "connector-contract"
+      ],
+      "bugs": [
+        37
+      ]
     }
   ]
 }
