@@ -221,3 +221,13 @@ test('htmlText reads tags as a browser does: hidden bodies go and no raw "<" is 
     assert.equal(htmlText(html).includes('<'), false, html);
   }
 });
+
+test('htmlText stays linear on a long run of "<" with no ">"', () => {
+  const started = performance.now();
+  assert.equal(htmlText('<'.repeat(100_000)), '');
+  assert.ok(performance.now() - started < 1000, 'finishes in well under a second');
+});
+
+test('htmlText keeps its place after a character whose lowercase is longer', () => {
+  assert.equal(htmlText('<p>\u0130stanbul</p><script>steal()</script><p>after</p>'), '\u0130stanbul\n\nafter');
+});

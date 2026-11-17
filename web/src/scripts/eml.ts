@@ -174,9 +174,13 @@ function tagText(name: string, closing: boolean): string {
  * (doc-views.ts); a '<' the email meant as text arrives as &lt; and is decoded after.
  */
 export function htmlText(html: string): string {
-  const lower = html.toLowerCase();
+  // ASCII-only fold: toLowerCase can change the length ('İ' becomes two code units), and indexes must match html's.
+  const lower = html.replace(/[A-Z]/g, (c) => c.toLowerCase());
   let text = '';
   let at = 0;
+  // The next '>' at or after the current '<', kept between tags so a run of '<' with no '>' is not rescanned each time.
+  // -1: none is left, so never search again; -2: not searched yet.
+  let gt = -2;
   while (at < html.length) {
     const open = html.indexOf('<', at);
     if (open < 0) {
@@ -191,7 +195,8 @@ export function htmlText(html: string): string {
     }
     TAG_NAME.lastIndex = open;
     const tag = TAG_NAME.exec(html);
-    const close = html.indexOf('>', open);
+    if (gt !== -1 && gt < open) gt = html.indexOf('>', open);
+    const close = gt;
     if (!tag) {
       // "<!doctype>", "<?xml?>" and "</ >" run to their '>'; a '<' before anything else is text's, and only it goes.
       const markup = /[!?/]/.test(html[open + 1] ?? '');
