@@ -56,7 +56,7 @@ import {
   readyAt,
   reviewAttempts,
 } from "./facts.ts";
-import { type Getter, type GraphQL, RateLimited, fetchGetter, getAll, ghGetter, graphqlClient } from "./github.ts";
+import { type Getter, type GraphQL, NotFound, RateLimited, fetchGetter, getAll, ghGetter, graphqlClient } from "./github.ts";
 import { type Collected, type DeletedRun, type Manifest, type OpenPull, WINDOW_DAYS, failedRecords, records } from "./metrics.ts";
 import { fixesByBlame, hasCommit } from "./rework.ts";
 
@@ -87,16 +87,29 @@ async function fileAt(get: Getter, repo: string, path: string, ref: string): Pro
   return Buffer.from(body.content, "base64").toString("utf8");
 }
 
-/** The template and .gitattributes as they were at a commit. */
+/** A file at a commit, or null when it did not exist there. Any other failure throws. */
+async function fileOrNull(get: Getter, repo: string, path: string, ref: string): Promise<string | null> {
+  try {
+    return await fileAt(get, repo, path, ref);
+  } catch (e) {
+    if (e instanceof NotFound) return null;
+    throw e;
+  }
+}
+
+/**
+ * The template and .gitattributes as they were at a commit. A base with no
+ * template (a repository's first commit) has nothing to complete: such a pull
+ * request is left out of template_complete, and every other metric still reads.
+ */
 async function rulesAt(get: Getter, repo: string, sha: string): Promise<Rules> {
-  const t = parseTemplate(await fileAt(get, repo, ".github/pull_request_template.md", sha));
+  const template = await fileOrNull(get, repo, ".github/pull_request_template.md", sha);
+  const attributes = await fileOrNull(get, repo, ".gitattributes", sha);
+  const generated = attributes === null ? [] : parseGitattributes(attributes);
+  if (template === null) return { templateHeadings: [], templateBoxes: 0, templateAttestations: 0, hasTemplate: false, generated };
+  const t = parseTemplate(template);
   if (t.headings.length === 0) throw new Error("pull request template has no headings");
-  return {
-    templateHeadings: t.headings,
-    templateBoxes: t.boxes,
-    templateAttestations: t.attestations,
-    generated: parseGitattributes(await fileAt(get, repo, ".gitattributes", sha)),
-  };
+  return { templateHeadings: t.headings, templateBoxes: t.boxes, templateAttestations: t.attestations, hasTemplate: true, generated };
 }
 
 /** Pull requests closed (merged or not) after `since`, newest update first. */

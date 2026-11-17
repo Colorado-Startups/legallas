@@ -26,6 +26,7 @@ export function fetchGetter(token: string): Getter {
     if (!res.ok) {
       const body = await res.text().catch(() => "");
       if (rateLimited(res.status, res.headers, body)) throw new RateLimited(endpoint(path), res.status);
+      if (res.status === 404) throw new NotFound(endpoint(path));
       throw new Error(`GET ${endpoint(path)}: HTTP ${res.status}${reason(body)}`);
     }
     return res.json();
@@ -36,6 +37,13 @@ export function fetchGetter(token: string): Getter {
 export class RateLimited extends Error {
   constructor(path: string, status: number) {
     super(`GET ${path}: HTTP ${status}, rate limited`);
+  }
+}
+
+/** A 404: the thing read does not exist, as a file absent at a commit. */
+export class NotFound extends Error {
+  constructor(path: string) {
+    super(`GET ${path}: HTTP 404, Not Found`);
   }
 }
 
