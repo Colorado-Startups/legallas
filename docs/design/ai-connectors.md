@@ -296,7 +296,9 @@ Caveats, even under ZDR:
 
 DCR for the agent is possible but not yet practical. Microsoft requires the server to issue a client secret at
 registration, the Developer Portal does not support DCR, and the agent's auth config has to come from Agents Toolkit, a
-developer tool [M5]. So 1.0 uses a static client per customer, the path the admin page already supports.
+developer tool [M5]. So 1.0 uses a static client per customer. The owner creates it on the MCP server's
+`/admin/clients` page (`web/mcp/admin-clients.ts`): a client ID, a secret shown once, and the Teams callback, which is
+on the redirect allowlist (`web/mcp/contract.ts`).
 
 ```mermaid
 sequenceDiagram
