@@ -96,8 +96,9 @@ gold_inputs+='|web/scripts/(ask-eval-(score|checks)|case-guard|config|diff|mcp-c
 gold_inputs+='|web/src/scripts/(formd\.test-data|sanitize)\.ts$'
 gold_inputs+='|web/worker/(citations|doc-facts|doc-kinds|files-catalog|law-cite|matter|matter-fields|matter-types|passages|room-settings|sql|stored-name)\.ts$'
 # web/package-lock.json: the site's TypeScript and Node types pins follow web's (quality-speed/core/pins.test.ts, #872), so
-# the bump that drifts them fails its own pull request.
-quality_speed="$(changed "^(quality-speed/|web/package-lock\.json$|$gold_inputs|$gate)")"
+# the bump that drifts them fails its own pull request. settings-apply.yml: its Plan is tested against the Settings page's
+# file (quality-speed/pages/settings/apply.test.ts).
+quality_speed="$(changed "^(quality-speed/|web/package-lock\.json$|\.github/workflows/settings-apply\.yml$|$gold_inputs|$gate)")"
 
 {
     echo "web=$web"
