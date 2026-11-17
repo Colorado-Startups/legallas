@@ -257,8 +257,8 @@ TVM-01.2,Threat and vulnerability management,Yes,Every 12 months and on change.,
 TVM-02.1,Threat and vulnerability management,Yes,Upload type allowlist by first bytes; sync guards; injection fencing. No antivirus.,docs/security/data-and-network.md; docs/security/ai-governance.md
 TVM-02.2,Threat and vulnerability management,Yes,Every 12 months and on change.,docs/security/data-and-network.md
 TVM-03.1,Threat and vulnerability management,Yes,"Nightly osv-scanner, Semgrep; gitleaks, CodeQL and GitHub secret scanning per change; push protection; Dependabot weekly.",docs/security/vulnerability-management.md
-TVM-04.1,Threat and vulnerability management,No,No threat analysis process. AI risks rated.,docs/security/ai-risk-assessment.md
-TVM-04.2,Threat and vulnerability management,No,No threat model.,docs/security/ai-risk-assessment.md
+TVM-04.1,Threat and vulnerability management,Yes,"STRIDE per trust boundary; reviewed every 12 months and when a boundary, store, outside service or MCP tool is added. AI risks rated.",docs/security/threat-model.md; docs/security/ai-risk-assessment.md
+TVM-04.2,Threat and vulnerability management,Yes,"Threat model: data flow, STRIDE per boundary, OWASP Top 10 map, open threats.",docs/security/threat-model.md
 TVM-05.1,Threat and vulnerability management,Yes,Live OSV database nightly; Dependabot weekly.,quality-speed/pages/security/scan.sh; .github/dependabot.yml
 TVM-06.1,Threat and vulnerability management,Yes,"Dependabot weekly, npm and Actions.",.github/dependabot.yml
 TVM-07.1,Threat and vulnerability management,No,No third-party penetration test.,docs/security/README.md; docs/security/vulnerability-management.md
