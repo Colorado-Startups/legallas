@@ -65,7 +65,7 @@
    ],
    "paths": "^/api/hold/notice$",
    "status": "accepted",
-   "reason": "The scan's script string comes back as JSON data (Response.json in web/worker/http.ts: application/json, nosniff, CSP default-src 'none'). The hold page puts the notice and custodians in with textContent and el(), never innerHTML (web/src/scripts/hold.ts).",
+   "reason": "The scan's script string comes back as JSON data (application/json from Response.json in web/worker/http.ts; nosniff and CSP default-src 'none' from web/worker/headers.ts). The hold page puts the notice and custodians in with textContent and el(), never innerHTML (web/src/scripts/hold.ts).",
    "decided": "2026-11-17"
   },
   {
