@@ -59,7 +59,7 @@ flowchart LR
 |---|---|
 | Task start | The earliest of a merge's session lines and commits: this page's choice |
 | p90 goal 24 h | State of DevOps states a typical lead time; holding the 90th percentile to it is this page's choice |
-| Token goal | Dollars turned into tokens at this repository's own measured rate (below) |
+| Token goal | Dollars turned into tokens at this repository's own measured rate, which stays off this public tree (below) |
 
 ## Token source
 
@@ -104,9 +104,9 @@ flowchart LR
 
 | Token goal | |
 |---|---|
-| Rate | $0.354 per million tokens: 1,541 M tokens cost $546 at Opus 5.5 prices, two days of this repo's sessions on this Mac (2026-11-05), 98.3 % of them cache reads |
-| Goal 35 M | One merged change costs no more than the costs page's average active day, $13 (36.7 M), rounded down |
-| Floor 80 M | Its 90th percentile, $30 (84.7 M), rounded down |
+| Rate | Dollars a million tokens at Opus 5.5 prices, over two days of this repo's sessions (2026-11-05), most of them cache reads. The sessions' totals and the rate stay off this public tree |
+| Goal 35 M | One merged change costs no more than the costs page's average active day, $13, in tokens at that rate, rounded down |
+| Floor 80 M | Its 90th percentile, $30, the same way |
 | All four types | Cache reads are 55 % of the price and grow with context and turns, the levers the costs page names |
 
 | Known limits | |
@@ -148,16 +148,16 @@ The 5 Nov run (42067834620) on Agents, scored on this list: fence missing, rules
 
 ## Levers
 
-For `tokens_per_merged_change`. Measured on this Mac's Legallas transcripts, 3 days to 2026-11-06: 56 sessions over 5 M tokens, 8,495 main-thread calls, 3,118 M context tokens read. Numbers only.
+For `tokens_per_merged_change`. Measured on Legallas session transcripts, 3 days to 2026-11-06, in shares only: the sessions' own token counts stay off this public tree.
 
 | Finding | Reading |
 |---|---|
-| Context at a session's first call | 132 K to 153 K tokens |
-| Context per call, each session's p50 | 242 K to 645 K |
+| Context at a session's first call | Most of the way to 200 K already |
+| Context per call, each session's p50 | Past 200 K in every session |
 | Calls past 200 K, per session | 77 % to 98 % |
 | Calls that only read (`grep`, `cat`, `sed -n`) | 51 % of tokens read; 93 % make one tool call, 74 % follow another read |
 | CI polling calls | 8 % of tokens read |
-| Subagent first call | p50 114 K |
+| Subagent first call | p50 past half of 200 K |
 
 | Lever | Change | Source | Expected effect | Reverse |
 |---|---|---|---|---|

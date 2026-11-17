@@ -8,7 +8,7 @@ Read 2026-11-01 and 2026-11-02.
 
 | Source | What it gives this page |
 |---|---|
-| [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions) | Enterprise Cloud includes $300 of compute a month, "a monetary amount, not a fixed number of minutes". Pages and Dependabot listed as free |
+| [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions) | Enterprise Cloud includes an amount of compute each month, "a monetary amount, not a fixed number of minutes". Pages and Dependabot listed as free |
 | [Actions runner pricing](https://docs.github.com/en/billing/reference/actions-runner-pricing) | Per minute: Linux 2-core $0.006, Linux 1-core $0.002, Linux arm $0.005, Windows $0.010, macOS $0.062. Each job rounds up to a whole minute. No 2x or 10x multipliers appear |
 | [Billing cycles](https://docs.github.com/en/billing/concepts/billing-cycles) | Metered products reset at 00:00 UTC on the first of each month |
 | [Set up budgets](https://docs.github.com/en/billing/how-tos/set-up-budgets) | At a stop budget, hosted runners are blocked until the next cycle. So running out means CI stops, and the required checks with it |
@@ -24,12 +24,11 @@ Read 2026-11-01 and 2026-11-02.
 
 ### What the money reading rests on
 
-- **The billing report had no rows until November.** On 2026-11-01 and 11-02 it answered HTTP 200 with `usageItems: []` for this organization and its enterprise. On 2026-11-06 the organization's November summary had rows: `actions_linux` $142.39, `actions_linux_slim` $24.48, `actions_macos` $14.45, `actions_windows` $2.06, `actions_storage` $0.18, $183.55 gross, all net $0 (#237). October still has none. The page keeps reading job records, which need no billing scope; an empty list still means unknown, never $0.
-- **The $0 budget covers `ubuntu-slim`.** The organization's budgets (read 2026-11-06) are product-level `ProductPricing` with `prevent_further_usage` on `actions`, `codespaces`, `packages` and `git_lfs`. The report books `actions_linux_slim` under product `Actions`, so the `actions` budget stops it too (#263).
-- **Job records recover the bill.** On a different enterprise account whose report does have rows, the same rule gave macOS 199 minutes against 200 billed, Linux 344 against 345, and 1-core Linux 65 against 65 (2026-11-02). That includes Dependabot's 2 minutes, so they count here too, even though the billing page lists Dependabot as free.
-- **The plan's "$13" was that other account.** It is a separate enterprise with its own allowance, and it has no bearing on this repository's $300.
-- **What this page works to.** GitHub's docs state $300, about 50,000 Linux minutes. The owner, 2026-11-06: "You are authorized to use all the action credits as needed". So the ceiling is the whole $300 of included usage. The stop is the enterprise's $0 Stop-usage budget on Actions: past the included $300, CI stops instead of billing. There is no hold below it.
-- **The blind spot.** A job's token sees only this repository, so the reading leaves out the organization's other private repositories, and their share of Blacksmith's minutes. They held $0.05 of the $7.33 on the first day, but another repository's site is about to share the allowance. The gap between the goal and the ceiling is partly for this, and Fixes has a row to close it.
+- **The billing report had no rows until November.** On 2026-11-01 and 11-02 it answered HTTP 200 with `usageItems: []` for this organization and its enterprise. On 2026-11-06 the organization's November summary had rows for `actions_linux`, `actions_linux_slim`, `actions_macos`, `actions_windows` and `actions_storage`, none of it billed (#237). October still has none. The page keeps reading job records, which need no billing scope; an empty list still means unknown, never $0.
+- **The stop-usage budget covers `ubuntu-slim`.** The organization's budgets (read 2026-11-06) are product-level `ProductPricing` with `prevent_further_usage` on `actions`, `codespaces`, `packages` and `git_lfs`. The report books `actions_linux_slim` under product `Actions`, so the `actions` budget stops it too (#263).
+- **Job records recover the bill.** On an account whose report does have rows, the same rule matched the billed minutes within one minute on each runner (2026-11-02). That includes Dependabot's minutes, so they count here too, even though the billing page lists Dependabot as free.
+- **What this page works to.** The owner, 2026-11-06: "You are authorized to use all the action credits as needed". So the ceiling is the whole included amount. The lane passes it in (`ACTIONS_INCLUDED_USD`), so no account's figure sits in this public tree; with none, the page draws no gauge. The stop is the enterprise's Stop-usage budget on Actions: past the included amount, CI stops instead of billing. There is no hold below it.
+- **The blind spot.** A job's token sees only this repository, so the reading leaves out the organization's other private repositories, and their share of Blacksmith's minutes. They held under 1% of the first day's spend, but another repository's site is about to share the allowance. The gap between the goal and the ceiling is partly for this, and Fixes has a row to close it.
 
 ## Metrics
 
@@ -39,7 +38,7 @@ Each metric has a floor (scores 0), a goal (scores 100) and a weight. All read w
 
 | Metric | Why it proves the ideal | Source | Floor | Goal | Weight | Min samples |
 |---|---|---|---|---|---|---|
-| `allowance_forecast_usd` | Running out stops CI, so where the month will end matters more than where it is | Job records priced by runner: month so far, plus the last 7 days' daily pace for the days left | $270 | $180 | 4 | 30 product jobs |
+| `allowance_forecast_usd` | Running out stops CI, so where the month will end matters more than where it is | Job records priced by runner: month so far, plus the last 7 days' daily pace for the days left | 90% of the included amount | 60% of it | 4 | 30 product jobs |
 | `main_green_pct` | A red main means green stopped meaning safe | CI on main, 14 days, green on the first attempt. A rerun can't erase a red, and a run open at 2 hours counts against | 90 | 100 | 3 | 10 runs |
 | `gates_ran_pct` | A run can be green because the gate that mattered never ran | Per merged product pull request, 14 days: the secret scan always, the web check, test, build and dry runs when `web/` changed, both Swift jobs on Swift paths, the workflow lint on `.github/` | 90 | 100 | 3 | 10 merges |
 | `planted_failures_caught_pct` | Green only means safe if red still happens | The repository's own gates, run on planted failures in throwaway folders, plus their wiring in `ci.yml` | 50 | 100 | 3 | 29 plants, all of them |
@@ -70,16 +69,16 @@ Each metric has a floor (scores 0), a goal (scores 100) and a weight. All read w
 
 ### Why the goals are where they are
 
-- **`allowance_forecast_usd`:** the floor, $270, is 90% of the $300 ceiling, close enough that one burst late in the month would reach the $0 budget and stop CI. The goal is $180, the 30,000 minutes the owner first expected (2026-11-02), which leaves $90 for a burst and the other repositories this page can't see. Stated reason, no outside standard exists.
+- **`allowance_forecast_usd`:** the floor is 90% of the ceiling, close enough that one burst late in the month would reach the stop-usage budget and stop CI. The goal is 60%, near what the owner first expected (2026-11-02), which leaves room for a burst and the other repositories this page can't see. Stated reason, no outside standard exists.
 - **`runs_deleted`:** GitHub's [contexts reference](https://docs.github.com/en/actions/reference/workflows-and-actions/contexts) says `github.run_number` begins at 1 for a workflow's first run and increments with each new run, and 825 runs on 2026-11-02 had no gap, so a gap means a deletion. One is enough to score 0, because the evidence is gone and can't be scored around. It counts every run, the site's too. Like any metric at goal, it adds to the score while it reads 0: adding it lifted the first baseline from 85 to 86. **Its limit:** a deleted newest run leaves no gap until that workflow runs again, and a deleted oldest run in the window leaves none at all.
-- **`usd_per_merge`:** $108 over 30 days of the busiest 24 hours so far, 37 merges, is about $0.10. So even a month at the rollout's pace stays inside the forecast's goal. The floor is five times that.
+- **`usd_per_merge`:** a month at the pace of the busiest 24 hours so far, over that day's merges, is about $0.10 a merge. So even a month at the rollout's pace stays inside the forecast's goal. The floor is five times that.
 - **`green_minutes_p50` and `p95`:** The DevOps research program's "a few minutes", and the ten-minute limit it and Fowler both name. Baseline already meets both, which the sources justify. Goals only tighten, so these can move down later.
 - **`billed_minutes_per_merge`:** `usd_per_merge`'s goal and floor, $0.10 and $0.50, in minutes at GitHub's Linux rate of $0.006 a minute (Actions runner pricing): 17 and 83.
 - **`slowest_job_minutes_p95`:** half of the ten-minute budget, since one job can't be allowed to use the whole of it.
 - **`main_green_pct`:** Fowler and the DevOps research program, as above. The floor is one red run in ten.
 - **`flaky_trees_pct`:** Fowler, as above. The floor of 5% is one flake in twenty comparisons, well past the point where people stop trusting red.
 - **`blacksmith_minutes_31d`:** Blacksmith's page gives the 3,000 free minutes. The guard stops this repository at 1,800, and the other repository's stops at 900. A few jobs in flight can pass the stop, so the goal is 1,900. The floor is 2,100, where this repository's use plus the other repository's full share reaches the free limit, so past it the organization can start to bill. It's a gate because the owner never allows per-use billing.
-- **`jobs_with_timeout_pct`:** $22.32 is 360 minutes at $0.062, 7% of the $300 from one job, and the gap from goal to floor is only $90. Today's longest limit is 30 minutes, so 60 leaves room without allowing an hour-long hang to pass unnoticed twice.
+- **`jobs_with_timeout_pct`:** $22.32 is 360 minutes at $0.062, from one hung job. Today's longest limit is 30 minutes, so 60 leaves room without allowing an hour-long hang to pass unnoticed twice.
 - **`unpinned_dependencies`, `workflow_lint_pass`:** GitHub's secure use reference and Scorecard, both above.
 - **`gates_ran_pct`, `planted_failures_caught_pct`, `workflows_proven_pct`:** all must be whole. There's no safe share of gates that didn't run or plants that got through. The drill's sample minimum equals its plant count, so deleting a plant reads as too few samples, not a clean score.
 
@@ -164,13 +163,13 @@ Read 2026-11-02 at 08:36 UTC in CI, by the real lane in [run 41413382412](https:
 
 | Metric | Baseline | Samples | Score |
 |---|---|---|---|
-| `allowance_forecast_usd` | $812 | 2,462 jobs | 0 |
+| `allowance_forecast_usd` | private | 2,462 jobs | 0 |
 | `main_green_pct` | 100 | 71 runs | 100 |
 | `gates_ran_pct` | 100 | 73 merges | 100 |
 | `planted_failures_caught_pct` | 100 | 29 plants | 100 |
 | `flaky_trees_pct` | 0 | 41 trees | 100 |
 | `runs_deleted` | 0 | 3,729 runs | 100 |
-| `usd_per_merge` | $0.312 | 73 merges | 47 |
+| `usd_per_merge` | private | 73 merges | private |
 | `blacksmith_minutes_31d` | 1,417 | 2,462 jobs | 100 |
 | `unpinned_dependencies` | 0 | 33 | 100 |
 | `workflow_lint_pass` | pass | 1 | 100 |
@@ -184,29 +183,14 @@ Read 2026-11-02 at 08:36 UTC in CI, by the real lane in [run 41413382412](https:
 
 The forecast is the largest gap. It rests on under a day of the rollout's heaviest traffic, divided as one whole day, so it overstates until a week of data has built up.
 
-### Spend by job, first 14 hours
-
-$27.39 in all. This pass read before matrix jobs were grouped, so `other` holds them, this site's own workflow and branch-only workflows.
-
-| Job | Runner | Jobs | Dollars |
-|---|---|---|---|
-| `other` | Linux | 212 | 5.19 |
-| `fixture-room.yml` | macOS | 10 | 2.98 |
-| CI `swift` | macOS | 14 | 2.67 |
-| CI `office-mac` | macOS | 42 | 2.60 |
-| Claude review | Linux | 261 | 2.06 |
-| CI `choose-runner` | Linux | 291 | 1.75 |
-| DCO | Linux | 288 | 1.73 |
-| Labeler | Linux | 280 | 1.68 |
-| CI `swift-ocr` | macOS | 14 | 1.24 |
-| CI `checks` | Linux | 100 | 1.10 |
+The organization's spend, by job and in total, stays off this public tree; the page's spend table shows it where the lane runs.
 
 ### First runs of the by-hand workflows
 
-| Workflow | Result | Time | Cost |
-|---|---|---|---|
-| `fixture-room.yml` | Passed: seed, build, screenshots and MCP smoke | 4 min 22 s | $0.31 |
-| `claude-confinement.yml` | Passed | 50 s | $0.006 |
+| Workflow | Result | Time |
+|---|---|---|
+| `fixture-room.yml` | Passed: seed, build, screenshots and MCP smoke | 4 min 22 s |
+| `claude-confinement.yml` | Passed | 50 s |
 
 ## Fixes
 

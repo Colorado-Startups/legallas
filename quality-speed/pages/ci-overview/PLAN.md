@@ -11,8 +11,8 @@ Read on 2026-11-02 unless marked.
 |---|---|---|
 | GitHub-hosted price a minute | Linux 2-core $0.006, `ubuntu-slim` 1-core $0.002, Windows $0.010, macOS (M1, `macos-26`, `xcode-27`) $0.062 | docs.github.com/en/billing/reference/actions-runner-pricing |
 | Rounding | Each job rounds up to a whole minute | Same page |
-| Included usage | A dollar pool: Enterprise Cloud $300 a month, "about 50,000 minutes" of Linux. No multipliers | docs.github.com/en/billing/concepts/product-billing/github-actions |
-| What we work to | The whole $300; the $0 Stop-usage budget is the stop, no hold below it. "You are authorized to use all the action credits as needed" | The owner, 2026-11-06 |
+| Included usage | A dollar pool, a monthly amount set by the plan, not a number of minutes. No multipliers | docs.github.com/en/billing/concepts/product-billing/github-actions |
+| What we work to | The whole included amount; the Stop-usage budget is the stop, no hold below it. "You are authorized to use all the action credits as needed" | The owner, 2026-11-06 |
 | `ubuntu-slim` | 1 CPU, 5 GB, a container, 15-minute job cap; git, Python 3.12, Node 24, jq, gh | runner reference; runner-images `ubuntu-slim-Readme.md` |
 | Blacksmith | 3,000 free x64 2-vCPU minutes a month per organization; Windows 2x; macOS 20x; then $0.004 a minute; alerts only, no hard stop; free colocated cache | docs.blacksmith.sh/blacksmith-runners/overview, blacksmith.sh/pricing |
 | The guard | `.github/scripts/build_minutes_guard.py` moves CI off Blacksmith at 2,700 minutes in 31 days | This repo |
@@ -95,13 +95,14 @@ slices, checked against each slice's count; since tightened to never page a list
 | Metric | Chart |
 |---|---|
 | `gates_intact` | `dotMatrix`, eight gates, pass or fail |
-| `ci_usd_per_merge` | `metricBullet`, with baseline |
+| `ci_usd_per_merge` | `metricBullet`, once the manifest holds Consumption |
 | `pushes_per_merge`, `reviews_per_merge`, `repeat_runs_per_merge` | `bullets` under "Per merge", with rebases as a tile beside them |
 | `final_push_to_merge_p50` | `metricTile` |
-| Infographic: one push, three paths | Docs, web and Swift tabs (CSS only), a Gantt of each job's measured start and end from the push, one lane per runner, cost a push |
-| Runners and third parties | `dataTable`s: job, runner, p50, billed minutes and dollars in the window; each provider's price, free pool and stop |
-| Pools and API | `meter`s: Blacksmith minutes and GitHub dollars a day against a day's share; API tiles, two dated `rate_limit` samples, unscored |
-| Changes | `roadTo100` toggles, and a ranked `dataTable` with each change's measured saving a day |
+| Infographic: one push, three paths | Docs, web and Swift tabs (CSS only), a Gantt of each job's measured start and end from the push, one lane per runner |
+| Runners and third parties | `dataTable`s: job, runner, p50 and billed minutes in the window; each provider's price, free pool and stop |
+| Pools and API | `meter`: Blacksmith minutes a day against a day's share; API tiles, two dated `rate_limit` samples, unscored |
+| Dollars | A push's cost, each job's billed dollars and GitHub dollars a day show only from a lane's own `rows.json`. The committed baseline has none: they are the organization's spend |
+| Changes | `roadTo100` toggles, and a `dataTable` of each change and its state, biggest saving first |
 
 ## Baseline
 
@@ -111,7 +112,7 @@ merges, 59 pull requests). Read once into a local dump; `compute.ts` turns it in
 | Metric | Baseline | Score |
 |---|---|---|
 | `gates_intact` | 7 of 8: four merges on 2026-11-01 have a failed `claude-review` on their final head. From the ruleset's history (orchestrator, #189): #2, #4 and #5 merged at 19:18, before the check became required at 19:24; #34 (`REVIEW.md`) merged at 20:04 through the admin route `claude-review.yml` names for that file. The metric stays as signed off | 0 |
-| `ci_usd_per_merge` | $0.232 | 60 |
+| `ci_usd_per_merge` | private | private |
 | `pushes_per_merge` | 3.21 | 70 |
 | `reviews_per_merge` | 2.74 | 45 |
 | `repeat_runs_per_merge` | 0.79 | 21 |
@@ -120,9 +121,9 @@ merges, 59 pull requests). Read once into a local dump; `compute.ts` turns it in
 
 The 9.9-hour dump has 38 merges, past the 10-merge minimum, though not 7 days. `baseline/` holds the records `collect.ts` wrote from it.
 
-Where the money went in that window, GitHub-hosted at list price: $7.38, plus 343 Blacksmith minutes. macOS $4.65 (CI's three Mac jobs
-$3.09, by-hand and probe runs the rest); `claude-review` $0.83; Labeler $0.82, DCO $0.80, `choose-runner` $0.79, each about 6 to 11
-seconds billed as a whole minute. Blacksmith: 343 minutes in 9.9 hours, against 87 a day that keep it free all month.
+Where the money went in that window, GitHub-hosted at list price: macOS most (CI's three Mac jobs, then by-hand and probe runs), then
+`claude-review`, Labeler, DCO and `choose-runner`, each about 6 to 11 seconds billed as a whole minute. The amounts stay off this public
+tree. Blacksmith: 343 minutes in 9.9 hours, against 87 a day that keep it free all month.
 
 API: the cloud sessions' shared app login used about 6,000 calls in the hour to 05:04 UTC (40 % of its 15,000) by two `rate_limit`
 reads, which are free. The local login's limit is 5,000, and it hit 0 at 04:48 UTC.
@@ -135,15 +136,15 @@ Not from a CI run, so not a scoring record; the daily lane's first run will be.
 | Metric | Live | Score |
 |---|---|---|
 | `gates_intact` | 7 of 8 (the same four merges) | 0 |
-| `ci_usd_per_merge` | $0.352 | 17 |
+| `ci_usd_per_merge` | private | private |
 | `pushes_per_merge` | 7.18: 474 head SHAs over 66 merges, most on open drafts | 0 |
 | `reviews_per_merge` | 3.42 | 21 |
 | `repeat_runs_per_merge` | 0.58 | 42 |
 | `final_push_to_merge_p50` | 4.2 minutes | 93 |
 | Total | | **41** (Q 16, S 92); without cost, Q 16 and the cap still hold |
 
-In those 12.6 hours: $23.47 GitHub-hosted and 1,180 Blacksmith minutes, of which `ci-ok` was 450 and `checks` 729. `office-mac` ran 34
-times at 7 seconds, each billed a whole Mac minute ($2.11). The fixture room's by-hand runs cost $2.67.
+In those 12.6 hours: 1,180 Blacksmith minutes, of which `ci-ok` was 450 and `checks` 729. `office-mac` ran 34 times at 7 seconds,
+each billed a whole Mac minute.
 
 **Fixes ranked by score gained, on the live read and the earlier six-metric list** (cost per merge, #6, moves no score until it
 returns as Consumption):
@@ -159,23 +160,23 @@ returns as Consumption):
 
 ## Fixes
 
-Replayed on the baseline window's job records: each change applied to the jobs it touches, re-rounded and re-priced. A day is the window
-times 24 / 9.9. Simplest and biggest first.
+Replayed on the baseline window's job records: each change applied to the jobs it touches, re-rounded and re-priced at list price. The
+dollar savings stay off this public tree. Simplest and biggest saving first.
 
-| # | Change | Saving a day, list price | State |
-|---|---|---|---|
-| 1 | DCO, Labeler and `choose-runner` on `ubuntu-slim` | $3.90 | Merged in #82 (another session) |
-| 2 | `ci-ok` on `ubuntu-slim`, off Blacksmith: GitHub +$0.36, Blacksmith -315 minutes | $1.53 | #187 |
-| 3 | DCO and Labeler stop rerunning on `ready_for_review`, an unchanged head | $0.12, and repeats to 0.08 | #187 |
-| 4 | Pull request skill: check once, `gh api --cache`, no watch loops; rebase just before ready | API calls; reviews per merge | Merged in #160 |
-| 5 | Rebase before marking ready, so one review per merge | ~$0.58 | In the skill (#160); the orchestrator's slot practice |
-| Cost | The 0-behind rule: about one rebase per merge, each rerunning CI, DCO, Labeler and often the review | ~$3.40 | Recorded, not a fix: the rule stays (`CLAUDE.md`); the merge queue's combined pull requests are what cut it |
-| No | Mac jobs skip drafts: $1.21 gross, less the rerun on ready | ~$0.68 | A green `ci-ok` could stand on a head Mac never checked; Swift drafts lose their only Mac signal |
-| No | `office-mac` folded into `swift-ocr` | $0.29 | 2 runs in the sample; recheck at 7 days |
-| No | npm cache | ~$0.16 | Install is 6 s on Blacksmith; a cache adds a poisoning surface |
-| No | Skip web checks on Markdown-only changes | ~$0.11 | 2 of 59 pull requests; web tests read Markdown |
-| No | Cancel superseded runs | $0 | Already on CI, review and Labeler; DCO costs $0.002 a run after #1 |
-| No | Move secret-free lanes (Law pack) to Blacksmith | $0 net | Blacksmith is the scarcest pool: at this pace its 3,000 last about 3 days |
+| # | Change | State |
+|---|---|---|
+| 1 | DCO, Labeler and `choose-runner` on `ubuntu-slim` | Merged in #82 (another session) |
+| 2 | `ci-ok` on `ubuntu-slim`, off Blacksmith: a little more GitHub, Blacksmith -315 minutes | #187 |
+| 3 | DCO and Labeler stop rerunning on `ready_for_review`, an unchanged head: repeats to 0.08 | #187 |
+| 4 | Pull request skill: check once, `gh api --cache`, no watch loops; rebase just before ready. Saves API calls and reviews per merge | Merged in #160 |
+| 5 | Rebase before marking ready, so one review per merge | In the skill (#160); the orchestrator's slot practice |
+| Cost | The 0-behind rule: about one rebase per merge, each rerunning CI, DCO, Labeler and often the review | Recorded, not a fix: the rule stays (`CLAUDE.md`); the merge queue's combined pull requests are what cut it |
+| No | Mac jobs skip drafts, less the rerun on ready | A green `ci-ok` could stand on a head Mac never checked; Swift drafts lose their only Mac signal |
+| No | `office-mac` folded into `swift-ocr` | 2 runs in the sample; recheck at 7 days |
+| No | npm cache | Install is 6 s on Blacksmith; a cache adds a poisoning surface |
+| No | Skip web checks on Markdown-only changes | 2 of 59 pull requests; web tests read Markdown |
+| No | Cancel superseded runs, no saving | Already on CI, review and Labeler; DCO costs $0.002 a run after #1 |
+| No | Move secret-free lanes (Law pack) to Blacksmith, no net saving | Blacksmith is the scarcest pool: at this pace its 3,000 last about 3 days |
 
 ## Final
 

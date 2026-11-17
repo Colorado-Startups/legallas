@@ -391,6 +391,7 @@ test('the spend detail adds up by job and day, in ids the detail file accepts', 
     ],
     NOW,
     known,
+    500,
   );
   assert.ok(Math.abs((detail['job_swift-ocr_macos']?.value ?? 0) - 0.124) < 1e-9);
   assert.equal(detail['job_swift-ocr_macos']?.n, 2);
@@ -398,7 +399,7 @@ test('the spend detail adds up by job and day, in ids the detail file accepts', 
   assert.equal(detail.job_dco_blacksmith?.value, 0);
   assert.ok(Math.abs((detail['day_2026-11-16']?.value ?? 0) - 0.13) < 1e-9);
   assert.ok(Math.abs((detail.month_usd?.value ?? 0) - 0.13) < 1e-9);
-  assert.equal(detail.month_usd?.limit, 300);
+  assert.equal(detail.month_usd?.limit, 500);
   assert.equal(detail.month_usd?.n, 4);
   assert.ok(isDetail({ checks: {}, readings: detail }), 'one bad id would lose the whole file');
 });
@@ -406,6 +407,7 @@ test('the spend detail adds up by job and day, in ids the detail file accepts', 
 test('a matrix job counts under its job, whatever its values are', () => {
   const detail = spendDetail([run({ path: DCO, jobs: [job({ name: 'lab (forming)' }), job({ name: 'lab (dispute)' })] })], NOW, new Set(['dco_lab']));
   assert.equal(detail.job_lab_linux?.n, 2);
+  assert.equal(detail.month_usd?.limit, null, 'with no allowance passed in, no ceiling');
 });
 
 test('a known job with too long a name reads as other, so it can\'t lose the whole detail file', () => {

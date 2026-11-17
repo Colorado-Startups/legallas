@@ -32,13 +32,13 @@ function context(records: 'measured' | 'missing', detail: Context['detail']): Co
 const DETAIL: NonNullable<Context['detail']> = {
   checks: { ci_ok_checks_failed: 1, dco_missing_sign_off: 0, secret_in_history: 1 },
   readings: {
-    month_usd: { value: 7.33, limit: 180, n: 784 },
-    'day_2026-11-01': { value: 5.68, limit: null, n: 500 },
-    'day_2026-11-02': { value: 1.65, limit: null, n: 284 },
+    month_usd: { value: 6.25, limit: 500, n: 784 },
+    'day_2026-11-01': { value: 4.5, limit: null, n: 500 },
+    'day_2026-11-02': { value: 1.75, limit: null, n: 284 },
     job_checks_blacksmith: { value: 0, limit: null, n: 99 },
-    job_checks_linux: { value: 0.46, limit: null, n: 27 },
-    min_checks_linux: { value: 77, limit: null, n: 27 },
-    job_dco_linux: { value: 0.61, limit: null, n: 101 },
+    job_checks_linux: { value: 0.52, limit: null, n: 27 },
+    min_checks_linux: { value: 81, limit: null, n: 27 },
+    job_dco_linux: { value: 0.74, limit: null, n: 101 },
     queue_macos: { value: 3600, limit: null, n: 9 },
   },
 };
@@ -65,15 +65,21 @@ test('with no history the page shows no chart, not a red box that reads as a sco
 });
 
 test('the gauge stops at the ceiling and says so in numbers', () => {
-  const html = gauge(7.33, 318, 180, 270);
-  assert.match(html, /aria-label="Heading for \$318 of \$300, \$7\.33 spent"/);
-  assert.match(html, /▼ \$318/);
+  const html = gauge(6.25, 640, 300, 450, 500);
+  assert.match(html, /aria-label="Heading for \$640 of \$500, \$6\.25 spent"/);
+  assert.match(html, /▼ \$640/);
   assert.match(html, /qs-area-q" width="100\.00%"/);
-  assert.match(html, /qs-fill-q" width="2\.44%"/);
+  assert.match(html, /qs-fill-q" width="1\.25%"/);
+});
+
+test('with no ceiling in the spend detail the page draws no gauge, so no plan\'s dollars are invented', () => {
+  const noCeiling = { ...DETAIL, readings: { ...DETAIL.readings, month_usd: { value: 6.25, limit: null, n: 784 } } };
+  assert.doesNotMatch(render(context('measured', noCeiling)).body, /Allowance/);
+  assert.match(render(context('measured', DETAIL)).body, /Allowance/);
 });
 
 test('with no spend detail the gauge still shows the forecast, with no invented spend', () => {
-  const html = gauge(null, 90, 180, 270);
+  const html = gauge(null, 90, 300, 450, 500);
   assert.match(html, /Missing/);
   assert.doesNotMatch(html, /qs-fill-q/);
 });
