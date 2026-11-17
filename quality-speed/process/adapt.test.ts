@@ -7,6 +7,7 @@ import { test } from 'node:test';
 import type { MetricDef, MetricRecord } from '../contract/format.ts';
 import { PAGE_GROUPS, PAGES } from '../contract/pages.ts';
 import { IDEAL_MAX_WORDS } from '../contract/validate.ts';
+import { processLink } from '../core/guard.ts';
 import { adapt, stepMetrics, toDef, toEntry } from './adapt.ts';
 
 const def: MetricDef = { id: 'pushes_per_merge', lens: 'quality', unit: 'ratio', direction: 'lower', floor: 6, goal: 2, weight: 1, max_age_hours: 48, min_samples: 10 };
@@ -64,4 +65,11 @@ test('every step metric is defined by its page, dotted ids included, and every p
   const mapped = new Set(defs.map((d) => String(d.id).split('.')[1]));
   const unmapped = PAGES.filter((p) => !mapped.has(p));
   assert.deepEqual(unmapped, PAGE_GROUPS.law.filter((p) => p !== 'sec' && p !== 'templates'));
+});
+
+test('every link the maps carry passes the publish guard, so the Process page can go out', () => {
+  const text = readFileSync(new URL('maps.json', import.meta.url), 'utf8') + readFileSync(new URL('process.json', import.meta.url), 'utf8');
+  const links = [...text.matchAll(/https:\/\/[^"\s]+/g)].map((m) => m[0]);
+  assert.ok(links.length >= 12, `${links.length} links`);
+  assert.deepEqual(links.filter((url) => !processLink(url)), []);
 });
