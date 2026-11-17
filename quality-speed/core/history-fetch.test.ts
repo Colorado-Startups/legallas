@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { commitOnMain, extendsHistory, isTrustedRun, MAX_QUOTA_WAIT_MS, prunePrivate, quotaWait, trustedCopies, type Artifact, type Run } from './history-fetch.ts';
+import { commitOnMain, extendsHistory, isTrustedRun, MAX_QUOTA_WAIT_MS, prunePrivate, publicHistory, quotaWait, trustedCopies, type Artifact, type Run } from './history-fetch.ts';
 
 const mainRun: Run = { event: 'schedule', path: '.github/workflows/quality-speed.yml', head_branch: 'main', head_sha: 'a1' };
 const onMain = () => true;
@@ -73,17 +73,19 @@ test('an error reading a run stops the fetch instead of skipping that copy', () 
   assert.throws(() => trustedCopies([copy(1, 1)], failing, CURRENT_RUN, onMain));
 });
 
+const day = (n: number) => `{"at":"2031-03-0${n}T08:00:00Z","page":"code","quality":${n},"speed":1,"consumption":1,"total":1}\n`;
+
 test('history extends when every older byte is there, in order', () => {
-  const older = Buffer.from('{"day":1}\n{"day":2}\n');
-  assert.equal(extendsHistory(older, Buffer.from('{"day":1}\n{"day":2}\n{"day":3}\n')), true);
+  const older = Buffer.from(day(1) + day(2));
+  assert.equal(extendsHistory(older, Buffer.from(day(1) + day(2) + day(3))), true);
   assert.equal(extendsHistory(older, older), true);
 });
 
 test('history that shrank or changed does not extend', () => {
-  const older = Buffer.from('{"day":1}\n{"day":2}\n');
-  assert.equal(extendsHistory(older, Buffer.from('{"day":1}\n')), false);
+  const older = Buffer.from(day(1) + day(2));
+  assert.equal(extendsHistory(older, Buffer.from(day(1))), false);
   assert.equal(extendsHistory(older, Buffer.alloc(0)), false);
-  assert.equal(extendsHistory(older, Buffer.from('{"day":1}\n{"day":9}\n{"day":3}\n')), false);
+  assert.equal(extendsHistory(older, Buffer.from(day(1) + day(9) + day(3))), false);
 });
 
 test("a commit is on main only if it's in main's history, by GitHub's own compare statuses", () => {
@@ -134,8 +136,8 @@ test('an earlier state loses every private page and lane before it is uploaded a
     mkdirSync(path.dirname(path.join(state, file)), { recursive: true });
     writeFileSync(path.join(state, file), typeof value === 'string' ? value : JSON.stringify(value));
   };
-  const history = '{"at":"2031-03-01T08:00:00Z","page":"claude-code","quality":1,"speed":1,"consumption":1,"total":1}\n';
-  put('history.jsonl', history);
+  const line = (page: string) => `{"at":"2031-03-01T08:00:00Z","page":"${page}","quality":1,"speed":1,"consumption":1,"total":1}`;
+  put('history.jsonl', `${line('code')}\n${line('claude-code')}\n${line('documentation')}\n${line('agents')}\n`);
   put('records/claude-code.json', [{ id: 'tokens_per_merged_change' }]);
   put('records/actions.json', [{ id: 'usd_per_merge' }]);
   put('records/code.json', [{ id: 'long_files' }]);
@@ -146,13 +148,24 @@ test('an earlier state loses every private page and lane before it is uploaded a
   put('lanes/security/keys/facts/names.json', {});
   put('lanes/security/scan.json', [{ id: 'sast_findings_open' }]);
   put('lanes/code/nightly.json', [{ id: 'long_files' }]);
-  assert.equal(prunePrivate(state), 5);
+  assert.equal(prunePrivate(state), 7, '5 files or folders and 2 score lines');
   for (const gone of ['records/claude-code.json', 'records/actions.json', 'lanes/claude-code', 'lanes/security/keys.json', 'lanes/security/keys']) {
     assert.equal(existsSync(path.join(state, gone)), false, gone);
   }
   for (const kept of ['records/code.json', 'lanes/code/nightly.json', 'lanes/security/scan.json']) assert.ok(existsSync(path.join(state, kept)), kept);
   assert.deepEqual(JSON.parse(readFileSync(path.join(state, 'records/security.json'), 'utf8')), [{ id: 'sast_findings_open' }]);
-  assert.equal(readFileSync(path.join(state, 'history.jsonl'), 'utf8'), history, 'the history only grows');
+  assert.equal(readFileSync(path.join(state, 'history.jsonl'), 'utf8'), `${line('code')}\n${line('documentation')}\n`, 'public lines kept in order, a renamed page included');
   assert.equal(prunePrivate(state), 0, 'a clean state is left as it is');
   rmSync(state, { recursive: true });
+});
+
+test('a page turning private never reads as the history shrinking, but a changed public line still does', () => {
+  const line = (page: string, total = 1) => `{"at":"2031-03-01T08:00:00Z","page":"${page}","quality":1,"speed":1,"consumption":1,"total":${total}}\n`;
+  const before = Buffer.from(line('code') + line('claude-code') + line('agents'));
+  const pruned = Buffer.from(line('code') + line('issues'));
+  assert.equal(publicHistory(before), line('code'));
+  assert.equal(extendsHistory(before, pruned), true);
+  assert.equal(extendsHistory(before, Buffer.from(line('code', 2))), false, 'a public score changed');
+  assert.equal(extendsHistory(before, Buffer.from(line('issues'))), false, 'a public line went missing');
+  assert.equal(publicHistory('not json\n{"page":7}\n'), '', 'an unreadable line fails closed');
 });

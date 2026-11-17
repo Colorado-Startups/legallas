@@ -14,7 +14,7 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, 
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { isPublicLane, isPublicPage } from '../contract/pages.ts';
+import { isPublicLane, isPublicPage, RENAMED } from '../contract/pages.ts';
 
 const ARTIFACT = 'quality-speed-history';
 export const HISTORY_FILE = 'history.jsonl';
@@ -63,9 +63,35 @@ export function trustedCopies(artifacts: readonly Artifact[], runOf: (id: number
   return copies;
 }
 
-/** True when `newer` holds all of `older`, unchanged and in order, with anything new after it. */
+/**
+ * The history's lines for public pages only (pages.ts), in order and byte for byte. A line whose page is private, or that
+ * can't be read, is left out: it fails closed. A renamed page's old lines count under its new slug.
+ */
+export function publicHistory(text: Uint8Array | string): string {
+  const kept = Buffer.from(text)
+    .toString('utf8')
+    .split('\n')
+    .filter((line) => {
+      if (!line) return false;
+      try {
+        const page = (JSON.parse(line) as { page?: unknown } | null)?.page;
+        if (typeof page !== 'string') return false;
+        return isPublicPage(Object.hasOwn(RENAMED, page) ? (RENAMED[page] as string) : page);
+      } catch {
+        return false;
+      }
+    });
+  return kept.length ? `${kept.join('\n')}\n` : '';
+}
+
+/**
+ * True when `newer` holds all of `older`, unchanged and in order, with anything new after it. Only public pages' lines
+ * count, so dropping a page that turned private never reads as the history shrinking.
+ */
 export function extendsHistory(older: Uint8Array, newer: Uint8Array): boolean {
-  return newer.length >= older.length && Buffer.compare(older, newer.subarray(0, older.length)) === 0;
+  const before = Buffer.from(publicHistory(older));
+  const after = Buffer.from(publicHistory(newer));
+  return after.length >= before.length && Buffer.compare(before, after.subarray(0, before.length)) === 0;
 }
 
 /**
@@ -116,8 +142,8 @@ function unpack(repo: string, id: number, dir: string): void {
 /**
  * Takes everything private out of an unpacked state (pages.ts, PUBLIC_PAGES and PRIVATE_LANES), before the workflow
  * uploads it again as `state-in`, which anyone can download: a private page's records and lanes, and a private lane's
- * file, detail and the records it reported. history.jsonl is left alone: it holds scores only and must only grow.
- * Returns how many files and folders it removed.
+ * file, detail and the records it reported, and a private page's score lines in history.jsonl.
+ * Returns how many files, folders and score lines it removed.
  */
 export function prunePrivate(state: string): number {
   let removed = 0;
@@ -126,6 +152,15 @@ export function prunePrivate(state: string): number {
     removed += 1;
   };
   const names = (dir: string) => (existsSync(dir) ? readdirSync(dir) : []);
+  const historyFile = path.join(state, HISTORY_FILE);
+  if (existsSync(historyFile)) {
+    const all = readFileSync(historyFile, 'utf8');
+    const kept = publicHistory(all);
+    if (kept !== all) {
+      removed += all.split('\n').filter(Boolean).length - kept.split('\n').filter(Boolean).length;
+      writeFileSync(historyFile, kept);
+    }
+  }
   const records = path.join(state, 'records');
   for (const name of names(records)) if (!isPublicPage(name.replace(/\.json$/, ''))) drop(path.join(records, name));
   const lanes = path.join(state, 'lanes');
@@ -177,7 +212,7 @@ function fetchState(out: string, repo: string, currentRun: number): string {
     }
   }
   const pruned = prunePrivate(out);
-  return `History from artifact ${newest.id}.${pruned ? ` ${pruned} private files or folders left out.` : ''}`;
+  return `History from artifact ${newest.id}.${pruned ? ` ${pruned} private files, folders or score lines left out.` : ''}`;
 }
 
 if (import.meta.main) {

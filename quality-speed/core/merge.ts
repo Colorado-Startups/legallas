@@ -20,7 +20,7 @@ import type { HistoryLine, Manifest, MetricRecord } from '../contract/format.ts'
 import { PUBLIC_PAGES, type PageSlug } from '../contract/pages.ts';
 import { validateRecords } from '../contract/validate.ts';
 import { carryDetail, carryFacts, copyPageFiles } from './detail.ts';
-import { HISTORY_FILE } from './history-fetch.ts';
+import { HISTORY_FILE, publicHistory } from './history-fetch.ts';
 import { loadManifest, PAGES_DIR, publicLanes } from './lanes.ts';
 import { scorePage } from './score.ts';
 
@@ -106,8 +106,8 @@ export function merge(fresh: string, state: string, out: string, planned: Readon
     lines.push(historyLine(slug, manifest, checked.records, now));
   }
   const olderFile = path.join(state, HISTORY_FILE);
-  // The history only grows (history-fetch.ts checks that), so a private page's earlier score lines stay; build.ts skips them.
-  const older = existsSync(olderFile) ? readFileSync(olderFile, 'utf8') : '';
+  // A private page's earlier score lines are dropped (publicHistory); history-fetch.ts compares public lines only, so this never reads as shrinking.
+  const older = existsSync(olderFile) ? publicHistory(readFileSync(olderFile)) : '';
   writeFileSync(path.join(out, HISTORY_FILE), `${older}${lines.map((line) => JSON.stringify(line)).join('\n')}\n`);
   return { kept, dropped };
 }

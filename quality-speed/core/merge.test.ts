@@ -227,11 +227,12 @@ test('a retired lane, a metric off the list and a repeat are all dropped', () =>
 
 test('the new history starts with every byte of the old one', () => {
   const { root, pagesDir, fresh, state, out } = setUp();
-  const older = '{"at":"2025-03-03T08:37:00Z"}\n';
+  const older = '{"at":"2025-03-03T08:37:00Z","page":"code","quality":1,"speed":1,"consumption":1,"total":1}\n';
   put(path.join(state, 'history.jsonl'), older);
   merge(fresh, state, out, new Set(), NOW, pagesDir);
   const newer = readFileSync(path.join(out, 'history.jsonl'));
   assert.equal(extendsHistory(Buffer.from(older), newer), true);
+  assert.ok(newer.toString('utf8').startsWith(older));
   assert.equal(historyLines(out).length, PAGES.length + 1);
   rmSync(root, { recursive: true });
 });
@@ -299,5 +300,17 @@ test("a private page's last state is not carried, and it gets no score line", ()
   assert.equal(existsSync(path.join(out, 'lanes', 'claude-code')), false);
   assert.equal(historyLines(out).some((line) => line.includes('claude-code')), false);
   assert.equal(historyLines(out).length, PAGES.length);
+  rmSync(root, { recursive: true });
+});
+
+test("a private page's earlier score lines leave the history; public ones stay first, in order", () => {
+  const { root, pagesDir, fresh, state, out } = setUp();
+  const old = (page: string) => `{"at":"2025-03-01T08:00:00Z","page":"${page}","quality":1,"speed":1,"consumption":1,"total":1}`;
+  put(path.join(state, 'history.jsonl'), `${old('code')}\n${old('claude-code')}\n`);
+  merge(fresh, state, out, new Set(), NOW, pagesDir);
+  const lines = historyLines(out);
+  assert.equal(lines[0], old('code'));
+  assert.equal(lines.some((l) => l.includes('"claude-code"')), false);
+  assert.equal(lines.length, 1 + PAGES.length);
   rmSync(root, { recursive: true });
 });
