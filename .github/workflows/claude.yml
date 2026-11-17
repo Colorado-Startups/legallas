@@ -2,9 +2,11 @@
 # comment or a review, and Claude answers there; asked for a change, it pushes
 # commits to a `claude/` branch and links a pull request for the owner to open.
 #
-# Only the owner's two GitHub accounts can start it, matched by numeric user
-# id (the organization's two admins, read 2026-11-06), and the action also
-# requires write access. Not author_association == 'OWNER': in an
+# Only the accounts listed by numeric user id in the CLAUDE_ALLOWED_USER_IDS
+# repository variable (a JSON array) can start it, and the action also
+# requires write access. The list is a variable, not a line in this public
+# file, so the file names no account; unset or empty, no one can start it.
+# Not author_association == 'OWNER': in an
 # organization's repository a person's comment reads MEMBER, so it never ran
 # (#234). It never runs for Claude's own comments. It runs on a fresh
 # GitHub-hosted Ubuntu VM, with the Claude Code version the
@@ -37,18 +39,18 @@ jobs:
     if: >-
       vars.CLAUDE_ENABLED == 'true' && (
       (github.event_name == 'issue_comment' &&
-        contains(fromJSON('[292968908, 268432743]'), github.event.comment.user.id) &&
+        contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.comment.user.id) &&
         github.event.comment.user.login != 'claude[bot]' &&
         contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' &&
-        contains(fromJSON('[292968908, 268432743]'), github.event.comment.user.id) &&
+        contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.comment.user.id) &&
         github.event.comment.user.login != 'claude[bot]' &&
         contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review' &&
-        contains(fromJSON('[292968908, 268432743]'), github.event.review.user.id) &&
+        contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.review.user.id) &&
         contains(github.event.review.body, '@claude')) ||
       (github.event_name == 'issues' &&
-        contains(fromJSON('[292968908, 268432743]'), github.event.issue.user.id) &&
+        contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.issue.user.id) &&
         (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
       )
     # GitHub-hosted on purpose, not vars.CI_RUNNER: the sandbox needs
