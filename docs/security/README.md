@@ -34,6 +34,7 @@ Legallas runs in each room owner's own Cloudflare account. Colorado Startups hos
 | Supporting record | For |
 |---|---|
 | [AI risk assessment and model card](ai-risk-assessment.md) | The AI systems, the model, risks and residual risk |
+| [Threat model](threat-model.md) | Data flow across every trust boundary, STRIDE per boundary, OWASP Top 10 map |
 | [Control map](control-map.md) | Each policy against SOC 2, ISO/IEC 27001 and ISO/IEC 42001, to shorten an audit |
 | [Questionnaire answers](questionnaire.md) | Short answers to the questions vendor reviews ask most |
 | [Tabletop exercise, November 2026](tabletop-2026-11.md) | The incident steps walked against the code |
