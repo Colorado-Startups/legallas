@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { collect, reusable } from "../src/collect.ts";
 import { FACTS_VERSION } from "../src/facts.ts";
-import { type Getter, NotFound, rateLimited, reason } from "../src/github.ts";
+import { type Getter, NotFound, fetchGetter, ghFailure, rateLimited, reason } from "../src/github.ts";
 
 const REPO = "example-org/example-repo";
 const NOW = new Date("2030-03-01T00:00:00Z");
@@ -266,4 +266,20 @@ test("collect: a day with more merge_group runs than one query lists throws, nev
     return { workflow_runs: page <= 10 ? full.map((r) => ({ ...r, id: r.id + page * 100 })) : [] };
   };
   await assert.rejects(collect(busy, REPO, NOW, OPTS), /a day holds more than one query lists/);
+});
+
+test("an HTTP 404 becomes NotFound in both getters; other failures stay plain errors", async () => {
+  const realFetch = globalThis.fetch;
+  try {
+    for (const [status, body] of [[404, '{"message":"Not Found"}'], [500, "{}"]] as const) {
+      globalThis.fetch = (async () => new Response(body, { status })) as typeof fetch;
+      const read = fetchGetter("token")("repos/o/r/contents/.github/pull_request_template.md?ref=abc");
+      if (status === 404) await assert.rejects(read, (e: unknown) => e instanceof NotFound && !String(e).includes("ref="));
+      else await assert.rejects(read, (e: unknown) => !(e instanceof NotFound));
+    }
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+  assert.ok(ghFailure("repos/o/r/contents/x?ref=abc", "gh: Not Found (HTTP 404)") instanceof NotFound);
+  assert.ok(!(ghFailure("repos/o/r/contents/x", "gh: Server Error (HTTP 500)") instanceof NotFound));
 });

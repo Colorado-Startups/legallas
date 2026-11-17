@@ -95,13 +95,18 @@ export function ghGetter(): Getter {
       out = execFileSync("gh", ["api", path], {
         encoding: "utf8",
         maxBuffer: 64 * 1024 * 1024,
-        stdio: ["ignore", "pipe", "ignore"],
+        stdio: ["ignore", "pipe", "pipe"],
       });
-    } catch {
-      throw new Error(`GET ${endpoint(path)}: gh api failed`);
+    } catch (error) {
+      throw ghFailure(path, String((error as { stderr?: unknown }).stderr ?? ""));
     }
     return JSON.parse(out);
   };
+}
+
+/** A failed `gh api` as the error fetch would give: a 404 is `NotFound`, anything else a plain error. Stderr is never kept. */
+export function ghFailure(path: string, stderr: string): Error {
+  return /\bHTTP 404\b/.test(stderr) ? new NotFound(endpoint(path)) : new Error(`GET ${endpoint(path)}: gh api failed`);
 }
 
 /** The path without its query, so errors and logs never carry branch names. */
