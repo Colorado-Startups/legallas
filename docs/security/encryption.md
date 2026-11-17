@@ -1,6 +1,6 @@
 # Encryption
 
-Part of the [security policies](README.md). Version 1.0, 2026-11-05.
+Part of the [security policies](README.md). Version 1.1, 2026-11-17.
 
 ## Purpose
 
@@ -11,7 +11,7 @@ Case content is encrypted on every network hop and wherever it is stored. Secret
 | Rule | Kind | Evidence |
 |---|---|---|
 | Every room and MCP route is served over HTTPS on the room owner's custom domain. No `workers.dev` or preview URL | Built in | `web/wrangler.example.jsonc` |
-| HSTS on every response, one year | Built in | `web/worker/headers.ts` |
+| HSTS on every response, one year, `includeSubDomains` | Built in | `web/worker/headers.ts` |
 | The zone's SSL mode is Full (strict), minimum TLS 1.2, TLS 1.3 on, Always Use HTTPS on | Room owner | Cloudflare dashboard, SSL/TLS |
 | Outbound calls go to https hosts only: a model host must be https, an OAuth origin must be https | Built in | `web/worker/ask-host.ts`, `web/mcp/gates.ts` |
 | Outbound `fetch()` always goes over the public internet, never to another route on the same zone | Built in | `global_fetch_strictly_public` in `web/wrangler.example.jsonc` |
@@ -47,7 +47,7 @@ Known Social Security numbers are kept only as salted scrypt hashes (`web/script
 |---|---|
 | No application-level encryption of documents in D1 or R2 beyond Cloudflare's | Per-room keys in Cloudflare's Secrets Store, and encrypting before each write. It would break AI Search over the index |
 | Keys are Cloudflare-managed, not customer-held | Not offered by D1 or R2 today |
-| HSTS has no `includeSubDomains` or preload | One header change, after checking every subdomain serves HTTPS |
+| HSTS has no `preload` | Left off on purpose: it binds the whole domain, not just the room's subdomains |
 
 ## Review
 

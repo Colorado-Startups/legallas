@@ -1,6 +1,6 @@
 # AI risk assessment and model card
 
-Part of the [security policies](README.md). Version 1.0, 2026-11-05. Supports [AI governance](ai-governance.md).
+Part of the [security policies](README.md). Version 1.1, 2026-11-17. Supports [AI governance](ai-governance.md).
 
 ## AI systems in the product
 
@@ -17,9 +17,9 @@ Part of the [security policies](README.md). Version 1.0, 2026-11-05. Supports [A
 
 | | |
 |---|---|
-| Default model | `@cf/zai-org/glm-5.3-flash` on Cloudflare Workers AI. Open weights from Z.ai. Cloudflare lists it for deprecation on 2026-11-15 ([its page](https://developers.cloudflare.com/workers-ai/models/glm-5.3-flash/), read 2026-11-05), so the default moves before then |
-| Fallback | `@cf/openai/gpt-oss-120b`, open weights from OpenAI, kept for rollback. No deprecation date listed |
-| Why this model | The replica eval of 2026-10-04 scored it 20 to 21 of 22, against 18 to 19 for the fallback, at under half the cost (`web/worker/ask.ts`) |
+| Default model | `@cf/openai/gpt-oss-120b` on Cloudflare Workers AI, since 2026-11-05. Open weights from OpenAI. No deprecation date listed |
+| Retired | `@cf/zai-org/glm-5.3-flash`, the default until 2026-11-05. Workers AI retired it on 2026-11-15; the config test refuses it (`DEPRECATED_MODELS`, `web/worker/budget.ts`) |
+| Why this model | The only model with a replica eval entry still served: 18 to 19 of 22 on 2026-10-04, 4 reps (`REASONING_EFFORT`, `web/worker/ask.ts`) |
 | Where it runs | Cloudflare Workers AI in the room owner's account. No AI Gateway for generation; AI Search attaches one with logs off |
 | Inputs | The member's question and retrieved passages, in data blocks |
 | Outputs | An answer with citations to document and page, or "I don't know" |
@@ -28,7 +28,7 @@ Part of the [security policies](README.md). Version 1.0, 2026-11-05. Supports [A
 | Known limits | Can misread a document or miss a rule. Citations are checked against retrieved pages, but meaning isn't |
 | Change rule | A model change needs a passing replica eval and an entry in `REASONING_EFFORT` (`web/worker/ask.ts`) |
 
-A room owner who limits models to particular vendors sets `LEGALLAS_MODEL` to the fallback.
+A room owner who limits models to particular vendors may set `LEGALLAS_MODEL` only to a model with a replica eval entry.
 
 ## Risks
 
@@ -44,7 +44,7 @@ Likelihood and impact on a three-step scale: low, medium, high. Residual is afte
 | A user relies on an answer as legal advice | Medium | High | "AI, not a lawyer" notice; answers cite sources to check; the full notice set is still a draft | Medium |
 | The model decides whether to hire, fire, discipline, promote, pay, lend to, rent to or deny credit to a named person | Low | High | Out of intended use; A4's guard in Ask, the connector and the Copilot agent, scored by `web/scripts/ask-eval.people.json` | Medium |
 | A model change lowers quality | Medium | Medium | Replica eval hard gates before release; rollback model kept | Low |
-| The provider retires the model | High | High | Watch each model's Workers AI page for a deprecation date; keep a tested fallback with its own settings | Medium |
+| The provider retires the model | High | High | Watch each model's Workers AI page for a deprecation date; the config test refuses a retired model; a replacement needs a passing replica eval | Medium |
 | AI spend runs past the free allowance | Low | Low | Daily and monthly ceilings in the metered binding | Low |
 
 ## Frameworks this answers

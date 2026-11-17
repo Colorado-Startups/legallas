@@ -122,7 +122,7 @@ DSP-12.1,Data security and privacy,No,No privacy notice. Notice set is a draft.,
 DSP-13.1,Data security and privacy,Yes,Cloudflare; outside Ask backend only past the zero-retention gate.,docs/security/data-and-network.md; web/worker/ask-gate.ts
 DSP-14.1,Data security and privacy,Yes,Room owner: every other processor is off until they turn it on.,docs/security/ai-governance.md; web/worker/ask-gate.ts
 DSP-15.1,Data security and privacy,Yes,Never. Tests use the fictional room only.,CLAUDE.md; web/fixtures
-DSP-16.1,Data security and privacy,No,"Replaced files 30 days, threads 90. No schedule for documents or audit log.",docs/security/data-and-network.md
+DSP-16.1,Data security and privacy,Yes,"Replaced files 30 days, threads 90; sign-ins and audit log per room setting; the rest at close-out. A hold blocks every purge.",docs/security/data-and-network.md; web/worker/data-retention.ts
 DSP-17.1,Data security and privacy,Yes,"Classes, encryption, roles, privilege, audit, deletion.",docs/security/data-and-network.md; docs/security/encryption.md
 DSP-18.1,Data security and privacy,NA,Colorado Startups holds no room data. Requests go to the room owner.,SECURITY.md
 DSP-19.1,Data security and privacy,Yes,Room owner: picks D1 and R2 region; sets jurisdiction at creation.,docs/security/data-and-network.md
@@ -160,18 +160,18 @@ IAM-01.1,Identity and access management,Yes,Access policy 1.0.,docs/security/acc
 IAM-01.2,Identity and access management,Yes,Every 12 months and on change.,docs/security/access.md
 IAM-02.1,Identity and access management,Yes,No passwords: email code or Cloudflare login. Tokens hashed.,docs/security/access.md; docs/security/encryption.md
 IAM-02.2,Identity and access management,Yes,Every 12 months.,docs/security/access.md
-IAM-03.1,Identity and access management,No,Members table and audit log. No scheduled review.,docs/security/access.md; web/worker/audit.ts
+IAM-03.1,Identity and access management,Yes,"Members table, access_events and audit log. Room owner: quarterly access review.",docs/security/access.md; web/worker/audit.ts; web/scripts/access-review.ts
 IAM-04.1,Identity and access management,No,One owner per room. No second approver.,docs/security/vulnerability-management.md; docs/security/bcp-dr.md
 IAM-05.1,Identity and access management,Yes,Three roles; privileged hidden; read-only MCP; read-only CI tokens.,docs/security/access.md; docs/security/ai-governance.md
-IAM-06.1,Identity and access management,No,"Room owner: CLI, then Access. No audit row yet.",docs/security/access.md
+IAM-06.1,Identity and access management,Yes,"Room owner: CLI, then Access. An access_events row per change; Access removal automated with the owner's token.",docs/security/access.md; web/scripts/member.ts; web/scripts/access-offboard.ts
 IAM-07.1,Identity and access management,Yes,"Removal ends row, invitations, MCP at once; daily sweep. Room owner: remove from Access.",docs/security/access.md; web/mcp/sweep.ts
-IAM-08.1,Identity and access management,No,No scheduled review.,docs/security/access.md
+IAM-08.1,Identity and access management,Yes,Room owner: quarterly access review; flags anything unused in 90 days.,docs/security/access.md; web/scripts/access-review.ts
 IAM-09.1,Identity and access management,Yes,"Owner only: activity log, admin pages, revoking others' AI.",web/worker/auth.ts; web/mcp/admin-clients.ts; web/mcp/connections.ts
 IAM-10.1,Identity and access management,No,Owner role standing. Sessions expire.,docs/security/access.md
 IAM-10.2,Identity and access management,No,One owner holds all by design.,docs/security/access.md
 IAM-11.1,Identity and access management,Yes,Only the room owner grants access. Vendor has none.,docs/security/access.md; SECURITY.md
 IAM-12.1,Identity and access management,Yes,One email per person; audit names email and AI app.,docs/security/access.md; web/mcp/audit.ts
-IAM-13.1,Identity and access management,No,Owner MFA; members email code. Room owner: turn on Access MFA.,docs/security/access.md
+IAM-13.1,Identity and access management,Yes,Owner MFA. Room owner: REQUIRE_MFA refuses any sign-in without a security key or biometric.,docs/security/access.md; web/worker/mfa.ts
 IAM-13.2,Identity and access management,Yes,RS256 Access tokens per request; server-bound OAuth tokens.,web/worker/auth.ts; web/mcp/oauth.ts
 IAM-14.1,Identity and access management,Yes,No passwords; hashed tokens; secrets in Cloudflare.,docs/security/encryption.md; .github/scripts/secret-scan.sh
 IAM-15.1,Identity and access management,Yes,Token and members row per request; role per MCP call.,web/worker/auth.ts; web/mcp/server.ts
@@ -243,8 +243,8 @@ STA-05.1,Supply chain and shared responsibility,Yes,This file marks owner per an
 STA-06.1,Supply chain and shared responsibility,Yes,Every 12 months. Not externally validated.,docs/security/README.md
 STA-07.1,Supply chain and shared responsibility,Yes,"Enforced in code, tested in CI, self-assessed. Not audited.",.github/workflows/ci.yml
 STA-08.1,Supply chain and shared responsibility,Yes,"Cloudflare; optional Groq or own model host; members' AI; GitHub, Blacksmith, Anthropic.",docs/security/data-and-network.md; SECURITY.md
-STA-09.1,Supply chain and shared responsibility,No,No SBOM. Lockfiles pin dependencies.,docs/security/vulnerability-management.md
-STA-09.2,Supply chain and shared responsibility,No,No SBOM.,docs/security/vulnerability-management.md
+STA-09.1,Supply chain and shared responsibility,Yes,CycloneDX SBOM on each release tag and by hand. Lockfiles pin dependencies.,docs/security/vulnerability-management.md; .github/workflows/sbom.yml
+STA-09.2,Supply chain and shared responsibility,Yes,CycloneDX SBOM on each release tag and by hand.,docs/security/vulnerability-management.md; .github/workflows/sbom.yml
 STA-10.1,Supply chain and shared responsibility,Yes,osv-scanner and Scorecard nightly; processors on change.,docs/security/vulnerability-management.md; docs/security/ai-governance.md
 STA-11.1,Supply chain and shared responsibility,No,No service agreement.,docs/security/README.md
 STA-12.1,Supply chain and shared responsibility,No,No scheduled terms review.,docs/security/README.md
@@ -256,7 +256,7 @@ TVM-01.1,Threat and vulnerability management,Yes,"Vulnerability policy: scans, d
 TVM-01.2,Threat and vulnerability management,Yes,Every 12 months and on change.,docs/security/vulnerability-management.md
 TVM-02.1,Threat and vulnerability management,Yes,Upload type allowlist by first bytes; sync guards; injection fencing. No antivirus.,docs/security/data-and-network.md; docs/security/ai-governance.md
 TVM-02.2,Threat and vulnerability management,Yes,Every 12 months and on change.,docs/security/data-and-network.md
-TVM-03.1,Threat and vulnerability management,Yes,"Nightly osv-scanner, Semgrep; gitleaks per change; Dependabot weekly.",docs/security/vulnerability-management.md
+TVM-03.1,Threat and vulnerability management,Yes,"Nightly osv-scanner, Semgrep; gitleaks, CodeQL and GitHub secret scanning per change; push protection; Dependabot weekly.",docs/security/vulnerability-management.md
 TVM-04.1,Threat and vulnerability management,No,No threat analysis process. AI risks rated.,docs/security/ai-risk-assessment.md
 TVM-04.2,Threat and vulnerability management,No,No threat model.,docs/security/ai-risk-assessment.md
 TVM-05.1,Threat and vulnerability management,Yes,Live OSV database nightly; Dependabot weekly.,quality-speed/pages/security/scan.sh; .github/dependabot.yml

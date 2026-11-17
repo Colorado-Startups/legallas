@@ -1,6 +1,6 @@
 # Control map: SOC 2, ISO/IEC 27001, ISO/IEC 42001
 
-Part of the [security policies](README.md). Version 1.0, 2026-11-05.
+Part of the [security policies](README.md). Version 1.1, 2026-11-17.
 
 This maps each policy to the criteria an auditor would test. It is our own mapping, not an auditor's. No audit has run,
 and nothing here is a certification. Its job is to make an audit shorter when one is bought.
@@ -25,6 +25,7 @@ and nothing here is a certification. Its job is to make an audit shorter when on
 | Vulnerabilities | [Vulnerability management](vulnerability-management.md) | CC7.1 | 8.8 | |
 | Secure development and change | [Vulnerability management](vulnerability-management.md) | CC8.1 | 8.25, 8.28, 8.29, 8.32 | A.6 (verification, deployment) |
 | Cloud provider | [README](README.md), hosting row | CC9.2 | 5.23 | A.10 |
+| Physical security | Inherited from Cloudflare, which runs the data centers: its SOC 2 Type II and ISO/IEC 27001 reports, in the Cloudflare dashboard (Trust Hub). No premises of the vendor's own | CC6.4 | 7.1 to 7.14 | |
 
 ## Not covered by any policy yet
 
@@ -32,7 +33,6 @@ and nothing here is a certification. Its job is to make an audit shorter when on
 |---|---|---|
 | SOC 2 CC1.4, ISO 27001 Annex A 6.1 to 6.3 | People: screening, terms, awareness training | Colorado Startups has no staff programme to write down yet |
 | ISO 27001 clauses 4 to 10 | A management system: scope, risk treatment, internal audit, management review | Needed only for certification |
-| ISO 27001 Annex A 7 | Physical security | No premises; every system is a cloud service |
 
 ## Sources
 

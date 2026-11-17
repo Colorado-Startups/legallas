@@ -1,6 +1,6 @@
 # CAIQ v4.1 answers
 
-Part of the [security policies](README.md). Version 1.0, 2026-11-06.
+Part of the [security policies](README.md). Version 1.1, 2026-11-17.
 
 | | |
 |---|---|
@@ -8,7 +8,7 @@ Part of the [security policies](README.md). Version 1.0, 2026-11-06.
 | Questionnaire | CSA CAIQ v4.1.0 (CCM v4.1.1): 283 questions, 17 domains |
 | Source | [CSA, CCM and CAIQ v4.1](https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4-1), released 2026-01-27; workbook generated 2026-10-02 |
 | Read | 2026-11-06 |
-| Basis | Policies 1.0 (#657), `SECURITY.md`, `main` at `52c50fe8` |
+| Basis | Policies 1.0 (#657), `SECURITY.md`, `main` at `52c50fe8`; IAM, STA-09, DSP-16 and TVM-03 rows updated at `00d3a3fc` |
 | Licence | CSA: personal, non-commercial use; no changes; no redistribution. So IDs and our answers only. Questions: CSA's workbook |
 | Claims | No certification, audit or penetration test ([Attestations](README.md#attestations)) |
 | Review | With the policies, every 12 months. An answer changes in its control's PR |
@@ -26,8 +26,8 @@ Part of the [security policies](README.md). Version 1.0, 2026-11-06.
 
 ```mermaid
 pie showData title All 283 answers
-  "Yes" : 149
-  "No" : 100
+  "Yes" : 156
+  "No" : 93
   "NA" : 34
 ```
 
@@ -39,18 +39,18 @@ pie showData title All 283 answers
 | CCC | Change control and configuration | 8 | 4 | 0 | 12 |
 | CEK | Cryptography and key management | 9 | 8 | 6 | 23 |
 | DCS | Datacenter security | 2 | 3 | 23 | 28 |
-| DSP | Data security and privacy | 17 | 5 | 2 | 24 |
+| DSP | Data security and privacy | 18 | 4 | 2 | 24 |
 | GRC | Governance, risk and compliance | 4 | 6 | 0 | 10 |
 | HRS | Human resources | 1 | 19 | 0 | 20 |
-| IAM | Identity and access management | 12 | 7 | 0 | 19 |
+| IAM | Identity and access management | 16 | 3 | 0 | 19 |
 | IPY | Interoperability and portability | 3 | 5 | 0 | 8 |
 | I&S | Infrastructure security | 14 | 0 | 1 | 15 |
 | LOG | Logging and monitoring | 14 | 4 | 1 | 19 |
 | SEF | Incidents, e-discovery and forensics | 11 | 5 | 0 | 16 |
-| STA | Supply chain and shared responsibility | 13 | 6 | 0 | 19 |
+| STA | Supply chain and shared responsibility | 15 | 4 | 0 | 19 |
 | TVM | Threat and vulnerability management | 12 | 3 | 0 | 15 |
 | UEM | Endpoint management | 1 | 14 | 0 | 15 |
-| | **All** | **149** | **100** | **34** | **283** |
+| | **All** | **156** | **93** | **34** | **283** |
 
 | Domain | Name | Asks about (our words) |
 |---|---|---|
@@ -79,10 +79,6 @@ pie showData title All 283 answers
 | An independent audit: SOC 2 Type I or II, or ISO/IEC 27001 | 10 | Paid, the owner's call. Waits until a firm says one is required | A&A-01.1, A&A-01.2, A&A-02.1, A&A-03.1, A&A-04.1, A&A-05.1, A&A-06.1, A&A-06.2, CEK-09.1, CEK-09.2 |
 | A third-party penetration test | 1 | Paid, the owner's call. The monthly automated dynamic scan (#684) is not one | TVM-07.1 |
 | A restore drill result in each live room | 3 | Built (#687); each room sets it up; no drill result yet | BCR-06.1, BCR-08.3, BCR-10.1 |
-| Required MFA for members, and an audit row for every member change | 2 | Free. In review: #690; then the room owner turns MFA on | IAM-06.1, IAM-13.1 |
-| A scheduled access review | 2 | Free. In review: #708 | IAM-03.1, IAM-08.1 |
-| A software bill of materials | 2 | Free. In review: #708 | STA-09.1, STA-09.2 |
-| A written retention schedule | 1 | Free. In review: #692 | DSP-16.1 |
 | A second maintainer who approves changes, and time-limited owner access | 3 | Needs a second person | IAM-04.1, IAM-10.1, IAM-10.2 |
 | An audit row when the owner views the activity log | 1 | Free. One code change | LOG-04.1 |
 | Alerts on unusual access, and a page when a scan or drill fails | 2 | Free | LOG-05.1, LOG-14.2 |
