@@ -53,19 +53,19 @@
    "targets": [
     "room-member"
    ],
-   "paths": "^/api/hold/release$",
+   "paths": "^/api/hold/",
    "status": "accepted",
-   "reason": "False positive. `reason` is a bound parameter (?4 in web/worker/hold.ts releaseHold); the two responses differ because the first request releases the hold, so the second finds none and returns another status.",
+   "reason": "False positive. Every hold route binds the values a request carries as D1 parameters (web/worker/hold.ts: addCustodian, recordAcknowledgment, stamp, releaseHold); its template SQL interpolates only code constants (EVENT, the column and action names). ZAP's differential tests see different answers because hold actions change state: the first release ends the hold, a repeat add or acknowledgment is ignored with 409, a notice stamps a time.",
    "decided": "2026-11-17"
   },
   {
-   "alert": "40018",
+   "alert": "6-5",
    "targets": [
     "room-member"
    ],
-   "paths": "^/api/hold/custodians$",
+   "paths": "^/api/hold/",
    "status": "accepted",
-   "reason": "False positive. `name` is a bound parameter (?3 in web/worker/hold.ts addCustodian); the two responses differ because the first request adds the custodian, so the second adds none (ON CONFLICT DO NOTHING) and returns another status.",
+   "reason": "False positive, and a Worker has no file system: no hold value reaches a file, R2 key, fetch or redirect. Every hold route binds the values a request carries as D1 parameters (web/worker/hold.ts: addCustodian, recordAcknowledgment, stamp, releaseHold); its template SQL interpolates only code constants (EVENT, the column and action names). ZAP's differential tests see different answers because hold actions change state: the first release ends the hold, a repeat add or acknowledgment is ignored with 409, a notice stamps a time.",
    "decided": "2026-11-17"
   },
   {
@@ -119,26 +119,6 @@
    "status": "accepted",
    "reason": "Informational: ZAP lists answers that differ when it changes the User-Agent header. Neither Worker decides access by User-Agent; the room only records it in its audit log.",
    "decided": "2026-11-06"
-  },
-  {
-   "alert": "6-5",
-   "targets": [
-    "room-member"
-   ],
-   "paths": "^/api/hold/custodians$",
-   "status": "accepted",
-   "reason": "ZAP sent the route's own last segment as a custodian's name and saw a different answer. The name is a D1 bound parameter (web/worker/hold.ts addCustodian) and a Worker has no file system; the answer flips between 201 and 409 because a custodian is added once per hold.",
-   "decided": "2026-11-07"
-  },
-  {
-   "alert": "6-5",
-   "targets": [
-    "room-member"
-   ],
-   "paths": "^/api/hold/release$",
-   "status": "accepted",
-   "reason": "ZAP sent the route's own last segment (release) as the reason and saw a different answer. The reason only reaches a D1 bound parameter (?4 in web/worker/hold.ts releaseHold), never a file, R2 key, fetch or redirect, and a Worker has no file system; the answer flips because the first request releases the hold and later ones get 409 no_hold (web/worker/routes/hold.ts step).",
-   "decided": "2026-11-17"
   },
   {
    "alert": "10027",
