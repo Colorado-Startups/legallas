@@ -22,7 +22,7 @@ import { mcpFlow, webModule, wrangler } from '../../data-room/lab/web.ts';
 import { countUrls, mcpCalls, mcpToolCoverage } from './coverage.ts';
 import { blocking, countBySeverity, judge, parseZapJson, validateTriage } from './findings.ts';
 import { fillPath, mcpOpenApi, paramValues, roomOpenApi, seededNames, type RouteLike, type Seeded } from './openapi.ts';
-import { ALERTS_FILE, MCP_HISTORY_FILE, memberWriteHeaders, TOKEN_VAR, urlsFile, WRK, zapPlan } from './plan.ts';
+import { ALERTS_FILE, MCP_HISTORY_FILE, memberWriteHeaders, RULE_MINUTES, SPIDER_MINUTES, TOKEN_VAR, urlsFile, WRK, zapPlan } from './plan.ts';
 import { renderReport, type Coverage, type RunInfo } from './report.ts';
 import { MCP_PORT, ROOM_PORT, serverArgs, STRANGER_HOST, strangerState, targetNamed, TARGETS, type Target } from './targets.ts';
 import { MCP_ADDON, ZAP_IMAGE, ZAP_VERSION } from './tools.ts';
@@ -333,7 +333,7 @@ async function main(): Promise<void> {
       `${JSON.stringify(mcpOpenApi({ clientId: grant.client.clientId, redirectUri: grant.redirectUri, resource: grant.resource }), null, 1)}\n`,
     );
     const openapi = { 'room-member': 'room-openapi.json', 'room-stranger': 'room-openapi.json', 'mcp-member': 'mcp-openapi.json', 'mcp-stranger': 'mcp-openapi.json' } as const;
-    const plan = zapPlan({ targets: TARGETS, openapi, mcpUrl: `http://localhost:${MCP_PORT}/mcp`, spiderMinutes: 2, ruleMinutes: 3 });
+    const plan = zapPlan({ targets: TARGETS, openapi, mcpUrl: `http://localhost:${MCP_PORT}/mcp`, spiderMinutes: SPIDER_MINUTES, ruleMinutes: RULE_MINUTES });
     await writeFile(path.join(wrk, 'plan.json'), `${JSON.stringify(plan, null, 1)}\n`);
     await installAddon(path.join(wrk, 'home'));
     for (const dir of ['home', 'home/plugin', 'out']) await chmod(path.join(wrk, dir), 0o777);

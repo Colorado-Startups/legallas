@@ -10,7 +10,7 @@ the static scans this page already runs (`../PLAN.md`: gitleaks, osv-scanner, Se
 | | |
 |---|---|
 | Workflow | `.github/workflows/dynamic-scan.yml`: monthly, by hand, and on a pull request that changes this folder |
-| Runner | GitHub-hosted `ubuntu-latest`, about 45 minutes |
+| Runner | GitHub-hosted `ubuntu-latest`: 28 minutes on 7 Nov, 55 at worst, inside a 60-minute job |
 | Target | The fictional room (the Doe v. Harbor Labs fixture), seeded by the data room lab's harness and served on 127.0.0.1 inside the job. Never a customer room, never a deployed host |
 | Latest report | `docs/security/scans/` |
 
