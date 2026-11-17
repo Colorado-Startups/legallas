@@ -45,6 +45,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
       # Tools that read their config from HOME (wrangler, npm, docker) start without
       # anyone's logins. The ZAP image is public, so docker needs none.
       - name: Private HOME
@@ -64,26 +65,32 @@ jobs:
       - name: Web install
         working-directory: web
         run: npm ci --ignore-scripts
-      - name: Scan tests
-        run: node --test quality-speed/pages/security/dast/dast.test.ts
-      - name: Scan
+      # Branch claude/wstg-internal only: 25 OWASP WSTG v4.2 checks on the fictional room instead of ZAP, for an
+      # internal, AI-assisted assessment. Not a penetration test.
+      - name: WSTG checks
         env:
-          SCAN_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: node quality-speed/pages/security/dast/run.ts --out "$RUNNER_TEMP/dast" --room "$RUNNER_TEMP/dast-room"
-      # always(): a failed scan's report and logs are what show why. ZAP's home folder is
-      # never uploaded.
+          SCAN_COMMIT: ${{ github.sha }}
+        run: node quality-speed/pages/security/dast/wstg.ts --out "$RUNNER_TEMP/dast" --room "$RUNNER_TEMP/dast-room"
+      # The two history hits the nightly scan counts: rule, file and commit only, values redacted and never printed.
+      - name: Secret scan of history, names only
+        if: ${{ always() }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/dast"
+          curl -fsSL -o "$RUNNER_TEMP/gl.tgz" https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  $RUNNER_TEMP/gl.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/gl.tgz" -C "$RUNNER_TEMP" gitleaks
+          "$RUNNER_TEMP/gitleaks" git --redact=100 --no-banner --log-level error --log-opts="--all" --report-format json --report-path "$RUNNER_TEMP/gl.json" . || true
+          jq -r '.[] | [.RuleID, .File, .StartLine, .Commit[0:12], .Date[0:10]] | @tsv' "$RUNNER_TEMP/gl.json" | tee "$RUNNER_TEMP/dast/secrets-names.tsv"
+          rm -f "$RUNNER_TEMP/gl.json"
       - name: Upload
         if: ${{ always() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: dynamic-scan-${{ github.run_id }}-${{ github.run_attempt }}
+          name: wstg-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
-            ${{ runner.temp }}/dast/report.md
-            ${{ runner.temp }}/dast/report.json
+            ${{ runner.temp }}/dast/wstg.md
+            ${{ runner.temp }}/dast/wstg.json
+            ${{ runner.temp }}/dast/secrets-names.tsv
             ${{ runner.temp }}/dast/logs/
-            ${{ runner.temp }}/dast/zap/out/
-            ${{ runner.temp }}/dast/zap/plan.json
-            ${{ runner.temp }}/dast/zap/room-openapi.json
-            ${{ runner.temp }}/dast/zap/mcp-openapi.json
           if-no-files-found: warn
           retention-days: 90
