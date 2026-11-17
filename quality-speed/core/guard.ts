@@ -74,6 +74,8 @@ const GIT_CRAFTER_LINK = /^https:\/\/github\.com\/SoulCraft-Org\/git-crafter\/(?
 const PROCESS_HOSTS = new Set([
   'claude.dev', 'code.claude.com', 'google.github.io', 'trunkbaseddevelopment.com',
   'developers.cloudflare.com', 'docs.github.com', 'dora.dev', 'learn.microsoft.com', 'peps.python.org', 'sre.google', 'www.anthropic.com',
+  // The own maps' ideal sources, each from its page's ideal.json (2026-11-17).
+  'martinfowler.com', 'nvlpubs.nist.gov', 'platform.claude.com', 'www.sec.gov',
 ]);
 const SECRET = /gh[pousr]_[A-Za-z0-9]{16,}|github_pat_[A-Za-z0-9_]{16,}|sk-ant-[A-Za-z0-9_-]{16,}|sk-or-v1-[A-Za-z0-9]{16,}|hf_[A-Za-z0-9]{16,}|gsk_[A-Za-z0-9]{16,}|npm_[A-Za-z0-9]{16,}|AIza[A-Za-z0-9_-]{16,}|A(?:KIA|SIA)[0-9A-Z]{16}|xox[abprs]-[A-Za-z0-9-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY|eyJ[A-Za-z0-9_-]{10,}\.eyJ/;
 const BASE64_RUN = /[A-Za-z0-9+/]{24,}={0,2}/g;
