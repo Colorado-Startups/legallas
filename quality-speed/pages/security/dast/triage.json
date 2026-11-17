@@ -49,6 +49,26 @@
    "decided": "2026-11-06"
   },
   {
+   "alert": "40018",
+   "targets": [
+    "room-member"
+   ],
+   "paths": "^/api/hold/release$",
+   "status": "accepted",
+   "reason": "False positive. `reason` is a bound parameter (?4 in web/worker/hold.ts releaseHold); the two responses differ because the first request releases the hold, so the second finds none and returns another status.",
+   "decided": "2026-11-17"
+  },
+  {
+   "alert": "40014-2",
+   "targets": [
+    "room-member"
+   ],
+   "paths": "^/api/hold/notice$",
+   "status": "accepted",
+   "reason": "The scan's script string comes back as JSON data (Response.json in web/worker/http.ts: application/json, nosniff, CSP default-src 'none'). The hold page puts the notice and custodians in with textContent and el(), never innerHTML (web/src/scripts/hold.ts).",
+   "decided": "2026-11-17"
+  },
+  {
    "alert": "10096",
    "status": "accepted",
    "reason": "The Unix times are RFC 7591's client_id_issued_at in /register answers and numeric constants in the build's script files. Neither says anything about the room.",
