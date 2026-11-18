@@ -15,8 +15,10 @@ export class RoomBackup extends WorkflowEntrypoint<BackupEnv, unknown> {
   async run(event: Readonly<WorkflowEvent<unknown>>, step: WorkflowStep): Promise<unknown> {
     const params = parseParams(event.payload);
     // Every step returns plain JSON (counts, hashes, cursors, table plans), which the Workflow persists.
-    const durable = step.do.bind(step) as unknown as (name: string, config: WorkflowStepConfig, fn: () => Promise<unknown>) => Promise<unknown>;
-    const steps: Step = { do: <T>(name: string, fn: () => Promise<T>) => durable(name, STEP, fn) as Promise<T> };
+    // `step` is an RPC stub in production: call step.do on it directly. Reading step.do.bind sends "bind" as an RPC
+    // method, which fails with "The RPC receiver does not implement the method "bind"" (seen 2026-11-17).
+    const durable = step as unknown as { do(name: string, config: WorkflowStepConfig, fn: () => Promise<unknown>): Promise<unknown> };
+    const steps: Step = { do: <T>(name: string, fn: () => Promise<T>) => durable.do(name, STEP, fn) as Promise<T> };
     return runWorkflow(this.env, steps, params, runIdAt(event.timestamp, event.instanceId), { hash: digestBody, now: () => Date.now() });
   }
 }

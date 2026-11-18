@@ -274,7 +274,7 @@ Members look a person or company up in public records before a deal (`worker/pub
 
 ## Edge rules: Cloudflare WAF, Free plan
 
-Optional, in the owner's zone: Security, Security rules. Use the room's hosts for the examples'. Free plan (Cloudflare docs, read 2026-11-05): 5 custom rules, no regex; 1 rate limiting rule, path only, per IP, 10 s period and block.
+`npm run harden` reads every edge and account setting below from the Cloudflare API and fixes the safe ones. Rules 1 to 5 live in `scripts/edge-rules.json`; `scripts/harden.test.ts` keeps it equal to this table. Free plan (Cloudflare docs, read 2026-11-05): 5 custom rules, no regex; 1 rate limiting rule, path only, per IP, 10 s period and block.
 
 | # | Kind, action | Expression | Why |
 |---|---|---|---|
@@ -283,6 +283,43 @@ Optional, in the owner's zone: Security, Security rules. Use the room's hosts fo
 | 3 | Custom, Block | `http.host eq "room.example.com" and cf.client.bot` | No crawlers in a private room |
 | 4 | Custom, Block | `ends_with(http.request.uri.path, ".php") or http.request.uri.path contains "/wp-" or http.request.uri.path contains "/.env" or http.request.uri.path contains "/.git"` | Scanner probes; saves MCP Worker requests |
 | 5 | Custom, Managed Challenge | `http.host eq "room.example.com" and (http.user_agent eq "" or http.user_agent contains "sqlmap" or http.user_agent contains "nikto" or http.user_agent contains "nuclei" or http.user_agent contains "zgrab")` | Attack tools; browsers always send a user agent |
+
+| Command | Does | Exit |
+|---|---|---|
+| `npm run harden -- --check` | Reads every row | 0 all pass, 1 drift, 2 a row unreadable (403, error) |
+| `npm run harden -- --apply` | Applies the Apply rows, prints one step for each other, checks again | Same |
+| `--report <file>` | Self-contained HTML: pass and fail tiles, drill-age bar. No hostname, id or token | |
+
+| Row | Pass when | Apply |
+|---|---|---|
+| Backup bucket lock | A rule keeps `objects/` 30+ days | Adds `keep-objects-30-days`, keeping the bucket's other rules |
+| `security.txt` (Cloudflare managed) | On, a Contact, Expires ahead. Warns 30 days before | Only when none exists, with `LEGALLAS_SECURITY_CONTACT` (`mailto:` or `https:`) |
+| Custom rules 2 to 5 | Each `ref` (or its expression) present and on | Missing ones, one POST each. Never a PUT of the phase |
+| Sign-in rate limit, rule 1 | Present and on | Only when the slot is empty |
+| Managed and OWASP rulesets | Both deployed (Pro plan or above) | Step |
+| Account 2FA | `enforce_twofactor` on | Step |
+| Access MFA | Every room app asks for a security key or biometric (`mfa_config`: policy, then app, then organization) | Step, in order: a wrong order locks the owner out |
+| Min TLS, Always HTTPS, HSTS | TLS 1.2+, on, on | Step |
+| Bot Fight Mode | Off | Step |
+| Backup running | Newest finished backup Workflow run under 48 h old | Step: the Workflow's schedule (not a Worker cron) |
+| Restore drill | Newest `drills/` record under 90 days old | |
+| Retention keys | `RETAIN_SIGNINS_DAYS`, `RETAIN_AUDIT_DAYS_AFTER_CLOSE` set | Warns only |
+
+```mermaid
+flowchart LR
+  H["Room hosts (wrangler configs)"] --> Z{"Zone in this account?"} -->|no| S[Stop, exit 2]
+  Z -->|yes| C[Read each row] --> D{Drift?}
+  D -->|"--apply, Apply row"| A[Add only what is missing] --> C
+  D -->|other row| P[Print one step]
+```
+
+| Token | |
+|---|---|
+| Where | `CLOUDFLARE_API_TOKEN` (wrangler reads it), else wrangler's login. Account from `CLOUDFLARE_ACCOUNT_ID` |
+| Scope | The room's account and its zone only |
+| Read | Account Settings, Access: Apps and Policies, Access: Organizations, Workers Scripts, Zone, Bot Management |
+| Edit, for `--apply` | Workers R2 Storage, Zone Settings (`security.txt`), Zone WAF |
+| Zone | The account's zone with the longest name the room's hosts end in. Another account's zone: stop |
 
 | Leave | Why |
 |---|---|

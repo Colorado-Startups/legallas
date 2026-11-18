@@ -45,7 +45,8 @@
     "checklist": "node --import ./scripts/room-preload.ts scripts/checklist/generate.ts",
     "templates": "node --import ./scripts/room-preload.ts scripts/templates/generate.ts",
     "backup": "node --import ./scripts/room-preload.ts scripts/backup.ts",
-    "backup:deploy": "wrangler deploy -c wrangler.backup.jsonc"
+    "backup:deploy": "wrangler deploy -c wrangler.backup.jsonc",
+    "harden": "node --import ./scripts/room-preload.ts scripts/harden.ts"
   },
   "dependencies": {
     "@cloudflare/ai-chat": "0.12.2",

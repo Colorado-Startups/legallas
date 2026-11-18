@@ -1,6 +1,6 @@
 # Data and network security
 
-Part of the [security policies](README.md). Version 1.0, 2026-11-05.
+Part of the [security policies](README.md). Version 1.2, 2026-11-17.
 
 ## Purpose
 
@@ -46,10 +46,39 @@ own AI vendor processes what that member asks for, under the member's own agreem
 | A replaced original | 30 days, then deleted | `web/worker/sync-rules.ts` (`RETAIN_DAYS`) |
 | Research chat threads | 90 days, deletable sooner | `web/worker/agent/protocol.ts` |
 | Expired OAuth grants and registrations | Purged by the daily sweep | `web/mcp/sweep.ts` |
-| Documents, comments, members, audit log | Until the room owner deletes them or the room | Room owner |
+| Sign-in records: email, IP, browser, country | `RETAIN_SIGNINS_DAYS`, at least 30. Unset: until close-out | `web/worker/data-retention.ts`, daily cron |
+| Audit log | `RETAIN_AUDIT_DAYS_AFTER_CLOSE` after the matter closes; a hash-chained copy is saved first. Unset: until close-out | `web/worker/data-retention.ts`, daily cron |
+| Documents, page text, comments, members | Until close-out | `npm run close-out -- --delete` (`web/scripts/close-out.ts`) |
 
-At the end of a matter, the room owner removes members (their connections end) and deletes the room's Workers, D1 database
-and buckets. A legal hold records the hold; it doesn't block a deletion (`web/worker/hold.ts`).
+The schedule: `web/README.md`, "Retention and close-out", which wins. A legal hold that is on refuses every purge, in the code
+and in the database (migration 0022), and refuses `close-out --revoke` and `--delete`. Research threads still expire under a hold.
+
+## Requests about personal data
+
+A room owner holds the data, so the room owner answers. Colorado Startups holds none and forwards any request it gets.
+
+| Request | Step | Tool |
+|---|---|---|
+| Arrives | Logged by the room owner with the date; answered within the deadline the governing law sets, and within 45 days when none does | Room owner's records |
+| Identity | Confirmed through the member's Access sign-in email, or by the room owner's own means | Cloudflare Access |
+| Access or copy | The member's rows from the tables export | `npm run close-out -- --export <dir>` (`web/scripts/close-out.ts`) |
+| Correction | The room owner edits the member's row | `web/scripts/member.ts` |
+| Deletion | Remove the member: row, invitations, Access policy, sessions | `web/scripts/member.ts`, `web/scripts/access-offboard.ts` |
+| Refusal | A legal hold, a court order or a client's file can override. Say why, in writing | [Retention and deletion](#retention-and-deletion) |
+
+Case documents about a person belong to the client's matter, not to the member. A request for them goes to the lawyer of
+record.
+
+## Interoperability and portability
+
+| Rule | Evidence |
+|---|---|
+| Interfaces are open standards: MCP over OAuth 2.1, HTTPS and JSON. The tool contract is public | `web/mcp/contract.ts`, [access](access.md) |
+| A room's data never leaves the room owner's account unless the owner exports it | [Where data lives](#where-data-lives) |
+| Full export: every table as JSON Lines, the audit log hash-chained, document ids with SHA-256, a manifest with each file's hash and each table's row count | `npm run close-out -- --export <dir>` (`web/scripts/close-out.ts`) |
+| Originals for counsel's own tools: a folder or zip | `npm run counsel-pack` (`web/scripts/counsel-pack.ts`) |
+| Exchange with another party only through an export the room owner makes, or through MCP under a member's role | [Access](access.md) |
+| Leaving: export, then delete. The code is Apache-2.0, so a room can keep running without Colorado Startups | [`LICENSE`](../../LICENSE) |
 
 ## What enters a room
 
@@ -58,6 +87,7 @@ and buckets. A legal hold records the hold; it doesn't block a deletion (`web/wo
 | Sync aborts on a symlink, a file outside the room's folder, or a private key | Built in | `web/scripts/guard.ts` |
 | Sync scans for Social Security numbers and blocks the upload unless that one file is allowed by its hash | Built in | `web/scripts/pii.ts`, `web/scripts/sync.ts` |
 | Uploads: an allowlist of types checked against the file's first bytes, 95 MB at most | Built in | `web/worker/files-upload.ts` |
+| Uploads and sync refuse active content: PDF scripts, Office macros or ActiveX, programs in a zip | Built in | `web/worker/active-content.ts` |
 
 ## Network
 
@@ -66,7 +96,7 @@ and buckets. A legal hold records the hold; it doesn't block a deletion (`web/wo
 | Strict Content Security Policy per response type, `frame-ancestors 'none'`, nosniff, same-origin opener and resource policies, no referrer, no-store caching | Built in | `web/worker/headers.ts` |
 | The build fails if a page breaks the Content Security Policy | Built in | `web/integrations/dist-audit.mjs` |
 | No CORS headers anywhere in `web/worker` or `web/mcp`: other sites can't read room responses | Built in | `web/worker/headers.ts` |
-| Rate limits: Ask 6 a minute per member; MCP registration 10 and token 120 a minute per IP; daily caps per member | Built in | `web/wrangler.example.jsonc`, `web/wrangler.mcp.example.jsonc`, `web/mcp/contract.ts` |
+| Rate limits: Ask 6 a minute per member; MCP registration 10 and token 120 a minute per IP; daily caps per member. If the limiter errors, `/register` and `/token` refuse (503, fail closed) | Built in | `web/wrangler.example.jsonc`, `web/wrangler.mcp.example.jsonc`, `web/mcp/contract.ts`, `web/mcp/gates.ts` |
 | DDoS protection at Cloudflare's edge, on every plan | Platform | The room owner's zone |
 | Default callback allowlist: Claude, Microsoft and Harvey. The room owner can allow others, including loopback (`localhost`, `127.0.0.1`) for a local tool, on `/admin/clients` or in config | Built in | `web/mcp/contract.ts`, `web/mcp/redirects.ts` |
 
@@ -74,11 +104,10 @@ and buckets. A legal hold records the hold; it doesn't block a deletion (`web/wo
 
 | Gap | What it would take |
 |---|---|
-| Rate limits fail open if Cloudflare's limiter errors (availability first; daily caps still hold) | A decision per route to fail closed |
+| Ask, tool-call and Copilot package limits pass if Cloudflare's limiter errors; daily caps still hold | Fail closed per route, as `/register` and `/token` do |
 | The MCP Origin check logs but doesn't refuse (`MCP_ORIGIN_ENFORCE` is `"0"`) | Turn it on once each AI vendor's Origin is confirmed |
 | No WAF rules of the room's own | Cloudflare WAF custom rules on the room owner's zone |
-| No malware scan of uploads | A scanning service, or limiting uploads to types that can't carry active content |
-| No written retention schedule for documents and the audit log | Agree one per room, then a sweep |
+| No antivirus scan of uploads; active content is refused, other malware isn't detected | A scanning service |
 | D1 and R2 regions are location hints, not a residency guarantee, unless a jurisdiction is set at creation | Create rooms with a jurisdiction where residency matters |
 
 ## Review

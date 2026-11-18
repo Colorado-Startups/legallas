@@ -1,6 +1,6 @@
 # Access management
 
-Part of the [security policies](README.md). Version 1.0, 2026-11-05.
+Part of the [security policies](README.md). Version 1.1, 2026-11-17.
 
 ## Purpose
 
@@ -31,7 +31,8 @@ flowchart LR
 |---|---|---|
 | Access lists each person's email. Never a whole domain | Room owner | `web/connect/security-brief.md` |
 | Members sign in with a one-time email code. The room owner uses the Cloudflare login with its own multi-factor sign-in | Room owner | `docs/design/rooms-and-grants.md`, "Sign-in, and keeping Access in step without a token" |
-| Access can add independent MFA (a security key or a biometric; `REQUIRE_MFA` counts only these) on top of the code, at no cost on Zero Trust Free | Room owner, recommended | `docs/design/rooms-and-grants.md` |
+| `REQUIRE_MFA` = `"1"`: the room and the AI sign-in refuse any Access session whose token (`amr`) shows no security key or biometric. An emailed code, `otp` or `mfa` alone never counts; a missing claim fails closed | Built in; the room owner turns it on | `web/worker/mfa.ts`, `web/worker/room.ts`, `web/mcp/authorize.ts` |
+| Access prompts for that key or biometric (independent MFA) on top of the code, at no cost on Zero Trust Free | Room owner, recommended | `docs/design/rooms-and-grants.md` |
 | Sign-ins limited to the room owner's chosen countries | Room owner | An Access policy rule |
 | Session length is set on the Access application. The Worker enforces the token's expiry | Room owner | `docs/design/rooms-and-grants.md` |
 | The room owner gets an email on every new session by another member | Built in | `web/worker/signins.ts` |
@@ -64,8 +65,11 @@ is hidden from a role without access, and answers like a missing document.
 | Step | Kind | Evidence |
 |---|---|---|
 | Add a member: the room owner's command line, then the Access policy | Room owner | `web/scripts/member.ts` |
+| Every add, role change and removal writes an `access_events` row: who ran it, the action, the email. Append-only by trigger | Built in | `web/scripts/member.ts`, `web/migrations/0012_deal_rooms.sql` |
 | Remove a member: deletes the row and revokes their room invitations. Their next MCP call fails | Built in | `web/scripts/member.ts`, `web/mcp/server.ts` |
-| Then remove the email from Access and revoke their sessions. The command prints these steps | Room owner | `web/scripts/member.ts` |
+| With the room owner's Access API token (`LEGALLAS_ACCESS_API_TOKEN`), removal also takes the email out of the room's Access policies, reads each back, and ends their Access sessions. Each step writes an `access_events` row | Built in; the token is the room owner's | `web/scripts/access-offboard.ts`, `web/scripts/member.ts` |
+| Without that token, the command prints the two dashboard steps | Room owner | `web/scripts/member.ts` |
+| Quarterly access review: every member, AI connection and guest invitation, with last use; flags anything unused in 90 days | Room owner runs `npm run access-review` | `web/scripts/access-review.ts`, `web/README.md` |
 | Guest invitations expire: 120 days by default, 730 at most | Built in | `web/scripts/room.ts` |
 | Admin pages (`/admin/clients`) are owner-only | Built in | `web/mcp/admin-clients.ts` |
 
@@ -82,10 +86,8 @@ is hidden from a role without access, and answers like a missing document.
 
 | Gap | What it would take |
 |---|---|
-| Counsel and guests sign in with an emailed code only, unless the room owner adds independent MFA | One Access setting; each person enrolls once |
-| Adding or removing a member writes no audit row | One `audit_log` insert in `web/scripts/member.ts` |
-| Removing someone from Access is a printed manual step | An Access API call, which needs a token the room owner creates |
-| The Worker doesn't check the token's MFA claim (`amr`) | Read `amr` and refuse a code-only session where the room requires MFA |
+| Members sign in with an emailed code alone until the room owner sets `REQUIRE_MFA` | One setting; each person enrolls a key or biometric once |
+| Automatic Access removal needs the room owner's own API token | The room owner creates it, with the two permissions `web/README.md` names |
 
 ## Review
 
