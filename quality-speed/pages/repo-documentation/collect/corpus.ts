@@ -11,6 +11,7 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { posix } from 'node:path';
+import { stripHtmlTags } from '../../../core/escape.ts';
 import { INPUTS } from './inputs.ts';
 
 export const EXCLUDED_PREFIXES = INPUTS.corpus_excluded;
@@ -75,10 +76,7 @@ export function slugBase(text: string): string {
 
 /** The text GitHub renders for a heading's Markdown source. */
 export function headingText(src: string): string {
-  return src
-    .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-    .replace(/<[^>]+>/g, '')
+  return stripHtmlTags(src.replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/\[([^\]]*)\]\([^)]*\)/g, '$1'))
     .replace(/`([^`]*)`/g, '$1')
     .replace(/(\*\*|__)(.+?)\1/g, '$2')
     .replace(/(^|\W)[*_](.+?)[*_](?=\W|$)/g, '$1$2')

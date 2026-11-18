@@ -8,6 +8,7 @@
 // to a route compiles it inside workerd.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { jsLiteral } from '../../../core/escape.ts';
 import { summarize, type JourneyResult, type Summary } from './report.ts';
 import { devCdp, devShoot, mcpClient, mcpFence, mcpFlow, type Browser, type CdpEvent, type ShotRecord } from './web.ts';
 
@@ -213,7 +214,7 @@ export class Lab {
   /** A real click at the middle of the first element `selector` matches. */
   async click(selector: string): Promise<void> {
     const { x, y } = await this.evaluate<{ x: number; y: number }>(
-      `(() => { const el = document.querySelector(${JSON.stringify(selector)}); el.scrollIntoView({ block: 'center' }); const r = el.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; })()`,
+      `(() => { const el = document.querySelector(${jsLiteral(selector)}); el.scrollIntoView({ block: 'center' }); const r = el.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; })()`,
     );
     await this.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
     await this.send('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: 'left', clickCount: 1 });
@@ -356,7 +357,7 @@ async function askOnce(lab: Lab, question: string): Promise<AskTurn> {
     `(() => { globalThis.__labBefore = document.querySelector('[data-chat-log]').children.length; globalThis.__labStart = performance.now(); ` +
       `globalThis.__labText = __labWhen(() => ${turn}?.querySelector('.ask-turn__a')?.textContent.trim(), ${WAIT_MS}); ` +
       `globalThis.__labFinal = __labWhen(() => ['done', 'failed'].includes(${turn}?.dataset.state), ${WAIT_MS}); ` +
-      `document.querySelector('[data-chat-input]').value = ${JSON.stringify(question)}; document.querySelector('[data-chat-form]').requestSubmit(); })()`,
+      `document.querySelector('[data-chat-input]').value = ${jsLiteral(question)}; document.querySelector('[data-chat-form]').requestSubmit(); })()`,
   );
   return lab.evaluate<AskTurn>(
     `Promise.all([__labText, __labFinal]).then(([text, final]) => { const root = ${turn}; return { ok: text.ok && final.ok && root?.dataset.state === 'done', firstText: text.at - __labStart, ` +
@@ -431,7 +432,7 @@ async function citationToPage(lab: Lab, href: string | null, samples: number): P
       await lab.settle();
       // The saved answer is drawn after the page goes quiet: it comes from the browser's own storage, and a slow CPU takes a while.
       const cite = `a[data-cite][href=${JSON.stringify(href)}]`;
-      const shown = await lab.when(`document.querySelector(${JSON.stringify(cite)})`);
+      const shown = await lab.when(`document.querySelector(${jsLiteral(cite)})`);
       if (!shown.ok) throw new Error('the saved answer never showed its citation');
       const start = await lab.evaluate<number>('performance.now()');
       await lab.click(cite);

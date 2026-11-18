@@ -11,6 +11,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { MetricRecord } from '../../contract/format.ts';
 import { laneRecord } from '../../core/lane/collect.ts';
+import { stripHtmlComments } from '../../core/escape.ts';
 
 const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 export const SETTINGS = '.claude/settings.json';
@@ -110,7 +111,7 @@ export function loadedText(text: string): string | null {
     if (/^\s*(```|~~~)/.test(line)) fenced = !fenced;
     else if (!fenced && /(^|\s)@[^\s`]/.test(line.replace(/`[^`]*`/g, ''))) return null;
   }
-  return text.replace(/<!--[\s\S]*?-->/g, '');
+  return stripHtmlComments(text);
 }
 
 /** A Markdown file's YAML frontmatter, or '' when it has none. */

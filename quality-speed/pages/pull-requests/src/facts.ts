@@ -3,6 +3,8 @@
 // codes from closed lists only: no titles, bodies, logins or file names leave
 // this file.
 
+import { stripHtmlComments } from "../../../core/escape.ts";
+
 /** The fields this page reads from a pull request. */
 export interface RawPull {
   number: number;
@@ -270,7 +272,7 @@ export function parseTemplate(text: string): { headings: string[]; boxes: number
  */
 export function templateComplete(body: string | null, rules: Rules): boolean {
   if (!body) return false;
-  const text = body.replace(/\r\n/g, "\n").replace(/<!--[\s\S]*?-->/g, "");
+  const text = stripHtmlComments(body.replace(/\r\n/g, "\n"));
   const lines = text.split("\n");
   for (const heading of rules.templateHeadings) {
     const start = lines.findIndex((l) => l.trim() === `## ${heading}`);

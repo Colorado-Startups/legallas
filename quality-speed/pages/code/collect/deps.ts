@@ -77,7 +77,7 @@ export function installedDirect(packageJson: unknown, lock: unknown): { name: st
 
 /** Fetches a package's release dates from the npm registry. */
 export async function registryTimes(name: string, fetcher: typeof fetch = fetch): Promise<Record<string, string>> {
-  const url = `https://registry.npmjs.org/${name.replace('/', '%2F')}`;
+  const url = `https://registry.npmjs.org/${name.replaceAll('/', '%2F')}`;
   const res = await fetcher(url, { headers: { accept: 'application/json' } });
   if (!res.ok) throw new Error(`${name}: registry answered ${res.status}`);
   const body = (await res.json()) as { time?: Record<string, string> };
