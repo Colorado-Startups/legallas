@@ -1,0 +1,58 @@
+name: CodeQL Swift
+
+# CodeQL for the Swift package and the Mac app. Swift needs a Mac, whose minutes cost about 10x Linux minutes, so this
+# runs only when Swift code changes (the code paths of `swift=` in .github/scripts/changed-paths.sh), weekly, and by
+# hand: never on every pull request (CLAUDE.md, "CI lanes and cost"). The other languages run in `codeql.yml`.
+# Build mode autobuild, as default setup used, which built on macos-latest in about 22 minutes (run 44241249140).
+
+on:
+  pull_request:
+    paths:
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'Sources/**'
+      - 'Tests/**'
+      - 'LegallasApp/**'
+      - '.github/workflows/codeql-swift.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'Sources/**'
+      - 'Tests/**'
+      - 'LegallasApp/**'
+      - '.github/workflows/codeql-swift.yml'
+  # Weekly, so a new query finds what's already on main even when no Swift changed.
+  schedule:
+    - cron: '53 7 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+# A new push to a pull request cancels the run it replaces, so a superseded Mac run stops billing. Runs on main finish.
+concurrency:
+  group: codeql-swift-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  analyze:
+    name: Analyze (swift)
+    # Fork pull requests get no Mac minutes.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: macos-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          languages: swift
+          build-mode: autobuild
+      - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          category: /language:swift
