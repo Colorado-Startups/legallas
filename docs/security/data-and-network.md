@@ -1,6 +1,6 @@
 # Data and network security
 
-Part of the [security policies](README.md). Version 1.1, 2026-11-17.
+Part of the [security policies](README.md). Version 1.2, 2026-11-17.
 
 ## Purpose
 
@@ -52,6 +52,33 @@ own AI vendor processes what that member asks for, under the member's own agreem
 
 The schedule: `web/README.md`, "Retention and close-out", which wins. A legal hold that is on refuses every purge, in the code
 and in the database (migration 0022), and refuses `close-out --revoke` and `--delete`. Research threads still expire under a hold.
+
+## Requests about personal data
+
+A room owner holds the data, so the room owner answers. Colorado Startups holds none and forwards any request it gets.
+
+| Request | Step | Tool |
+|---|---|---|
+| Arrives | Logged by the room owner with the date; answered within the deadline the governing law sets, and within 45 days when none does | Room owner's records |
+| Identity | Confirmed through the member's Access sign-in email, or by the room owner's own means | Cloudflare Access |
+| Access or copy | The member's rows from the tables export | `npm run close-out -- --export <dir>` (`web/scripts/close-out.ts`) |
+| Correction | The room owner edits the member's row | `web/scripts/member.ts` |
+| Deletion | Remove the member: row, invitations, Access policy, sessions | `web/scripts/member.ts`, `web/scripts/access-offboard.ts` |
+| Refusal | A legal hold, a court order or a client's file can override. Say why, in writing | [Retention and deletion](#retention-and-deletion) |
+
+Case documents about a person belong to the client's matter, not to the member. A request for them goes to the lawyer of
+record.
+
+## Interoperability and portability
+
+| Rule | Evidence |
+|---|---|
+| Interfaces are open standards: MCP over OAuth 2.1, HTTPS and JSON. The tool contract is public | `web/mcp/contract.ts`, [access](access.md) |
+| A room's data never leaves the room owner's account unless the owner exports it | [Where data lives](#where-data-lives) |
+| Full export: every table as JSON Lines, the audit log hash-chained, document ids with SHA-256, a manifest with each file's hash and each table's row count | `npm run close-out -- --export <dir>` (`web/scripts/close-out.ts`) |
+| Originals for counsel's own tools: a folder or zip | `npm run counsel-pack` (`web/scripts/counsel-pack.ts`) |
+| Exchange with another party only through an export the room owner makes, or through MCP under a member's role | [Access](access.md) |
+| Leaving: export, then delete. The code is Apache-2.0, so a room can keep running without Colorado Startups | [`LICENSE`](../../LICENSE) |
 
 ## What enters a room
 
