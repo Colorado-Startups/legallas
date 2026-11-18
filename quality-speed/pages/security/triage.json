@@ -8,6 +8,7 @@
     }
   ],
   "sast": [
+    { "rule": "dangerous-subprocess-use-audit", "path": "tools/merge_policy.py", "line_hash": "8c24554dc31db216", "reason": "run() passes an argument list with no shell, so no argument is parsed as a command; its callers name fixed gh and git commands" },
     { "rule": "detect-non-literal-regexp", "path": "quality-speed/pages/security/readings.ts", "line_hash": "d6a809992281abad", "reason": "The patterns come from this page's own reviewed forbidden-paths.json" },
     { "rule": "detect-non-literal-regexp", "path": "web/mcp/pages-text.ts", "line_hash": "a117c9390ac0133c", "reason": "The Worker checks the id against an anchored allowlist of letters, digits, hyphen and underscore, at most 64 characters, before building the pattern" },
     { "rule": "detect-non-literal-regexp", "path": "web/mcp/pages-text.ts", "line_hash": "c7ea89775fb6029e", "reason": "The Worker checks the id against an anchored allowlist of letters, digits, hyphen and underscore, at most 64 characters, before building the pattern" },

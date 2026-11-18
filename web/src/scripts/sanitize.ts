@@ -149,6 +149,19 @@ export function isBackgroundHeading(text: string): boolean {
  * and dangerous schemes.
  */
 export function stripUnsafe(text: string): string {
+  // Until stable: removing a link or image can join its neighbours into a new tag, so one pass is not enough.
+  let out = text;
+  let previous: string;
+  do {
+    previous = out;
+    // Ends: each pass only removes characters, or swaps an address for LINK_REMOVED, whose words never form one again.
+    out = stripPass(out);
+  } while (out !== previous);
+  return out;
+}
+
+/** One pass of stripUnsafe: the tag loop, then images, links, reference definitions and addresses. */
+function stripPass(text: string): string {
   // Tags and comments go until none is left: removing one can join its neighbours into a new one ("<<b>script>").
   let bare = text;
   let previous: string;

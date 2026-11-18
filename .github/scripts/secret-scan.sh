@@ -159,7 +159,10 @@ esac
 # commit, file, rule and line, so a later change to that file is still read. The launch
 # snapshot (#2) adds the whole tree in one commit, and run 43747961458 read it whole: a
 # test's fake key that only a whole-file read matches, reported twice on that line.
-excused=("f668214f58118acc870eefa0683aa3dc971ad9b3:web/scripts/iwork.test.ts:private-key:280")
+# Both entries: test placeholder proving a .key file is refused; body AAAA. The second is
+# the same line in #2's own commit before the squash, which a full-history scan also reads.
+# One line: secret-scan-test.sh swaps this whole line for its own entry.
+excused=("f668214f58118acc870eefa0683aa3dc971ad9b3:web/scripts/iwork.test.ts:private-key:280" "99a94c44b77ae02fd303202c5f102a74d875dfec:web/scripts/iwork.test.ts:private-key:280")
 excused_file="$(mktemp)"
 printf '%s\n' "${excused[@]}" >"$excused_file"
 
