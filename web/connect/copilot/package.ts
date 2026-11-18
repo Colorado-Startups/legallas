@@ -23,7 +23,7 @@ export function resolvePlaceholders(files: PackageFiles, referenceId: string): M
   const escaped = JSON.stringify(referenceId).slice(1, -1);
   const out = new Map<string, Uint8Array>();
   for (const [name, bytes] of files) {
-    out.set(name, name.endsWith('.json') ? encoder.encode(decoder.decode(bytes).replaceAll(REFERENCE_PLACEHOLDER, escaped)) : bytes);
+    out.set(name, name.endsWith('.json') ? encoder.encode(decoder.decode(bytes).replaceAll(REFERENCE_PLACEHOLDER, () => escaped)) : bytes);
   }
   return out;
 }

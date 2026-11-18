@@ -143,6 +143,15 @@ test('entryRule reads names alone, case-insensitively', () => {
   assert.equal(entryRule('ppt/activeX/activeX2.bin'), 'office-activex');
 });
 
+test('entryRule ignores trailing dots and spaces, as Windows does', () => {
+  for (const name of ['payload.exe.', 'payload.exe ', 'payload.exe. . ', 'tools\\setup.EXE..']) assert.equal(entryRule(name), 'runnable', name);
+  assert.equal(entryRule('Q3.xlsm. '), 'office-macros');
+  assert.equal(entryRule('xl/vbaProject.bin.'), 'office-macros');
+  assert.equal(entryRule('Viewer.app./Contents/MacOS/Viewer'), 'runnable');
+  assert.equal(entryRule('xl/activeX /activeX1.xml'), 'office-activex');
+  for (const name of ['notes.docx.', 'notes. ', '...', ' ']) assert.equal(entryRule(name), null, name);
+});
+
 test('a Word or Excel 97-2003 file with a VBA project is refused', async () => {
   const ole = (...parts: Uint8Array[]) => join(Uint8Array.of(0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1), new Uint8Array(500), ...parts);
   const utf16 = (text: string) => Uint8Array.from([...text].flatMap((c) => [c.charCodeAt(0), 0]));

@@ -6,6 +6,10 @@
 # repository variable (a JSON array) can start it, and the action also
 # requires write access. The list is a variable, not a line in this public
 # file, so the file names no account; unset or empty, no one can start it.
+# The issue or pull request must also be started by a listed account, and every
+# comment and review already in the thread must come from a listed account or
+# Claude (`Only listed accounts in the thread`): Claude reads the whole thread
+# with a write token, so text from anyone else never reaches it.
 # Not author_association == 'OWNER': in an
 # organization's repository a person's comment reads MEMBER, so it never ran
 # (#234). It never runs for Claude's own comments. It runs on a fresh
@@ -40,14 +44,17 @@ jobs:
       vars.CLAUDE_ENABLED == 'true' && (
       (github.event_name == 'issue_comment' &&
         contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.comment.user.id) &&
+        contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.issue.user.id) &&
         github.event.comment.user.login != 'claude[bot]' &&
         contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' &&
         contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.comment.user.id) &&
+        contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.pull_request.user.id) &&
         github.event.comment.user.login != 'claude[bot]' &&
         contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review' &&
         contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.review.user.id) &&
+        contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.pull_request.user.id) &&
         contains(github.event.review.body, '@claude')) ||
       (github.event_name == 'issues' &&
         contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.issue.user.id) &&
@@ -83,6 +90,30 @@ jobs:
           head="$(gh api "repos/$REPO/pulls/$PR" --jq '.head.repo.full_name')"
           if [ "$head" != "$REPO" ]; then
             echo "::error::Pull request $PR comes from ${head}, not $REPO: @claude runs only on this repository's branches"
+            exit 1
+          fi
+      # Claude reads every comment and review in the thread, so one from an
+      # account that is not listed stops the run before any of it is read. A
+      # deleted account reads null and stops it too.
+      - name: Only listed accounts in the thread
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
+          IS_PR: ${{ github.event.pull_request.number || github.event.issue.pull_request && 'yes' || '' }}
+          ALLOWED: ${{ vars.CLAUDE_ALLOWED_USER_IDS || '[]' }}
+        run: |
+          others="$(
+            {
+              gh api --paginate "repos/$REPO/issues/$NUMBER/comments"
+              if [ -n "$IS_PR" ]; then
+                gh api --paginate "repos/$REPO/pulls/$NUMBER/comments"
+                gh api --paginate "repos/$REPO/pulls/$NUMBER/reviews"
+              fi
+            } | jq -r --argjson allowed "$ALLOWED" '.[] | select(.user.login != "claude[bot]" and ((.user.id as $id | $allowed | index($id)) == null)) | "x"' | wc -l
+          )"
+          if [ "$others" -ne 0 ]; then
+            echo "::error::$others comment or review in this thread is from an account that is not listed: @claude does not run here"
             exit 1
           fi
       # HOME and Claude's config live in the job's temp folder, the one place
