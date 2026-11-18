@@ -12,12 +12,22 @@ import { bridgeScript, BRIDGE_SCRIPT, prepareVisual, rewriteHref, type ResolvePa
 const PAGE = { artifact: 'A1', path: 'index.html' };
 const resolve: ResolvePage = (page) => (page.artifact === 'A1' && page.path === 'other.html' ? 'other' : null);
 
+/** A bridge script's body: the one leading <script> and trailing </script> its builder wraps it in, sliced off. */
+function scriptBody(tagged: string): string {
+  const open = '<script>';
+  const close = '</script>';
+  let body = tagged;
+  if (body.startsWith(open)) body = body.slice(open.length);
+  if (body.endsWith(close)) body = body.slice(0, -close.length);
+  return body;
+}
+
 /** Runs a page's bridge script over a fake window, and returns what each click and key posts. */
 function runBridge(script: string): { click(href: string): void; key(key: string): void; posted: Record<string, unknown>[] } {
   const listeners: Record<string, (event: unknown) => void> = {};
   const posted: Record<string, unknown>[] = [];
   const parent = { postMessage: (message: unknown) => posted.push(JSON.parse(JSON.stringify(message))) };
-  runInNewContext(script.replace(/^<script>/, '').replace(/<\/script>$/, ''), {
+  runInNewContext(scriptBody(script), {
     window: { parent },
     document: { addEventListener: (type: string, listener: (event: unknown) => void) => { listeners[type] = listener; } },
   });

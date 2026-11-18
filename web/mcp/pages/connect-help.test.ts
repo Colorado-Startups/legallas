@@ -42,7 +42,23 @@ const proHtml = renderConnectPage({ claudePlugin: true, copilotPackage: true, co
 const web = join(import.meta.dirname, '..', '..');
 const read = (...parts: string[]) => readFileSync(join(web, ...parts), 'utf8');
 /** The text a lawyer reads, with the quote entities and tags undone. */
-const text = (h: string) => h.replaceAll('&ldquo;', '"').replaceAll('&rdquo;', '"').replaceAll('&gt;', '>').replaceAll('&#39;', "'").replace(/<[^>]+>/g, '');
+/** `html` with every tag (`<`, at least one character, `>`) taken out, as `/<[^>]+>/g` would, without a regular expression. */
+function stripTags(html: string): string {
+  let out = '';
+  let from = 0;
+  let open = html.indexOf('<');
+  while (open !== -1) {
+    const close = html.indexOf('>', open + 1);
+    if (close === -1) break;
+    if (close > open + 1) {
+      out += html.slice(from, open);
+      from = close + 1;
+      open = html.indexOf('<', from);
+    } else open = html.indexOf('<', open + 1);
+  }
+  return out + html.slice(from);
+}
+const text = (h: string) => stripTags(h).replaceAll('&ldquo;', '"').replaceAll('&rdquo;', '"').replaceAll('&gt;', '>').replaceAll('&#39;', "'");
 
 /** Cloudflare Access's own one-time PIN messages (developers.cloudflare.com, one-time-pin, read 2026-10-20). */
 const ACCESS_MESSAGES = ['This One-Time PIN has already been used', 'That account does not have access.'];
@@ -126,7 +142,7 @@ test('the Claude guide carries the same messages as the page', () => {
   }
   assert.ok(guide.includes("(README.md#if-the-sign-in-code-doesnt-arrive)") && guide.includes('connect#sign-in-code'), 'links the code help');
   assert.ok(read('connect', 'README.md').includes("### If the sign-in code doesn't arrive"), 'the README heading the link targets');
-  assert.ok(!guide.includes(CODE_SENDER) && guide.includes('room.cloudflareaccess.com'), 'the sender lives in one place');
+  assert.ok(!guide.includes(CODE_SENDER) && guide.includes('`room.cloudflareaccess.com`'), 'the sender lives in one place');
   assert.ok(guide.includes('the exact address your'), 'no alias');
   assert.ok(guide.includes('**Always allow**') && guide.includes('**Reconnect**'));
   assert.ok(!guide.includes('—'), 'no em dashes');
@@ -140,7 +156,7 @@ const connectHtml = html;
 
 /** Every href, src and action value on a page, with the HTML entities in it undone. */
 function urls(html: string): string[] {
-  const unescape = (v: string) => v.replaceAll('&amp;', '&').replaceAll('&#39;', "'").replaceAll('&quot;', '"');
+  const unescape = (v: string) => v.replaceAll('&#39;', "'").replaceAll('&quot;', '"').replaceAll('&amp;', '&');
   return [...html.matchAll(/(?:href|src|action)="([^"]+)"/g)].map((m) => unescape(m[1]!));
 }
 
@@ -275,7 +291,8 @@ test('connect is self-contained: no scripts, no style attributes, no em dashes, 
     const bytes = new TextEncoder().encode(page).length;
     assert.ok(bytes < 42_000, `${name}: ${bytes} bytes`);
   }
-  for (const m of connectHtml.matchAll(/<input class="input" id="([^"]+)"/g)) assert.ok(connectHtml.includes(`<label for="${m[1]}">`), m[1]);
+  const labelled = new Set([...connectHtml.matchAll(/<label for="([^"]+)">/g)].map((m) => m[1]));
+  for (const m of connectHtml.matchAll(/<input class="input" id="([^"]+)"/g)) assert.ok(labelled.has(m[1]), m[1]);
 });
 
 test('every email button decodes to its subject and body, with no recipient', () => {
@@ -303,8 +320,9 @@ test('every link on connect is https, mailto, a fragment on the page or a known 
   // CLAUDE_PLUGIN_PATH, SKILL_ZIP_PATH: the kits' downloads (claude-plugin.ts), linked when pro offers them.
   const known = new Set(['/connections', '/privacy', '/terms', COPILOT_PACKAGE_PATH, AGENT_ZIP_PATH, SECURITY_PATH, CLAUDE_PLUGIN_PATH, SKILL_ZIP_PATH]);
   for (const html of [connectHtml, sharedHtml, proHtml]) {
+    const ids = new Set([...html.matchAll(/id="([^"]*)"/g)].map((m) => m[1]));
     for (const url of urls(html)) {
-      if (url.startsWith('#')) assert.ok(html.includes(`id="${url.slice(1)}"`), `${url}: target exists`);
+      if (url.startsWith('#')) assert.ok(ids.has(url.slice(1)), `${url}: target exists`);
       else if (url.startsWith('/')) assert.ok(known.has(url), `${url}: known path`);
       else assert.ok(url.startsWith('https://') || url.startsWith('mailto:'), `${url}: https or mailto`);
     }

@@ -213,12 +213,12 @@ test("a page links outside only to a source its own valid ideal.json lists, exac
   }
   const check = (files: Record<string, string>) => guardSite(plant(files), { allowSynthetic: true, pagesDir: pages }).join('\n');
   const link = (href: string) => page(`<a href="${href}">x</a><p>${href}</p>`);
-  const escaped = query.replace('&', '&amp;');
+  const escaped = query.replaceAll('&', '&amp;');
   assert.equal(check({ 'code/other.html': link(listed), 'code/more.html': link(escaped), 'code/data.json': JSON.stringify({ url: query }) }), '');
   for (const [label, files] of [
     ['an unlisted link', { 'code/other.html': link('https://example.com/') }],
     ['a listed link with more after it', { 'code/other.html': link(`${listed}#x`) }],
-    ['a listed link, differently escaped', { 'code/other.html': link(query.replace('&', '&#38;')) }],
+    ['a listed link, differently escaped', { 'code/other.html': link(query.replaceAll('&', '&#38;')) }],
     ["another page's source", { 'issues/other.html': link(listed) }],
     ['a source in an invalid ideal.json', { 'sync/other.html': link(listed) }],
     ['the home page', { 'index.html': `${pageHead('Home', '', true)}<a href="${listed}">x</a>${PAGE_END}` }],

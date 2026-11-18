@@ -147,7 +147,7 @@ test('local: a server without S256 or without the server under test fails at dis
   const offsite = fakeServer({ asm: { token_endpoint: 'https://evil.example/token' } });
   const report = await runLocal(offsite.fetcher, LOCAL_BASE);
   assert.ok(failures(report).length > 0);
-  assert.ok(offsite.requests.every((url) => !url.startsWith('https://evil.example')), 'no request left the server under test');
+  assert.ok(offsite.requests.every((url) => new URL(url).hostname !== 'evil.example'), 'no request left the server under test');
 });
 
 test('local under wrangler dev: portless endpoints map onto the base; the missing RFC 9728 document is a skip', async () => {

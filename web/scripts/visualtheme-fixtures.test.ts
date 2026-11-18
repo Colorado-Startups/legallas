@@ -12,6 +12,8 @@ import { parseComplex, parseElements } from './visualtheme-dom.ts';
 import { isDarkSelector } from './visualtheme-scheme.ts';
 import { themeVisual, type ThemeFonts } from './visualtheme.ts';
 
+/** `text` as a regular expression that matches it literally. */
+const escapeRegex = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const TAGS = { sans: 'SANS', serif: 'SERIF', serifItalic: 'SERIFITALIC', mono400: 'MONO4', mono500: 'MONO5' } as const;
 const FONTS: ThemeFonts = { load: async (request) => TAGS[request.face] };
 const fixture = (name: string) => readFile(path.resolve(import.meta.dirname, '..', 'fixtures', 'visuals', `${name}.html`), 'utf8');
@@ -52,7 +54,7 @@ test('next-card fixture: navy grounds become deep forest and brass on them reads
   const { html, warnings } = await themed('next-card');
   assert.match(html, /:root\{color-scheme:light;[^}]*--legallas-deep:#1F3A2E/);
   for (const selector of ['.topbar', '.next']) {
-    const rule = new RegExp(`\\${selector} \\{ background: var\\(--legallas-deep\\);[^}]*${DEEP_DECLARATIONS.replace(/[()]/g, '\\$&')};--bar:var\\(--legallas-forest\\);--gold:var\\(--legallas-brass-text\\)`);
+    const rule = new RegExp(`\\${selector} \\{ background: var\\(--legallas-deep\\);[^}]*${escapeRegex(DEEP_DECLARATIONS)};--bar:var\\(--legallas-forest\\);--gold:var\\(--legallas-brass-text\\)`);
     assert.match(html, rule, selector);
   }
   // The white pill inside the card gets the light text tokens back.

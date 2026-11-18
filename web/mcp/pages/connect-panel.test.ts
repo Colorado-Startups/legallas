@@ -118,7 +118,7 @@ test('each reader is told of the AIs their panel offers, and reads their own roo
   for (const reader of READERS) assert.deepEqual(READER_AIS[reader], PANEL_ORDER[reader].map((id) => names[id]), `${reader}: invite.ts names the panel's AIs`);
   assert.equal(aiList('investor'), 'Claude, Microsoft 365 Copilot or OpenCode');
   assert.equal(aiList('counsel'), 'Claude, Microsoft 365 Copilot, Harvey or OpenCode');
-  const mails = (html: string) => [...html.matchAll(/href="(mailto:[^"]+)"/g)].map((m) => decodeURIComponent(m[1]!.replaceAll('&amp;', '&').replaceAll('&#39;', "'"))).join('\n');
+  const mails = (html: string) => [...html.matchAll(/href="(mailto:[^"]+)"/g)].map((m) => decodeURIComponent(m[1]!.replaceAll('&#39;', "'").replaceAll('&amp;', '&'))).join('\n');
   for (const reader of READERS) {
     const html = renderConnectPage({ copilotPackage: true, reader });
     const copilot = html.slice(html.indexOf('data-ai="copilot"'), html.indexOf('</li>', html.indexOf('data-ai="copilot"')));

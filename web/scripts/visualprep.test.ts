@@ -6,6 +6,16 @@ import { runInNewContext } from 'node:vm';
 import { BRIDGE_MARKER, BRIDGE_SCRIPT, joinRelative, prepareVisual, rewriteHref, type PageRef } from '../worker/visualprep.ts';
 import { planExport } from './visuals.ts';
 
+/** A bridge script's body: the one leading <script> and trailing </script> its builder wraps it in, sliced off. */
+function scriptBody(tagged: string): string {
+  const open = '<script>';
+  const close = '</script>';
+  let body = tagged;
+  if (body.startsWith(open)) body = body.slice(open.length);
+  if (body.endsWith(close)) body = body.slice(0, -close.length);
+  return body;
+}
+
 const artifactUrl = (path: string) => `https://${'claude.ai'}/${path}`;
 const PAGE: PageRef = { artifact: 'Hub1', path: 'index.html' };
 const known: Record<string, string> = {
@@ -122,7 +132,7 @@ test('the bridge posts what follows each link prefix: a slug, a web address, a c
   const listeners: Record<string, (event: unknown) => void> = {};
   const posted: unknown[] = [];
   const parent = { postMessage: (message: unknown) => posted.push(JSON.parse(JSON.stringify(message))) };
-  runInNewContext(BRIDGE_SCRIPT.replace(/^<script>/, '').replace(/<\/script>$/, ''), {
+  runInNewContext(scriptBody(BRIDGE_SCRIPT), {
     window: { parent },
     document: { addEventListener: (type: string, listener: (event: unknown) => void) => { listeners[type] = listener; } },
   });

@@ -7,6 +7,8 @@ import { answerSources, answerText, answerView, COMPANY_LAW_NOT_FACT, COMPANY_RE
 import { DROPPED_NOTE, hrefsOf, lawIndex, PENDING_NOTE, renderAnswer } from './sanitize.ts';
 import { RECOMMENDATION_NOTE } from '../../worker/product-notices.ts';
 
+/** `text` as a regular expression that matches it literally. */
+const escapeRegex = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const CITES = [{ id: 'doc-a', page: 1, name: 'Fixture memo.pdf', control_seq: 12, quote: null }];
 const LAW = [
   { id: 'crs-7-80-714', cite: 'C.R.S. § 7-80-714(1)', title: 'Derivative proceeding - demand', url: 'https://content.leg.colorado.gov/sites/default/files/images/olls/crs2024-title-07.pdf', track: 'civil', kind: 'statute' },
@@ -81,7 +83,7 @@ test('with the library off, nothing law-shaped changes the answer: no Law group,
   assert.ok(off.body.every((part) => part.kind !== 'claim' || part.claim !== 'law'));
   const text = JSON.stringify(off);
   assert.match(text, /\[law:crs-7-80-714\]/, 'the tag stays plain text, as before the library existed');
-  assert.doesNotMatch(text, new RegExp(DROPPED_NOTE.replace(/[[\]]/g, '\\$&')));
+  assert.doesNotMatch(text, new RegExp(escapeRegex(DROPPED_NOTE)));
   assert.deepEqual(answerSources(off).law, []);
 });
 
@@ -115,7 +117,7 @@ test('only official https links survive, whatever the server list says', () => {
 
 test('copy with cites keeps the Law group and its notice', () => {
   const text = answerText(answerView(ANSWER, CITES, OPTS));
-  assert.match(text, new RegExp(`Law\\. ${LAW_NOTICE.replace(/[.;]/g, '\\$&')}`));
+  assert.match(text, new RegExp(`Law\\. ${escapeRegex(LAW_NOTICE)}`));
   assert.match(text, /Law: A member makes a written demand first \(C\.R\.S\. § 7-80-714\(1\)\)/);
 });
 

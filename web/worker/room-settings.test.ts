@@ -34,8 +34,8 @@ const SET = {
 /** Runs `body` in a fresh Node process, with `set` as globals, and returns what it prints as JSON. */
 function run(set: Record<string, unknown>, body: string): any {
   const preload = `data:text/javascript,Object.assign(globalThis,${encodeURIComponent(JSON.stringify(set))})`;
-  const imports = `const load = (file) => import(${JSON.stringify(`file://${WEB}/`)} + file);`;
-  const out = execFileSync(process.execPath, ['--import', preload, '--input-type=module', '--eval', `${imports}\nconsole.log(JSON.stringify(await (async () => {${body}})()));`], { cwd: WEB, encoding: 'utf8' });
+  const imports = 'const load = (file) => import(process.env.LEGALLAS_WEB_URL + file);';
+  const out = execFileSync(process.execPath, ['--import', preload, '--input-type=module', '--eval', `${imports}\nconsole.log(JSON.stringify(await (async () => {${body}})()));`], { cwd: WEB, encoding: 'utf8', env: { ...process.env, LEGALLAS_WEB_URL: `file://${WEB}/` } });
   return JSON.parse(out);
 }
 

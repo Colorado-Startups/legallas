@@ -531,7 +531,7 @@ test('only sec.gov hears the contact, and interpretations are labelled staff vie
     assert.equal(staff[0]?.track, 'regulator');
     assert.match(staff[0]?.source ?? '', /staff views, not rules; page last updated October 15, 2099/);
     assert.equal(agents.get('www.sec.gov'), 'Example Company legal@example.com');
-    assert.ok(!agents.get('www.govinfo.gov')?.includes('example.com'), 'told another site the contact');
+    assert.ok(!agents.get('www.govinfo.gov')?.includes('legal@example.com'), 'told another site the contact');
   });
 });
 
