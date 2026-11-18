@@ -129,6 +129,27 @@
    "status": "accepted",
    "reason": "Informational. The match is the word select in a minified MCP App view's own script (this.select(t)), sent in a POST /mcp resource, not a comment. It names no table or query.",
    "decided": "2026-11-07"
+  },
+  {
+   "alert": "10062",
+   "targets": [
+    "room-member"
+   ],
+   "paths": "^/api/activity/audit-log\\.jsonl$",
+   "status": "accepted",
+   "reason": "False positive. ZAP matched a 16-digit run that passes the card checksum in the owner's audit copy. That copy holds only the scan's own actions on the fictional room and each row's SHA-256 chain (web/worker/audit-chain.ts), which changes every run; no card number is stored. The route is owner-only (viewActivity).",
+   "decided": "2026-11-18"
+  },
+  {
+   "alert": "40045",
+   "targets": [
+    "mcp-member",
+    "mcp-stranger"
+   ],
+   "paths": "^/connect/copilot-package$",
+   "status": "accepted",
+   "reason": "False positive. Spring4Shell is a Java Spring data-binding flaw; the MCP server is a JavaScript Worker with no Spring and no data binding. ZAP took the 400 answer to its class.module.classLoader form field as a sign: that route answers 400 to any body without a valid registration ID (web/mcp/copilot-package.ts).",
+   "decided": "2026-11-18"
   }
  ]
 }
