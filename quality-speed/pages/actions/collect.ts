@@ -159,7 +159,7 @@ async function collect(out: string): Promise<number> {
   let token: ReturnType<typeof tokenJobs> = null;
   try {
     const minting = appWorkflows(workflows);
-    if (GH_TOKEN && minting.length) token = tokenJobs(await github.tokenJobs(minting, new Date(now.getTime() - TOKEN_DAYS * DAY_MS)));
+    if (GH_TOKEN && minting.length) token = tokenJobs(await github.tokenJobs(minting, new Date(now.getTime() - TOKEN_DAYS * DAY_MS), now));
   } catch (error) {
     console.error(`the token jobs: ${error instanceof Error ? error.constructor.name : 'failed'}`);
   }
