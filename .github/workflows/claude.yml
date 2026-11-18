@@ -6,6 +6,10 @@
 # repository variable (a JSON array) can start it, and the action also
 # requires write access. The list is a variable, not a line in this public
 # file, so the file names no account; unset or empty, no one can start it.
+# The issue or pull request must also be started by a listed account, and every
+# comment and review already in the thread must come from a listed account or
+# Claude (`Only listed accounts in the thread`): Claude reads the whole thread
+# with a write token, so text from anyone else never reaches it.
 # Not author_association == 'OWNER': in an
 # organization's repository a person's comment reads MEMBER, so it never ran
 # (#234). It never runs for Claude's own comments. It runs on a fresh
@@ -40,14 +44,17 @@ jobs:
       vars.CLAUDE_ENABLED == 'true' && (
       (github.event_name == 'issue_comment' &&
         contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.comment.user.id) &&
+        contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.issue.user.id) &&
         github.event.comment.user.login != 'claude[bot]' &&
         contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' &&
         contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.comment.user.id) &&
+        contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.pull_request.user.id) &&
         github.event.comment.user.login != 'claude[bot]' &&
         contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review' &&
         contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.review.user.id) &&
+        contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.pull_request.user.id) &&
         contains(github.event.review.body, '@claude')) ||
       (github.event_name == 'issues' &&
         contains(fromJSON(vars.CLAUDE_ALLOWED_USER_IDS || '[]'), github.event.issue.user.id) &&
@@ -151,6 +158,32 @@ jobs:
           jq -e '.permissions.blockReadsOutsideWorkingDirectories == true and .sandbox.enabled == true and .sandbox.failIfUnavailable == true and .sandbox.allowUnsandboxedCommands == false' "$RUNNER_TEMP/claude-settings.json" >/dev/null
           # main's rules as user memory: --setting-sources user below skips the checkout's own CLAUDE.md.
           git show origin/main:CLAUDE.md > "$CLAUDE_CONFIG_DIR/CLAUDE.md"
+      # Claude reads every comment and review in the thread, so one from an
+      # account that is not listed stops the run. It runs last, right before
+      # Claude, to keep the gap after the check to seconds. A deleted account
+      # reads null and stops it too. Any failed read stops it (fails closed).
+      - name: Only listed accounts in the thread
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
+          IS_PR: ${{ github.event.pull_request.number || github.event.issue.pull_request && 'yes' || '' }}
+          ALLOWED: ${{ vars.CLAUDE_ALLOWED_USER_IDS || '[]' }}
+        run: |
+          set -euo pipefail
+          [ -n "$NUMBER" ] || { echo "::error::No issue or pull request number"; exit 1; }
+          echo "$ALLOWED" | jq -e 'type == "array"' >/dev/null
+          thread="$RUNNER_TEMP/thread.json"
+          gh api --paginate --slurp "repos/$REPO/issues/$NUMBER/comments" > "$thread"
+          if [ -n "$IS_PR" ]; then
+            gh api --paginate --slurp "repos/$REPO/pulls/$NUMBER/comments" >> "$thread"
+            gh api --paginate --slurp "repos/$REPO/pulls/$NUMBER/reviews" >> "$thread"
+          fi
+          others="$(jq -s --argjson allowed "$ALLOWED" '[.[][][] | select(.user.login != "claude[bot]" and ((.user.id as $id | $allowed | index($id)) == null))] | length' "$thread")"
+          if [ "$others" -ne 0 ]; then
+            echo "::error::$others comment or review in this thread is from an account that is not listed: @claude does not run here"
+            exit 1
+          fi
       # No path_to_claude_code_executable: the action installs the Claude
       # Code version it pins into the private HOME.
       - name: Claude

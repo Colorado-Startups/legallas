@@ -4,7 +4,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { test } from 'node:test';
 import { readPackage } from './build.ts';
-import { PACKAGE_FILES, buildPackage, bundledPackage, zipProblems } from './package.ts';
+import { PACKAGE_FILES, buildPackage, bundledPackage, resolvePlaceholders, zipProblems } from './package.ts';
+import { REFERENCE_PLACEHOLDER } from './validate.ts';
 import { GENERATED_FILE, renderPackageData } from './package-data.ts';
 import { readZipStore, zipStore } from '../../mcp/zip.ts';
 
@@ -43,6 +44,15 @@ test('zipProblems passes a built package and names what is wrong with a bad one'
   );
   assert.ok(zipProblems(zipStore(unresolved)).some((p) => p.startsWith('ai-plugin.json: has an unresolved')));
   assert.deepEqual(readZipStore(zip).map((e) => e.name), [...PACKAGE_FILES]);
+});
+
+test('a reference ID reaches the JSON as typed, whatever replacement patterns it holds', () => {
+  const encoder = new TextEncoder();
+  const id = "a$&b$'c$`d$$e";
+  const files = new Map([['ai-plugin.json', encoder.encode(`{"id":"${REFERENCE_PLACEHOLDER}"}`)], ['color.png', new Uint8Array([1])]]);
+  const out = resolvePlaceholders(files, id);
+  assert.deepEqual(JSON.parse(new TextDecoder().decode(out.get('ai-plugin.json')!)), { id });
+  assert.deepEqual([...out.get('color.png')!], [1]);
 });
 
 /** Relative imports of a module and everything it imports, plus every bare specifier seen on the way. */

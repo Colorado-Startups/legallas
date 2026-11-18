@@ -65,9 +65,16 @@ const RUNNABLE_EXTENSIONS = new Set([
   'sh', 'command', 'pkg', 'mpkg', 'dmg', 'scpt',
 ]);
 
+/** A name as Windows and Office read it: trailing dots and spaces are not part of it (`a.exe.` is `a.exe`). */
+function withoutTrailingDotsAndSpaces(name: string): string {
+  let end = name.length;
+  while (end > 0 && (name[end - 1] === '.' || name[end - 1] === ' ')) end -= 1;
+  return name.slice(0, end);
+}
+
 /** The rule a zip entry or synced file breaks by name alone. */
 export function entryRule(name: string): ActiveRule | null {
-  const segments = name.replace(/\\/g, '/').toLowerCase().split('/').filter(Boolean);
+  const segments = name.replace(/\\/g, '/').toLowerCase().split('/').map(withoutTrailingDotsAndSpaces).filter(Boolean);
   const base = segments.at(-1) ?? '';
   const folders = segments.slice(0, -1);
   if (base === 'vbaproject.bin') return 'office-macros';
