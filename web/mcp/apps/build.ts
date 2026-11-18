@@ -34,7 +34,8 @@ async function tokens(): Promise<string> {
 }
 
 /** Text that can sit inside a <script> or <style> element without closing it. */
-const inert = (code: string, tag: 'script' | 'style') => code.replace(new RegExp(`</(${tag})`, 'gi'), '<\\/$1');
+const CLOSING = { script: /<\/(script)/gi, style: /<\/(style)/gi } as const;
+const inert = (code: string, tag: 'script' | 'style') => code.replace(CLOSING[tag], '<\\/$1');
 
 /** Every view as its HTML page. Deterministic: the same sources and esbuild version give the same bytes. */
 export async function buildViews(): Promise<Record<View, string>> {

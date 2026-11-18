@@ -83,6 +83,23 @@ export function buildNotices(dist: string, metafiles: string[], base = WEB, extr
   ].join('\n');
 }
 
+/**
+ * The package folders whose code is in a bundle, from its metafile: where the bundler lists each output's inputs (esbuild,
+ * so Wrangler), only those with bytes in an output; else every input. The CI log prints them, so a search answers
+ * "does this package ship?".
+ */
+export function shippedPackages(metafile: string, base = WEB): string[] {
+  const meta = JSON.parse(readFileSync(metafile, 'utf8')) as {
+    inputs: Record<string, unknown>;
+    outputs?: Record<string, { inputs?: Record<string, { bytesInOutput?: number }> }>;
+  };
+  const ids = meta.outputs
+    ? Object.values(meta.outputs).flatMap((output) => Object.entries(output.inputs ?? {}).filter(([, input]) => (input.bytesInOutput ?? 0) > 0).map(([id]) => id))
+    : Object.keys(meta.inputs);
+  const dirs = new Set(ids.map((id) => packageDir(id, base)).filter((dir): dir is string => dir !== null));
+  return [...dirs].map((dir) => path.relative(base, dir)).sort();
+}
+
 if (import.meta.main) {
   const [out, dist, ...metafiles] = process.argv.slice(2);
   if (!out || !dist || metafiles.length === 0) {
@@ -92,6 +109,7 @@ if (import.meta.main) {
   try {
     writeFileSync(out, buildNotices(path.resolve(dist), metafiles));
     console.log(`notices: wrote ${out}`);
+    for (const meta of metafiles) console.log(`notices: ${path.basename(meta)} ships ${shippedPackages(meta).join(', ') || 'no package'}`);
   } catch (error) {
     console.error((error as Error).message);
     process.exit(1);

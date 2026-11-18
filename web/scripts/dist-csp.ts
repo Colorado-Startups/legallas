@@ -27,12 +27,22 @@ function attributes(raw: string): Map<string, string> {
   return out;
 }
 
+/** HTML with its comments removed, again until none is left: removing one can join the text around it into another. */
+export function withoutComments(html: string): string {
+  let out = html;
+  for (let before = ''; before !== out; ) {
+    before = out;
+    out = out.replace(/<!--[\s\S]*?-->/g, '');
+  }
+  return out;
+}
+
 /** Inline style, inline script, inline event handlers and remote assets in one HTML page. */
 export function checkHtml(file: string, html: string): Finding[] {
   const found: Finding[] = [];
   const add = (problem: string) => found.push({ file, problem });
   // Comments can hold markup-looking text; they never render.
-  const body = html.replace(/<!--[\s\S]*?-->/g, '');
+  const body = withoutComments(html);
   for (const m of body.matchAll(TAG)) {
     const tag = m[1].toLowerCase();
     const attrs = attributes(m[2]);

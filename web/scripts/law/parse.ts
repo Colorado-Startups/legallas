@@ -59,7 +59,13 @@ export function crsArticle(paragraphs: readonly string[], article: string): Sect
 
 /** Tags stripped, entities decoded, whitespace collapsed. */
 export function htmlText(fragment: string): string {
-  return decodeXml(fragment.replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, ''))
+  let text = fragment.replace(/<br\s*\/?>/gi, ' ');
+  // Again until no tag is left, so removing one never leaves another behind.
+  for (let before = ''; before !== text; ) {
+    before = text;
+    text = text.replace(/<[^>]+>/g, '');
+  }
+  return decodeXml(text)
     .replace(/&nbsp;/g, ' ')
     .replace(/&(?:sect);/g, '§')
     .replace(/&(?:ndash);/g, '-')

@@ -3,7 +3,7 @@
 // scripts at the end of <body>, so on slow 4G the ask leaves seconds sooner. Built names are hashed, so this reads what
 // each script does: the first one whose static graph names /api/doc/ (doc-open.ts) must be in <head>. dist-audit.ts runs it.
 import { entryScripts, pageBudget, type ReadAsset } from './bundle-budget.ts';
-import type { Finding } from './dist-csp.ts';
+import { withoutComments, type Finding } from './dist-csp.ts';
 
 /** The route checked, and the URL its first script asks. */
 export const DOC_ROUTE = '/doc/';
@@ -22,7 +22,7 @@ function asks(url: string, read: ReadAsset): boolean {
 /** A finding when no script on /doc/ asks /api/doc/, or the first that does is not in <head>. */
 export function checkDocEarly(rel: string, route: string, html: string, read: ReadAsset): Finding[] {
   if (route !== DOC_ROUTE) return [];
-  const page = html.replace(/<!--[\s\S]*?-->/g, '');
+  const page = withoutComments(html);
   const end = page.search(/<\/head\s*>/i);
   const inHead = end < 0 ? 0 : scripts(page.slice(0, end)).length;
   const all = scripts(page);

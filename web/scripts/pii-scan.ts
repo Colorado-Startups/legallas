@@ -156,8 +156,17 @@ const SHORT_NUMBER = /^-?[A-Z]{0,3}\d{1,8}(?:\.\d+)?$/;
  * of its data.
  */
 function xmlReadings(xml: string): string[] {
-  const open = xml.replace(/<!\[CDATA\[|\]\]>|<!--|-->/g, '');
-  const lines = open.replace(/<\/(?:[\w.-]+:)?(?:p|tr|row|si|c)>/g, '\n').replace(/<[^<>]+>/g, '');
+  // Each removal runs again until nothing is left to remove: taking one marker or tag out can join the text around it into another.
+  let open = xml;
+  for (let before = ''; before !== open; ) {
+    before = open;
+    open = open.replace(/<!\[CDATA\[|\]\]>|<!--|--!?>/g, '');
+  }
+  let lines = open.replace(/<\/(?:[\w.-]+:)?(?:p|tr|row|si|c)>/g, '\n');
+  for (let before = ''; before !== lines; ) {
+    before = lines;
+    lines = lines.replace(/<[^<>]+>/g, '');
+  }
   let pieces = '';
   for (const [, double, single, text] of open.matchAll(/=\s*"([^"]*)"|=\s*'([^']*)'|>([^<>]+)/g)) {
     const piece = double ?? single ?? text ?? '';
