@@ -20,7 +20,7 @@ function setup(settings: Partial<ResearchToolEnv>) {
   const tools = researchTools(state);
   const run = async (args: Record<string, unknown>) => {
     const t = tools[RECORDS_TOOL_NAME]!;
-    const parsed = (t.inputSchema as { parse(v: unknown): Record<string, unknown> }).parse(args);
+    const parsed = (t.inputSchema as unknown as { parse(v: unknown): Record<string, unknown> }).parse(args);
     return (await t.execute!(parsed, { toolCallId: 'x', messages: [], context: {} })) as string;
   };
   return { db, state, tools, run };
