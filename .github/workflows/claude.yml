@@ -93,18 +93,23 @@ jobs:
             exit 1
           fi
       # HOME and Claude's config live in the job's temp folder, the one place
-      # besides the checkout the sandbox lets commands write (npm's cache), and
-      # the action installs Claude Code there. GIT_TERMINAL_PROMPT=0 fails any
+      # the action installs Claude Code. Sandboxed commands write only the
+      # checkout and claude-sandbox (npm's cache), never HOME or the runner's
+      # command files (claude-settings.sh). GIT_TERMINAL_PROMPT=0 fails any
       # credential prompt fast.
       - name: Private HOME
         run: |
-          mkdir -p "$RUNNER_TEMP/home/.claude"
+          mkdir -p "$RUNNER_TEMP/home/.claude" "$RUNNER_TEMP/claude-sandbox"
           {
             echo "HOME=$RUNNER_TEMP/home"
             echo "CLAUDE_CONFIG_DIR=$RUNNER_TEMP/home/.claude"
+            echo "npm_config_cache=$RUNNER_TEMP/claude-sandbox/npm-cache"
             echo "GIT_TERMINAL_PROMPT=0"
             # Astro writes telemetry settings outside the sandbox's write area.
             echo "ASTRO_TELEMETRY_DISABLED=1"
+            # Wrangler (npm run check) logs under HOME, which the sandbox can't write.
+            echo "WRANGLER_LOG_PATH=$RUNNER_TEMP/claude-sandbox/wrangler-logs"
+            echo "WRANGLER_SEND_METRICS=false"
           } >> "$GITHUB_ENV"
       # fetch-depth 0 also fetches origin/main for the confinement script.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -149,8 +154,9 @@ jobs:
           fi
       # Confines Claude: file tools read only the checkout, and its shell
       # commands run in Claude Code's sandbox (no reads of the runner's home
-      # outside the checkout and the job's temp folder, writes only there,
-      # network only to the npm registry). The script comes from main.
+      # outside the checkout and the job's temp folder, writes only to the
+      # checkout and claude-sandbox, network only to the npm registry). The
+      # script comes from main.
       - name: Confinement from main
         run: |
           git show origin/main:.github/scripts/claude-settings.sh > "$RUNNER_TEMP/claude-settings.sh"

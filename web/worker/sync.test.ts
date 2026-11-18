@@ -9,6 +9,7 @@ import { syncSql } from '../scripts/sqlplan.ts';
 import { kindOf, splitPath } from './doc-kinds.ts';
 import { handleSync } from './routes/sync.ts';
 import { acquireLease, isSyncKey, LEASE_TTL_MS, MAX_RECORD_OPS, parseSyncRecord, purgeRetired, RETAIN_DAYS, SYNC_PART_BYTES, validSyncPath, type SyncRecord } from './sync.ts';
+import './digest-fixtures.ts';
 import { syncRoom, CLIENT, NOW, ORIGIN, OWNER, type SyncRoom } from './sync-fixtures.ts';
 
 const sha = (bytes: Uint8Array | string) => createHash('sha256').update(bytes).digest('hex');
@@ -283,6 +284,24 @@ test('an upload of the wrong size stays out of the record', async () => {
   assert.equal((await call(room, `${base}/complete`, { method: 'POST', lease: held, json: { size: 11, parts: [part] } })).status, 409);
   const body = record({ adds: [{ id: randomUUID(), path: 'a.zip', size: 11, sha256: sha('x'), r2_key: key }] });
   assert.equal((await call(room, '/api/sync/record', { method: 'POST', lease: held, json: body })).status, 409);
+});
+
+test('a large upload goes into the record only with the sha256 of its own bytes, which the room computes', async () => {
+  const room = syncRoom();
+  const held = await lease(room);
+  const key = randomUUID();
+  const bytes = new TextEncoder().encode('the altered draft of the fixture agreement');
+  const started = await call(room, `/api/sync/files/${key}/uploads`, { method: 'POST', lease: held, json: { contentType: 'application/pdf' } });
+  const base = `/api/sync/files/${key}/uploads/${encodeURIComponent(((await started.json()) as { upload: string }).upload)}`;
+  const part = await (await call(room, `${base}/parts/1`, { method: 'PUT', lease: held, body: bytes })).json();
+  assert.equal((await call(room, `${base}/complete`, { method: 'POST', lease: held, json: { size: bytes.byteLength, parts: [part] } })).status, 200);
+  const id = randomUUID();
+  const add = (sha256: string) => record({ adds: [{ id, path: 'Agreements/supply.pdf', size: bytes.byteLength, sha256, r2_key: key }] });
+  // Another file's hash, claimed for these bytes, is refused and records nothing.
+  assert.equal((await call(room, '/api/sync/record', { method: 'POST', lease: held, json: add(sha('the signed fixture agreement')) })).status, 409);
+  assert.equal(docs(room).length, 0);
+  assert.equal((await call(room, '/api/sync/record', { method: 'POST', lease: held, json: add(sha(bytes)) })).status, 200);
+  assert.equal(docs(room)[0]?.sha256, sha(bytes));
 });
 
 test('only a stopped run\'s own upload can be deleted', async () => {
@@ -895,10 +914,12 @@ test('a plan applied through the endpoints leaves the same documents and audit r
     }
   };
   const run = new Date().toISOString();
-  const file = (rel: string) => ({ rel, size: 3, sha256: sha(rel) });
+  // Each new original holds these bytes (put below), and the room checks a record's sha256 against them.
+  const bytes = 'abc';
+  const file = (rel: string) => ({ rel, size: bytes.length, sha256: sha(bytes) });
   const target = (rel: string) => {
     const { kind, contentType } = kindOf(rel);
-    return { path: rel, ...splitPath(rel), kind, contentType, size: 3, sha256: sha(rel), file: file(rel) };
+    return { path: rel, ...splitPath(rel), kind, contentType, size: bytes.length, sha256: sha(bytes), file: file(rel) };
   };
   const row = (n: number, path: string) => ({ id: id(n), path, sha256: `old-${n}`, size: 1, kind: 'pdf', pages: null, r2_key: `key-${n}`, source: 'mirror' });
   const keys = { changed: randomUUID(), added: randomUUID() };
@@ -918,8 +939,8 @@ test('a plan applied through the endpoints leaves the same documents and audit r
 
   const viaRoom = syncRoom();
   seed(viaRoom);
-  await viaRoom.files.put(keys.changed, 'abc');
-  await viaRoom.files.put(keys.added, 'abc');
+  await viaRoom.files.put(keys.changed, bytes);
+  await viaRoom.files.put(keys.added, bytes);
   const held = await lease(viaRoom);
   const op = (entry: { id: string; path: string; size: number; sha256: string; r2Key: string }) => ({ id: entry.id, path: entry.path, size: entry.size, sha256: entry.sha256, r2_key: entry.r2Key });
   const response = await call(viaRoom, '/api/sync/record', {

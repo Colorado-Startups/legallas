@@ -75,7 +75,7 @@ Under `/api/sync/`. All but `state` and `POST lease` need `X-Sync-Lease`.
 | `PUT files/:key/uploads/:upload/parts/:n` | raw | `{ partNumber, etag }`, 429 `upload_budget` |
 | `POST files/:key/uploads/:upload/complete` | `{ size, parts }` | `{ key, size }` |
 | `DELETE files/:key/uploads/:upload` | | give up |
-| `POST record` | `{ run, removals, renames, changes, adds, pages }`, 100 entries at most | 409 `key_taken`, `object_mismatch`, `privileged_move` |
+| `POST record` | `{ run, removals, renames, changes, adds, pages }`, 100 entries at most | 409 `key_taken`, `object_mismatch` (missing object, other size, or a sha256 its bytes don't have: R2's for a single put, the room's own hash for a multipart one), `privileged_move` |
 | `PUT` `DELETE index/:id/:part` | raw, up to 4 MB, `X-Index-Sha256`, `X-Index-Stamp` | 429 `ingest_budget`: the month is full. The room records each document's text (`index_text`); `GET state` returns it as `index` |
 | `PUT` `DELETE side/:name` | raw | 429 `upload_budget` |
 | `POST reindex` | | 502 is not fatal |
