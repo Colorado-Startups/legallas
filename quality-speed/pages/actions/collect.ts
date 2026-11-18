@@ -171,8 +171,10 @@ async function collect(out: string): Promise<number> {
   // What sits behind the numbers, for the page's tables. A failed read leaves it out, so the page shows no table, not a false one.
   if (process.env.DETAIL_DIR) {
     let readings: Record<string, DetailReading> = {};
+    // The plan's included dollars, the gauge's ceiling: a repository variable the lane passes in, never a number in this tree.
+    const included = Number(process.env.ACTIONS_INCLUDED_USD);
     try {
-      readings = runs ? { ...spendDetail(runs, now, knownJobs(workflows)), ...queueDetail(product, now) } : {};
+      readings = runs ? { ...spendDetail(runs, now, knownJobs(workflows), included > 0 ? included : null), ...queueDetail(product, now) } : {};
     } catch (error) {
       console.error(`the spend detail: ${error instanceof Error ? error.constructor.name : 'failed'}`);
     }

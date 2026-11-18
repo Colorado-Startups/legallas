@@ -61,8 +61,6 @@ export class Unreadable extends Error {}
 const HOUR_MS = 3_600_000;
 const DAY_MS = 24 * HOUR_MS;
 
-/** What this page works to: the whole included $300, which the owner authorized on 2026-11-06 (PLAN.md). The $0 budget stops it. */
-export const ALLOWANCE_USD = 300;
 /** The price per minute, from GitHub's billing docs. */
 export const PRICE_PER_MINUTE = { linux: 0.006, linux_slim: 0.002, linux_arm: 0.005, windows: 0.01, macos: 0.062 } as const;
 export type Sku = keyof typeof PRICE_PER_MINUTE;
@@ -185,8 +183,8 @@ export function detailId(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
-/** Where this month's money went, by job and by day, for the spend table and the running total. Only jobs in `known` keep their names, so a branch's job name can't carry text to the site. */
-export function spendDetail(runs: readonly Run[], now: Date, known: ReadonlySet<string>): Record<string, DetailReading> {
+/** Where this month's money went, by job and by day, for the spend table and the running total. Only jobs in `known` keep their names, so a branch's job name can't carry text to the site. `allowance` is the plan's included dollars, the gauge's ceiling: the lane passes it in, so no account's figure sits in this public tree, and with none the page draws no gauge. */
+export function spendDetail(runs: readonly Run[], now: Date, known: ReadonlySet<string>, allowance: number | null = null): Record<string, DetailReading> {
   const readings: Record<string, DetailReading> = {};
   const add = (id: string, value: number, limit: number | null = null) => {
     const reading = (readings[id] ??= { value: 0, limit, n: 0 });
@@ -202,7 +200,7 @@ export function spendDetail(runs: readonly Run[], now: Date, known: ReadonlySet<
     add(`job_${id}_${sku}`, dollars(job));
     add(`min_${id}_${sku}`, billedMinutes(job));
     add(`day_${(job.started_at as string).slice(0, 10)}`, dollars(job));
-    add('month_usd', dollars(job), ALLOWANCE_USD);
+    add('month_usd', dollars(job), allowance);
   }
   return readings;
 }

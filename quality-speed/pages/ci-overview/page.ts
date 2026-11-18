@@ -9,7 +9,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import type { Manifest, Metric, MetricRecord } from '../../contract/format.ts';
 import type { PageContext, PageOutput } from '../../core/build.ts';
-import { bullets, dataTable, dotMatrix, esc, fmtValue, markKey, meter, metricBullet, metricTile, roadTo100, statTile, tableView, tileRow } from '../../core/charts/index.ts';
+import { bullets, dataTable, dotMatrix, esc, fmtValue, markKey, meter, metricBullet, metricTile, roadTo100, statTile, tableView, tileRow, type Column } from '../../core/charts/index.ts';
 import type { PassState, RoadFixProps } from '../../core/charts/index.ts';
 import { fixGain } from '../../core/charts/road.ts';
 import { lineScore, scorePage } from '../../core/score.ts';
@@ -34,7 +34,6 @@ export interface Change {
   why?: string;
   pull: number | null;
   merged_at?: string;
-  usd_day: number;
   effect?: Record<string, number>;
 }
 
@@ -90,7 +89,8 @@ export function pushChart(p: Path): string {
   }
   y += 18;
   const ticks = Array.from({ length: span / 60 + 1 }, (_, i) => `<text class="qs-tick-label" x="${x(i * 60)}" y="${y}" text-anchor="${i === 0 ? 'start' : i === span / 60 ? 'end' : 'middle'}">${i === span / 60 ? `${i} min` : i}</text>`);
-  const label = `${PATH[p.path]} push: ${p.bars.length} jobs, done in ${fmtValue(end / 60, 'minutes')}, ${fmtValue(p.usd_push, 'usd')} a push, ${p.runs} pushes`;
+  const usd = p.usd_push === undefined ? '' : `, ${fmtValue(p.usd_push, 'usd')} a push`;
+  const label = `${PATH[p.path]} push: ${p.bars.length} jobs, done in ${fmtValue(end / 60, 'minutes')}${usd}, ${p.runs} pushes`;
   return (
     `<figure class="qs-chart"><svg width="100%" height="${y + 4}" role="img" aria-label="${esc(label)}">${rows.join('')}${ticks.join('')}</svg>` +
     `${tableView(`${PATH[p.path]} push`, ['Job', 'Runner', 'Start s', 'End s'], p.bars.map((b) => [b.job, LANE[b.kind], b.start_s, b.end_s]))}</figure>`
@@ -112,13 +112,13 @@ function gateMatrix(g: boolean[]): string {
 }
 
 const PROVIDERS = [
-  { provider: 'GitHub 1-core', price: '0.002', pool: '$300 a month, all of it', stop: '$0 budgets' },
+  { provider: 'GitHub 1-core', price: '0.002', pool: 'the plan\'s included amount, all of it', stop: 'stop-usage budgets' },
   { provider: 'GitHub Linux', price: '0.006', pool: 'same pool', stop: 'same' },
   { provider: 'GitHub Windows', price: '0.010', pool: 'same pool', stop: 'same' },
   { provider: 'GitHub Mac', price: '0.062', pool: 'same pool', stop: 'same' },
   { provider: 'Blacksmith', price: '0.004 past free', pool: '3,000 min a month, org; 1,800 here', stop: 'none: the guard' },
   { provider: 'Claude cloud VM', price: '0', pool: 'plan usage', stop: 'plan limits' },
-  { provider: 'Hugging Face Jobs', price: '0.000167', pool: 'about $2 credit', stop: 'credit; Spaces never' },
+  { provider: 'Hugging Face Jobs', price: '0.000167', pool: 'plan credit', stop: 'credit; Spaces never' },
 ];
 
 /** The page body, from the build's scores, this folder's baseline, drill-down and changes. */
@@ -137,6 +137,9 @@ export function render(ctx: PageContext): PageOutput {
     return metricBullet(metric(id), LABELS[id] ?? id, b === null || b === undefined ? { reading: reading(id) } : { reading: reading(id), baseline: b });
   };
   const perDay = (x: number) => Math.round((x * 24) / Math.max(1, rows.span_hours));
+  // Dollars show only from a lane's own rows.json. The committed baseline has none: they are the organization's spend.
+  const hosted = rows.hosted_usd;
+  const usdColumn = (label: string): Column[] => (hosted === undefined ? [] : [{ key: 'usd', label, type: 'num', unit: 'usd' }]);
   const shown = rows.paths.filter((p) => p.runs > 0);
   // The consumption ring's score too: a variable, so it type-checks before core's RoadScore takes `c`.
   const now = { q: score.quality, s: score.speed, total: score.total, c: score.exact_consumption };
@@ -151,9 +154,9 @@ export function render(ctx: PageContext): PageOutput {
     ]),
     rows.gates ? gateMatrix(rows.gates) : '',
     `</div></div><div><div class="qs-grid">`,
-    // A day's share of each pool: this repository's 1,800 Blacksmith minutes over 31 days; the included $300 over 30.
+    // A day's share of this repository's 1,800 Blacksmith minutes over 31 days. GitHub's dollars a day have no limit drawn: the plan's included amount stays off this tree.
     meter({ label: 'Blacksmith/day', value: perDay(rows.blacksmith_minutes), limit: 58 }),
-    meter({ label: 'GitHub/day', value: perDay(rows.hosted_usd), limit: 10, unit: 'usd' }),
+    hosted === undefined ? '' : statTile({ label: 'GitHub/day', value: perDay(hosted), unit: 'usd' }),
     // The sessions' shared logins can't be read from CI: two dated samples of GitHub's rate-limit reading.
     tileRow([
       statTile({ label: 'API local', value: 100, unit: 'percent', better: 'down', status: 'ok', time: '2026-11-02T04:48:00Z', stage: 'lab' }),
@@ -168,7 +171,7 @@ export function render(ctx: PageContext): PageOutput {
       columns: [
         { key: 'path', label: 'Path' },
         { key: 'pushes', label: 'Pushes', type: 'num' },
-        { key: 'usd', label: '$ a push', type: 'num', unit: 'usd' },
+        ...usdColumn('$ a push'),
         { key: 'min', label: 'Done', type: 'num', unit: 'minutes' },
       ],
       rows: shown.map((p) => ({ path: PATH[p.path], pushes: p.runs, usd: p.usd_push, min: Math.round(Math.max(0, ...p.bars.map((b) => b.end_s)) / 6) / 10 })),
@@ -178,11 +181,10 @@ export function render(ctx: PageContext): PageOutput {
       filter: false,
       columns: [
         { key: 'change', label: 'Change' },
-        { key: 'usd', label: '$ a day', type: 'num', unit: 'usd' },
         { key: 'state', label: 'State' },
       ],
       linkKey: 'link',
-      rows: [...changes].sort((a, b) => b.usd_day - a.usd_day).map((c) => ({ change: c.label, usd: c.usd_day, state: c.state === 'no' ? `no: ${c.why ?? ''}` : c.state, link: c.pull ? `${REPO_URL}/pull/${c.pull}` : null })),
+      rows: changes.map((c) => ({ change: c.label, state: c.state === 'no' ? `no: ${c.why ?? ''}` : c.state, link: c.pull ? `${REPO_URL}/pull/${c.pull}` : null })),
     }),
     dataTable({
       caption: 'Jobs',
@@ -193,7 +195,7 @@ export function render(ctx: PageContext): PageOutput {
         { key: 'runs', label: 'Runs', type: 'num' },
         { key: 'p50', label: 'p50', type: 'num', unit: 'seconds' },
         { key: 'minutes', label: 'Min', type: 'num' },
-        { key: 'usd', label: 'Billed', type: 'num', unit: 'usd' },
+        ...usdColumn('Billed'),
       ],
       rows: rows.jobs.map((j) => ({ job: j.job, workflow: j.workflow, runner: LANE[j.kind], runs: j.runs, p50: j.p50_s, minutes: j.minutes, usd: j.kind === 'blacksmith' ? 0 : j.usd })),
     }),

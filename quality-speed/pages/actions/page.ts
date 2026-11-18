@@ -6,7 +6,6 @@ import type { PageContext, PageOutput } from '../../core/build.ts';
 import { bullets, dataTable, esc, markKey, metricBullet, metricTile, roadTo100, tableView, tileRow, totalOf, trend, type ReadingLike, type RoadFixProps, type RoadScore } from '../../core/charts/index.ts';
 import { fixGain } from '../../core/charts/road.ts';
 import type { Metric } from '../../contract/format.ts';
-import { ALLOWANCE_USD } from './measure.ts';
 
 /** The first read of this page, from PLAN.md, with no consumption metric yet; the total by core's own rule. */
 const BASELINE: RoadScore = { q: 81, s: 100, total: totalOf(81, 100) };
@@ -22,17 +21,17 @@ const FIXES: readonly { id: string; label: string; issue?: number; metrics: stri
 const HOLD_LABEL_GAP = 2;
 const dollars = (value: number) => `$${value.toFixed(value < 10 ? 2 : 0)}`;
 
-/** The infographic. The scale ends at the ceiling, and a forecast past it stops there with its own number on it. */
-export function gauge(spent: number | null, forecast: number, goal: number, hold: number): string {
-  const share = (usd: number) => Math.min(usd / ALLOWANCE_USD, 1) * 100;
+/** The infographic. The scale ends at the ceiling, the plan's included dollars from the spend detail, and a forecast past it stops there with its own number on it. */
+export function gauge(spent: number | null, forecast: number, goal: number, hold: number, ceiling: number): string {
+  const share = (usd: number) => Math.min(usd / ceiling, 1) * 100;
   const x = (usd: number) => `${share(usd).toFixed(2)}%`;
-  const spoken = `Heading for ${dollars(forecast)} of ${dollars(ALLOWANCE_USD)}${spent === null ? '' : `, ${dollars(spent)} spent`}`;
+  const spoken = `Heading for ${dollars(forecast)} of ${dollars(ceiling)}${spent === null ? '' : `, ${dollars(spent)} spent`}`;
   const table = tableView(spoken, ['Mark', 'Dollars'], [
     ['Spent', spent === null ? 'Missing' : dollars(spent)],
     ['Forecast', dollars(forecast)],
     ['Goal', dollars(goal)],
     ['Floor', dollars(hold)],
-    ['Ceiling', dollars(ALLOWANCE_USD)],
+    ['Ceiling', dollars(ceiling)],
   ]);
   return (
     `<figure class="qs-chart"><figcaption>Allowance</figcaption><svg width="100%" height="64" role="img" aria-label="${esc(spoken)}">` +
@@ -41,8 +40,8 @@ export function gauge(spent: number | null, forecast: number, goal: number, hold
     (spent === null ? '' : `<rect class="qs-fill-q" width="${x(spent)}" y="20" height="20" rx="3"/>`) +
     `<line class="qs-goal" x1="${x(goal)}" x2="${x(goal)}" y1="14" y2="46"/><text class="qs-ref" x="${x(goal)}" y="60" text-anchor="middle">◆ ${dollars(goal)}</text>` +
     `<line class="qs-cap" x1="${x(hold)}" x2="${x(hold)}" y1="14" y2="46"/><text class="qs-ref" x="${(share(hold) - HOLD_LABEL_GAP).toFixed(2)}%" y="60" text-anchor="end">${dollars(hold)}</text>` +
-    `<text class="qs-ref-strong" x="${x(forecast)}" y="12" text-anchor="${forecast > ALLOWANCE_USD / 2 ? 'end' : 'start'}">▼ ${dollars(forecast)}</text>` +
-    `<text class="qs-end" x="100%" y="60" text-anchor="end">${dollars(ALLOWANCE_USD)}</text></svg>${table}</figure>`
+    `<text class="qs-ref-strong" x="${x(forecast)}" y="12" text-anchor="${forecast > ceiling / 2 ? 'end' : 'start'}">▼ ${dollars(forecast)}</text>` +
+    `<text class="qs-end" x="100%" y="60" text-anchor="end">${dollars(ceiling)}</text></svg>${table}</figure>`
   );
 }
 
@@ -114,6 +113,7 @@ export function render({ score, metrics, history, detail }: PageContext): PageOu
   const plants = Object.keys(checks);
   const forecast = metric('allowance_forecast_usd');
   const spent = readings.month_usd?.value;
+  const ceiling = readings.month_usd?.limit;
 
   const weightOf = (lens: Metric['lens']) => metrics.filter((m) => m.lens === lens).reduce((sum, m) => sum + m.weight, 0) || 1;
   const fixes: RoadFixProps[] = FIXES.map((fix) => {
@@ -129,7 +129,7 @@ export function render({ score, metrics, history, detail }: PageContext): PageOu
   // The consumption ring's score too: a variable, so it type-checks before core's RoadScore takes `c`.
   const now = { q: score.exact_quality, s: score.exact_speed, total: score.total, c: score.exact_consumption };
   const body = [
-    forecast.status === 'ok' && forecast.value !== null ? gauge(spent ?? null, forecast.value, forecast.goal, forecast.floor) : '',
+    forecast.status === 'ok' && forecast.value !== null && ceiling ? gauge(spent ?? null, forecast.value, forecast.goal, forecast.floor, ceiling) : '',
     bullets('Money', [bullet('allowance_forecast_usd', 'Month end'), bullet('usd_per_merge', 'Per merge'), bullet('blacksmith_minutes_31d', 'Blacksmith')]),
     bullets('Consumption', [bullet('billed_minutes_per_merge', 'Per merge')]),
     tileRow([

@@ -266,8 +266,9 @@ export interface JobRow {
   runs: number;
   p50_s: number;
   minutes: number;
-  usd_run: number;
-  usd: number;
+  /** Dollars, here and in `Path` and `Rows`: a lane's own rows carry them. The committed baseline leaves them out, since they are the organization's spend. */
+  usd_run?: number;
+  usd?: number;
 }
 export interface Bar {
   job: string;
@@ -278,7 +279,7 @@ export interface Bar {
 export interface Path {
   path: 'docs' | 'web' | 'swift';
   runs: number;
-  usd_push: number;
+  usd_push?: number;
   bars: Bar[];
 }
 export interface Rows {
@@ -290,7 +291,7 @@ export interface Rows {
   rebases_per_merge: number | null;
   gates: boolean[] | null;
   /** GitHub-hosted dollars and Blacksmith minutes in the window, every event. */
-  hosted_usd: number;
+  hosted_usd?: number;
   blacksmith_minutes: number;
   jobs: JobRow[];
   paths: Path[];
