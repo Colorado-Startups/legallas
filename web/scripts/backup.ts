@@ -61,7 +61,17 @@ export function parseArgs(args: readonly string[]): Options {
 }
 
 /** A Cloudflare API call. Failures carry the HTTP status and Cloudflare's error codes, never the path or body. */
-export type Api = (method: 'GET' | 'POST', path: string, body?: unknown) => Promise<unknown>;
+export type Api = (method: 'GET' | 'POST' | 'PUT' | 'PATCH', path: string, body?: unknown) => Promise<unknown>;
+
+/** A failed call: `status` lets a caller tell "absent" (404) and "not allowed" (403) from other failures. */
+export class CloudflareApiError extends Error {
+  override name = 'CloudflareApiError';
+  readonly status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
 
 export function cloudflareApi(token: () => Promise<string>, fetchImpl: typeof fetch = fetch): Api {
   return async (method, path, body) => {
@@ -73,7 +83,7 @@ export function cloudflareApi(token: () => Promise<string>, fetchImpl: typeof fe
     const parsed = (await response.json().catch(() => null)) as { success?: boolean; result?: unknown; errors?: { code?: unknown }[] } | null;
     if (!response.ok || !parsed?.success) {
       const codes = (parsed?.errors ?? []).map((error) => error.code).filter((code) => typeof code === 'number');
-      throw new Error(`Cloudflare API ${method} answered ${response.status}${codes.length ? ` (codes ${codes.join(', ')})` : ''}`);
+      throw new CloudflareApiError(`Cloudflare API ${method} answered ${response.status}${codes.length ? ` (codes ${codes.join(', ')})` : ''}`, response.status);
     }
     return parsed.result;
   };
