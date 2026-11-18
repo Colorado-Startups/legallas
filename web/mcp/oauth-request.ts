@@ -11,8 +11,8 @@ const TOKEN_PATH = '/token';
 const REGISTER_PATH = '/register';
 const FORM_TYPE = 'application/x-www-form-urlencoded';
 /**
- * Real token and registration requests are far smaller. A longer /register body is left to the library unread; a
- * longer /token body is refused with a 413 before the library reads it (mcp/revoke-audit.ts).
+ * Real token and registration requests are far smaller. A longer form-encoded /token body or /register body is
+ * refused with a 413 before the library reads it (mcp/revoke-audit.ts).
  */
 export const MAX_PREREAD_BYTES = 16_384;
 

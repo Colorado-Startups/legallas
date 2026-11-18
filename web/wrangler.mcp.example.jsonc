@@ -58,7 +58,8 @@
     // and Harvey sessions show what they send (none of the three AIs is expected to send one).
     "MCP_ORIGIN_ENFORCE": "0",
     // "zdr": zero retention only (mcp/retention.ts). claude.ai and Microsoft are refused; any other app connects once
-    // its client id is in AI_ZDR_CLIENTS, after the owner confirms its setup keeps nothing. "": any allowed AI.
+    // its client id is in AI_ZDR_CLIENTS, after the owner confirms its setup keeps nothing ("member@example.com
+    // client-id" for one member; a desktop app's shared https client id needs that form). "": any allowed AI.
     "AI_POLICY": "",
     "AI_ZDR_CLIENTS": "",
     // "1": lists legallas_search_law (mcp/tools/search-law.ts), public law from the law library's own bucket and

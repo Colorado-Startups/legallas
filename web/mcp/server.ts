@@ -254,7 +254,7 @@ export async function runTool(tool: ToolDefinition, args: unknown, env: McpEnv, 
       return toolError('forbidden', "This tool is for the room's owner and counsel. Search, list or read the room's documents instead.");
     }
     const { member } = caller;
-    const retention = retentionRefusal(env, clientKind, props.clientId);
+    const retention = retentionRefusal(env, clientKind, props.clientId, props.email);
     if (retention) return toolError('zero_retention', retention);
     if (stoppedByConversion(props, await convertedAt(env.DB))) {
       return toolError('reapprove', 'This room became a litigation room, so every AI connection stopped. Connect this app again to approve it.');

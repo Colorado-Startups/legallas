@@ -10,6 +10,7 @@ import {
   MAX_SIGNIN_FAILURES_PER_GROUP,
   METADATA_RESOLUTION_FAILED,
   recordSignInFailure,
+  SIGNIN_FAILURE_FULL_TTL_SECONDS,
   SIGNIN_FAILURE_PREFIX,
   SIGNIN_FAILURE_TTL_SECONDS,
   type SignInFailure,
@@ -169,4 +170,31 @@ test('odd codes and hosts become "unknown" in the key, the log and the email; AL
   await recordSignInFailure(off.env, TOKEN_FAILURE, NOW);
   assert.equal(off.puts.length, 1);
   assert.equal(off.sent.length, 0);
+});
+
+test('once a group is full, 50 more failures from new hosts list KV once, not 50 times', async (t) => {
+  quiet(t);
+  const { env: e, store, puts, sent } = env();
+  for (let i = 0; i < MAX_SIGNIN_FAILURES_PER_GROUP; i++) store.set(`${SIGNIN_FAILURE_PREFIX}public:token:invalid_grant:h${i}.dummy-app.net`, '1');
+  const kv = e.OAUTH_KV as unknown as { list: (options: { prefix?: string; limit?: number }) => Promise<unknown> };
+  const list = kv.list.bind(kv);
+  let lists = 0;
+  kv.list = async (options) => {
+    lists++;
+    return list(options);
+  };
+  for (let i = 0; i < 50; i++) {
+    await recordSignInFailure(e, { where: 'token', code: 'invalid_grant', grantType: 'authorization_code', host: `n${i}.dummy-app.net` }, NOW);
+  }
+  assert.ok(lists <= MAX_SIGNIN_FAILURES_PER_GROUP + 1, `${lists} KV lists`);
+  assert.equal(lists, 1);
+  assert.equal(sent.length, 0);
+  assert.equal([...store.keys()].filter((key) => key.startsWith(`${SIGNIN_FAILURE_PREFIX}public:`)).length, MAX_SIGNIN_FAILURES_PER_GROUP, 'no key added');
+  assert.deepEqual(puts, [{ key: `${SIGNIN_FAILURE_PREFIX}public-full`, ttl: SIGNIN_FAILURE_FULL_TTL_SECONDS }]);
+  // The marker expires (KV's TTL): the next failure lists again, and emails once a slot has freed.
+  store.delete(`${SIGNIN_FAILURE_PREFIX}public-full`);
+  store.delete(`${SIGNIN_FAILURE_PREFIX}public:token:invalid_grant:h0.dummy-app.net`);
+  await recordSignInFailure(e, TOKEN_FAILURE, NOW);
+  assert.equal(lists, 2);
+  assert.equal(sent.length, 1);
 });

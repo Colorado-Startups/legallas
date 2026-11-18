@@ -94,8 +94,8 @@ matter board from the room." The same folder is in the Legallas repository at `w
 
 In a room set to zero retention only (`AI_POLICY` set to `"zdr"`, `mcp/retention.ts`), also confirm each member: check with
 them that their setup matches "Before you start" and step 1 above, then add their OpenCode client ID (listed on
-`/admin/clients` after their first sign-in) to `AI_ZDR_CLIENTS`, and deploy. Until then the room refuses it: "the room owner
-hasn't confirmed this app keeps nothing".
+`/admin/clients` after their first sign-in) to `AI_ZDR_CLIENTS` as `member@example.com client-id`, and deploy. Until
+then the room refuses it: "the room owner hasn't confirmed this app keeps nothing".
 
 ## Good to know
 

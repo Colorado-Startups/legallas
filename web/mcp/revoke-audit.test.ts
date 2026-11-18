@@ -181,6 +181,58 @@ test('a form-encoded /token body over MAX_PREREAD_BYTES gets a 413 in the OAuth 
   assert.equal(audits.length, 1);
 });
 
+test('a /register body over MAX_PREREAD_BYTES gets a 413 before the library reads it; one at the limit goes on', async (t) => {
+  const logs = captureLogs(t);
+  const metadata = (pad: string) => JSON.stringify({ client_name: 'Example App', redirect_uris: ['https://app.example.test/cb'], pad });
+  const big = metadata('x'.repeat(MAX_PREREAD_BYTES));
+  let pulled = 0;
+  const chunk = new TextEncoder().encode('x'.repeat(4096));
+  const streamed = new ReadableStream<Uint8Array>({
+    pull(controller) {
+      pulled += chunk.byteLength;
+      if (pulled > 4 * 1024 * 1024) controller.close();
+      else controller.enqueue(chunk);
+    },
+  });
+  const cases = [
+    new Request(`${MCP_ORIGIN}/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: big }),
+    new Request(`${MCP_ORIGIN}/register`, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: big }),
+    new Request(`${MCP_ORIGIN}/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': String(MAX_PREREAD_BYTES + 1) },
+      body: metadata(''),
+    }),
+    new Request(`${MCP_ORIGIN}/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: streamed, duplex: 'half' } as RequestInit),
+  ];
+  for (const request of cases) {
+    const { env } = setup();
+    let forwarded = 0;
+    const forward = async () => {
+      forwarded++;
+      return new Response('{}', { status: 201 });
+    };
+    const response = await withRevocationAudit(request, env, forward);
+    assert.equal(response.status, 413);
+    assert.deepEqual(await response.json(), { error: 'invalid_client_metadata', error_description: 'The registration request is too large.' });
+    assert.equal(response.headers.get('cache-control'), 'no-store');
+    assert.equal(forwarded, 0, 'the library never sees it');
+  }
+  assert.ok(pulled < 64 * 1024, `pulled ${pulled} bytes of a 4 MiB streamed body`);
+  assert.deepEqual(logs, Array(4).fill('mcp_register_too_large'));
+  // Exactly the limit goes on to the library, which reads the original body whole.
+  const atLimit = metadata('x'.repeat(MAX_PREREAD_BYTES - metadata('').length));
+  assert.equal(new TextEncoder().encode(atLimit).byteLength, MAX_PREREAD_BYTES);
+  const { env } = setup();
+  let read = '';
+  const forward = async (request: Request) => {
+    read = await request.text();
+    return new Response('{}', { status: 201 });
+  };
+  const response = await withRevocationAudit(new Request(`${MCP_ORIGIN}/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: atLimit }), env, forward);
+  assert.equal(response.status, 201);
+  assert.equal(read, atLimit);
+});
+
 test('via falls back to the client record, then a CIMD host, then REVOKE_VIA', async () => {
   const { kv } = fakeKv({ 'client:dcr-1': { clientId: 'dcr-1', clientName: 'Copilot Studio' }, 'client:blank': { clientName: ' ' } });
   assert.equal(await viaForGrant(kv, grant('dcr-1', null)), 'Copilot Studio');

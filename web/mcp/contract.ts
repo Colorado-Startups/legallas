@@ -304,7 +304,10 @@ export interface McpEnv extends LawBindings, RoomNameVars, ProposalSetting, Chec
   MCP_ORIGIN_ENFORCE?: string;
   /** "zdr": zero retention only (mcp/retention.ts). Unset or anything else: any allowed AI, as today. */
   AI_POLICY?: string;
-  /** With AI_POLICY "zdr": the client ids, comma-separated, whose setup the owner confirmed keeps nothing. */
+  /**
+   * With AI_POLICY "zdr": comma-separated `client-id` or `member@example.com client-id` entries whose setup the owner
+   * confirmed keeps nothing (mcp/retention.ts). A desktop app's shared https client id needs the member's entry.
+   */
   AI_ZDR_CLIENTS?: string;
   /**
    * The shared Teams Developer Portal OAuth client registration ID ("Any Microsoft 365 organization")

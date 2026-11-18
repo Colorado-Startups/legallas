@@ -2,6 +2,7 @@
 // The active-content reader on tiny files built here, never real documents.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { crc32 } from 'node:zlib';
 import { activeContentGuard, entryRule, scanBytes, scanKindOf, scanStream, MAX_OBJSTM_BYTES, type ActiveRule } from './active-content.ts';
 
 const bytes = (text: string) => Uint8Array.from(text, (c) => c.charCodeAt(0));
@@ -120,6 +121,44 @@ function zip(names: string[], central = names): Uint8Array {
   const centrals = central.map((n) => join(Uint8Array.of(0x50, 0x4b, 1, 2, ...new Array(24).fill(0), ...u16(name(n).length), ...new Array(16).fill(0)), name(n)));
   return join(...locals, ...centrals, Uint8Array.of(0x50, 0x4b, 5, 6, ...new Array(18).fill(0)));
 }
+
+/**
+ * A one-entry stored zip whose headers say `name` and whose extra field carries `fields` ([id, data]) in the local
+ * header, the central one, or both.
+ */
+function zipWithExtra(name: string, fields: [number, Uint8Array][], where: 'local' | 'central' | 'both' = 'both'): Uint8Array {
+  const u16 = (n: number) => [n & 0xff, n >> 8];
+  const encoded = new TextEncoder().encode(name);
+  const extra = join(...fields.map(([id, data]) => join(Uint8Array.of(...u16(id), ...u16(data.length)), data)));
+  const local = where !== 'central' ? extra : new Uint8Array(0);
+  const central = where !== 'local' ? extra : new Uint8Array(0);
+  return join(
+    Uint8Array.of(0x50, 0x4b, 3, 4, 20, 0, ...new Array(20).fill(0), ...u16(encoded.length), ...u16(local.length)),
+    encoded,
+    local,
+    Uint8Array.of(0x50, 0x4b, 1, 2, ...new Array(24).fill(0), ...u16(encoded.length), ...u16(central.length), ...new Array(14).fill(0)),
+    encoded,
+    central,
+    Uint8Array.of(0x50, 0x4b, 5, 6, ...new Array(18).fill(0)),
+  );
+}
+
+/** An Info-ZIP Unicode Path field (0x7075): version 1, the CRC-32 of the header name, the UTF-8 name. */
+function unicodePath(headerName: string, unicodeName: string): [number, Uint8Array] {
+  const crc = crc32(headerName);
+  return [0x7075, join(Uint8Array.of(1, crc & 0xff, (crc >>> 8) & 0xff, (crc >>> 16) & 0xff, crc >>> 24), new TextEncoder().encode(unicodeName))];
+}
+
+test('a zip entry whose Unicode Path name runs is refused, though its header name is harmless', async () => {
+  const timestamp: [number, Uint8Array] = [0x5455, Uint8Array.of(1, 0, 0, 0, 0)];
+  assert.equal(await both(zipWithExtra('notes.txt', [unicodePath('notes.txt', 'payload.exe')])), 'runnable');
+  assert.equal(await both(zipWithExtra('notes.txt', [timestamp, unicodePath('notes.txt', 'payload.exe')], 'central')), 'runnable', 'after another field');
+  assert.equal(await both(zipWithExtra('notes.txt', [unicodePath('notes.txt', 'word/vbaProject.bin')], 'local')), 'office-macros');
+  assert.equal(await both(zipWithExtra('notes.txt', [unicodePath('other.txt', 'Viewer.app/Contents/MacOS/Viewer')])), 'runnable', 'whatever the CRC');
+  assert.equal(await both(zipWithExtra('setup.exe', [unicodePath('setup.exe', 'notes.txt')])), 'runnable', 'the header name still counts');
+  assert.equal(await both(zipWithExtra('notes.txt', [timestamp, unicodePath('notes.txt', 'Notizen.txt')])), null, 'a harmless Unicode name passes');
+  assert.equal(await both(zipWithExtra('notes.txt', [timestamp])), null);
+});
 
 test('a Word file with only document parts passes', async () => {
   assert.equal(await both(zip(['[Content_Types].xml', '_rels/.rels', 'word/document.xml', 'word/media/image1.png'])), null);

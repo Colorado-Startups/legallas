@@ -153,7 +153,17 @@ test('a call posts the body to the chat URL with the key as a bearer token; reas
   assert.equal((calls[0]!.init.headers as Record<string, string>).Authorization, `Bearer ${HOST_KEY}`);
   assert.deepEqual(JSON.parse(String(calls[0]!.init.body)), hostInput(TARGET, MESSAGES));
   assert.ok(calls[0]!.init.signal instanceof AbortSignal, 'every call has a time limit');
+  assert.equal(calls[0]!.init.redirect, 'manual', 'a redirect is never followed');
   assert.deepEqual(await text(stream), { text: '- READ: It was Tuesday [doc:D1 p:2].', stop: 'stop' });
+});
+
+test('a redirect from the host is a failure: the turn and the key never reach another host', async () => {
+  for (const status of [301, 302, 303, 307, 308]) {
+    const { fetcher, calls } = fakeFetch(() => new Response(null, { status, headers: { location: 'https://other.example.test/v1/chat/completions' } }));
+    await assert.rejects(hostChat(fetcher, { url: HOST_CHAT_URL, apiKey: HOST_KEY }, hostInput(TARGET, MESSAGES)), (error: unknown) => error instanceof ChatUnavailable && error.message === `host_http_${status}`);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0]!.init.redirect, 'manual');
+  }
 });
 
 test('a failed host carries its status only: never its error body, its URL or the key', async () => {

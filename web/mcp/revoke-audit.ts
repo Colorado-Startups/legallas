@@ -3,9 +3,9 @@
 // whole grant but writes nothing to audit_log, so the member's activity feed would never show the disconnect.
 // This wraps the library call: it reads the grant before and after, and writes ai_disconnect when a 200 removed
 // it. Revoking an access token leaves the grant in place and writes nothing. The token itself is never logged.
-// It is also where a form-encoded /token body is bounded: it is read here first, so one over MAX_PREREAD_BYTES gets a
-// 413 and never reaches the library, which reads any other form body whole (it answers another content type with a
-// 400, unread).
+// It is also where a form-encoded /token body and any POST /register body are bounded: each is read here first, so one
+// over MAX_PREREAD_BYTES gets a 413 and never reaches the library, which reads any other form or registration body
+// whole (it answers /token with another content type with a 400, unread).
 import { aiAudit } from './audit.ts';
 import type { GrantMetadata, McpEnv } from './contract.ts';
 import { MAX_PREREAD_BYTES, preread } from './oauth-request.ts';
@@ -14,6 +14,7 @@ import { MAX_PREREAD_BYTES, preread } from './oauth-request.ts';
 export const REVOKE_VIA = 'revocation';
 
 const TOKEN_PATH = '/token';
+const REGISTER_PATH = '/register';
 
 export type RevokeAuditEnv = Pick<McpEnv, 'DB' | 'OAUTH_KV'>;
 
@@ -61,10 +62,28 @@ async function revocationToken(request: Request): Promise<string | typeof TOO_LA
   }
 }
 
-/** RFC 6749 section 5.2's error shape, as the library and the rate limit (mcp/gates.ts) answer /token. */
-function tooLarge(): Response {
-  console.warn('mcp_token_too_large');
-  return new Response(JSON.stringify({ error: 'invalid_request', error_description: 'The token request is too large.' }), {
+/** True when a POST /register body, of any content type, is over MAX_PREREAD_BYTES; read from a copy, as above. */
+async function registerTooLarge(request: Request): Promise<boolean> {
+  if (request.method !== 'POST' || new URL(request.url).pathname !== REGISTER_PATH) return false;
+  if (Number(request.headers.get('Content-Length') ?? '0') > MAX_PREREAD_BYTES) return true;
+  try {
+    return (await preread(request)) === null;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * RFC 6749 section 5.2's error shape, as the library and the rate limit (mcp/gates.ts) answer /token; RFC 7591
+ * section 3.2.2's for /register.
+ */
+function tooLarge(step: 'token' | 'register' = 'token'): Response {
+  console.warn(`mcp_${step}_too_large`);
+  const body =
+    step === 'token'
+      ? { error: 'invalid_request', error_description: 'The token request is too large.' }
+      : { error: 'invalid_client_metadata', error_description: 'The registration request is too large.' };
+  return new Response(JSON.stringify(body), {
     status: 413,
     headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
   });
@@ -109,7 +128,7 @@ export async function viaForGrant(kv: KVNamespace, grant: StoredGrant): Promise<
  * Forwards `request` to the library (`forward`, which gets the original, unread request) and, for a revocation
  * that removed a grant, writes one ai_disconnect row for the grant's member. A failed audit write is logged by
  * code and never changes the library's answer: the revocation already stands. `audit` is injectable for tests.
- * A form-encoded /token body over MAX_PREREAD_BYTES is answered with a 413 and never forwarded.
+ * A form-encoded /token body or a /register body over MAX_PREREAD_BYTES is answered with a 413 and never forwarded.
  */
 export async function withRevocationAudit(
   request: Request,
@@ -117,6 +136,7 @@ export async function withRevocationAudit(
   forward: (request: Request) => Promise<Response>,
   audit: typeof aiAudit = aiAudit,
 ): Promise<Response> {
+  if (await registerTooLarge(request)) return tooLarge('register');
   const token = await revocationToken(request);
   if (token === TOO_LARGE) return tooLarge();
   const ref = token === null ? null : grantRefFromToken(token);
