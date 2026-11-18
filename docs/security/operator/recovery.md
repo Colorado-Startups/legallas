@@ -28,8 +28,8 @@ setup: `web/README.md`, "Backup and restore".
 
 ## Drill log
 
-Run `npm run backup -- --drill` at least every quarter. It restores into a scratch bucket and database and prints counts
-and hashes only.
+Run `npm run backup -- --drill` at least every 90 days. It restores into a scratch bucket and database and prints counts
+and hashes only. `npm run harden -- --check` flags a drill older than that.
 
 | Date | Backup used | Objects | Rows | Minutes | Result | By |
 |---|---|---|---|---|---|---|

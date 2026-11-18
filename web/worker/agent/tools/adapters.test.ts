@@ -53,7 +53,7 @@ function setup(role: Role = 'counsel', options: { refuseSearch?: boolean } = {})
   const tools = researchTools(state);
   const run = async (name: string, args: Record<string, unknown>) => {
     const t = tools[name]!;
-    const parsed = (t.inputSchema as { parse(v: unknown): Record<string, unknown> }).parse(args);
+    const parsed = (t.inputSchema as unknown as { parse(v: unknown): Record<string, unknown> }).parse(args);
     return (await t.execute!(parsed, { toolCallId: 'x', messages: [], context: {} })) as string;
   };
   return { state, run, searches, progress: () => progress };
