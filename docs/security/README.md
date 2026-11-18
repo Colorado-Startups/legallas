@@ -42,6 +42,7 @@ Legallas runs in each room owner's own Cloudflare account. Colorado Startups hos
 | [Tabletop exercise, November 2026](tabletop-2026-11.md) | The incident steps walked against the code |
 | [Privacy impact assessment](privacy-impact.md) | Personal data processed, privacy risks and residual risk |
 | [Internal audit, November 2026](internal-audit-2026-11.md) | Evidence and claims checked against `main`, findings |
+| [Operator security records](operator/README.md) | Fill-in templates for a room owner's own policy, data map, vendors, risks, incidents, recovery drills, edge check and weekly watch |
 
 ## Attestations
 
