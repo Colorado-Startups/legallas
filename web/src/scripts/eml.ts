@@ -143,16 +143,79 @@ function partText(entity: Entity): string {
   return entity.body;
 }
 
-/** HTML as plain text: no head, scripts, styles or comments; blocks and breaks become lines; entities decoded. */
+const HIDDEN = new Set(['head', 'script', 'style', 'title']);
+const BLOCK = new Set(['p', 'div', 'tr', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'table', 'ul', 'ol', 'pre', 'section', 'article', 'header', 'footer']);
+const TAG_NAME = /<(\/?)([A-Za-z][A-Za-z0-9]*)/y;
+
+/** The index just past the end tag "</name ...>" at or after `from` (any case), or the text's length when there is none. */
+function pastEndTag(lower: string, name: string, from: number): number {
+  for (let at = lower.indexOf(`</${name}`, from); at >= 0; at = lower.indexOf(`</${name}`, at + 1)) {
+    const next = lower[at + 2 + name.length];
+    if (next === '>' || next === '/' || (next !== undefined && /\s/.test(next))) {
+      const close = lower.indexOf('>', at);
+      return close < 0 ? lower.length : close + 1;
+    }
+  }
+  return lower.length;
+}
+
+/** What a tag leaves in the text: a line for a block or break, "- " for an item, a space after a cell, else nothing. */
+function tagText(name: string, closing: boolean): string {
+  if (name === 'br') return '\n';
+  if (name === 'li') return closing ? '' : '\n- ';
+  if (BLOCK.has(name)) return '\n';
+  return closing && (name === 'td' || name === 'th') ? ' ' : '';
+}
+
+/**
+ * HTML as plain text: no head, scripts, styles or comments; blocks and breaks become lines; entities decoded. One pass
+ * over the characters, as a browser reads tags, so no '<' survives: a comment runs to "-->", a head, script, style or
+ * title to its end tag, any other tag to its '>', and a '<' that starts no tag is dropped. Shown with textContent
+ * (doc-views.ts); a '<' the email meant as text arrives as &lt; and is decoded after.
+ */
 export function htmlText(html: string): string {
-  const text = html
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/<(head|script|style|title)\b[\s\S]*?<\/\1\s*>/gi, '')
-    .replace(/<br\b[^>]*>/gi, '\n')
-    .replace(/<li\b[^>]*>/gi, '\n- ')
-    .replace(/<\/?(?:p|div|tr|h[1-6]|blockquote|table|ul|ol|pre|section|article|header|footer)\b[^>]*>/gi, '\n')
-    .replace(/<\/t[dh]\s*>/gi, ' ')
-    .replace(/<[^>]*>/g, '');
+  // ASCII-only fold: toLowerCase can change the length ('İ' becomes two code units), and indexes must match html's.
+  const lower = html.replace(/[A-Z]/g, (c) => c.toLowerCase());
+  let text = '';
+  let at = 0;
+  // The next '>' at or after the current '<', kept between tags so a run of '<' with no '>' is not rescanned each time.
+  // -1: none is left, so never search again; -2: not searched yet.
+  let gt = -2;
+  while (at < html.length) {
+    const open = html.indexOf('<', at);
+    if (open < 0) {
+      text += html.slice(at);
+      break;
+    }
+    text += html.slice(at, open);
+    if (html.startsWith('<!--', open)) {
+      const close = html.indexOf('-->', open + 4);
+      at = close < 0 ? html.length : close + 3;
+      continue;
+    }
+    TAG_NAME.lastIndex = open;
+    const tag = TAG_NAME.exec(html);
+    if (gt !== -1 && gt < open) gt = html.indexOf('>', open);
+    const close = gt;
+    if (!tag) {
+      // "<!doctype>", "<?xml?>" and "</ >" run to their '>'; a '<' before anything else is text's, and only it goes.
+      const markup = /[!?/]/.test(html[open + 1] ?? '');
+      at = markup && close >= 0 ? close + 1 : open + 1;
+      continue;
+    }
+    const name = tag[2]!.toLowerCase();
+    const closing = tag[1] === '/';
+    if (close < 0) {
+      at = open + 1;
+      continue;
+    }
+    if (!closing && HIDDEN.has(name)) {
+      at = pastEndTag(lower, name, close + 1);
+      continue;
+    }
+    text += tagText(name, closing);
+    at = close + 1;
+  }
   return text
     .replace(/&(#x[0-9a-f]{1,6}|#[0-9]{1,7}|[a-z]+);/gi, (whole, ref: string) => {
       if (ref[0] !== '#') return HTML_ENTITIES[ref.toLowerCase()] ?? whole;

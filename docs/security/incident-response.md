@@ -1,6 +1,6 @@
 # Incident response
 
-Part of the [security policies](README.md). Version 1.0, 2026-11-05.
+Part of the [security policies](README.md). Version 1.1, 2026-11-17.
 
 ## Purpose
 
@@ -51,6 +51,36 @@ flowchart LR
 | Notify | Room members, in writing, with what happened, what was exposed, and what was done. The room owner decides on any other notice the law requires |
 | Fix | A pull request that closes the cause, and a test that would have caught it |
 | Review | A short private note: timeline, cause, fix, what changes. Never repeat a secret or case content in it |
+
+## Records
+
+| Record | Where | Holds |
+|---|---|---|
+| A product incident | A private GitHub security advisory on this repository | Timeline, cause, fix, notices sent. Never case content or a secret |
+| A room incident | The room owner's own private store | As above, plus what the room's audit log showed |
+
+| Metric, per year | Reading, 2026-11-17 |
+|---|---|
+| Incidents by level | 0 at every level |
+| Time to contain, against the goal for its level | No incidents |
+| Time to tell members | No incidents |
+| Repeat causes | No incidents |
+
+The records and metrics are reviewed at each [internal audit](governance.md#internal-audit). Review on 2026-11-17: no
+security advisories, so no records.
+
+## Authorities
+
+| Who | When | Where |
+|---|---|---|
+| Colorado Attorney General | When C.R.S. 6-1-716 requires notice of a breach of Colorado residents' data. The statute sets the threshold and deadline | The room owner, as the data holder |
+| FBI Internet Crime Complaint Center | A crime: account takeover, extortion, theft of data | [ic3.gov](https://www.ic3.gov/) |
+| CISA | A cyber incident worth reporting nationally, voluntary | [cisa.gov/report](https://www.cisa.gov/report) |
+| Cloudflare | Abuse of, or a flaw in, the platform | The room owner's Cloudflare support, and Cloudflare's own disclosure program |
+| The state bar's ethics line | A lawyer member asks whether notice to a client is owed | The member's firm decides |
+
+The room owner decides on legal notice. Colorado Startups tells room owners about a product flaw, never an authority on a
+room's behalf.
 
 A credential or case content that reached this repository follows [`SECURITY.md`](../../SECURITY.md), "If something leaks":
 rotate, remove, and recreate the repository when it was case content.
