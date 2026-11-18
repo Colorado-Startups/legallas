@@ -187,3 +187,14 @@ test('a format character inside a number does not hide it: soft hyphen, zero-wid
   assert.equal(maskPath(rel, known), `W#/holder_###${ZWSP}##${ZWSP}####.pdf`);
   assert.ok(pathHits(`W9/holder_123${SHY}-45-6789.pdf`).length > 0, 'a printed form in a name');
 });
+
+test('a path: a format character written as a UTF-8 escape is dropped too, a whole code point at a time (#37)', () => {
+  const number = n('-', ...INVENTED);
+  for (const rel of [`W9/holder_123-45-67%C2%AD89.pdf`, `W9/holder_123-45-67%E2%80%8B89.pdf`, `W9/holder_123%e2%80%8b-45-6789.pdf`, `W9/holder_123-45-67%AD89.pdf`, `Caf%C3%A9 ${number}.pdf`]) {
+    assert.ok(pathHits(rel).some((hit) => hit.rule === 'ssn-form'), rel);
+    assert.equal(/\d/.test(maskPath(rel)), false, rel);
+  }
+  const known: KnownMatcher = { matches: async () => true, matchesSync: (digits) => digits === INVENTED.join('') };
+  assert.deepEqual(pathHits(`W9/holder_123%E2%80%8B45%E2%80%8B6789.pdf`, known).map((hit) => hit.rule), ['known-hash'], 'escaped zero-width spaces');
+  for (const rel of ['Deck%202024-01-15.pdf', 'Order%20123456789.pdf', 'bad%E2%80.pdf', 'bad%FF%FE.pdf']) assert.deepEqual(pathHits(rel), [], rel);
+});

@@ -227,13 +227,49 @@ export function findPiiSync(text: string, known: KnownMatcher | null = null): Pi
   return sorted(hits);
 }
 
+const UTF8 = new TextDecoder('utf-8', { fatal: true });
+
+/** How many bytes the UTF-8 sequence led by `byte` holds: 2 to 4, or 1 for a byte that leads none. */
+function utf8Length(byte: number): number {
+  if (byte >= 0xc2 && byte <= 0xdf) return 2;
+  if (byte >= 0xe0 && byte <= 0xef) return 3;
+  if (byte >= 0xf0 && byte <= 0xf4) return 4;
+  return 1;
+}
+
 /**
- * A path as the rules read it: percent escapes decoded, format characters dropped, underscores as spaces, in capitals
- * so a label counts in any case.
+ * Percent escapes decoded: each run of escaped bytes read as UTF-8, a whole code point at a time ("%E2%80%8B" is one
+ * zero-width space, not three Latin-1 letters). A byte that starts no valid sequence ("%AD" alone, "%E9") reads as the
+ * Latin-1 character it names, as before.
+ */
+function decodeEscapes(rel: string): string {
+  return rel.replace(/(?:%[0-9a-f]{2})+/gi, (run) => {
+    const bytes = run.slice(1).split('%').map((hex) => parseInt(hex, 16));
+    let out = '';
+    for (let i = 0; i < bytes.length; ) {
+      const length = utf8Length(bytes[i]!); // safe: i < length
+      if (length > 1) {
+        try {
+          out += UTF8.decode(Uint8Array.from(bytes.slice(i, i + length)));
+          i += length;
+          continue;
+        } catch {
+          // Not a whole UTF-8 sequence: its first byte reads as Latin-1 below.
+        }
+      }
+      out += String.fromCharCode(bytes[i]!);
+      i += 1;
+    }
+    return out;
+  });
+}
+
+/**
+ * A path as the rules read it: percent escapes decoded as UTF-8, format characters dropped, underscores as spaces, in
+ * capitals so a label counts in any case.
  */
 function pathText(rel: string): string {
-  const decoded = rel.replace(/%([0-9a-f]{2})/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)));
-  return decoded.replace(FORMAT, '').replace(/_/g, ' ').toUpperCase();
+  return decodeEscapes(rel).replace(FORMAT, '').replace(/_/g, ' ').toUpperCase();
 }
 
 /** Every hit in a file or folder name. A digit beside the form does not hide it there: W-9-ddd-dd-dddd, ddd-dd-dddd-2024. */
