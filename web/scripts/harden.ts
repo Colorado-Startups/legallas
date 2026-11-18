@@ -95,12 +95,16 @@ export interface Hosts {
   mcp?: string;
 }
 
-/** A rule's expression for this room, or null when it names a host the configs don't give. */
+/** A rule's expression for this room, or null when it names a host the configs don't give. Swaps whole quoted literals only. */
 export function forRoom(expression: string, hosts: Hosts): string | null {
-  if (expression.includes(PLACEHOLDER_MCP) && !hosts.mcp) return null;
-  const swapped = hosts.mcp ? expression.split(PLACEHOLDER_MCP).join(hosts.mcp) : expression;
-  if (swapped.includes(PLACEHOLDER_ROOM) && !hosts.room) return null;
-  return hosts.room ? swapped.split(PLACEHOLDER_ROOM).join(hosts.room) : swapped;
+  const swap = (text: string, placeholder: string, host: string | undefined): string | null => {
+    const quoted = `"${placeholder}"`;
+    const parts = text.split(quoted);
+    if (parts.length === 1) return text;
+    return host ? parts.join(`"${host}"`) : null;
+  };
+  const withMcp = swap(expression, PLACEHOLDER_MCP, hosts.mcp);
+  return withMcp === null ? null : swap(withMcp, PLACEHOLDER_ROOM, hosts.room);
 }
 
 export interface Context {

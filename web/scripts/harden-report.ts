@@ -26,7 +26,6 @@ export function reportHtml(rows: readonly Row[], now: number, drillMaxDays: numb
 <title>Edge hardening</title>
 <style>
 :root{--bg:#fff;--fg:#1a1a1a;--muted:#5c5c5c;--pass:#1d7a3a;--drift:#b42318;--warn:#a15c00;--error:#6941c6;--line:#e4e4e4}
-@media (prefers-color-scheme:dark){:root{--bg:#141414;--fg:#ececec;--muted:#a3a3a3;--pass:#4ade80;--drift:#f87171;--warn:#fbbf24;--error:#c4b5fd;--line:#2e2e2e}}
 body{margin:0;padding:24px 16px;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,sans-serif}
 main{max-width:960px;margin:0 auto}
 h1{font-size:22px;margin:0 0 4px}

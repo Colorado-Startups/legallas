@@ -160,7 +160,9 @@ test('--apply fixes only the Apply rows, one rule at a time, and never PUTs an e
   assert.equal((custom[0]!.body as { rules: unknown[] }).rules.length, 1);
   assert.equal(writes.filter((c) => c.path.endsWith('/rules')).length, rules.custom.length - 1);
   const bodies = JSON.stringify(writes.map((c) => c.body));
-  assert.ok(bodies.includes(ROOM) && bodies.includes(MCP) && !bodies.includes('room.example.com'));
+  assert.match(bodies, /room\.doe-harbor\.test/);
+  assert.match(bodies, /mcp\.room\.doe-harbor\.test/);
+  assert.doesNotMatch(bodies, /room\.example\.com/);
   assert.equal(writes.filter((c) => (c.body as { phase?: string })?.phase === 'http_ratelimit').length, 1);
   assert.ok(lines.some((l) => l.startsWith('APPLY')));
   assert.equal(code, 1, 'the fake still answers 404 afterwards, so rows still drift');
@@ -195,7 +197,7 @@ test('output and the report carry no hostname, id, bucket or token', async () =>
   let html = '';
   await harden({ mode: 'check', report: 'r.html' }, context(world), (l) => lines.push(l), (_f, h) => (html = h));
   const text = `${lines.join('\n')}\n${html}`;
-  for (const secret of [ROOM, MCP, ACCOUNT, ZONE, BUCKET, TOKEN, 'app-1', 'aud-1', 'run-backup']) assert.ok(!text.includes(secret), secret);
+  for (const secret of [ROOM, MCP, ACCOUNT, ZONE, BUCKET, TOKEN, 'app-1', 'aud-1', 'run-backup']) assert.equal(text.split(secret).length, 1, secret);
   assert.match(html, /^<!doctype html>/);
   assert.match(html, /Restore drill: 47 of 90 days/);
   assert.doesNotMatch(html, /<script|src=|href=/);
