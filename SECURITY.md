@@ -14,7 +14,8 @@ Please do not open a public issue, pull request or commit. A person replies.
 |---|---|
 | Hosting | Colorado Startups hosts no customer's room |
 | A room | Runs in its owner's own Cloudflare account, so its documents, members and settings stay there |
-| Written policies | AI governance, access, encryption, data and network, continuity, incident response, vulnerability management: [`docs/security/`](docs/security/README.md) |
+| Written policies | AI governance, access, encryption, data and network, continuity, incident response, vulnerability management, governance and audit, people and endpoints: [`docs/security/`](docs/security/README.md) |
+| Supporting records | Threat model, AI risk assessment, privacy impact, control map, internal audit, operator record templates: same folder |
 
 ## What keeps case data out of this repository
 
