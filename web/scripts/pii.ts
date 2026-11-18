@@ -227,8 +227,6 @@ export function findPiiSync(text: string, known: KnownMatcher | null = null): Pi
   return sorted(hits);
 }
 
-const UTF8 = new TextDecoder('utf-8', { fatal: true });
-
 /** How many bytes the UTF-8 sequence led by `byte` holds: 2 to 4, or 1 for a byte that leads none. */
 function utf8Length(byte: number): number {
   if (byte >= 0xc2 && byte <= 0xdf) return 2;
@@ -244,13 +242,15 @@ function utf8Length(byte: number): number {
  */
 function decodeEscapes(rel: string): string {
   return rel.replace(/(?:%[0-9a-f]{2})+/gi, (run) => {
-    const bytes = run.slice(1).split('%').map((hex) => parseInt(hex, 16));
+    const escapes = run.slice(1).split('%');
+    const bytes = escapes.map((hex) => parseInt(hex, 16));
     let out = '';
     for (let i = 0; i < bytes.length; ) {
       const length = utf8Length(bytes[i]!); // safe: i < length
       if (length > 1) {
         try {
-          out += UTF8.decode(Uint8Array.from(bytes.slice(i, i + length)));
+          // Throws URIError unless these bytes are one whole, valid UTF-8 sequence.
+          out += decodeURIComponent(escapes.slice(i, i + length).map((hex) => `%${hex}`).join(''));
           i += length;
           continue;
         } catch {
