@@ -171,7 +171,7 @@ Whole picture: `../SECURITY.md`.
 | A member before ticking the full notice ([A3](../docs/legal/product-notices.md)) | `/notice/` and sign-out; no AI sign-in or tool call. Ticks: `notice_acks`, per version; owner sees them on Activity (`worker/notice-gate.ts`) |
 | The assistant (`ASSISTANT_NAME`, `assistantName`) | No lawyer-like name (A1): build and `config.test.ts` fail; Worker shows "Legallas" (`worker/room-names.ts`) |
 | `ROOMS_ENABLED` "1": people invited to a deal or matter room (`npm run room`) | That room's guest routes only (`worker/rooms.ts`) |
-| A deal-room investor's AI (`ROOMS_ENABLED` "1" on `legallas-mcp`, on in its example) | Read-only tools over their rooms, never privileged (`worker/privilege.ts`) |
+| A deal-room investor's AI (`ROOMS_ENABLED` "1" on `legallas-mcp` too; off in both examples, and `config.test.ts` fails when the two Workers differ) | Read-only tools over their rooms, never privileged (`worker/privilege.ts`) |
 | The owner, counsel members | Privileged folders |
 | A member's AI | Every read in the audit log, with the app's name |
 

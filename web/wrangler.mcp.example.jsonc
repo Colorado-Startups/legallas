@@ -83,10 +83,6 @@
     // automated tools. "": EDGAR is linked for the member to search, never searched by the room. CourtListener needs
     // the secret COURTLISTENER_TOKEN (the owner's own API token); unset, CourtListener is linked too.
     "PUBLIC_RECORDS_CONTACT": "",
-    // "1": an investor invited to a deal room (`npm run room`) may connect their own AI, read-only and scoped to their
-    // rooms, never privileged (worker/rooms.ts, worker/privilege.ts). Invitations exist only where the room has deal rooms
-    // on, so this follows wrangler.jsonc's ROOMS_ENABLED. Rollback: "0" and deploy; the daily sweep revokes guests' grants.
-    "ROOMS_ENABLED": "1",
     // The shared Teams Developer Portal registration ID ("Any Microsoft 365 organization", in a test tenant)
     // that GET /connect/legallas-agent.zip builds the Legallas agent with. Not a secret: every ZIP carries it. "":
     // /connect keeps the per-firm registration form and the download is a 404 page (mcp/copilot-package.ts).
