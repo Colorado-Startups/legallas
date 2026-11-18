@@ -324,17 +324,33 @@ async function abortUpload(c: SyncContext): Promise<Response> {
 
 // --- The record ------------------------------------------------------------------------------------------------
 
-/** Every new key names an object already in R2, of the size the record says, so a row can't point at nothing. */
+/** SHA-256 of an object's bytes, read once through the runtime's DigestStream. Null when the object is gone. */
+async function objectSha256(c: SyncContext, key: string): Promise<string | null> {
+  const object = await c.env.FILES.get(key);
+  if (!object) return null;
+  const digest = new crypto.DigestStream('SHA-256');
+  await object.body.pipeTo(digest);
+  return hex(await digest.digest);
+}
+
+/**
+ * Every new key names an object already in R2, of the size the record says, holding the bytes of the sha256 it says, so
+ * a row can't point at nothing or carry another file's hash. A single put has R2's sha256 (putFile). A multipart object
+ * has none, so the room hashes its bytes here, one at a time, and never takes the client's word for them.
+ */
 async function objectsMatch(c: SyncContext, ops: readonly { r2_key: string; size: number; sha256: string }[]): Promise<boolean> {
-  const checks = await Promise.all(
-    ops.map(async (op) => {
-      const stored = await c.env.FILES.head(op.r2_key);
-      if (!stored || stored.size !== op.size) return false;
-      // Present for a single put, absent for a multipart object (whose parts R2 checked by size).
-      return stored.checksums.sha256 === undefined || hex(stored.checksums.sha256) === op.sha256;
-    }),
-  );
-  return checks.every(Boolean);
+  const heads = await Promise.all(ops.map((op) => c.env.FILES.head(op.r2_key)));
+  const unhashed: (typeof ops)[number][] = [];
+  for (const [i, op] of ops.entries()) {
+    const stored = heads[i];
+    if (!stored || stored.size !== op.size) return false;
+    if (stored.checksums.sha256 === undefined) unhashed.push(op);
+    else if (hex(stored.checksums.sha256) !== op.sha256) return false;
+  }
+  for (const op of unhashed) {
+    if ((await objectSha256(c, op.r2_key)) !== op.sha256) return false;
+  }
+  return true;
 }
 
 async function writeRecord(c: SyncContext): Promise<Response> {

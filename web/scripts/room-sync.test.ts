@@ -41,6 +41,8 @@ interface Room {
 
 const { syncRoom, CLIENT, ORIGIN } = await loadModule<{ syncRoom: () => Room; CLIENT: string; ORIGIN: string }>('worker/sync-fixtures.ts');
 const { handleSync } = await loadModule<{ handleSync: (request: Request, env: unknown, url: URL, clientId: string | null) => Promise<Response> }>('worker/routes/sync.ts');
+// The record hashes a large file's bytes with Workers' crypto.DigestStream; this installs it on Node.
+await loadModule('worker/digest-fixtures.ts');
 
 const SECRET = 'cfast_invented_secret_for_this_test';
 const WEB = path.resolve(import.meta.dirname, '..');

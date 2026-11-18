@@ -16,14 +16,21 @@
 # - hooks off.
 # - the Bash sandbox (@claude may run tests): shell commands cannot read the
 #   real home outside the checkout and the runner's temp folder, write anywhere
-#   else, or reach any host but the npm registry; a command the sandbox blocks
-#   fails instead of retrying unsandboxed.
+#   but the checkout and $RUNNER_TEMP/claude-sandbox (npm's cache), or reach
+#   any host but the npm registry; a command the sandbox blocks fails instead
+#   of retrying unsandboxed.
+# - write denies, inside those, for the runner's command files (GITHUB_ENV,
+#   GITHUB_PATH, GITHUB_OUTPUT, GITHUB_STATE: later steps run what they say,
+#   unsandboxed) and Claude's config folder (its confinement). Edit rules deny
+#   the same paths to the file tools. claude-settings-test.sh checks both.
 set -euo pipefail
 
 mode="${1:?mode: agent}"
 workspace="${2:?workspace path}"
 out="${3:?output path}"
 temp="${RUNNER_TEMP:?RUNNER_TEMP is not set}"
+# The one folder of the job's temp folder sandboxed commands may write.
+scratch="$temp/claude-sandbox"
 
 case "$mode" in agent) ;; *) echo "::error::unknown mode $mode"; exit 1 ;; esac
 
@@ -60,10 +67,29 @@ for path in "${sensitive[@]}"; do
 done
 deny+=("Read(//Users/Shared/**)" "Edit(//Users/Shared/**)")
 
+# Never writable, by a command or a file tool: the runner applies these files
+# to every later step, outside the sandbox, and Claude's config is its fence.
+# The runner keeps its command files in $RUNNER_TEMP/_runner_file_commands;
+# each variable's own folder is added in case that moves.
+candidates=("$temp/_runner_file_commands" "${CLAUDE_CONFIG_DIR:-$HOME/.claude}")
+for var in GITHUB_ENV GITHUB_PATH GITHUB_OUTPUT GITHUB_STATE; do
+    if [[ -n "${!var:-}" ]]; then candidates+=("$(dirname "${!var}")"); fi
+done
+no_write=()
+for path in "${candidates[@]}"; do
+    case " ${no_write[*]-} " in *" $path "*) continue ;; esac
+    case "$workspace/" in "$path"/*) echo "::error::workspace $workspace sits inside $path"; exit 1 ;; esac
+    no_write+=("$path")
+    deny+=("Edit(/$path/**)")
+done
+mkdir -p "$scratch"
+
 jq -n \
     --arg home "$real_home" \
     --arg workspace "$workspace" \
     --arg temp "$temp" \
+    --arg scratch "$scratch" \
+    --argjson noWrite "$(printf '%s\n' "${no_write[@]}" | jq -R . | jq -s .)" \
     --args '{
         disableAllHooks: true,
         permissions: {
@@ -77,7 +103,8 @@ jq -n \
             filesystem: {
                 denyRead: [$home],
                 allowRead: [$workspace, $temp],
-                allowWrite: [$workspace, $temp]
+                allowWrite: [$workspace, $scratch],
+                denyWrite: $noWrite
             },
             network: { allowedDomains: ["registry.npmjs.org"] }
         }
