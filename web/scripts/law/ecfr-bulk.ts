@@ -41,7 +41,7 @@ function withoutNotes(body: string): string {
 }
 
 // A formula outside any paragraph is a line of its own.
-const READ = new RegExp(`${BLOCK.source}|${FORMULA.replace(/[[\]]/g, '\\$&')}`, 'g');
+const READ = new RegExp(`${BLOCK.source}|${FORMULA.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&')}`, 'g');
 
 function blockLines(text: string): string[] {
   const lines: string[] = [];

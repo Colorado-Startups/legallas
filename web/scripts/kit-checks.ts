@@ -43,7 +43,7 @@ const MAX_DEPTH = 12;
 /** Walks one tool result and counts what its rows cite. */
 export function tallyCites(value: unknown, prefix: string, privilegedIds: ReadonlySet<string>): CiteTally {
   const tally = emptyTally();
-  const control = new RegExp(`^${prefix}-\\d{6}$`);
+  const isControl = (text: string) => text.startsWith(`${prefix}-`) && /^\d{6}$/.test(text.slice(prefix.length + 1));
   const seen = new Set<string>();
   const walk = (node: unknown, depth: number): void => {
     if (depth > MAX_DEPTH || node === null) return;
@@ -60,7 +60,7 @@ export function tallyCites(value: unknown, prefix: string, privilegedIds: Readon
     if (typeof row.id === 'string' && 'control' in row) {
       tally.cited++;
       if (typeof row.control !== 'string' || row.control === '') tally.noControl++;
-      else if (!control.test(row.control)) tally.badControl++;
+      else if (!isControl(row.control)) tally.badControl++;
       if (typeof row.link !== 'string' || row.link === '') tally.noLink++;
       if (row.privileged === true) seen.add(row.id);
     }

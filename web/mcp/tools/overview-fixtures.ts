@@ -80,6 +80,8 @@ const isObj = (v: unknown): v is Value => !!v && typeof v === 'object' && !Array
 function mergeInto(whole: Value, addition: Value): void {
   for (const [key, value] of Object.entries(addition)) {
     if (key === 'id' || key === 'continues') continue;
+    // A key that names the prototype chain is never data.
+    if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;
     if (key === 'truncated') {
       whole.truncated = true;
     } else if (Array.isArray(value)) {

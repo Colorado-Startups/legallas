@@ -188,7 +188,7 @@ export function formatCounts(s: CoverageSummary): string {
   return lines.join('\n');
 }
 
-const cell = (value: unknown) => String(value ?? '').replace(/\|/g, '\\|').replace(/\s+/g, ' ');
+const cell = (value: unknown) => String(value ?? '').replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\s+/g, ' ');
 const table = (head: readonly string[], body: readonly (readonly unknown[])[]) =>
   [`| ${head.join(' | ')} |`, `|${head.map(() => '---').join('|')}|`, ...body.map((row) => `| ${row.map(cell).join(' | ')} |`)].join('\n');
 const yes = (value: boolean | null) => (value === null ? '' : value ? 'yes' : 'no');

@@ -4,7 +4,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
-import { buildNotices, packageDir } from './notices.ts';
+import { buildNotices, packageDir, shippedPackages } from './notices.ts';
 
 test('packageDir finds the package of a module path, a query or a virtual helper, and skips our own code', () => {
   assert.equal(packageDir('/w/node_modules/a/node_modules/@s/b/dist/x.js?url', '/w'), '/w/node_modules/a/node_modules/@s/b');
@@ -35,6 +35,22 @@ test('buildNotices carries every package and copied licence, and fails on one wh
     writeFileSync(path.join(extras, '@s__b.txt'), 'Reviewed b licence');
     const text = run();
     for (const part of ['@s/b 1.0.0 (MIT)', 'Reviewed b licence', 'a 1.0.0 (MIT)', 'A licence', 'pdfjs/LICENSE_FOXIT', 'Foxit licence']) assert.ok(text.includes(part), part);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('shippedPackages lists the packages with bytes in an output, or every input when the metafile has no outputs', () => {
+  const root = mkdtempSync(path.join(tmpdir(), 'notices-'));
+  try {
+    const meta = path.join(root, 'meta.json');
+    const inputs = { 'node_modules/a/i.js': {}, 'node_modules/a/node_modules/@s/b/i.js': {}, 'node_modules/c/i.js': {}, 'src/x.ts': {} };
+    writeFileSync(meta, JSON.stringify({ inputs }));
+    assert.deepEqual(shippedPackages(meta, root), ['node_modules/a', 'node_modules/a/node_modules/@s/b', 'node_modules/c']);
+    // Tree-shaken to nothing, c is an input of the build and in no output.
+    const outputs = { 'index.js': { inputs: { 'node_modules/a/i.js': { bytesInOutput: 10 }, 'node_modules/c/i.js': { bytesInOutput: 0 }, 'src/x.ts': { bytesInOutput: 5 } } } };
+    writeFileSync(meta, JSON.stringify({ inputs, outputs }));
+    assert.deepEqual(shippedPackages(meta, root), ['node_modules/a']);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

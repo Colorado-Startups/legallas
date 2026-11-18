@@ -47,8 +47,9 @@ export function htmlCopy(html: string, firstLine = 1): CopyText[] {
     const clean = decodeEntities(text).replace(/\s+/g, ' ').trim();
     if (clean && looksLikeCopy(clean)) out.push({ line: firstLine - 1 + lineAt(html, index), text: clean });
   };
-  const body = html.replace(/<!--[\s\S]*?-->|<(script|style)\b[\s\S]*?<\/\1>/gi, (m) => m.replace(/[^\n]/g, ' '));
-  const tag = /<\/?[A-Za-z][\w.:-]*((?:\s+[^\s=>/]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|\{[^}]*\}|[^\s>]+))?)*)\s*\/?>/g;
+  const body = html.replace(/<!--[\s\S]*?-->|<(script|style)\b[\s\S]*?<\/\1\b[^>]*>/gi, (m) => m.replace(/[^\n]/g, ' '));
+  // An unquoted value never starts with a quote or a brace, so each value matches one way only.
+  const tag = /<\/?[A-Za-z][\w.:-]*((?:\s+[^\s=>/]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|\{[^}]*\}|[^\s>"'{][^\s>]*))?)*)\s*\/?>/g;
   let last = 0;
   for (let match = tag.exec(body); match; match = tag.exec(body)) {
     push(body.slice(last, match.index).replace(/\{[^{}]*\}/g, ' '), last);
@@ -116,7 +117,7 @@ export function astroCopy(source: string): CopyText[] {
     out.push(...tsCopy(front[1]!, 2));
     template = source.slice(0, front.index) + front[0].replace(/[^\n]/g, ' ') + source.slice(front.index + front[0].length);
   }
-  const script = /<script\b[^>]*>([\s\S]*?)<\/script>/gi;
+  const script = /<script\b[^>]*>([\s\S]*?)<\/script\b[^>]*>/gi;
   for (let match = script.exec(template); match; match = script.exec(template)) {
     out.push(...tsCopy(match[1]!, lineAt(template, match.index)));
   }

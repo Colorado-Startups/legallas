@@ -5,6 +5,7 @@
 // later) load on demand and are excluded, so a lazy chunk that becomes static counts against the page.
 import { gzipSync } from 'node:zlib';
 import path from 'node:path';
+import { withoutComments } from './dist-csp.ts';
 
 /** The R20 limit, in gzipped bytes. */
 export const EAGER_BUDGET = 60 * 1024;
@@ -29,7 +30,7 @@ function attr(raw: string, name: string): string | undefined {
 /** Same-origin script URLs a page loads up front, in document order. */
 export function entryScripts(html: string): string[] {
   const out: string[] = [];
-  for (const m of html.replace(/<!--[\s\S]*?-->/g, '').matchAll(TAG)) {
+  for (const m of withoutComments(html).matchAll(TAG)) {
     const tag = m[1].toLowerCase();
     const url = tag === 'script' ? attr(m[2], 'src') : attr(m[2], 'rel') === 'modulepreload' ? attr(m[2], 'href') : undefined;
     if (url && url.startsWith('/') && !url.startsWith('//')) out.push(url);

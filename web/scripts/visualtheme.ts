@@ -147,9 +147,9 @@ function attributeRules(collected: Collected): string {
   return [...rules, ...textRules].join('\n');
 }
 
-const PROTECTED = /(<script\b[^>]*>[\s\S]*?<\/script\s*>|<style\b[^>]*>[\s\S]*?<\/style\s*>)/gi;
-const STYLE_ELEMENT = /^(<style\b[^>]*>)([\s\S]*?)(<\/style\s*>)$/i;
-const SCRIPT_ELEMENT = /^<script\b[^>]*>([\s\S]*?)<\/script\s*>$/i;
+const PROTECTED = /(<script\b[^>]*>[\s\S]*?<\/script\b[^>]*>|<style\b[^>]*>[\s\S]*?<\/style\b[^>]*>)/gi;
+const STYLE_ELEMENT = /^(<style\b[^>]*>)([\s\S]*?)(<\/style\b[^>]*>)$/i;
+const SCRIPT_ELEMENT = /^<script\b[^>]*>([\s\S]*?)<\/script\b[^>]*>$/i;
 
 function themePieces(html: string, state: CssState, collected: Collected): string[] {
   const pieces = html.split(PROTECTED);

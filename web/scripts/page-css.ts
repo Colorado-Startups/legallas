@@ -28,8 +28,13 @@ export const JOINED_TYPE = 'text/x-legallas-joined';
 
 const STYLESHEET = /<link\b(?:[^>"']|"[^"]*"|'[^']*')*>/gi;
 
-function attr(tag: string, name: string): string | undefined {
-  const m = tag.match(new RegExp(`\\s${name}\\s*=\\s*("[^"]*"|'[^']*'|[^\\s>]+)`, 'i'));
+const ATTR = {
+  rel: /\srel\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/i,
+  href: /\shref\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/i,
+} as const;
+
+function attr(tag: string, name: keyof typeof ATTR): string | undefined {
+  const m = tag.match(ATTR[name]);
   return m ? m[1]!.replace(/^["']|["']$/g, '') : undefined;
 }
 

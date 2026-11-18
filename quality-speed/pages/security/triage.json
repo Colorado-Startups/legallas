@@ -11,6 +11,7 @@
     { "rule": "detect-non-literal-regexp", "path": "quality-speed/pages/security/readings.ts", "line_hash": "d6a809992281abad", "reason": "The patterns come from this page's own reviewed forbidden-paths.json" },
     { "rule": "detect-non-literal-regexp", "path": "web/mcp/pages-text.ts", "line_hash": "a117c9390ac0133c", "reason": "The Worker checks the id against an anchored allowlist of letters, digits, hyphen and underscore, at most 64 characters, before building the pattern" },
     { "rule": "detect-non-literal-regexp", "path": "web/mcp/pages-text.ts", "line_hash": "c7ea89775fb6029e", "reason": "The Worker checks the id against an anchored allowlist of letters, digits, hyphen and underscore, at most 64 characters, before building the pattern" },
+    { "rule": "detect-non-literal-regexp", "path": "web/mcp/pages/security.ts", "line_hash": "5595d03ab7e9fd04", "reason": "Every key is escaped first, so each matches literally. The keys are the brief placeholders, constants in the code" },
     { "rule": "detect-non-literal-regexp", "path": "web/scripts/ask-eval-checks.ts", "line_hash": "a89404166454d4e3", "reason": "A pattern from the eval set the owner keeps privately, run only by the owner or their own CI job, never reached by a remote person" },
     { "rule": "detect-non-literal-regexp", "path": "web/scripts/ask-eval-score.ts", "line_hash": "b351f628b87d92fe", "reason": "A pattern from the eval set the owner keeps privately, run only by the owner or their own CI job, never reached by a remote person" },
     { "rule": "detect-non-literal-regexp", "path": "web/scripts/case-guard.ts", "line_hash": "1f9a49901b7bb378", "reason": "Reads a guard file from the checkout, on the owner's machine" },
@@ -26,6 +27,7 @@
     { "rule": "detect-non-literal-regexp", "path": "web/scripts/mcp-eval-v2.ts", "line_hash": "38ded21268f6e160", "reason": "Every value is escaped first" },
     { "rule": "detect-non-literal-regexp", "path": "web/scripts/mcp-sweep.ts", "line_hash": "5cb47c6050895c76", "reason": "The document id is escaped first" },
     { "rule": "detect-non-literal-regexp", "path": "web/scripts/pii-hash.ts", "line_hash": "29219199e757f942", "reason": "A whole number already checked to be in range" },
+    { "rule": "detect-non-literal-regexp", "path": "web/worker/litigation/production.ts", "line_hash": "5f51c6d189c1e2b5", "reason": "Every syntax character in the words is escaped, so they match literally between two fixed lookarounds, with no repeat to backtrack on" },
     { "rule": "detect-non-literal-regexp", "path": "web/worker/visualprep.ts", "line_hash": "01143cd3632001c9", "reason": "A name the build itself writes" },
     { "rule": "detect-non-literal-regexp", "path": "web/scripts/visualtheme-bar.ts", "line_hash": "a52f5291e94e19f4", "reason": "A tag name parsed from the owner's own visual, on their own machine" },
     { "rule": "detect-non-literal-regexp", "path": "web/scripts/visualtheme-contrast.ts", "line_hash": "db314f6895068dc7", "reason": "The property names are constants in the code" },
@@ -39,6 +41,7 @@
     { "rule": "detect-redos", "path": "quality-speed/contract/validate.ts", "line_hash": "bcbeb71f46e0ceca", "reason": "A lookahead limits it to 120 characters first, and each repeat starts with a literal dot, so it can not backtrack" },
     { "rule": "detect-redos", "path": "quality-speed/contract/validate.ts", "line_hash": "0761b85375b480be", "reason": "A lookahead limits it to 120 characters first, and each repeat starts with a literal dot, so it can not backtrack" },
     { "rule": "detect-redos", "path": "web/scripts/copy-text.ts", "line_hash": "68455c6c08830b15", "reason": "Build tool over this repository's own files. Each repeat needs a separator" },
+    { "rule": "detect-redos", "path": "web/scripts/guard.ts", "line_hash": "e38f8db4fd2c2b7f", "reason": "Reads at most the first 64 bytes of a file, and each repeat ends with a literal space, so it can not backtrack" },
     { "rule": "detect-redos", "path": "web/scripts/law/cli.ts", "line_hash": "b8fb162d47606768", "reason": "Command-line argument from the person running it. Each repeat starts with a literal comma" },
     { "rule": "detect-redos", "path": "web/scripts/law/compilation.ts", "line_hash": "402fceb22c65a236", "reason": "Law builder over official sources. Each repeat starts with a literal parenthesis, so it can't backtrack" },
     { "rule": "detect-redos", "path": "web/scripts/mcp-testkit.ts", "line_hash": "2928d595e631b33c", "reason": "Test kit, never shipped. Compares an Origin the test itself sets" },
@@ -48,11 +51,12 @@
     { "rule": "insecure-document-method", "path": "web/fixtures/visual-ai/doe-seats.html", "line_hash": "c4c02d9481c2a744", "reason": "An invented fixture for tests, served only by the fixture room" },
     { "rule": "insecure-document-method", "path": "web/src/scripts/safe-html.ts", "line_hash": "ac655f13a796804c", "reason": "This is the sanitizer. A template's content is inert, it is cleaned against an allowlist, and the nodes move with no reparse" },
     { "rule": "insecure-innerhtml", "path": "web/src/scripts/safe-html.ts", "line_hash": "ac655f13a796804c", "reason": "This is the sanitizer. A template's content is inert, it is cleaned against an allowlist, and the nodes move with no reparse" },
-    { "rule": "insufficient-postmessage-origin-validation", "path": "web/src/scripts/visual-viewer.ts", "line_hash": "6b41b219bed72870", "reason": "It checks the sender is its own frame, whose sandbox gives it no origin to compare" },
+    { "rule": "insufficient-postmessage-origin-validation", "path": "web/mcp/apps/view/bridge.ts", "line_hash": "dc137ebe305af8f3", "reason": "A view in an MCP Apps frame can not know its host origin, which the host chooses. It takes messages only from its parent window, as the MCP Apps transport does" },
     { "rule": "missing-integrity", "path": "web/fixtures/visual-ai/doe-seats.html", "line_hash": "3bf461095d43f0ed", "reason": "An invented fixture for tests, served only by the fixture room" },
     { "rule": "raw-html-join", "path": "web/scripts/dev-fixture.ts", "line_hash": "1f2f6c706467e722", "reason": "Builds an invented fixture for a development run, from constants" },
     { "rule": "raw-html-join", "path": "web/scripts/matter/report.ts", "line_hash": "d9458c67cfefc464", "reason": "A local report, and the audit of 2026-11-02 found document text is escaped before this join" },
     { "rule": "unsafe-dynamic-method", "path": "web/worker/answer-shape.ts", "line_hash": "dcf6515554dcb1ac", "reason": "The key is the constant Symbol.asyncIterator, never a value from outside" },
-    { "rule": "unsafe-dynamic-method", "path": "web/worker/ask-stream.ts", "line_hash": "dcf6515554dcb1ac", "reason": "The key is the constant Symbol.asyncIterator, never a value from outside" }
+    { "rule": "unsafe-dynamic-method", "path": "web/worker/ask-stream.ts", "line_hash": "dcf6515554dcb1ac", "reason": "The key is the constant Symbol.asyncIterator, never a value from outside" },
+    { "rule": "wildcard-postmessage-configuration", "path": "web/mcp/apps/view/bridge.ts", "line_hash": "ae079b249e44abbc", "reason": "A view in an MCP Apps frame can not know its host origin, so the protocol posts to any origin. It posts only to its parent window: tool calls and link requests, never a key or a session" }
   ]
 }

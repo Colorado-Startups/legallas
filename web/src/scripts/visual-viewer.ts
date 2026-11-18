@@ -233,8 +233,10 @@ function wireNavigation(v: Viewer): void {
   });
 
   window.addEventListener('message', (event) => {
-    if (event.source !== v.iframe.contentWindow || !isBridgeMessage(event.data)) return;
-    onBridgeMessage(v, event.data);
+    // The frame's sandbox is script-only, so every message it sends carries the origin "null".
+    if (event.origin === 'null' && event.source === v.iframe.contentWindow && isBridgeMessage(event.data)) {
+      onBridgeMessage(v, event.data);
+    }
   });
 
   window.addEventListener('popstate', () => show(v, new URLSearchParams(location.search).get('v') ?? '', false));
