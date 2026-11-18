@@ -4,7 +4,7 @@
 |---|---|
 | Applies to | The Legallas product and every room built from it |
 | Maintained by | Colorado Startups |
-| Version | 1.1, 2026-11-17 |
+| Version | 1.2, 2026-11-17 |
 | Reviewed | Every 12 months, and whenever a control a policy names changes |
 | Status | Written from the code as it is. No outside auditor has reviewed these policies |
 
@@ -30,6 +30,8 @@ Legallas runs in each room owner's own Cloudflare account. Colorado Startups hos
 | [Business continuity and disaster recovery](bcp-dr.md) | What can fail, how a room recovers, recovery point and time |
 | [Incident response](incident-response.md) | Detection, severity, containment, notice to the room owner and members |
 | [Vulnerability management](vulnerability-management.md) | Scans, dependency alerts, fix deadlines, change control |
+| [Governance, risk and audit](governance.md) | The program, risk rating, exceptions, laws and contracts, internal audit, suppliers |
+| [People and endpoints](people-and-endpoints.md) | Remote work, telling people about rules, device rules, disposal |
 
 | Supporting record | For |
 |---|---|
@@ -38,6 +40,8 @@ Legallas runs in each room owner's own Cloudflare account. Colorado Startups hos
 | [Control map](control-map.md) | Each policy against SOC 2, ISO/IEC 27001 and ISO/IEC 42001, to shorten an audit |
 | [Questionnaire answers](questionnaire.md) | Short answers to the questions vendor reviews ask most |
 | [Tabletop exercise, November 2026](tabletop-2026-11.md) | The incident steps walked against the code |
+| [Privacy impact assessment](privacy-impact.md) | Personal data processed, privacy risks and residual risk |
+| [Internal audit, November 2026](internal-audit-2026-11.md) | Evidence and claims checked against `main`, findings |
 
 ## Attestations
 

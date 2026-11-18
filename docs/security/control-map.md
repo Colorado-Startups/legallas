@@ -1,13 +1,20 @@
 # Control map: SOC 2, ISO/IEC 27001, ISO/IEC 42001
 
-Part of the [security policies](README.md). Version 1.1, 2026-11-17.
+Part of the [security policies](README.md). Version 1.2, 2026-11-17.
 
-This maps each policy to the criteria an auditor would test. It is our own mapping, not an auditor's. No audit has run,
+This maps each policy to the criteria an auditor would test. It is our own mapping, not an auditor's. No independent audit has run,
 and nothing here is a certification. Its job is to make an audit shorter when one is bought.
 
 | Area | Policy | SOC 2 Trust Services Criteria | ISO/IEC 27001:2022 Annex A | ISO/IEC 42001 Annex A |
 |---|---|---|---|---|
 | Policies and review | [README](README.md) | CC1, CC2, CC5.3 | 5.1, 5.37 | A.2 |
+| Risk management and exceptions | [Governance](governance.md) | CC3.1 to CC3.4, CC5.1 | Clause 6.1, 5.1 | A.5 |
+| Laws and contracts | [Governance](governance.md) | CC2.3, CC3.1 | 5.31, 5.32 | A.2 |
+| Internal audit | [Governance](governance.md), [internal audit](internal-audit-2026-11.md) | CC4.1, CC4.2 | Clause 9.2 | |
+| Suppliers | [Governance](governance.md) | CC9.2 | 5.19 to 5.22 | A.10 |
+| Privacy | [Privacy impact assessment](privacy-impact.md), [data and network](data-and-network.md) | P1 to P8 | 5.34 | A.5 |
+| Remote work and endpoints | [People and endpoints](people-and-endpoints.md) | CC6.8 | 6.7, 8.1 | |
+| Equipment disposal | [People and endpoints](people-and-endpoints.md) | CC6.5 | 7.10, 7.14 | |
 | AI governance | [AI governance](ai-governance.md) | CC3, CC9.2 | 5.19 to 5.23 (AI processors as suppliers) | A.2, A.6, A.9, A.10 |
 | AI impact and risk | [AI risk assessment](ai-risk-assessment.md) | CC3.2 | Clause 6.1 (risk assessment) | A.5, A.7, A.8 |
 | Identity and sign-in | [Access](access.md) | CC6.1, CC6.2 | 5.16, 5.17, 8.5 | |
@@ -31,8 +38,8 @@ and nothing here is a certification. Its job is to make an audit shorter when on
 
 | Criterion | What it asks | Why it's open |
 |---|---|---|
-| SOC 2 CC1.4, ISO 27001 Annex A 6.1 to 6.3 | People: screening, terms, awareness training | Colorado Startups has no staff programme to write down yet |
-| ISO 27001 clauses 4 to 10 | A management system: scope, risk treatment, internal audit, management review | Needed only for certification |
+| SOC 2 CC1.4, ISO 27001 Annex A 6.1 to 6.3 | People: screening, terms, awareness training | Colorado Startups has no staff yet. Remote work and endpoints: [people and endpoints](people-and-endpoints.md) |
+| ISO 27001 clauses 4 to 10, in full | A management system: scope statement, objectives, management review | [Governance](governance.md) covers risk treatment and internal audit. The rest is needed only for certification |
 
 ## Sources
 
