@@ -34,7 +34,7 @@ Read 2026-11-02.
 | `failed_main_runs_with_issue` | Quality | 0% | 100% | 3 | Failed, timed-out and never-started runs on `main`, 90 days, linked in a bug's body | Bullet |
 | `risky_areas_reviewed_in_time` | Quality | 0% | 100% | 3 | `reviews.json` against the seven areas and 14-day limit in `measure.ts`. A row dated after now reads missing | Bullet, matrix |
 | `fixes_with_test` | Quality | 0% | 100% | 2 | Bugs closed as done in 90 days whose merged closing pull request changed a test | Bullet |
-| `detection_drill` | Quality | 0 | 1 | 1 | `measure` on invented events, the canary issue #273 read back whole while it carries `bug`, and the runs list answering | Bullet |
+| `detection_drill` | Quality | 0 | 1 | 1 | `measure` on invented events, the canary issue #28 read back whole while it carries `bug`, and the runs list answering | Bullet |
 | `time_to_find_p90` | Speed | 90 d | 14 d | 1 | `Landed:` commit to issue. None, unknown or after filing: 90 days | Bullet |
 | `time_to_fix_high_p90` | Speed | 168 h | 24 h | 3 | Critical and high, each open one at its age so far | Bullet |
 | `time_to_fix_other_p90` | Speed | 30 d | 7 d | 1 | Medium and low, the same way | Bullet |
@@ -119,18 +119,17 @@ Not features, so not issues. For the board:
 | `time_to_fix_other_p90` | 0.03 d | 100 |
 | `error_to_issue_p90` | No events, no proof | 0 |
 
-The drill reads 0 because canary #273 is open until this page's pull request merges and closes it. Time to fix reads well because most of these bugs were filed within hours, and it falls as they age.
+## Now
 
-## Fixes, ranked by score gained
+2026-11-17, run 44016097386 in the public repository: Q 35, S 76, C 97, total 69.
 
-| Fix | Total gained | Where |
-|---|---:|---|
-| Merge this page, so a merged pull request closes canary #273 and the drill passes | +22.9 | #184 |
-| Fix or correct the 7 open high bugs, 5 of which only count as high because they have no `Severity:` line: #39, #51, #58, #106, #142 | +11.7 | Their sessions |
-| Each review's row names only the bugs that review filed, and a bug from a failed run links it. There is no bulk backfill: the 84 bugs from outside the ledger age out by 2027-01-31 | +9.1 | Each review |
-| A real sha in `Landed:`, once the code is on `main` | +4.8 | Whoever files or fixes |
-| The 2 fixes with no test or no merged pull request | +1.3 | Their sessions |
-
-## Final
-
-Not reached. The page needs its first daily run after the merge, where the drill must read 1, and the fixes above.
+| Gap | Reading | Cause | Fix | Where |
+|---|---:|---|---|---|
+| `detection_drill` | 0 | Canary #273 was in the private repository | Canary #28 here, closed by this page's pull request | this PR |
+| `open_bugs_critical_high` | 2 | #8 had no `Severity:` line; #10's line had text after `medium` | Severity lines fixed | #8, #10 |
+| `failed_main_runs_with_issue`, `error_to_issue_p90` | 0%, 34 h | 2 failed runs on main named by no issue | Filed | #29, #30 |
+| `bugs_found_first` | 0% | No bug filed from a review or failed run | #29, #30 link their runs | |
+| `risky_areas_reviewed_in_time` | 0% | Last review 2026-11-02, limit 14 days | A review of the 7 areas | next review |
+| `time_to_find_p90` | 90 d | No bug has a `Landed:` sha | Whoever files or fixes | each bug |
+| `fixes_with_test` | no events | No bug fixed yet in this repository | Fixes with a test | each fix |
+| `failed_main_run_minutes_90d` | 3 | Failed runs on main | Ages out | 90 days |

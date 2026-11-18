@@ -113,6 +113,10 @@ test('structure: paragraphs, bullets, the background heading, bold', () => {
   assert.ok(last.inline.some((t) => t.kind === 'strong' && t.text === 'read'));
 });
 
+test('a tag that only forms once an inner one is removed goes too', () => {
+  assert.equal(stripUnsafe('<<b>script>alert(1)<</b>/script>'), 'alert(1)');
+});
+
 test('ordinary prose with angle brackets and colons is left alone', () => {
   assert.equal(stripUnsafe('If x < 5 and y > 3. Data: two items. Note: tel 555.'), 'If x < 5 and y > 3. Data: two items. Note: tel 555.');
 });

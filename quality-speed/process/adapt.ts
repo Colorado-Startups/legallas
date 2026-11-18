@@ -61,7 +61,10 @@ export function adapt(state: string, out: string, now = Date.now()): { defs: Def
   const metrics: Record<string, Entry> = {};
   for (const full of stepMetrics(readJson(path.join(HERE, 'maps.json')))) {
     if (!full.startsWith(PREFIX)) throw new Error(`maps.json names ${full}; a step metric is ${PREFIX}<page>.<id>`);
-    const [page = '', id = ''] = full.slice(PREFIX.length).split('.');
+    // A data-room metric id has dots of its own, so only the first one splits page from id.
+    const rest = full.slice(PREFIX.length);
+    const dot = rest.indexOf('.');
+    const [page, id] = dot < 0 ? [rest, ''] : [rest.slice(0, dot), rest.slice(dot + 1)];
     const metric = readJson<Manifest>(path.join(PAGES_DIR, page, 'manifest.json')).metrics.find((m) => m.id === id);
     if (!metric) throw new Error(`maps.json names ${full}, which ${page}/manifest.json does not define`);
     const file = path.join(state, 'records', `${page}.json`);

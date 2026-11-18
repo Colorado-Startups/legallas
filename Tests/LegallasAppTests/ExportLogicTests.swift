@@ -10,7 +10,7 @@ struct ExportLogicTests {
     static func makeCase() -> CaseExportDTO.CaseDTO {
         .init(
             name: "Doe v. Harbor Labs, Inc.",
-            caseNumber: "2012CV04817",
+            caseNumber: "2012-CV-0417",
             court: "Example County District",
             judge: "Smith",
             courtroom: "5A",
@@ -159,7 +159,7 @@ struct ExportLogicTests {
     func caseSection() {
         let md = ExportLogic.buildMarkdown(from: Self.makeEmptyDTO())
         #expect(md.contains("# Doe v. Harbor Labs, Inc."))
-        #expect(md.contains("2012CV04817"))
+        #expect(md.contains("2012-CV-0417"))
         #expect(md.contains("Example County District"))
         #expect(md.contains("Courtroom 5A"))
     }

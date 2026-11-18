@@ -9,7 +9,7 @@ export type HashBody = (body: ReadableStream<Uint8Array>) => Promise<string>;
 
 /** Hashes in the Workers runtime's native DigestStream: no copy of the body in JavaScript. */
 export const digestBody: HashBody = async (body) => {
-  const digest = new DigestStream('SHA-256');
+  const digest = new crypto.DigestStream('SHA-256');
   await body.pipeTo(digest);
   return hex(await digest.digest);
 };
