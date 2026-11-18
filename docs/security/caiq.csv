@@ -29,14 +29,14 @@ BCR-04.1,Business continuity and resilience,Yes,BCP/DR policy is the plan.,docs/
 BCR-05.1,Business continuity and resilience,Yes,"Our code plus Cloudflare's D1, R2 and Time Travel docs.",docs/security/bcp-dr.md
 BCR-05.2,Business continuity and resilience,Yes,In this repo; sent with vendor reviews.,docs/security/bcp-dr.md; docs/security/questionnaire.md
 BCR-05.3,Business continuity and resilience,Yes,Every 12 months.,docs/security/bcp-dr.md
-BCR-06.1,Business continuity and resilience,No,Drill command exists; no live result yet.,docs/security/bcp-dr.md; web/README.md; web/worker/backup
+BCR-06.1,Business continuity and resilience,No,"Drill command; harden flags one older than 90 days. No live result yet.",docs/security/bcp-dr.md; web/scripts/harden.ts; web/worker/backup
 BCR-07.1,Business continuity and resilience,Yes,Room owner: emails members. Members use the counsel pack.,docs/security/bcp-dr.md
 BCR-08.1,Business continuity and resilience,Yes,"Room owner: sets up the backup Worker; daily once scheduled. D1 Time Travel: 30 days Paid, 7 Free.",docs/security/bcp-dr.md; web/README.md; web/worker/backup
-BCR-08.2,Business continuity and resilience,Yes,"Copy stays in the account, under another location hint; SHA-256 per object; 30-day bucket lock.",web/README.md; web/worker/backup; docs/security/encryption.md
-BCR-08.3,Business continuity and resilience,No,Restore and drill commands exist; CI runs them on the fictional room. No live result yet.,docs/security/bcp-dr.md; web/README.md; web/worker/backup
+BCR-08.2,Business continuity and resilience,Yes,"Copy stays in the account, under another location hint; SHA-256 per object; 30-day bucket lock. Room owner: harden checks and adds the lock.",web/README.md; web/worker/backup; web/scripts/harden.ts; docs/security/encryption.md
+BCR-08.3,Business continuity and resilience,No,"Restore and drill commands; CI runs them on the fictional room; harden flags a drill older than 90 days. No live result yet.",docs/security/bcp-dr.md; web/worker/backup/backup.test.ts; web/scripts/harden.ts
 BCR-09.1,Business continuity and resilience,Yes,"Steps for bad release, damaged database, lost original, region outage, lost account.",docs/security/bcp-dr.md
 BCR-09.2,Business continuity and resilience,Yes,Every 12 months and after any recovery.,docs/security/bcp-dr.md
-BCR-10.1,Business continuity and resilience,No,Drill command exists; no live result yet.,docs/security/bcp-dr.md; web/README.md; web/worker/backup
+BCR-10.1,Business continuity and resilience,No,"Drill command; harden flags one older than 90 days. No live result yet.",docs/security/bcp-dr.md; web/scripts/harden.ts; docs/security/operator/recovery.md
 BCR-10.2,Business continuity and resilience,NA,No premises.,docs/security/control-map.md
 BCR-11.1,Business continuity and resilience,Yes,"Room owner: backup under another location hint (a hint, not a region guarantee); same location refused. One provider.",docs/security/bcp-dr.md; web/README.md
 CCC-01.1,Change control and configuration,Yes,Change control in vulnerability management policy.,docs/security/vulnerability-management.md
@@ -47,7 +47,7 @@ CCC-04.1,Change control and configuration,Yes,"Room owner: only their account ad
 CCC-05.1,Change control and configuration,No,No SLA. Updates reach a room only when its owner moves the pin.,docs/security/vulnerability-management.md
 CCC-06.1,Change control and configuration,Yes,Example Wrangler configs; repo settings from the settings page.,web/wrangler.example.jsonc; web/wrangler.mcp.example.jsonc; .github/workflows/settings-apply.yml
 CCC-06.2,Change control and configuration,Yes,Every 12 months.,docs/security/README.md
-CCC-07.1,Change control and configuration,No,CI blocks repo baseline breaks. No drift alert on live rooms.,web/worker/config.test.ts
+CCC-07.1,Change control and configuration,No,"CI blocks repo baseline breaks. Room owner: harden reports edge drift when run by hand. No alert.",web/worker/config.test.ts; web/scripts/harden.ts
 CCC-08.1,Change control and configuration,Yes,"Exception register: reason, compensating control, rating, expiry; emergency path first.",docs/security/governance.md
 CCC-08.2,Change control and configuration,Yes,Same process as GRC-04.,docs/security/governance.md
 CCC-09.1,Change control and configuration,Yes,Room owner: Worker rollback or D1 restore to pre-change bookmark.,docs/security/bcp-dr.md
@@ -171,7 +171,7 @@ IAM-10.1,Identity and access management,No,Owner role standing. Sessions expire.
 IAM-10.2,Identity and access management,No,One owner holds all by design.,docs/security/access.md
 IAM-11.1,Identity and access management,Yes,Only the room owner grants access. Vendor has none.,docs/security/access.md; SECURITY.md
 IAM-12.1,Identity and access management,Yes,One email per person; audit names email and AI app.,docs/security/access.md; web/mcp/audit.ts
-IAM-13.1,Identity and access management,Yes,Owner MFA. Room owner: REQUIRE_MFA refuses any sign-in without a security key or biometric.,docs/security/access.md; web/worker/mfa.ts
+IAM-13.1,Identity and access management,Yes,"Owner MFA. Room owner: REQUIRE_MFA refuses any sign-in without a security key or biometric; harden checks account 2FA and Access MFA.",docs/security/access.md; web/worker/mfa.ts; web/scripts/harden.ts
 IAM-13.2,Identity and access management,Yes,RS256 Access tokens per request; server-bound OAuth tokens.,web/worker/auth.ts; web/mcp/oauth.ts
 IAM-14.1,Identity and access management,Yes,No passwords; hashed tokens; secrets in Cloudflare.,docs/security/encryption.md; .github/scripts/secret-scan.sh
 IAM-15.1,Identity and access management,Yes,Token and members row per request; role per MCP call.,web/worker/auth.ts; web/mcp/server.ts
@@ -191,13 +191,13 @@ I&S-03.2,Infrastructure security,Yes,HTTPS; TLS inside Cloudflare.,docs/security
 I&S-03.3,Infrastructure security,Yes,Token and members row; MCP OAuth; no CORS.,web/worker/auth.ts; web/worker/headers.ts
 I&S-03.4,Infrastructure security,Yes,Every 12 months and on change.,docs/security/data-and-network.md
 I&S-03.5,Infrastructure security,Yes,"HTTPS on custom domain only; outbound https, public only.",web/wrangler.example.jsonc; docs/security/encryption.md
-I&S-04.1,Infrastructure security,NA,Serverless: no hosts or OS. Room owner: 2FA on Cloudflare.,docs/security/access.md
+I&S-04.1,Infrastructure security,NA,"Serverless: no hosts or OS. Room owner: 2FA on Cloudflare, checked by harden.",docs/security/access.md; web/scripts/harden.ts
 I&S-05.1,Infrastructure security,Yes,"Local dev identity, banned from production by test. Fictional test room.",web/worker/config.test.ts; CLAUDE.md
 I&S-05.2,Infrastructure security,Yes,Production data never leaves production.,CLAUDE.md
 I&S-06.1,Infrastructure security,Yes,One Cloudflare account per room. Guests: own room only.,SECURITY.md; web/worker/rooms.ts
 I&S-07.1,Infrastructure security,Yes,Sync over HTTPS.,docs/security/encryption.md; web/scripts/sync.ts
 I&S-08.1,Infrastructure security,Yes,Case content and privileged classes; AI risks rated.,docs/security/data-and-network.md; docs/security/ai-risk-assessment.md
-I&S-09.1,Infrastructure security,Yes,Cloudflare DDoS; rate limits; two locks; CSP. Room owner: add WAF rules.,docs/security/data-and-network.md
+I&S-09.1,Infrastructure security,Yes,"Cloudflare DDoS; rate limits; two locks; CSP. Room owner: harden adds 5 WAF rules, checks TLS and Bot Fight Mode.",docs/security/data-and-network.md; web/scripts/harden.ts; web/scripts/edge-rules.json
 LOG-01.1,Logging and monitoring,Yes,Data and network policy.,docs/security/data-and-network.md
 LOG-01.2,Logging and monitoring,Yes,Every 12 months and on change.,docs/security/data-and-network.md
 LOG-02.1,Logging and monitoring,Yes,Append-only trigger; hash-chain export; kept until owner deletes.,web/migrations/0019_audit_append_only.sql; web/worker/audit-chain.ts
