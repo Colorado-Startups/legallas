@@ -130,7 +130,7 @@ test('a reset further off than the job can wait stops the run instead', () => {
   assert.equal(quotaWait({ remaining: 0, reset: (now + MAX_QUOTA_WAIT_MS) / 1000 }, now), null);
 });
 
-test('an earlier state loses every private page and lane before it is uploaded again, and nothing public', () => {
+test('an earlier state loses every private page, lane, measurement and detail before it is uploaded again, and nothing public', () => {
   const state = mkdtempSync(path.join(tmpdir(), 'history-prune-'));
   const put = (file: string, value: unknown) => {
     mkdirSync(path.dirname(path.join(state, file)), { recursive: true });
@@ -139,7 +139,10 @@ test('an earlier state loses every private page and lane before it is uploaded a
   const line = (page: string) => `{"at":"2031-03-01T08:00:00Z","page":"${page}","quality":1,"speed":1,"consumption":1,"total":1}`;
   put('history.jsonl', `${line('code')}\n${line('claude-code')}\n${line('documentation')}\n${line('agents')}\n`);
   put('records/claude-code.json', [{ id: 'tokens_per_merged_change' }]);
-  put('records/actions.json', [{ id: 'usd_per_merge' }]);
+  const rec = (page: string, id: string, value: number) => ({ id, page, value, status: 'ok', stage: 'live', measured_at: '2031-03-01T08:00:00Z', source_url: 'x', sample_size: 3 });
+  put('records/pull-requests.json', [rec('pull-requests', 'review_tokens_p50', 900), rec('pull-requests', 'small_changes', 99)]);
+  put('lanes/pull-requests/github.json', [rec('pull-requests', 'review_tokens_p50', 900), rec('pull-requests', 'small_changes', 99)]);
+  put('lanes/pull-requests/github/facts/facts.json', { review_tokens: [900] });
   put('records/code.json', [{ id: 'long_files' }]);
   put('records/security.json', [{ id: 'key_age_max_days' }, { id: 'sast_findings_open' }]);
   put('lanes/claude-code/claude-code.json', [{ id: 'tokens_per_merged_change' }]);
@@ -148,12 +151,16 @@ test('an earlier state loses every private page and lane before it is uploaded a
   put('lanes/security/keys/facts/names.json', {});
   put('lanes/security/scan.json', [{ id: 'sast_findings_open' }]);
   put('lanes/code/nightly.json', [{ id: 'long_files' }]);
-  assert.equal(prunePrivate(state), 7, '5 files or folders and 2 score lines');
-  for (const gone of ['records/claude-code.json', 'records/actions.json', 'lanes/claude-code', 'lanes/security/keys.json', 'lanes/security/keys']) {
+  assert.equal(prunePrivate(state), 9, '5 files or folders, 2 score lines, 2 private measurements');
+  for (const gone of ['records/claude-code.json', 'lanes/claude-code', 'lanes/security/keys.json', 'lanes/security/keys', 'lanes/pull-requests/github']) {
     assert.equal(existsSync(path.join(state, gone)), false, gone);
   }
   for (const kept of ['records/code.json', 'lanes/code/nightly.json', 'lanes/security/scan.json']) assert.ok(existsSync(path.join(state, kept)), kept);
   assert.deepEqual(JSON.parse(readFileSync(path.join(state, 'records/security.json'), 'utf8')), [{ id: 'sast_findings_open' }]);
+  for (const file of ['records/pull-requests.json', 'lanes/pull-requests/github.json']) {
+    const [usd, green] = JSON.parse(readFileSync(path.join(state, file), 'utf8'));
+    assert.deepEqual([usd.value, usd.status, green.value], [null, 'missing', 99], file);
+  }
   assert.equal(readFileSync(path.join(state, 'history.jsonl'), 'utf8'), `${line('code')}\n${line('documentation')}\n`, 'public lines kept in order, a renamed page included');
   assert.equal(prunePrivate(state), 0, 'a clean state is left as it is');
   rmSync(state, { recursive: true });

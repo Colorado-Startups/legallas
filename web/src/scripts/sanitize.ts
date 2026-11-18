@@ -149,10 +149,15 @@ export function isBackgroundHeading(text: string): boolean {
  * and dangerous schemes.
  */
 export function stripUnsafe(text: string): string {
+  // Tags and comments go until none is left: removing one can join its neighbours into a new one ("<<b>script>").
+  let bare = text;
+  let previous: string;
+  do {
+    previous = bare;
+    bare = bare.replace(/<!--[\s\S]*?(?:-->|$)/g, '').replace(/<\/?[A-Za-z!?][^<>]*>?/g, '');
+  } while (bare !== previous);
   return (
-    text
-      .replace(/<!--[\s\S]*?(?:-->|$)/g, '')
-      .replace(/<\/?[A-Za-z!?][^<>]*>?/g, '')
+    bare
       // Images: inline ![alt](url) and reference ![alt][ref]. The alt text goes too.
       .replace(new RegExp(String.raw`!\[[^\]\n]*\](?:${TARGET}|\[[^\]\n]*\])`, 'g'), '')
       // Links: keep the words, drop the target. A citation tag written as a link stays a citation tag.

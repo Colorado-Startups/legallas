@@ -6,7 +6,7 @@ Status: design, 2026-10-31; "Ask's own model" added 2026-11-01. Docs only; nothi
 - **Sources:** every vendor fact links to the vendor's own page, all read on 2026-10-31. The [Sources](#sources)
   table gives each page's own date where it shows one. Facts about the existing connector come from the code now in
   `web/mcp/` and `web/connect/`.
-- **Zero data retention (ZDR):** the bar a customer can set for a room (the owner's rule for case files, 2026-10-31). A third party that reads case files or customer documents
+- **Zero data retention (ZDR):** the bar a customer can set for a room. A third party that reads case files or customer documents
   may not keep them, neither for 30 days nor for compliance.
 - **Closed models:** only Claude, Microsoft 365 Copilot and Harvey (the owner, 2026-10-31); any open-weight model is fine.
   See [Which AI may connect](#which-ai-may-connect).
@@ -46,7 +46,7 @@ where each one may read.
 | Microsoft 365 Copilot | Yes, closed | Section 2 |
 | Harvey | Yes, closed | Section 3 |
 | Open-weight models from any maker: OpenAI's gpt-oss, Google's Gemma, xAI's open weights, Meta's Llama and others | Yes | OpenCode (section 4) with a local model, Workers AI in the customer's own Cloudflare, or a ZDR host such as Groq, where every customer can turn ZDR on in its Data Controls [G1]. Built-in Ask on any OpenAI-compatible host, OpenRouter included, once its ZDR is confirmed and its providers pinned ([Ask's own model](#asks-own-model)) |
-| Google Gemini: Gemini Enterprise, the Gemini app, the Gemini API | No | Gemini Enterprise's callback left the first customer's allowlist on 2026-10-31; Legallas inherits that |
+| Google Gemini: Gemini Enterprise, the Gemini app, the Gemini API | No | Gemini Enterprise's callback left the allowlist on 2026-10-31 (the closed-models rule) |
 | ChatGPT and the OpenAI API | No | |
 | xAI Grok: the app and the Grok API | No | |
 
@@ -56,8 +56,8 @@ too (OpenAI's among them), so a generated config names an allowed model, never a
 
 ## What already exists (`web/mcp/`)
 
-The room's remote MCP connector is what counsel's Claude, Microsoft 365 Copilot and Harvey use in the first customer's room
-today. So each connector below is mostly packaging, setup pages and docs on one server.
+The room's remote MCP connector already accepts Claude, Microsoft 365 Copilot and Harvey (the callback allowlist below).
+So each connector below is mostly packaging, setup pages and docs on one server.
 
 | Part | Today | Legallas changes |
 |---|---|---|
@@ -289,14 +289,16 @@ Caveats, even under ZDR:
 
 | Way in | How it works | Sign-in | Licence | Verdict |
 |---|---|---|---|---|
-| **Declarative agent with an MCP action** (the Legallas agent package) | Plugin manifest with a `RemoteMCPServer` runtime; tools found at run time or pinned in the package; Microsoft screens new or changed tools [M2]. Answers may get worse past 10 tools [M1]; the instance has nine | Entra SSO, DCR, OAuth authorization code or none; no API key [M3]. Static OAuth uses a Teams Developer Portal registration and the callback `https://teams.microsoft.com/api/platform/v1.0/oAuthRedirect` [M4]; the manifest names it by `reference_id` [M5] | Copilot licence, or pay-as-you-go (see Cost) | **Build first** (Pro): tested end to end in the first customer's room on 2026-10-21 |
+| **Declarative agent with an MCP action** (the Legallas agent package) | Plugin manifest with a `RemoteMCPServer` runtime; tools found at run time or pinned in the package; Microsoft screens new or changed tools [M2]. Answers may get worse past 10 tools [M1]; the instance has nine | Entra SSO, DCR, OAuth authorization code or none; no API key [M3]. Static OAuth uses a Teams Developer Portal registration and the callback `https://teams.microsoft.com/api/platform/v1.0/oAuthRedirect` [M4]; the manifest names it by `reference_id` [M5] | Copilot licence, or pay-as-you-go (see Cost) | **Build first** (Pro): tested end to end on 2026-10-21 |
 | **Federated connector** ("Connect to MCP server" in the admin center) | Copilot asks the server live as the signed-in user; nothing is indexed [M13]. Generally available [M29] | Entra SSO, OAuth through a Developer Portal registration ID, or none; no DCR. Global or AI Administrator sets it up [M14] | Microsoft 365 Copilot (or E7) for every user; Copilot Studio licences and pay-as-you-go do not count [M15] | **Document as the alternative** for tenants that already pay for Copilot |
 | Copilot Studio agent | The MCP wizard makes a Power Platform custom connector; connector data policies apply; tools and resources, no prompts; Streamable HTTP only [M11] [M12] | None, API key, or OAuth (dynamic discovery, dynamic, or manual) [M11] | Copilot Studio for the maker | **Not recommended:** transcripts stored by default (Retention) |
 | Synced Copilot connector (formerly Graph connector) | Crawls a copy of the content into the tenant's Microsoft Graph index [M16] | Graph connectors API | Copilot licence for Copilot grounding [M15] | **Rejected:** copies documents out of the instance and bypasses its grants and privilege guard |
 
 DCR for the agent is possible but not yet practical. Microsoft requires the server to issue a client secret at
 registration, the Developer Portal does not support DCR, and the agent's auth config has to come from Agents Toolkit, a
-developer tool [M5]. So 1.0 uses a static client per customer, the path the first customer's room already runs.
+developer tool [M5]. So 1.0 uses a static client per customer. The owner creates it on the MCP server's
+`/admin/clients` page (`web/mcp/admin-clients.ts`): a client ID, a secret shown once, and the Teams callback, which is
+on the redirect allowlist (`web/mcp/contract.ts`).
 
 ```mermaid
 sequenceDiagram
@@ -322,7 +324,7 @@ sequenceDiagram
     C-->>M: Answer with cites
 ```
 
-A law firm does the same in its own tenant, with its own registration, as firms do for the first customer today.
+A law firm does the same in its own tenant, with its own registration.
 
 ### Retention and ZDR
 
@@ -341,7 +343,7 @@ web search and Anthropic models) [M25].
 |---|---|---|
 | Microsoft 365 Copilot | $30 a user a month, billed yearly [M17] | Yes |
 | Microsoft 365 Copilot Business (up to 300 users) | $21 a user a month billed yearly ($18 in the first year until 2026-12-31); $25.20 billed monthly [M18] [M19] | Yes |
-| Copilot Chat only (included in Microsoft 365) | $0; agents grounded in instructions or public websites cost nothing more, tenant data is metered [M10]; pay-as-you-go messages at $0.01 [M20] | **Microsoft's pages disagree.** The extensibility table lists custom actions for Copilot Chat without usage billing [M7]; the Copilot overview says other agents are "pay-as-you-go only" [M9]. The first customer's test (2026-10-21): with Copilot Chat alone the agent was listed but never called the server. Budget a Copilot licence or pay-as-you-go, and retest |
+| Copilot Chat only (included in Microsoft 365) | $0; agents grounded in instructions or public websites cost nothing more, tenant data is metered [M10]; pay-as-you-go messages at $0.01 [M20] | **Microsoft's pages disagree.** The extensibility table lists custom actions for Copilot Chat without usage billing [M7]; the Copilot overview says other agents are "pay-as-you-go only" [M9]. A test on 2026-10-21: with Copilot Chat alone the agent was listed but never called the server. Budget a Copilot licence or pay-as-you-go, and retest |
 | Copilot Studio | $200 a month for 25,000 credits, or $0.01 a credit [M21]; no charge for Copilot-licensed users working as themselves [M28] | Not needed |
 
 ### Build effort: medium
@@ -354,7 +356,7 @@ web search and Anthropic models) [M25].
 | Test tenant with a Copilot licence: settle the licence question, check the published addresses (Decision 11) | Small |
 | DCR through Agents Toolkit | Later, if Microsoft adds it to the Developer Portal |
 
-Government clouds (GCC, GCC High, DoD) stay unsupported: the first customer's research found no authenticated agent
+Government clouds (GCC, GCC High, DoD) stay unsupported: research for this design found no authenticated agent
 actions there.
 
 **Recommendation: second.** It reaches the Windows and Microsoft 365 founders Legallas targets. The retention card says
@@ -408,7 +410,7 @@ sequenceDiagram
 
 - **Cost:** Harvey sells to firms through sales; there is no public price. Its mid-sized firm offering targets firms of
   about 15 to 150 lawyers [H9]. The firm pays, never the founder.
-- **Build effort: small.** The first customer's Harvey guide works for any instance once its URLs are generated. The
+- **Build effort: small.** The Harvey guide (`web/connect/harvey.md`) works for any instance once its URLs are generated. The
   hard part is testing: Colorado Startups cannot buy a Harvey workspace for evals, so the first firm that connects is
   the live test (Decision 11).
 
@@ -611,7 +613,7 @@ The work proceeds on each recommendation; the owner can change any of them.
 | 12 | Write path | Product, decided by the owner (2026-11-01) | Propose and approve, as above | None: the owner's rule |
 | 8 | OpenCode hosted models | Product and security | Through a model route on the instance (Workers AI, Cloudflare-hosted models, spend guard, audit); LM Studio as the default local runner | Members use their own provider keys |
 | 9 | Retention card | Product | Shown when an AI connects and on `/connect`, built from this doc's tables, rechecked each release | Docs only |
-| 10 | Closed models | Product, decided by the owner (2026-10-31) | Only Claude, Microsoft 365 Copilot and Harvey; any open-weight model is fine. Gemini Enterprise's code path goes (the first customer's room removed it on 2026-10-31); ChatGPT, the OpenAI API and the xAI Grok API are out ([Which AI may connect](#which-ai-may-connect)) | None: the owner's rule |
+| 10 | Closed models | Product, decided by the owner (2026-10-31) | Only Claude, Microsoft 365 Copilot and Harvey; any open-weight model is fine. Gemini Enterprise's code path goes (its callback left the allowlist on 2026-10-31); ChatGPT, the OpenAI API and the xAI Grok API are out ([Which AI may connect](#which-ai-may-connect)) | None: the owner's rule |
 | 13 | Replica eval lane for a room's own host | Major security | Add `host` to `replica-eval.yml`'s providers, with a `REPLICA_EVAL_HOST_API_KEY` secret on the `replica-eval` environment, passed only to the replica step on host runs (as Groq's key is). Until then no host can pass the release gate | Rooms run the host replica outside CI (against "evals run in CI") |
 | 11 | Test accounts for connector evals | Billing | Colorado Startups buys one Claude Pro account ($20 a month) and one Microsoft 365 test tenant with one Copilot Business licence ($25.20 a month on an annual commitment [M18] [M19], plus a base plan), each within the $50-a-month cap per plan; Harvey is tested with the first firm | No paid test accounts; connectors tested only with customers |
 

@@ -14,8 +14,8 @@ const UNKNOWN_FIND_DAYS = 90;
 export const RISKY_AREAS = ['who-can-see-what', 'citations', 'sync-and-save-back', 'migrations', 'pii-guard', 'spend-guard', 'connector-contract'] as const;
 export const AREA_AGE_LIMIT_DAYS = 14;
 
-/** The invented issue every collection reads, to prove each field still parses. Closed by #184, the pull request that added this. */
-export const CANARY_ISSUE = 273;
+/** The invented issue every collection reads, to prove each field still parses: #28 in this repository, closed by the pull request that set it. */
+export const CANARY_ISSUE = 28;
 const CANARY_RUN = 1;
 
 export interface Bug {

@@ -16,6 +16,7 @@ const closed = (reason: string, over: Partial<Bug> = {}) => bug({ state: 'CLOSED
 const CANARY = closed('COMPLETED', { body: 'Severity: low\nRun: /actions/runs/1', landedAt: '2026-01-01T00:00:00Z', closedBy: [['a.test.ts']], reopenedAt: ['2026-01-02T00:00:00Z'] });
 
 test('the drill proves the whole read: the logic, the canary and the runs list', () => {
+  assert.equal(CANARY_ISSUE, 28, 'the canary is an issue in this repository; one from another repository never reads back');
   assert.equal(detectionDrill(CANARY, true), 1);
   assert.equal(detectionDrill(undefined, true), 0, 'a renamed label or a broken query loses the canary');
   assert.equal(detectionDrill(CANARY, false), 0, 'a renamed branch empties the runs list');

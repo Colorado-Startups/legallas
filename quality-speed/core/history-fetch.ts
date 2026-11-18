@@ -14,7 +14,7 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, 
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { isPublicLane, isPublicPage, RENAMED } from '../contract/pages.ts';
+import { isPublicLane, isPublicPage, isPublicMetric, PRIVATE_DETAIL, RENAMED } from '../contract/pages.ts';
 
 const ARTIFACT = 'quality-speed-history';
 export const HISTORY_FILE = 'history.jsonl';
@@ -145,6 +145,25 @@ function unpack(repo: string, id: number, dir: string): void {
  * file, detail and the records it reported, and a private page's score lines in history.jsonl.
  * Returns how many files, folders and score lines it removed.
  */
+/** Rewrites a list of records with each private measurement's value taken out. Returns how many it changed. */
+function blankPrivate(file: string): number {
+  try {
+    const list = JSON.parse(readFileSync(file, 'utf8')) as { id?: unknown; page?: unknown; value?: unknown }[];
+    let changed = 0;
+    const kept = list.map((r) => {
+      if (typeof r?.id !== 'string' || typeof r.page !== 'string' || isPublicMetric(r.page, r.id) || r.value === null) return r;
+      changed += 1;
+      return { ...r, value: null, status: 'missing', measured_at: null, source_url: null, sample_size: null };
+    });
+    if (changed) writeFileSync(file, `${JSON.stringify(kept)}\n`);
+    return changed;
+  } catch {
+    // Unreadable: it goes, and merge.ts rebuilds the page's list from its lanes.
+    rmSync(file, { force: true });
+    return 1;
+  }
+}
+
 export function prunePrivate(state: string): number {
   let removed = 0;
   const drop = (target: string) => {
@@ -171,7 +190,16 @@ export function prunePrivate(state: string): number {
     }
     const gone = new Set<string>();
     for (const name of names(path.join(lanes, slug))) {
-      if (isPublicLane(slug, name.replace(/\.json$/, ''))) continue;
+      const file = path.join(lanes, slug, name);
+      // A private page detail folder goes; a public lane file loses its private measurements' values.
+      if (!name.endsWith('.json') && PRIVATE_DETAIL.includes(slug)) {
+        drop(file);
+        continue;
+      }
+      if (isPublicLane(slug, name.replace(/\.json$/, ''))) {
+        if (name.endsWith('.json')) removed += blankPrivate(file);
+        continue;
+      }
       // The ids this lane reported, so its records leave the page's merged list too. An unreadable file names none.
       try {
         if (name.endsWith('.json')) for (const r of JSON.parse(readFileSync(path.join(lanes, slug, name), 'utf8')) as { id?: unknown }[]) if (typeof r?.id === 'string') gone.add(r.id);
@@ -181,6 +209,7 @@ export function prunePrivate(state: string): number {
       drop(path.join(lanes, slug, name));
     }
     const merged = path.join(records, `${slug}.json`);
+    if (existsSync(merged)) removed += blankPrivate(merged);
     if (!gone.size || !existsSync(merged)) continue;
     try {
       const kept = (JSON.parse(readFileSync(merged, 'utf8')) as { id?: unknown }[]).filter((r) => typeof r?.id !== 'string' || !gone.has(r.id));

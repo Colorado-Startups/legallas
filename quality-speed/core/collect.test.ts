@@ -88,3 +88,40 @@ test('a lane the page does not declare does not run', () => {
   assert.deepEqual(collectLane('code', 'other', out, pagesDir), ['this lane is not declared']);
   rmSync(path.dirname(out), { recursive: true });
 });
+
+test('a private measurement goes out missing, and a page with private detail sends none', () => {
+  const root = mkdtempSync(path.join(tmpdir(), 'collect-private-'));
+  const pagesDir = path.join(root, 'pages');
+  mkdirSync(path.join(pagesDir, 'pull-requests'), { recursive: true });
+  // The example list, renamed to the Pull requests page: one private measurement (review_tokens_p50), one public.
+  const manifest = MANIFEST.replaceAll('"code"', '"pull-requests"').replace('"line_coverage"', '"review_tokens_p50"').replace('"functions_over_60_lines"', '"small_changes"');
+  writeFileSync(path.join(pagesDir, 'pull-requests', 'manifest.json'), manifest);
+  writeFileSync(path.join(pagesDir, 'pull-requests', 'lanes.json'), JSON.stringify([LANE]));
+  const records = [
+    { ...RECORD, id: 'review_tokens_p50', page: 'pull-requests', value: 0.42 },
+    { ...RECORD, id: 'small_changes', page: 'pull-requests', value: 3 },
+  ];
+  const body = `import { mkdirSync, writeFileSync } from 'node:fs';\nmkdirSync(process.env.DETAIL_DIR + '/page', { recursive: true });\nwriteFileSync(process.env.DETAIL_DIR + '/page/rows.json', '[{"usd":1}]');\nwriteFileSync(process.argv[process.argv.indexOf('--out') + 1], ${JSON.stringify(JSON.stringify(records))});\n`;
+  writeFileSync(path.join(pagesDir, 'pull-requests', 'collect.ts'), body);
+  const out = path.join(root, 'out');
+  assert.deepEqual(collectLane('pull-requests', 'github', out, pagesDir), []);
+  const [usd, green] = JSON.parse(readFileSync(path.join(out, 'pull-requests', 'github.json'), 'utf8'));
+  assert.deepEqual([usd.id, usd.value, usd.status, usd.measured_at], ['review_tokens_p50', null, 'missing', null]);
+  assert.equal(green.value, 3);
+  assert.equal(existsSync(path.join(out, 'pull-requests', 'github')), false, 'no detail folder');
+  rmSync(root, { recursive: true });
+});
+
+test('a page with private detail sends none even when its collector fails', () => {
+  const root = mkdtempSync(path.join(tmpdir(), 'collect-private-fail-'));
+  const pagesDir = path.join(root, 'pages');
+  mkdirSync(path.join(pagesDir, 'pull-requests'), { recursive: true });
+  writeFileSync(path.join(pagesDir, 'pull-requests', 'manifest.json'), MANIFEST.replaceAll('"code"', '"pull-requests"'));
+  writeFileSync(path.join(pagesDir, 'pull-requests', 'lanes.json'), JSON.stringify([LANE]));
+  const body = `import { mkdirSync, writeFileSync } from 'node:fs';\nmkdirSync(process.env.DETAIL_DIR + '/facts', { recursive: true });\nwriteFileSync(process.env.DETAIL_DIR + '/facts/facts.json', '{"review_tokens":[1]}');\nprocess.exit(3);\n`;
+  writeFileSync(path.join(pagesDir, 'pull-requests', 'collect.ts'), body);
+  const out = path.join(root, 'out');
+  assert.deepEqual(collectLane('pull-requests', 'github', out, pagesDir), ['the collector failed or timed out']);
+  assert.equal(existsSync(path.join(out, 'pull-requests', 'github')), false);
+  rmSync(root, { recursive: true });
+});

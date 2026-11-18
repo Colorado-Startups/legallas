@@ -76,6 +76,8 @@ export interface Rules {
   templateBoxes: number;
   /** Checklist lines that state a "No ..." fact: these must be ticked. */
   templateAttestations: number;
+  /** False when the base commit had no template: nothing to complete, so the pull request is not counted. */
+  hasTemplate: boolean;
   /** linguist-generated patterns from .gitattributes. */
   generated: string[];
 }
@@ -453,7 +455,7 @@ export function pullFacts(input: PullInput): PullFacts {
     gate_misses: merged ? gateMisses(input, bot) : null,
     ci_green_first_time: ciFirst,
     drew_blocking: ready === null ? null : blockingVerdict || blockingComment,
-    template_complete: !merged || bot ? null : input.editedAfterReview !== true && templateComplete(pull.body, rules),
+    template_complete: !merged || bot || !rules.hasTemplate ? null : input.editedAfterReview !== true && templateComplete(pull.body, rules),
     edit_checked: input.editedAfterReview !== null,
     open_minutes: minutesBetween(pull.created_at, ended),
     review_result_minutes: reviewResultMinutes(input),

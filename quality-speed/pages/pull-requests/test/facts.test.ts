@@ -40,6 +40,7 @@ const RULES: Rules = {
   templateHeadings: t.headings,
   templateBoxes: t.boxes,
   templateAttestations: t.attestations,
+  hasTemplate: true,
   generated: ["web/package-lock.json", "*.riv"],
 };
 
@@ -136,7 +137,7 @@ test("template incomplete: missing heading, empty or comment-only section, missi
 test("table template: each row's first cell is a section, filled when another cell has text", () => {
   const tt = parseTemplate(["| | |", "|---|---|", "| What | <!-- one line --> |", "| Why | <!-- goal --> |", "", "- [ ] No secrets"].join("\n"));
   assert.deepEqual(tt.headings, ["What", "Why"]);
-  const rules: Rules = { templateHeadings: tt.headings, templateBoxes: tt.boxes, templateAttestations: tt.attestations, generated: [] };
+  const rules: Rules = { templateHeadings: tt.headings, templateBoxes: tt.boxes, templateAttestations: tt.attestations, hasTemplate: true, generated: [] };
   const body = ["| | |", "|---|---|", "| What | Adds a widget. |", "| Why | Fixes #7. |", "", "- [x] No secrets"].join("\n");
   assert.equal(templateComplete(body, rules), true);
   assert.equal(templateComplete(body.replace("Fixes #7.", "<!-- goal -->"), rules), false);

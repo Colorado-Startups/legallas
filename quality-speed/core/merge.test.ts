@@ -314,3 +314,19 @@ test("a private page's earlier score lines leave the history; public ones stay f
   assert.equal(lines.length, 1 + PAGES.length);
   rmSync(root, { recursive: true });
 });
+
+test("a private measurement carried in the state reads missing, and a private-detail page keeps no detail", () => {
+  const { root, pagesDir, fresh, state, out } = setUp();
+  const manifest = MANIFEST.replaceAll('"code"', '"pull-requests"').replace('"line_coverage"', '"review_tokens_p50"');
+  mkdirSync(path.join(pagesDir, 'pull-requests'), { recursive: true });
+  writeFileSync(path.join(pagesDir, 'pull-requests', 'manifest.json'), manifest);
+  writeFileSync(path.join(pagesDir, 'pull-requests', 'collect.ts'), '');
+  writeFileSync(path.join(pagesDir, 'pull-requests', 'lanes.json'), JSON.stringify([{ id: 'github', runner: 'linux', cadence: 'daily', collector: 'collect.ts' }]));
+  put(path.join(state, 'lanes', 'pull-requests', 'github.json'), [{ ...reading('review_tokens_p50', TODAY), page: 'pull-requests' }]);
+  put(path.join(state, 'lanes', 'pull-requests', 'github', 'facts', 'facts.json'), { tokens: [1] });
+  merge(fresh, state, out, new Set(), NOW, pagesDir);
+  const lane = JSON.parse(readFileSync(path.join(out, 'lanes', 'pull-requests', 'github.json'), 'utf8')) as MetricRecord[];
+  assert.deepEqual(lane.map((r) => [r.id, r.value, r.status]), [['review_tokens_p50', null, 'missing']]);
+  assert.equal(existsSync(path.join(out, 'lanes', 'pull-requests', 'github')), false);
+  rmSync(root, { recursive: true });
+});
