@@ -19,7 +19,7 @@ show that the operator did it.
 | [Vendors](vendors.md) | Every supplier, its retention and zero data retention (ZDR) state | Room owner | Every 12 months, and before adding a supplier |
 | [Risks](risks.md) | The room's risks, rated and treated | Room owner | Every quarter |
 | [Incidents](incidents.md) | Contacts, steps, and every incident | Incident lead | After each incident; contacts every quarter |
-| [Recovery](recovery.md) | Recovery plan and restore drills | Room owner | A drill every quarter |
+| [Recovery](recovery.md) | Recovery plan and restore drills | Room owner | A drill every 90 days |
 | [Edge check](edge-check.md) | Cloudflare edge settings, checked | Room owner | Every month, and after any zone change |
 | [Watch log](watch-log.md) | Sign-in alerts, member changes, backups | Room owner or a delegate | Every week |
 

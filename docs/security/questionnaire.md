@@ -1,6 +1,6 @@
 # Questionnaire answers
 
-Part of the [security policies](README.md). Version 1.1, 2026-11-17.
+Part of the [security policies](README.md). Version 1.2, 2026-11-17.
 
 Short answers to the questions vendor risk reviews ask most (SIG Lite, CAIQ and firms' own forms), for the product. A room
 owner adds their own settings, from their Cloudflare account, before sending. Each answer links its policy.
@@ -13,16 +13,16 @@ owner adds their own settings, from their Cloudflare account, before sending. Ea
 | 4 | Who are the subprocessors? | Cloudflare. Any outside AI backend only if the room owner turns it on, and only with zero data retention | [AI governance](ai-governance.md) |
 | 5 | Can the vendor see our data? | No. Colorado Startups has no access to any room or room account | [Access](access.md) |
 | 6 | Encryption at rest? | Yes. AES-256 (GCM) in D1 and R2, keys managed by Cloudflare | [Encryption](encryption.md) |
-| 7 | Encryption in transit? | Yes. HTTPS only, TLS 1.2 or higher, HSTS | [Encryption](encryption.md) |
+| 7 | Encryption in transit? | Yes. HTTPS only, TLS 1.2 or higher, HSTS. `npm run harden -- --check` reads the room owner's zone settings | [Encryption](encryption.md) |
 | 8 | How do users sign in? | Cloudflare Access: per-person allowlist, emailed one-time code, optional security key or biometric | [Access](access.md) |
-| 9 | MFA? | The room owner signs in with multi-factor. For members, `REQUIRE_MFA` makes the room refuse any sign-in without a security key or biometric; the room owner turns it on | [Access](access.md) |
+| 9 | MFA? | The room owner signs in with multi-factor. For members, `REQUIRE_MFA` makes the room refuse any sign-in without a security key or biometric; the room owner turns it on. `npm run harden -- --check` reads account 2FA and Access MFA | [Access](access.md) |
 | 10 | SSO? | Access can use an identity provider such as Microsoft Entra ID; the room owner configures it | [Access](access.md) |
 | 11 | Role-based access? | Yes. Owner, counsel and guest; privileged documents hidden from roles without access | [Access](access.md) |
 | 12 | How is access removed? | Remove the member: their row, invitations and AI connections end at once. With the room owner's Access token, their Access entry and sessions go too; each step is logged | [Access](access.md) |
 | 13 | Is access logged? | Yes. Every read, search and file sent: who, when, which document, which AI app. No query or document text | [Data and network](data-and-network.md) |
 | 14 | Can logs be changed? | No. The audit log is append-only by database trigger and exports as a hash chain | [Data and network](data-and-network.md) |
-| 15 | Backups? | Database: point-in-time restore for 30 days on Workers Paid, 7 on Free. Files and database: a second copy in another location, daily when scheduled, with a restore drill | [BCP/DR](bcp-dr.md) |
-| 16 | Recovery time and point? | Goals: 1 hour and 1 minute for the database. Not yet measured by a drill | [BCP/DR](bcp-dr.md) |
+| 15 | Backups? | Database: point-in-time restore for 30 days on Workers Paid, 7 on Free. Files and database: a second copy in another location, daily when scheduled, with a restore drill at least every 90 days. `npm run harden -- --check` flags a backup over 48 hours or a drill over 90 days old | [BCP/DR](bcp-dr.md) |
+| 16 | Recovery time and point? | Goals: 1 hour and 1 minute for the database. No drill result from a live room yet | [BCP/DR](bcp-dr.md) |
 | 17 | Incident notice? | Goals: case content exposed or a live key exposed (level 1), members told within 24 hours; other incidents that could expose content (level 2), 72 hours; no exposure path (level 3), the next routine note | [Incident response](incident-response.md) |
 | 18 | Vulnerability fix times? | Goals: 3 days critical and high, 14 days medium and low; never past 60 | [Vulnerability management](vulnerability-management.md) |
 | 19 | Secure development? | `Signed-off-by` on every commit, verified signatures on `main`, pull requests, required CI, secret scan and CodeQL on every change, push protection, pinned dependencies, an SBOM per release | [Vulnerability management](vulnerability-management.md) |
