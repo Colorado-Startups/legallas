@@ -98,7 +98,7 @@ async function revokeFromForm(request: Request, env: McpEnv, member: Member, aud
   } catch {
     return message(400, 'Bad request', 'The form could not be read. Reload the page and try again.');
   }
-  if (!checkForm(request, form)) {
+  if (!(await checkForm(request, form))) {
     return message(403, 'Form expired', 'This form is out of date or came from another site. Reload the page and try again.');
   }
   const grantId = form.get(GRANT_FIELD);

@@ -17,7 +17,7 @@
   // research chat, the case picture, the visual binder) and the research Durable Object class. A room may fill in its
   // own entry: worker/room.ts alone runs the room without them, and then leaves out the two blocks below.
   "main": "./worker/entry-pro.ts",
-  "compatibility_date": "2026-09-30",
+  "compatibility_date": "2026-11-17",
   // nodejs_compat: the research chat's Agents SDK (agents, @cloudflare/ai-chat) imports node:async_hooks, node:crypto
   // and node:diagnostics_channel (worker/agent/SPIKE.md). Compatibility dates from 2026-08-04 turn it on anyway; it is
   // explicit, as in legallas-mcp, so a date rollback cannot drop it. nodejs_compat_do_not_populate_process_env: Node

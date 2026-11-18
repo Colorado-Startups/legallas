@@ -309,7 +309,7 @@ async function submit(request: Request, env: McpEnv): Promise<Response> {
   } catch {
     return messagePage(400, 'Form not readable', 'Reload the page and try again.');
   }
-  if (!checkForm(request, form)) return messagePage(403, 'Form expired', 'Reload the page and try again.');
+  if (!(await checkForm(request, form))) return messagePage(403, 'Form expired', 'Reload the page and try again.');
   const action = form.get(FIELDS.action);
   if (action === ADMIN_ACTIONS.create) return create(request, env, form);
   if (action === ADMIN_ACTIONS.delete) return remove(request, env, form);

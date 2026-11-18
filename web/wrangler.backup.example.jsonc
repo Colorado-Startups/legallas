@@ -10,7 +10,7 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "legallas-backup",
   "main": "./worker/backup/entry.ts",
-  "compatibility_date": "2026-09-30",
+  "compatibility_date": "2026-11-17",
   "upload_source_maps": true,
 
   "workers_dev": false,

@@ -10,7 +10,10 @@ import { failureHost, recordSignInFailure, skipReason, type SignInFailure, type 
 const TOKEN_PATH = '/token';
 const REGISTER_PATH = '/register';
 const FORM_TYPE = 'application/x-www-form-urlencoded';
-/** Bodies longer than this are left to the library unread: real token and registration requests are far smaller. */
+/**
+ * Real token and registration requests are far smaller. A longer /register body is left to the library unread; a
+ * longer /token body is refused with a 413 before the library reads it (mcp/revoke-audit.ts).
+ */
 export const MAX_PREREAD_BYTES = 16_384;
 
 /** What a failed answer to the request is reported as, before its error code is known. */
@@ -23,8 +26,11 @@ export interface PreparedRequest {
   source?: OAuthSource;
 }
 
-/** The body of a copy of `request` as text, or null once it passes MAX_PREREAD_BYTES. The original stays unread. */
-async function preread(request: Request): Promise<string | null> {
+/**
+ * The body of a copy of `request` as text, or null once it passes MAX_PREREAD_BYTES. The original stays unread. The
+ * copy's cancel is not awaited: it settles only when the original is read or cancelled too.
+ */
+export async function preread(request: Request): Promise<string | null> {
   const reader = request.clone().body?.getReader();
   if (!reader) return '';
   const chunks: Uint8Array[] = [];

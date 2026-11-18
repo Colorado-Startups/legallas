@@ -3,8 +3,12 @@
 // whole grant but writes nothing to audit_log, so the member's activity feed would never show the disconnect.
 // This wraps the library call: it reads the grant before and after, and writes ai_disconnect when a 200 removed
 // it. Revoking an access token leaves the grant in place and writes nothing. The token itself is never logged.
+// It is also where a form-encoded /token body is bounded: it is read here first, so one over MAX_PREREAD_BYTES gets a
+// 413 and never reaches the library, which reads any other form body whole (it answers another content type with a
+// 400, unread).
 import { aiAudit } from './audit.ts';
 import type { GrantMetadata, McpEnv } from './contract.ts';
+import { MAX_PREREAD_BYTES, preread } from './oauth-request.ts';
 
 /** audit_log.via when neither the grant, the client record nor a CIMD client ID names the app. */
 export const REVOKE_VIA = 'revocation';
@@ -34,18 +38,36 @@ export function grantRefFromToken(token: string): GrantRef | null {
   return { userId: parts[0], grantId: parts[1] };
 }
 
-/** The token a revocation request carries, or null when the request is anything else (the library's own test). */
-async function revocationToken(request: Request): Promise<string | null> {
+/** Returned in place of a token when a form-encoded /token body is over MAX_PREREAD_BYTES. */
+const TOO_LARGE = Symbol('too_large');
+
+/**
+ * The token a revocation request carries, null when the request is anything else (the library's own test), or
+ * TOO_LARGE. The body is read from a copy and only up to MAX_PREREAD_BYTES, so the original stays unread.
+ */
+async function revocationToken(request: Request): Promise<string | typeof TOO_LARGE | null> {
   if (request.method !== 'POST' || new URL(request.url).pathname !== TOKEN_PATH) return null;
   const type = (request.headers.get('Content-Type') ?? '').split(';')[0].trim().toLowerCase();
   if (type !== 'application/x-www-form-urlencoded') return null;
+  if (Number(request.headers.get('Content-Length') ?? '0') > MAX_PREREAD_BYTES) return TOO_LARGE;
   try {
-    const form = await request.clone().formData();
+    const text = await preread(request);
+    if (text === null) return TOO_LARGE;
+    const form = new URLSearchParams(text);
     const token = form.get('token');
-    return !form.get('grant_type') && typeof token === 'string' && token !== '' ? token : null;
+    return !form.get('grant_type') && token ? token : null;
   } catch {
     return null;
   }
+}
+
+/** RFC 6749 section 5.2's error shape, as the library and the rate limit (mcp/gates.ts) answer /token. */
+function tooLarge(): Response {
+  console.warn('mcp_token_too_large');
+  return new Response(JSON.stringify({ error: 'invalid_request', error_description: 'The token request is too large.' }), {
+    status: 413,
+    headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
+  });
 }
 
 async function readJson<T>(kv: KVNamespace, key: string): Promise<T | null> {
@@ -87,6 +109,7 @@ export async function viaForGrant(kv: KVNamespace, grant: StoredGrant): Promise<
  * Forwards `request` to the library (`forward`, which gets the original, unread request) and, for a revocation
  * that removed a grant, writes one ai_disconnect row for the grant's member. A failed audit write is logged by
  * code and never changes the library's answer: the revocation already stands. `audit` is injectable for tests.
+ * A form-encoded /token body over MAX_PREREAD_BYTES is answered with a 413 and never forwarded.
  */
 export async function withRevocationAudit(
   request: Request,
@@ -95,6 +118,7 @@ export async function withRevocationAudit(
   audit: typeof aiAudit = aiAudit,
 ): Promise<Response> {
   const token = await revocationToken(request);
+  if (token === TOO_LARGE) return tooLarge();
   const ref = token === null ? null : grantRefFromToken(token);
   if (!ref) return forward(request);
   const key = `grant:${ref.userId}:${ref.grantId}`;

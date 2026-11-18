@@ -28,13 +28,13 @@ test('a browser with a token keeps it', () => {
   assert.equal(again.setCookie, null);
 });
 
-test('accepts a same-origin post whose field matches the cookie', () => {
+test('accepts a same-origin post whose field matches the cookie', async () => {
   const { token } = formToken(new Request(`${ORIGIN}/`));
   const { request, form } = post(token, token, ORIGIN);
-  assert.equal(checkForm(request, form), true);
+  assert.equal(await checkForm(request, form), true);
 });
 
-test('refuses cross-origin, missing origin, mismatched or missing tokens', () => {
+test('refuses cross-origin, missing origin, mismatched or missing tokens', async () => {
   const { token } = formToken(new Request(`${ORIGIN}/`));
   const other = formToken(new Request(`${ORIGIN}/`)).token;
   for (const [cookie, field, origin] of [
@@ -46,12 +46,12 @@ test('refuses cross-origin, missing origin, mismatched or missing tokens', () =>
     [token, null, ORIGIN],
   ] as const) {
     const { request, form } = post(cookie, field, origin);
-    assert.equal(checkForm(request, form), false);
+    assert.equal(await checkForm(request, form), false);
   }
 });
 
-test('on localhost the local origin counts as same-origin', () => {
+test('on localhost the local origin counts as same-origin', async () => {
   const { token } = formToken(new Request('http://localhost:8790/'));
   const { request, form } = post(token, token, 'http://localhost:8790', 'http://localhost:8790/connections');
-  assert.equal(checkForm(request, form), true);
+  assert.equal(await checkForm(request, form), true);
 });
