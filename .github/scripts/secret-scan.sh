@@ -161,8 +161,8 @@ esac
 # test's fake key that only a whole-file read matches, reported twice on that line.
 # Both entries: test placeholder proving a .key file is refused; body AAAA. The second is
 # the same line in #2's own commit before the squash, which a full-history scan also reads.
-excused=("f668214f58118acc870eefa0683aa3dc971ad9b3:web/scripts/iwork.test.ts:private-key:280"
-    "99a94c44b77ae02fd303202c5f102a74d875dfec:web/scripts/iwork.test.ts:private-key:280")
+# One line: secret-scan-test.sh swaps this whole line for its own entry.
+excused=("f668214f58118acc870eefa0683aa3dc971ad9b3:web/scripts/iwork.test.ts:private-key:280" "99a94c44b77ae02fd303202c5f102a74d875dfec:web/scripts/iwork.test.ts:private-key:280")
 excused_file="$(mktemp)"
 printf '%s\n' "${excused[@]}" >"$excused_file"
 
