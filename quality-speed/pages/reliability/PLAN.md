@@ -97,6 +97,18 @@ Not features, so not issues. For the board:
 | A guest sees a member's reply to their thread |
 | Sync lists each iWork bundle it cannot send, instead of stopping the run |
 
+## Second review, 2026-11-17
+
+| Area | Result |
+|---|---|
+| SSN guard | #37: a soft hyphen or zero-width space inside a number hides it from all three rules. Reproduced on invented numbers |
+| Sync | The same miss reaches the sync's guard (#37). Its lease and upload paths read clean |
+| Who can see what | None. `privilegeFilter` and `canSeeDocument` agree on every checklist read and write; a guest's call keeps its own reader role |
+| Citations | None. Document ids are UUIDs, which the cite pattern accepts |
+| Spend guard | None. Holds, settles, the cancel path and the local refusal read clean |
+| Migrations | None. All 32 apply on real SQLite; 0028 keeps all 13 indexes and triggers of the six rebuilt tables, and the foreign key check passes |
+| Connector contract | None by reading. Guests reach only `GUEST_TOOLS`, inside `withGuestScope`. Its tool tests need packages, so they run in CI |
+
 ## Baseline
 
 2026-11-02 07:17 UTC, one real collection over 92 bug issues, with #172 to #176 already fixed. The list was signed off after this.
