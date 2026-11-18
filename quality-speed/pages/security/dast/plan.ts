@@ -17,6 +17,27 @@ export const TOKEN_VAR = 'MCP_TOKEN';
 
 export const urlsFile = (target: Target['name']) => `urls-${target}.txt`;
 
+/** Each spider's cap, and the most any one active rule may run. */
+export const SPIDER_MINUTES = 2;
+export const RULE_MINUTES = 3;
+/** Each passive-scan wait's cap. The passive scanner keeps up as requests arrive, so a wait rarely uses a minute. */
+export const PASSIVE_WAIT_MINUTES = 3;
+/** Room build, seed, the MCP grant and ZAP's own start, outside the plan's caps: about 3 minutes on 7 Nov, 8 allowed. */
+export const SETUP_MINUTES = 8;
+/** The job's limit in dynamic-scan.yml, which the plan's worst case must fit under. */
+export const JOB_MINUTES = 60;
+
+/** The longest the plan can run: the sum of every capped job's limit (spiders, passive waits, active scans). */
+export function worstCaseMinutes(plan: { jobs: { type: string; parameters?: Record<string, unknown> }[] }): number {
+  let total = 0;
+  for (const job of plan.jobs) {
+    const p = job.parameters ?? {};
+    if (job.type === 'spider' || job.type === 'passiveScan-wait') total += Number(p.maxDuration);
+    if (job.type === 'activeScan') total += Number(p.maxScanDurationInMins);
+  }
+  return total;
+}
+
 export const escapeRegex = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export interface PlanOptions {
@@ -80,7 +101,7 @@ export function zapPlan(options: PlanOptions): Record<string, unknown> {
   for (const target of targets) {
     jobs.push({ type: 'spider', name: `spider ${target.name}`, parameters: { context: target.name, url: `${target.origin}${target.spiderPath}`, maxDuration: options.spiderMinutes, maxDepth: 5 } });
   }
-  jobs.push({ type: 'passiveScan-wait', parameters: { maxDuration: 5 } });
+  jobs.push({ type: 'passiveScan-wait', parameters: { maxDuration: PASSIVE_WAIT_MINUTES } });
   for (const target of targets) {
     jobs.push({
       type: 'activeScan',
@@ -88,7 +109,7 @@ export function zapPlan(options: PlanOptions): Record<string, unknown> {
       parameters: { context: target.name, maxRuleDurationInMins: options.ruleMinutes, maxScanDurationInMins: target.activeMinutes, maxAlertsPerRule: 0 },
     });
   }
-  jobs.push({ type: 'passiveScan-wait', parameters: { maxDuration: 5 } });
+  jobs.push({ type: 'passiveScan-wait', parameters: { maxDuration: PASSIVE_WAIT_MINUTES } });
   for (const target of targets) jobs.push({ type: 'export', name: `export urls ${target.name}`, parameters: { context: target.name, type: 'url', source: 'all', fileName: out(urlsFile(target.name)) } });
   jobs.push({ type: 'report', name: 'report json', parameters: { template: 'traditional-json', reportDir: `${WRK}/out`, reportFile: ALERTS_FILE, reportTitle: 'Automated dynamic scan' } });
   jobs.push({ type: 'report', name: 'report html', parameters: { template: 'traditional-html', reportDir: `${WRK}/out`, reportFile: HTML_FILE, reportTitle: 'Automated dynamic scan' } });

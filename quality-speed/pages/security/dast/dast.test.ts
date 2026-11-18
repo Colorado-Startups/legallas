@@ -8,7 +8,7 @@ import { test } from 'node:test';
 import { countUrls, mcpCalls, mcpToolCoverage, rpcReply } from './coverage.ts';
 import { blocking, countBySeverity, judge, normalizePath, parseZapJson, validateTriage, type Alert, type Triage } from './findings.ts';
 import { BODY_EXAMPLES, fillPath, mcpOpenApi, openApiPath, paramValues, pathParams, roomOpenApi, seededNames } from './openapi.ts';
-import { memberWriteHeaders, TOKEN_VAR, zapPlan } from './plan.ts';
+import { JOB_MINUTES, memberWriteHeaders, RULE_MINUTES, SETUP_MINUTES, SPIDER_MINUTES, TOKEN_VAR, worstCaseMinutes, zapPlan } from './plan.ts';
 import { renderReport, type RunInfo } from './report.ts';
 import { serverArgs, STRANGER_HOST, strangerState, targetNamed, TARGETS, targetOfSite } from './targets.ts';
 import { MCP_ADDON, ZAP_IMAGE } from './tools.ts';
@@ -283,4 +283,14 @@ test('the report names itself an automated dynamic scan, never a penetration tes
   assert.match(md, /\[40012\]\(https:\/\/www\.zaproxy\.org\/docs\/alerts\/40012\/\)/);
   assert.doesNotMatch(md, /\u2014/, 'no em dashes');
   assert.doesNotMatch(md, /elsewhere\.example/);
+});
+
+test("the plan's worst case and the setup fit the job's limit, and the workflow sets that limit", () => {
+  const openapi = { 'room-member': 'room-openapi.json', 'room-stranger': 'room-openapi.json', 'mcp-member': 'mcp-openapi.json', 'mcp-stranger': 'mcp-openapi.json' } as const;
+  const plan = zapPlan({ targets: TARGETS, openapi, mcpUrl: 'http://localhost:8790/mcp', spiderMinutes: SPIDER_MINUTES, ruleMinutes: RULE_MINUTES });
+  const worst = worstCaseMinutes(plan as { jobs: { type: string; parameters?: Record<string, unknown> }[] });
+  assert.equal(worst, 47, '4 spiders of 2, 2 passive waits of 3, active scans of 15, 3, 12 and 3');
+  assert.ok(worst + SETUP_MINUTES <= JOB_MINUTES, `${worst} + ${SETUP_MINUTES} minutes over ${JOB_MINUTES}`);
+  const workflow = readFileSync(new URL('../../../../.github/workflows/dynamic-scan.yml', import.meta.url), 'utf8');
+  assert.deepEqual([...workflow.matchAll(/^\s*timeout-minutes:\s*(\d+)/gm)].map((m) => Number(m[1])), [JOB_MINUTES]);
 });

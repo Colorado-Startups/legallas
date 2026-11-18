@@ -4,7 +4,7 @@
 # (quality-speed/pages/security/dast/README.md). It is not a penetration test.
 #
 # Monthly, by hand, and on a pull request that changes the scan itself. Never on other pull
-# requests: a run takes about 45 Linux minutes.
+# requests: a run took 28 Linux minutes (7 Nov), 55 at worst.
 #
 #   gh workflow run dynamic-scan.yml -R Colorado-Startups/legallas --ref <branch>
 #
@@ -40,7 +40,8 @@ jobs:
     # A fork's pull request gets no run.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    # The plan's worst case plus setup, checked against this line by dast.test.ts (plan.ts JOB_MINUTES).
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
