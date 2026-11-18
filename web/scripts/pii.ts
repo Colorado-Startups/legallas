@@ -13,8 +13,10 @@
 //               legallas.config.json (piiHashes, pii-hash.ts): a known SSN in any format, never stored as digits.
 //
 // A business EIN (dd-ddddddd) matches only the last two: after a label, or when its digits are a known SSN.
-// Text is read in NFKC first, so fullwidth digits and dashes and thin, narrow and figure spaces read as plain ones. A
-// file or folder name has its own reading (pathHits), because a name's dashes only separate words.
+// Text is read in NFKC first, so fullwidth digits and dashes and thin, narrow and figure spaces read as plain ones, and
+// with its format characters (Unicode Cf: soft hyphen, zero-width space and joiners, BOM) dropped, since PDF and Word
+// text carries them inside numbers and NFKC keeps them. A file or folder name has its own reading (pathHits), because a
+// name's dashes only separate words.
 
 export type PiiRule = 'ssn-form' | 'labelled' | 'known-hash' | 'private-key';
 
@@ -90,7 +92,10 @@ function inUrlEscape(text: string, start: number): boolean {
   return token.includes('://') || token.startsWith('/');
 }
 
-const plainWidths = (text: string) => text.normalize('NFKC');
+/** Format characters (Unicode Cf): invisible, so a number reads the same with or without them. */
+const FORMAT = /\p{Cf}/gu;
+
+const plainWidths = (text: string) => text.normalize('NFKC').replace(FORMAT, '');
 
 /**
  * Rule ssn-form: printed SSNs with an issuable area, group and serial. With `neighbors` off, a digit beside the form
@@ -222,9 +227,13 @@ export function findPiiSync(text: string, known: KnownMatcher | null = null): Pi
   return sorted(hits);
 }
 
-/** A path as the rules read it: percent escapes decoded, underscores as spaces, in capitals so a label counts in any case. */
+/**
+ * A path as the rules read it: percent escapes decoded, format characters dropped, underscores as spaces, in capitals
+ * so a label counts in any case.
+ */
 function pathText(rel: string): string {
-  return rel.replace(/%([0-9a-f]{2})/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16))).replace(/_/g, ' ').toUpperCase();
+  const decoded = rel.replace(/%([0-9a-f]{2})/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)));
+  return decoded.replace(FORMAT, '').replace(/_/g, ' ').toUpperCase();
 }
 
 /** Every hit in a file or folder name. A digit beside the form does not hide it there: W-9-ddd-dd-dddd, ddd-dd-dddd-2024. */

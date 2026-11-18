@@ -171,3 +171,19 @@ test('a path: dashes and underscores only separate words, escapes are decoded, a
   const known: KnownMatcher = { matches: async () => true, matchesSync: (digits) => digits === INVENTED.join('') };
   assert.equal(maskPath(`Order ${INVENTED.join('')}.pdf`, known), 'Order #########.pdf', 'a known number in a name');
 });
+
+test('a format character inside a number does not hide it: soft hyphen, zero-width space', () => {
+  const SHY = '\u00ad';
+  const ZWSP = '\u200b';
+  const number = n('-', ...INVENTED);
+  assert.equal(findPiiSync(`Holder ${number} signed`).length, 1);
+  for (const text of [`Holder 123-45-67${SHY}89 signed`, `Holder 123-45-67${ZWSP}89 signed`, `Holder 123${ZWSP}-45-6789 signed`, `Holder 1${SHY}2${ZWSP}3-45-6789 signed`]) {
+    assert.deepEqual(rules(text), ['ssn-form'], JSON.stringify(text));
+  }
+  assert.deepEqual(rules(`SSN: 123${ZWSP}45${SHY}6789`), ['labelled']);
+  const known: KnownMatcher = { matches: async () => true, matchesSync: (digits) => digits === INVENTED.join('') };
+  const rel = `W9/holder_123${ZWSP}45${ZWSP}6789.pdf`;
+  assert.deepEqual(pathHits(rel, known).map((hit) => hit.rule), ['known-hash'], 'a known number in a name');
+  assert.equal(maskPath(rel, known), `W#/holder_###${ZWSP}##${ZWSP}####.pdf`);
+  assert.ok(pathHits(`W9/holder_123${SHY}-45-6789.pdf`).length > 0, 'a printed form in a name');
+});
