@@ -56,6 +56,13 @@ npm run dev
 |---|---|
 | Access team and audience (empty in the examples) | Refuses every request |
 
+Before inviting members, from `web/`:
+
+| Step | |
+|---|---|
+| `npm run harden -- --check` | Reads the account and zone: WAF, TLS, 2FA, Access MFA, backup, restore drill. Exit 0 all pass. `--apply` fixes the safe rows. `web/README.md`, "Edge rules" |
+| [Operator records](docs/security/operator/README.md) | Copy to your own private store and fill in: policy, data map, vendors, risks, incidents, recovery, edge check, watch log |
+
 ## Licence
 
 | File | Covers |

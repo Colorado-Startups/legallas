@@ -21,7 +21,7 @@ function setup(settings: Partial<ResearchToolEnv>, member: Member = MEMBER) {
   const tools = researchTools(state);
   const run = async (args: Record<string, unknown>) => {
     const t = tools[PROPOSE_TOOL_NAME]!;
-    const parsed = (t.inputSchema as { parse(v: unknown): Record<string, unknown> }).parse(args);
+    const parsed = (t.inputSchema as unknown as { parse(v: unknown): Record<string, unknown> }).parse(args);
     return (await t.execute!(parsed, { toolCallId: 'x', messages: [], context: {} })) as string;
   };
   return { db, sqlite, state, tools, run };
