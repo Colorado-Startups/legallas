@@ -363,7 +363,10 @@ jobs:
     # A first run embeds the whole library: 12,802 parts took 40 minutes on 17 Nov (run 44016097386), and the job ran out
     # before it could save them, so every run started cold. Now the cache is written every 1,000 parts
     # (web/scripts/law/replica.ts) and `Law eval` has its own limit, so the save below still runs; later runs take minutes.
-    timeout-minutes: 45
+    # Run 44359087533 started cold (no cache on main yet) and embedded 11,750 parts in its 38: a cold run needs about 42,
+    # plus the eval. 50 for the step and 58 for the job (under the Actions page's 60) let a cold run finish; warm runs
+    # are unchanged.
+    timeout-minutes: 58
     environment: quality-speed
     permissions:
       contents: read
@@ -409,9 +412,9 @@ jobs:
         working-directory: .
         run: node quality-speed/core/law/collect.ts --questions > "$RUNNER_TEMP/law-questions.json"
       - name: Law eval
-        # Under the job's 45, so a step past its time fails instead of the job being cancelled, and the upload and the
+        # Under the job's 58, so a step past its time fails instead of the job being cancelled, and the upload and the
         # embeddings save below still run with what it did.
-        timeout-minutes: 38
+        timeout-minutes: 50
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.LIVE_ROOM_CLOUDFLARE_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}

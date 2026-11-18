@@ -284,16 +284,24 @@ const GATE_WORKFLOWS: [DeletedRun["workflow"], string][] = [
 /**
  * Run numbers missing between the window's first and last run of each gate
  * workflow. Numbers count up per workflow with no gaps of GitHub's own, so a
- * missing one is a deleted run, which could hide a red result.
+ * missing one is a deleted run, which could hide a red result. A workflow the
+ * repository does not have (a 404, as claude-review.yml since it was retired)
+ * has no runs to delete: no events, not a failed read. Any other failure throws.
  */
 async function deletedRuns(rd: Readers, since: number): Promise<DeletedRun[]> {
   const out: DeletedRun[] = [];
   for (const [workflow, file] of GATE_WORKFLOWS) {
-    const runs = await getAll<{ run_number: number }>(
-      rd.get,
-      `repos/${rd.repo}/actions/workflows/${file}/runs?created=${encodeURIComponent(`>=${iso(since)}`)}`,
-      (b) => (b as { workflow_runs: { run_number: number }[] }).workflow_runs,
-    );
+    let runs: { run_number: number }[];
+    try {
+      runs = await getAll<{ run_number: number }>(
+        rd.get,
+        `repos/${rd.repo}/actions/workflows/${file}/runs?created=${encodeURIComponent(`>=${iso(since)}`)}`,
+        (b) => (b as { workflow_runs: { run_number: number }[] }).workflow_runs,
+      );
+    } catch (e) {
+      if (e instanceof NotFound) continue;
+      throw e;
+    }
     const seen = new Set(runs.map((r) => r.run_number));
     if (seen.size === 0) continue;
     for (let n = Math.min(...seen); n <= Math.max(...seen); n++) if (!seen.has(n)) out.push({ workflow, run_number: n });

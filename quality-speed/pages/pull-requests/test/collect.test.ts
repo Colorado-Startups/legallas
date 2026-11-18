@@ -142,6 +142,13 @@ test("collect: merged and closed pull requests in range, open ones, and direct p
   assert.ok(calls.some((c) => c.includes("jobs?filter=all")), "every attempt of the review");
 });
 
+test("collect: a gate workflow the repository does not have has no deleted runs; another failure on it still throws", async () => {
+  const R = `repos/${REPO}`;
+  const out = await collect(api([], undefined, [`${R}/actions/workflows/claude-review.yml/runs`]), REPO, NOW, OPTS);
+  assert.deepEqual(out.deleted_runs, [{ workflow: "ci", run_number: 2 }]);
+  await assert.rejects(collect(api([], `${R}/actions/workflows/claude-review.yml/runs`), REPO, NOW, OPTS));
+});
+
 test("collect: a failed read throws, so the run writes every metric missing", async () => {
   await assert.rejects(collect(api([], `repos/${REPO}/pulls/2/comments`), REPO, NOW, OPTS));
   await assert.rejects(collect(api([], `repos/${REPO}/compare/p2...h2`), REPO, NOW, OPTS));
