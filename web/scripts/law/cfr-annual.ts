@@ -56,7 +56,9 @@ export function cfrAnnualSection(xml: string, title: number, number: string): Cf
   if (sections.length !== 1) throw new Error(`${where}: the file holds ${sections.length} sections, not one`);
   const body = unindent(sections[0]![1]!);
   const sectno = htmlText(/<SECTNO>([\s\S]*?)<\/SECTNO>/.exec(body)?.[1] ?? '');
-  if (sectno !== `§ ${number}`) throw new Error(`${where}: the file holds ${sectno || 'no section number'}`);
+  // The annual edition prints a section number's hyphen as a hyphen or a dash, by edition (seen 2026-11-18:
+  // 26 C.F.R. 301.6109-1 came with U+2013). Either is the same number; any other difference is another section.
+  if (sectno.replace(/[\u2010-\u2015\u2212]/g, '-') !== `§ ${number}`) throw new Error(`${where}: the file holds ${sectno || 'no section number'}`);
   const heading = htmlText(/<SUBJECT>([\s\S]*?)<\/SUBJECT>/.exec(body)?.[1] ?? '').replace(/\.$/, '');
   if (!heading) throw new Error(`${where}: the file gives no heading`);
   const text = body
