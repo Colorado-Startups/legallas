@@ -20,6 +20,8 @@ import type { LawCatalog } from './types.ts';
 export const EMBEDDING_MODEL = '@cf/qwen/qwen3-embedding-0.6b';
 const API = 'https://api.cloudflare.com/client/v4';
 const EMBED_BATCH = 50;
+/** Batches between cache writes: 1,000 parts, about 3 minutes. A run killed by its time limit keeps what it embedded. */
+export const CHECKPOINT_BATCHES = 20;
 /** qwen3-embedding-0.6b's vector size. */
 const EMBED_DIMENSIONS = 1024;
 /** 4xx statuses about the token, the account or the rate, not the text. */
@@ -222,6 +224,13 @@ export async function embedParts(dir: string, parts: readonly Part[], embed: (te
   const cache = JSON.parse(await readFile(file, 'utf8').catch(() => '{}')) as Record<string, number[]>;
   const missing = parts.filter((p) => !cache[sha256(p.text)]);
   let added = 0;
+  let saved = 0;
+  const save = async () => {
+    if (added === saved) return;
+    await mkdir(path.dirname(file), { recursive: true, mode: 0o700 });
+    await writeFile(file, JSON.stringify(cache), { mode: 0o600 });
+    saved = added;
+  };
   try {
     for (let i = 0; i < missing.length; i += EMBED_BATCH) {
       const batch = missing.slice(i, i + EMBED_BATCH);
@@ -229,13 +238,12 @@ export async function embedParts(dir: string, parts: readonly Part[], embed: (te
       batch.forEach((p, j) => (cache[sha256(p.text)] = vectors[j]!));
       added += batch.length;
       log(`  embedded ${Math.min(i + EMBED_BATCH, missing.length)} of ${missing.length}`);
+      // Written as it goes: a process killed by a time limit runs no finally, and a first run takes most of an hour.
+      if ((i / EMBED_BATCH + 1) % CHECKPOINT_BATCHES === 0) await save();
     }
   } finally {
     // Kept after a stop too (the day's budget, a refused call), so the next run embeds only what is still missing.
-    if (added) {
-      await mkdir(path.dirname(file), { recursive: true, mode: 0o700 });
-      await writeFile(file, JSON.stringify(cache), { mode: 0o600 });
-    }
+    await save();
   }
   return parts.map((p) => cache[sha256(p.text)]!);
 }
