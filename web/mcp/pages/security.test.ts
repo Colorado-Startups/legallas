@@ -22,7 +22,24 @@ import { slug } from './markdown.ts';
 const BRIEF = readFileSync(BRIEF_FILE, 'utf8');
 const GENERATED = readFileSync(GENERATED_FILE, 'utf8');
 const page = renderSecurityPage();
-const text = (html: string) => html.replace(/<[^>]+>/g, '').replace(/&#39;/g, "'").replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
+/** `html` with every tag (`<`, at least one character, `>`) taken out, as `/<[^>]+>/g` would, without a regular expression. */
+function stripTags(html: string): string {
+  let out = '';
+  let from = 0;
+  let open = html.indexOf('<');
+  while (open !== -1) {
+    const close = html.indexOf('>', open + 1);
+    if (close === -1) break;
+    if (close > open + 1) {
+      out += html.slice(from, open);
+      from = close + 1;
+      open = html.indexOf('<', from);
+    } else open = html.indexOf('<', open + 1);
+  }
+  return out + html.slice(from);
+}
+/** The page's text: tags out, entities undone, `&amp;` last so `&amp;lt;` reads `&lt;`. */
+const text = (html: string) => stripTags(html).replaceAll('&#39;', "'").replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&amp;', '&');
 
 test('the page carries connect/security-brief.md word for word: the generated module is the brief', () => {
   assert.equal(SECURITY_BRIEF_MD, BRIEF, 'run node scripts/security-brief.ts');

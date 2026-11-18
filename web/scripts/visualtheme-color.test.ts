@@ -8,6 +8,8 @@ import { TOKENS, composite, contrast, mapColour, parseColour, tokenValue } from 
 import { contrastWarnings, resolveColour } from './visualtheme-contrast.ts';
 import { STACKS, newCssState, partyOf, stackKind, themeCss } from './visualtheme-css.ts';
 
+/** `text` as a regular expression that matches it literally. */
+const escapeRegex = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const c = (literal: string) => parseColour(literal)!;
 
 test('parseColour reads hex, rgb, hsl and named colours, and refuses the rest', () => {
@@ -93,7 +95,7 @@ test('themeCss rewrites colours and stacks and leaves comments, strings, url() a
   const out = themeCss(css, state);
   assert.match(out, /\/\* \{ not a rule; color: #b91c1c \} \*\//);
   assert.match(out, /--navy:var\(--legallas-forest\);--muted-text:var\(--legallas-ink-3\);--defendant:var\(--legallas-enc-defendant\)/);
-  assert.match(out, new RegExp(`--serif:${STACKS.serif.replace(/[()]/g, '\\$&')}\\}`));
+  assert.match(out, new RegExp(`--serif:${escapeRegex(STACKS.serif)}\\}`));
   assert.match(out, /@font-face\{font-family:'Old Face';src:url\(data:font\/woff2;base64,AA;BB\)\}/);
   assert.match(out, /fill="%23b91c1c"\/>\) var\(--legallas-paper\);color:var\(--legallas-forest\) !important/);
   assert.match(out, /content:'\{#b91c1c\}'/);

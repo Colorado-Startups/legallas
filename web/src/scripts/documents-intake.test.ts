@@ -72,7 +72,7 @@ test('every refusal reads as one plain sentence with no names in it', () => {
     'length_required', 'bad_length', 'incomplete_body', 'network', 'canceled', 'something_new', '', null];
   for (const code of codes) {
     const text = messageFor(code);
-    assert.match(text, /^[A-Z][^.!]*(\.[a-z]+[^.!]*)*\.$/, `${String(code)}: ${text}`);
+    assert.match(text, /^[A-Z][^.!]*(?:\.[a-z][^.!]*)*\.$/, `${String(code)}: ${text}`);
     assert.doesNotMatch(text, /the owner|Mac|\u2014|!/, `${String(code)}: ${text}`);
   }
   assert.equal(messageFor('too_large'), `That file is larger than ${MAX_UPLOAD_LABEL}.`);

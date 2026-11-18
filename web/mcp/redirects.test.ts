@@ -188,7 +188,7 @@ describe('Google: no Gemini Enterprise callback (allowed from 2026-10-20; remove
   const GEMINI_ENTERPRISE = 'https://vertexaisearch.cloud.google.com/oauth-redirect';
 
   test('the callback is no default entry and is refused', () => {
-    assert.ok(!DEFAULT_REDIRECT_ALLOW.includes(GEMINI_ENTERPRISE));
+    assert.ok(!DEFAULT_REDIRECT_ALLOW.some((uri) => uri === GEMINI_ENTERPRISE));
     assert.equal(isAllowedRedirect(GEMINI_ENTERPRISE, none), false);
     assert.equal(redirectHost(GEMINI_ENTERPRISE), 'vertexaisearch.cloud.google.com', 'a refused registration still names its host for the owner');
   });

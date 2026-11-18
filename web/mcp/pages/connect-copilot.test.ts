@@ -157,7 +157,7 @@ test('Microsoft\'s labels, as its screens show them, are the same on the page an
   assert.ok(copilotPackageSection(false).includes(`<strong>${ANY_TEAMS_APP}</strong>`), 'page: the per-firm registration');
   assert.equal(guide.split(`| Restrict usage by Teams app | **${ANY_TEAMS_APP}**`).length - 1, 2, 'guide: both Developer Portal tables');
   assert.equal(guide.split('| Enable Proof Key for Code Exchange (PKCE) | Turn it on (it starts off) |').length - 1, 2, 'PKCE starts off');
-  assert.ok(guide.includes('https://admin.cloud.microsoft/'), 'the admin center address');
+  assert.ok(guide.includes('<https://admin.cloud.microsoft/>'), 'the admin center address');
 });
 
 test('the checklist names the hosts, the code sender and the data policy pattern, on the page and in the guide', () => {
