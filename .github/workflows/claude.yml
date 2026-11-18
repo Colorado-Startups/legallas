@@ -92,30 +92,6 @@ jobs:
             echo "::error::Pull request $PR comes from ${head}, not $REPO: @claude runs only on this repository's branches"
             exit 1
           fi
-      # Claude reads every comment and review in the thread, so one from an
-      # account that is not listed stops the run before any of it is read. A
-      # deleted account reads null and stops it too.
-      - name: Only listed accounts in the thread
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-          NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
-          IS_PR: ${{ github.event.pull_request.number || github.event.issue.pull_request && 'yes' || '' }}
-          ALLOWED: ${{ vars.CLAUDE_ALLOWED_USER_IDS || '[]' }}
-        run: |
-          others="$(
-            {
-              gh api --paginate "repos/$REPO/issues/$NUMBER/comments"
-              if [ -n "$IS_PR" ]; then
-                gh api --paginate "repos/$REPO/pulls/$NUMBER/comments"
-                gh api --paginate "repos/$REPO/pulls/$NUMBER/reviews"
-              fi
-            } | jq -r --argjson allowed "$ALLOWED" '.[] | select(.user.login != "claude[bot]" and ((.user.id as $id | $allowed | index($id)) == null)) | "x"' | wc -l
-          )"
-          if [ "$others" -ne 0 ]; then
-            echo "::error::$others comment or review in this thread is from an account that is not listed: @claude does not run here"
-            exit 1
-          fi
       # HOME and Claude's config live in the job's temp folder, the one place
       # besides the checkout the sandbox lets commands write (npm's cache), and
       # the action installs Claude Code there. GIT_TERMINAL_PROMPT=0 fails any
@@ -182,6 +158,32 @@ jobs:
           jq -e '.permissions.blockReadsOutsideWorkingDirectories == true and .sandbox.enabled == true and .sandbox.failIfUnavailable == true and .sandbox.allowUnsandboxedCommands == false' "$RUNNER_TEMP/claude-settings.json" >/dev/null
           # main's rules as user memory: --setting-sources user below skips the checkout's own CLAUDE.md.
           git show origin/main:CLAUDE.md > "$CLAUDE_CONFIG_DIR/CLAUDE.md"
+      # Claude reads every comment and review in the thread, so one from an
+      # account that is not listed stops the run. It runs last, right before
+      # Claude, to keep the gap after the check to seconds. A deleted account
+      # reads null and stops it too. Any failed read stops it (fails closed).
+      - name: Only listed accounts in the thread
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
+          IS_PR: ${{ github.event.pull_request.number || github.event.issue.pull_request && 'yes' || '' }}
+          ALLOWED: ${{ vars.CLAUDE_ALLOWED_USER_IDS || '[]' }}
+        run: |
+          set -euo pipefail
+          [ -n "$NUMBER" ] || { echo "::error::No issue or pull request number"; exit 1; }
+          echo "$ALLOWED" | jq -e 'type == "array"' >/dev/null
+          thread="$RUNNER_TEMP/thread.json"
+          gh api --paginate --slurp "repos/$REPO/issues/$NUMBER/comments" > "$thread"
+          if [ -n "$IS_PR" ]; then
+            gh api --paginate --slurp "repos/$REPO/pulls/$NUMBER/comments" >> "$thread"
+            gh api --paginate --slurp "repos/$REPO/pulls/$NUMBER/reviews" >> "$thread"
+          fi
+          others="$(jq -s --argjson allowed "$ALLOWED" '[.[][][] | select(.user.login != "claude[bot]" and ((.user.id as $id | $allowed | index($id)) == null))] | length' "$thread")"
+          if [ "$others" -ne 0 ]; then
+            echo "::error::$others comment or review in this thread is from an account that is not listed: @claude does not run here"
+            exit 1
+          fi
       # No path_to_claude_code_executable: the action installs the Claude
       # Code version it pins into the private HOME.
       - name: Claude
