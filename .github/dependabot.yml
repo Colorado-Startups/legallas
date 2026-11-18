@@ -59,3 +59,23 @@ updates:
         update-types: [minor, patch]
     labels: [dependencies, 'area:web']
     open-pull-requests-limit: 5
+
+  - package-ecosystem: npm
+    directory: /quality-speed
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Denver
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
+    groups:
+      quality-speed-minor-patch:
+        applies-to: version-updates
+        update-types: [minor, patch]
+      quality-speed-security:
+        applies-to: security-updates
+        update-types: [minor, patch]
+    labels: [dependencies, 'area:quality-speed']
+    open-pull-requests-limit: 5

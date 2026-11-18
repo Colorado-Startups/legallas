@@ -17,7 +17,7 @@ flowchart LR
 
 | File | Is |
 |---|---|
-| `maps.json` | 16 maps (7 own, 9 from the Git Crafter library), 2 to 6 steps each, one metric a step |
+| `maps.json` | 16 maps (8 own, 8 from the Git Crafter library), 2 to 6 steps each, one metric a step |
 | `adapt.ts` | Legallas records and goals to Git Crafter's run format |
 | `quality.json` | The Quality config the action reads: `out/` |
 | `config.json` | The Process page config |
@@ -33,7 +33,7 @@ flowchart LR
 | `board` | card `projects.cards_ready` · start `projects.in_progress` · done `projects.done_with_pr` · watch `projects.oldest_active_hours` · split, finish dropped |
 | `triage` | intake `issues.missing_parts` · issue `reliability.time_to_fix_high_p90` · card `projects.status_matches_state` · fix `reliability.fixes_with_test` · link `issues.closed_by_hand` |
 | `contribute` | idea `issues.untyped` · approve `settings.settings_drift_count` · deploy `insights.change_failure_rate` · review, merge, rebuild dropped |
-| `secure` | keys `security.secrets_in_history` · scan `security.scan_minutes` · model `reliability.risky_areas_reviewed_in_time` · report `repo-documentation.community_files_ok` · alerts `security.time_to_fix_critical_high_hours` |
+| `secure` | keys `security.secrets_in_history` · scan `security.scan_minutes` · dependency review `security.osv_vulnerabilities_open` · AI security audits `security.sast_findings_open` · model `reliability.risky_areas_reviewed_in_time` · alerts `security.time_to_fix_critical_high_hours` · report dropped (an own map: the library format adds no step, and a map holds 6) |
 | `code` | measure `code.long_files` · simplify `code.long_functions` · delete `code.dead_code` · explain `code.public_symbols_documented` · check `code.web_loop_seconds` · hold `build.release_gzip_bytes` |
 | `document` | write `repo-documentation.readme_visual_share` · lint `code.long_sentence_share` · map `code.doc_lag_hours_p90` · publish `code.broken_internal_links` · read `code.reading_minutes_p90` · load `repo-documentation.readme_tokens` |
 | `measure` | collect `settings.read_gap_hours` · page `reliability.failed_main_runs_with_issue` · goal `issues.unranked` · fix `issues.closed_by_hand` · score `settings.planted_drift_detected` |
@@ -52,7 +52,7 @@ flowchart LR
 | Pages with a step on a map | 19 of the 28 public pages; no step names a private page |
 | The other 9 public pages | Law pages. They run the `law` map's process; `sec` stands for all 10 |
 | Steps dropped | 8: their only measurement is on a private page, or none exists (`adopt` update) |
-| Maps with an ideal and a dated source | 16 of 16: 7 own in `maps.json`, 9 from the library |
+| Maps with an ideal and a dated source | 16 of 16: 8 own in `maps.json`, 8 from the library |
 | Page size | Each map adds about 17 KB; the guard's limit, 384,000 bytes, holds about 19. `sync` and `connect` share one map to stay under it |
 | Library maps not used | 3: `decide`, `guard` (no blockers page), `delivery` (4 of its 5 steps measure private pages) |
 

@@ -35,16 +35,6 @@
    }
   },
   {
-   "use": "secure",
-   "steps": {
-    "keys": {"rule": "No key or secret is ever committed: the history scan finds none.", "rule_ref": "quality-speed/pages/security/PLAN.md", "metric": "legallas.security.secrets_in_history"},
-    "scan": {"metric": "legallas.security.scan_minutes"},
-    "model": {"metric": "legallas.reliability.risky_areas_reviewed_in_time"},
-    "report": {"metric": "legallas.repo-documentation.community_files_ok"},
-    "alerts": {"metric": "legallas.security.time_to_fix_critical_high_hours"}
-   }
-  },
-  {
    "use": "code",
    "steps": {
     "measure": {"metric": "legallas.code.long_files"},
@@ -650,6 +640,91 @@
      "rule": "The compliance lane runs in 5 minutes or less.",
      "rule_ref": "quality-speed/pages/compliance/manifest.json",
      "metric": "legallas.compliance.lane_minutes"
+    }
+   ]
+  },
+  {
+   "id": "secure",
+   "name": "Secure",
+   "why": "A repo's security, from keys no session reads to dependencies and alerts closed within a week",
+   "ideal": "No session reads a key, scans and dependency review run on every change, AI audits find nothing open, and alerts close within a week.",
+   "sources": [
+    {"title": "Claude Code: configure permissions", "url": "https://code.claude.com/docs/en/permissions", "date": "2026-11-04"},
+    {"title": "GitHub Docs: GitHub security features", "url": "https://docs.github.com/en/code-security/getting-started/github-security-features", "date": "2026-11-10"},
+    {"title": "GitHub Docs: About dependency review", "url": "https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review", "date": "2026-11-10"}
+   ],
+   "critical_path": [
+    "keys",
+    "scan",
+    "deps",
+    "audit",
+    "model",
+    "alerts"
+   ],
+   "steps": [
+    {
+     "id": "keys",
+     "name": "Keys",
+     "tools": [
+      "Secret scanning",
+      "Push protection"
+     ],
+     "rule": "No key or secret is ever committed: the history scan finds none.",
+     "rule_ref": "quality-speed/pages/security/PLAN.md",
+     "metric": "legallas.security.secrets_in_history"
+    },
+    {
+     "id": "scan",
+     "name": "Scan",
+     "tools": [
+      "Secret scanning",
+      "Code scanning in CI"
+     ],
+     "rule": "A scan runs on every push and finishes in minutes.",
+     "rule_ref": "https://docs.github.com/en/code-security/getting-started/github-security-features",
+     "metric": "legallas.security.scan_minutes"
+    },
+    {
+     "id": "deps",
+     "name": "Dependency review",
+     "tools": [
+      "actions/dependency-review-action",
+      "Dependabot"
+     ],
+     "rule": "A pull request that adds a high-severity vulnerable dependency fails CI.",
+     "rule_ref": ".github/workflows/ci.yml",
+     "metric": "legallas.security.osv_vulnerabilities_open"
+    },
+    {
+     "id": "audit",
+     "name": "AI security audits",
+     "tools": [
+      "Claude Code security audit",
+      "CodeQL"
+     ],
+     "rule": "Every audit and static analysis finding is fixed, so none stays open.",
+     "rule_ref": "quality-speed/pages/security/PLAN.md",
+     "metric": "legallas.security.sast_findings_open"
+    },
+    {
+     "id": "model",
+     "name": "Model",
+     "tools": [
+      "docs/security/threat-model.md"
+     ],
+     "rule": "The threat model is reviewed whenever the attack surface changes.",
+     "rule_ref": "docs/security/threat-model.md",
+     "metric": "legallas.reliability.risky_areas_reviewed_in_time"
+    },
+    {
+     "id": "alerts",
+     "name": "Alerts",
+     "tools": [
+      "Dependabot alerts"
+     ],
+     "rule": "An open alert closes within a week.",
+     "rule_ref": "https://docs.github.com/en/code-security/getting-started/github-security-features",
+     "metric": "legallas.security.time_to_fix_critical_high_hours"
     }
    ]
   }

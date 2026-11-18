@@ -2,6 +2,7 @@
 // The dated report: what was scanned, how hard, and every finding with its severity and remediation status. It holds
 // paths, rule names and counts only: no request or response body, no header, no token, and nothing from a document.
 import { countBySeverity, RISKS, type Finding, type Judged } from './findings.ts';
+import { escapeTableCell } from '../../../core/escape.ts';
 import { TARGETS, type TargetName } from './targets.ts';
 
 export interface Coverage {
@@ -30,7 +31,7 @@ export interface RunInfo {
 }
 
 const LIMIT = 6;
-const cell = (value: string) => value.replace(/\|/g, '\\|').replace(/\n/g, ' ');
+const cell = escapeTableCell;
 const targetLabel = (name: TargetName | null) => (name === null ? 'Every target' : (TARGETS.find((target) => target.name === name)?.label ?? name));
 const rule = (finding: Finding) => `[${finding.alertRef}](https://www.zaproxy.org/docs/alerts/${finding.pluginId}/)`;
 const nf = (n: number) => n.toLocaleString('en-US');

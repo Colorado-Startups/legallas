@@ -4,7 +4,7 @@
 // otherwise read as catching everything. A control that goes wrong, or a tool that can't run, throws and the reading is
 // missing. The wiring plants check the workflow itself, since a sound script behind `if: false` still catches nothing.
 import { spawnSync } from 'node:child_process';
-import { randomBytes } from 'node:crypto';
+import { randomInt } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -32,6 +32,13 @@ function run(command: string, args: readonly string[], cwd: string, env: Record<
   if (result.error || result.status === null) throw new Unreadable('a tool in the drill did not finish');
   return { code: result.status, output: `${result.stdout}${result.stderr}` };
 }
+
+/**
+ * Runs a repository script. Its path travels in the environment, never in the argument list: an absolute path built from the
+ * working directory is not a command, and `bash -c` reads it as one only through "$DRILL_SCRIPT", which stays one quoted word.
+ */
+const runScript = (script: string, cwd: string, env: Record<string, string> = {}) =>
+  run('bash', ['-c', 'exec bash "$DRILL_SCRIPT"'], cwd, { ...env, DRILL_SCRIPT: script });
 
 const exitCode = (command: string, args: readonly string[], cwd: string, env: Record<string, string> = {}) => run(command, args, cwd, env).code;
 
@@ -126,7 +133,7 @@ export function changedPathsPlants(root: string): Plant[] {
   const areas = (dir: string, env: Record<string, string>): Record<string, string> => {
     const output = path.join(dir, '.git', 'drill-output');
     writeFileSync(output, '');
-    if (exitCode('bash', [script], dir, { ...env, GITHUB_OUTPUT: output }) !== 0) throw new Unreadable('changed-paths.sh did not run');
+    if (runScript(script, dir, { ...env, GITHUB_OUTPUT: output }).code !== 0) throw new Unreadable('changed-paths.sh did not run');
     return Object.fromEntries(readFileSync(output, 'utf8').trim().split('\n').map((line) => line.split('=') as [string, string]));
   };
   return inTempRepo((dir) => {
@@ -170,8 +177,8 @@ export function changedPathsPlants(root: string): Plant[] {
 /** Blacksmith bills past its free minutes, and this guard is its only stop. */
 export function guardPlants(root: string): Plant[] {
   const choice = (minutes: string): string => {
-    const code = `import sys; sys.path.insert(0, sys.argv[1]); import build_minutes_guard as g; print(g.choose(${minutes})[0])`;
-    const result = run('python3', ['-c', code, path.join(root, '.github/scripts')], tmpdir());
+    const code = `import os, sys; sys.path.insert(0, os.environ['DRILL_SCRIPTS']); import build_minutes_guard as g; print(g.choose(${minutes})[0])`;
+    const result = run('python3', ['-c', code], tmpdir(), { DRILL_SCRIPTS: path.join(root, '.github/scripts') });
     if (result.code !== 0) throw new Unreadable('the build minutes guard did not run');
     return result.output.trim();
   };
@@ -185,13 +192,13 @@ export function guardPlants(root: string): Plant[] {
 /** A token made up on the spot, so no such string is ever in this repository. */
 function plantedToken(): string {
   const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  return `${'ghp'}_${[...randomBytes(36)].map((byte) => alphabet[byte % alphabet.length]).join('')}`;
+  return `${'ghp'}_${Array.from({ length: 36 }, () => alphabet[randomInt(alphabet.length)]).join('')}`;
 }
 
 /** A scan that stops on its own error also exits 1, so a catch must name what it found. */
 export function secretScanPlants(root: string): Plant[] {
   const script = path.join(root, '.github/scripts/secret-scan.sh');
-  const scan = (dir: string, env: Record<string, string> = {}) => run('bash', [script], dir, env);
+  const scan = (dir: string, env: Record<string, string> = {}) => runScript(script, dir, env);
   const found = (result: { code: number; output: string }) => result.code !== 0 && /leaks found: [1-9]/.test(result.output);
   return inTempRepo((dir) => {
     const clean = commit(dir, 'a.txt', 'nothing here\n');
@@ -227,13 +234,13 @@ export function lintDrill(root: string, workflows: readonly SourceFile[]): { rea
     const config = path.join(root, '.github/actionlint.yaml');
     if (existsSync(config)) copyFileSync(config, path.join(dir, '.github/actionlint.yaml'));
     writeFileSync(path.join(folder, 'clean.yml'), CLEAN_WORKFLOW);
-    requireControl(exitCode('bash', [script], dir) === 0, 'the workflow lint, on a clean workflow');
+    requireControl(runScript(script, dir).code === 0, 'the workflow lint, on a clean workflow');
     writeFileSync(path.join(folder, 'clean.yml'), INJECTION_WORKFLOW);
-    const planted = run('bash', [script], dir);
+    const planted = runScript(script, dir);
     const plant = { name: 'workflow_template_injection', caught: planted.code !== 0 && /template-injection|potentially untrusted/.test(planted.output) };
     rmSync(path.join(folder, 'clean.yml'));
     for (const file of workflows) writeFileSync(path.join(folder, file.name), file.text);
-    return { real: exitCode('bash', [script], dir) === 0, plant };
+    return { real: runScript(script, dir).code === 0, plant };
   });
 }
 

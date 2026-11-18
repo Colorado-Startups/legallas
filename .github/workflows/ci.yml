@@ -154,7 +154,7 @@ jobs:
     # The only job here that can run on Blacksmith, so this timeout is WORST_CASE_MINUTES in build_minutes_guard.py
     # (build_minutes_guard_test.py checks they agree).
     timeout-minutes: 20
-    # actions and pull-requests: read for inputs_passed.py alone, the one step given the token.
+    # actions and pull-requests: read for inputs_passed.py, and the dependency review, the only steps given the token.
     permissions:
       contents: read
       actions: read
@@ -220,6 +220,14 @@ jobs:
           MERGE_GROUP_BASE_SHA: ${{ github.event.merge_group.base_sha }}
           MERGE_GROUP_HEAD_SHA: ${{ github.event.merge_group.head_sha }}
         run: .github/scripts/secret-scan.sh
+      # A pull request that adds a dependency with a known high-severity vulnerability fails here, before it merges.
+      # It reads the dependency graph with this job's read-only token and posts nothing; `ci-ok` covers it through `checks`.
+      - name: Dependency review
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: never
       - name: Lint workflows
         if: steps.changed.outputs.workflows == 'true'
         run: .github/scripts/lint-workflows.sh

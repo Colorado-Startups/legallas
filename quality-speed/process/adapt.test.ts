@@ -40,7 +40,7 @@ test('every map step names one metric, at most 6 steps a map', () => {
 test('every map of our own opens with an ideal of 25 words at most and a dated source', () => {
   const maps = JSON.parse(readFileSync(new URL('maps.json', import.meta.url), 'utf8'));
   const own = maps.maps.filter((m: { id?: string }) => m.id);
-  assert.equal(own.length, 7);
+  assert.equal(own.length, 8);
   for (const m of own) {
     assert.ok(typeof m.ideal === 'string' && m.ideal.split(/\s+/).length <= IDEAL_MAX_WORDS, m.id);
     assert.ok(Array.isArray(m.sources) && m.sources.length > 0, m.id);

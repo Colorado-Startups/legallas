@@ -1,6 +1,8 @@
 // Issues page: pure scoring of GitHub issue records. Reads titles and bodies in memory only; every output is a number,
 // a boolean, an issue number or one of this file's fixed labels, so nothing an issue says can reach the site.
 
+import { stripHtmlComments } from "../../core/escape.ts";
+
 export type Label = { name: string };
 export type Issue = {
   number: number;
@@ -104,7 +106,7 @@ const clean = (l: string) => l.replace(/^[\s>*+-]*(?:\[[ x]\])?\s*/i, "").replac
 const real = (l: string) => l.length > 0 && !PLACEHOLDER.test(l);
 
 const filled = (text: string | undefined) =>
-  text !== undefined && text.replace(/<!--[\s\S]*?-->/g, "").split("\n").map(clean).some(real);
+  text !== undefined && stripHtmlComments(text).split("\n").map(clean).some(real);
 
 /** Which of the four template parts a body states, each with some text under it. */
 export function templateParts(body: string | null | undefined) {

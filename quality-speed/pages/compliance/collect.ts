@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import type { MetricRecord } from '../../contract/format.ts';
 import type { Detail, Reading } from '../../core/detail.ts';
+import { escapeRegExp } from '../../core/escape.ts';
 import { laneRecord } from '../../core/lane/collect.ts';
 
 const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
@@ -86,7 +87,7 @@ export function resolves(ref: Ref, lookup: Lookup): boolean {
   const found = lookup(ref.path.replace(/\/$/, ''));
   if (found === null) return false;
   if (ref.symbol === undefined) return true;
-  return found !== 'dir' && new RegExp(`(?<![\\w$])${ref.symbol.replace(/\$/g, '\\$')}(?![\\w$])`).test(found);
+  return found !== 'dir' && new RegExp(`(?<![\\w$])${escapeRegExp(ref.symbol)}(?![\\w$])`).test(found);
 }
 
 /** Data rows of the table under a `## <heading>`, as cells; the header and its rule line are left out. */

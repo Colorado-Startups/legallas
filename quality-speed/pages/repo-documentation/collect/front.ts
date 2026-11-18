@@ -8,7 +8,7 @@ import { INPUTS } from './inputs.ts';
 const words = (text: string): number => text.match(/[\p{L}\p{N}]+/gu)?.length ?? 0;
 
 /** A prose line that holds only images: a picture, not prose. */
-const IMAGE_ONLY = /^(\s*!\[[^\]]*\]\([^)]*\)\s*)+$/;
+const IMAGE_ONLY = /^\s*(?:!\[[^\]]*\]\([^)]*\)\s*)+$/;
 
 /**
  * The share of a doc's content lines that are visual: table rows, fenced blocks (diagrams, commands) and image lines, against

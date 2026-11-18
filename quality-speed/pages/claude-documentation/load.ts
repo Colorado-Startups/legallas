@@ -6,6 +6,7 @@
 
 import { existsSync, readdirSync, readFileSync, realpathSync } from 'node:fs';
 import path from 'node:path';
+import { stripHtmlComments } from '../../core/escape.ts';
 
 export interface Loaded { path: string; tokens: number }
 
@@ -48,7 +49,7 @@ export function loadedText(text: string): string | null {
     if (/^\s*(```|~~~)/.test(line)) fenced = !fenced;
     else if (!fenced && /(^|\s)@[^\s`]/.test(line.replace(/`[^`]*`/g, ''))) return null;
   }
-  return text.replace(/<!--[\s\S]*?-->/g, '');
+  return stripHtmlComments(text);
 }
 
 const frontmatter = (text: string) => /^---\n([\s\S]*?)\n---/.exec(text)?.[1] ?? '';
