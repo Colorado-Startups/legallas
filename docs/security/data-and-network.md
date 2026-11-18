@@ -1,6 +1,6 @@
 # Data and network security
 
-Part of the [security policies](README.md). Version 1.2, 2026-11-17.
+Part of the [security policies](README.md). Version 1.3, 2026-11-17.
 
 ## Purpose
 
@@ -98,6 +98,7 @@ record.
 | No CORS headers anywhere in `web/worker` or `web/mcp`: other sites can't read room responses | Built in | `web/worker/headers.ts` |
 | Rate limits: Ask 6 a minute per member; MCP registration 10 and token 120 a minute per IP; daily caps per member. If the limiter errors, `/register` and `/token` refuse (503, fail closed) | Built in | `web/wrangler.example.jsonc`, `web/wrangler.mcp.example.jsonc`, `web/mcp/contract.ts`, `web/mcp/gates.ts` |
 | DDoS protection at Cloudflare's edge, on every plan | Platform | The room owner's zone |
+| WAF on the Free plan: sign-in rate limit on `/token` and `/register`, members' countries only, no crawlers, scanner probes, attack-tool user agents. `npm run harden -- --apply` adds any missing; `--check` reads them with TLS, HSTS, account 2FA and Access MFA | Room owner | `web/scripts/edge-rules.json`, `web/scripts/harden.ts` |
 | Default callback allowlist: Claude, Microsoft and Harvey. The room owner can allow others, including loopback (`localhost`, `127.0.0.1`) for a local tool, on `/admin/clients` or in config | Built in | `web/mcp/contract.ts`, `web/mcp/redirects.ts` |
 
 ## Gaps
@@ -106,7 +107,7 @@ record.
 |---|---|
 | Ask, tool-call and Copilot package limits pass if Cloudflare's limiter errors; daily caps still hold | Fail closed per route, as `/register` and `/token` do |
 | The MCP Origin check logs but doesn't refuse (`MCP_ORIGIN_ENFORCE` is `"0"`) | Turn it on once each AI vendor's Origin is confirmed |
-| No WAF rules of the room's own | Cloudflare WAF custom rules on the room owner's zone |
+| Cloudflare's managed and OWASP rulesets need the Pro plan; a Free room runs without them | The room owner's plan; `npm run harden -- --check` reports it |
 | No antivirus scan of uploads; active content is refused, other malware isn't detected | A scanning service |
 | D1 and R2 regions are location hints, not a residency guarantee, unless a jurisdiction is set at creation | Create rooms with a jurisdiction where residency matters |
 

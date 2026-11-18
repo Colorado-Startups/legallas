@@ -1,6 +1,6 @@
 # Business continuity and disaster recovery
 
-Part of the [security policies](README.md). Version 1.0, 2026-11-05.
+Part of the [security policies](README.md). Version 1.1, 2026-11-17.
 
 ## Purpose
 
@@ -29,7 +29,18 @@ A room can be rebuilt from its sources after any single failure, and its members
 | A Cloudflare region or service outage | Wait for Cloudflare. Members work from the counsel pack meanwhile | None lost | Cloudflare's | Platform |
 | The room owner's account is lost or locked | Cloudflare account recovery; the room owner's second factor | None lost | Days | Room owner |
 
-The recovery times are goals. The restore drill (`npm run backup -- --drill`) measures the backup's; see `web/README.md`, "Backup and restore", and `web/worker/backup/`.
+The recovery times are goals. The restore drill measures the backup's.
+
+## Restore drill
+
+| | |
+|---|---|
+| Run | `npm run backup -- --drill`, from `web/`. Restores the newest backup into scratch copies, checks every SHA-256 and row hash, prints PASSED or FAILED, then empties them |
+| How often | At least every 90 days, and after any change to `web/worker/backup/` |
+| Overdue | `npm run harden -- --check`: row "Restore drill age" drifts past 90 days, or when no drill is recorded |
+| Record | `drills/<UTC time>.json` in the backup bucket; the room owner copies it to the [recovery drill log](operator/recovery.md) |
+| In CI | `web/worker/backup/backup.test.ts` runs backup, drill and restore on the fictional room |
+| Detail | `web/README.md`, "Backup and restore"; `web/worker/backup/` |
 
 ## Before every release
 
@@ -61,7 +72,7 @@ Neither replaces the backup copy in another location, above.
 | Gap | What it would take |
 |---|---|
 | Each room must set up its backup once (buckets, schedule) | The steps in `web/README.md`, "Backup and restore" |
-| No drill result yet in a live room | Run the drill after setup, then at least every quarter |
+| No drill result yet in a live room | The room owner runs the drill after setup, then at least every 90 days ([Restore drill](#restore-drill)) |
 | No failover to a second provider | Not planned. A room is one Cloudflare account by design |
 | Recovery leans on one person, the room owner | A second administrator on the room's Cloudflare account, with multi-factor sign-in |
 
