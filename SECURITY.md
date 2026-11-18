@@ -37,6 +37,7 @@ Please do not open a public issue, pull request or commit. A person replies.
 | Privileged paths | A document with "privileged" in any segment of its path is only for a role allowed to see it, on every route and MCP tool. To anyone else it answers like a missing document | `web/worker/privilege.ts` |
 | Content Security Policy | Set on every response. The build fails when a page breaks it | `web/worker/headers.ts`, `web/integrations/dist-audit.mjs` |
 | The MCP server is read-only | It writes who read what to the audit log, never the query or page text. `web/connect/security-brief.md` is written for a firm's security team | `web/mcp/contract.ts`, `web/mcp/audit.ts` |
+| Edge and account settings | `npm run harden -- --check` (from `web/`) reads the room's Cloudflare settings: WAF and rate limit rules, TLS and HSTS, 2FA and Access MFA, backup lock, backups and restore drills, `security.txt`. `--apply` fixes the safe ones. The room's owner runs it | `web/scripts/harden.ts`, `web/README.md` (Edge rules) |
 | Proposals (`PROPOSALS_ENABLED`, off by default) | For a connection its member allowed to propose, one tool stores a pending draft for that member to approve in the room. No tool approves, changes the record or changes access | `docs/design/propose-and-approve.md` |
 
 ## Case content and AI
