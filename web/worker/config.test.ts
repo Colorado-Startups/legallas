@@ -10,6 +10,7 @@ import { configuredRoomDefines } from '../scripts/config.ts';
 import { NEURON_RATES } from './budget.ts';
 import { MFA_SETTINGS } from './mfa.ts';
 import { assistantNameProblem } from './room-names.ts';
+import { roomsEnabled } from './rooms.ts';
 import { DEFAULT_STORED_NAME } from './stored-name.ts';
 import { definedSetting, entryExport, hasRoomConfig, readWranglerConfig, withoutRoomExtras, withoutRoomFields } from './wrangler-config.ts';
 
@@ -126,6 +127,14 @@ test('deal rooms ship off: the example never sets ROOMS_ENABLED, so a room turns
   assert.equal(raw.includes('ROOMS_ENABLED'), false);
 });
 
+test('deal rooms are on in both Workers or in neither: a guest\'s AI never connects where the room has rooms off (#10)', () => {
+  // Both room files, or both examples: a checkout with only one room file compares nothing it deploys together.
+  const example = !hasRoomConfig('wrangler') || !hasRoomConfig('wrangler.mcp');
+  const [room, mcp] = (['wrangler', 'wrangler.mcp'] as const).map((base) => roomsEnabled(readWranglerConfig(base, example).config.vars));
+  assert.equal(mcp, room, `ROOMS_ENABLED: room Worker ${room ? 'on' : 'off'}, MCP Worker ${mcp ? 'on' : 'off'}`);
+  if (example) assert.equal(room, false, 'the examples ship deal rooms off');
+});
+
 test('the control prefix is a secret, never a var', () => {
   assert.equal(config.vars.CONTROL_PREFIX, undefined);
   assert.equal(raw.includes('"CONTROL_PREFIX"'), false);
@@ -234,10 +243,10 @@ test('the Worker and its database carry the stored name, so they vary with it an
 const ROOM_FIELDS = ['name', 'main', 'routes', 'vars.TEAM_DOMAIN', 'vars.ACCESS_AUD', 'vars.ASK_GROQ', 'vars.ASK_HOST', 'd1_databases[].database_id', 'd1_databases[].database_name', 'r2_buckets[].bucket_name', 'ai_search[].instance_name', 'services[].service', 'send_email[].destination_address', 'send_email[].allowed_sender_addresses'];
 
 /**
- * Vars a room may set or leave out: the names a room may change (room-names.ts), its alerts' time zone, and whether it
- * requires a second factor at sign-in (mfa.ts).
+ * Vars a room may set or leave out: the names a room may change (room-names.ts), its alerts' time zone, whether it
+ * requires a second factor at sign-in (mfa.ts), and whether it has deal rooms on (rooms.ts; the same in both Workers).
  */
-const ROOM_VARS = ['INSTANCE_NAME', 'ASSISTANT_NAME', 'TIME_ZONE', 'REQUIRE_MFA'];
+const ROOM_VARS = ['INSTANCE_NAME', 'ASSISTANT_NAME', 'TIME_ZONE', 'REQUIRE_MFA', 'ROOMS_ENABLED'];
 
 test('neither Worker names its assistant anything that could pass for a lawyer (A1, "Assistant names")', () => {
   for (const base of ['wrangler', 'wrangler.mcp'] as const) {

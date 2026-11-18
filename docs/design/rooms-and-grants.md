@@ -94,7 +94,7 @@ flowchart TD
 
 | Piece | What it does | Where |
 |---|---|---|
-| Setting | `ROOMS_ENABLED`: "1" on, anything else or unset off. Not in `wrangler.example.jsonc`, so a room turns it on deliberately, after migration 0012 is applied | `worker/env.ts`, `worker/rooms.ts` |
+| Setting | `ROOMS_ENABLED`: "1" on, anything else or unset off. Not in `wrangler.example.jsonc` or `wrangler.mcp.example.jsonc`, so a room turns it on deliberately, after migration 0012 is applied, in both Workers together (`worker/config.test.ts` fails when they differ) | `worker/env.ts`, `worker/rooms.ts` |
 | Data | `rooms`, `room_folders`, `room_members`, `access_events`, and a nullable `room_id` on `comments` and `audit_log` | `migrations/0012_deal_rooms.sql` |
 | Gate | A verified email with no `members` row, while the setting is on, is looked up in `room_members`. With an active invitation it reaches the guest routes and nothing else | `worker/room.ts` |
 | Guest routes | `GET /` (the guest's page), `GET /api/rooms`, `GET /api/rooms/:room/documents`, `GET /api/rooms/:room/files/:id` (inline to a viewer; a download only where the role allows it), `GET` and `POST /api/rooms/:room/documents/:id/comments` | `worker/routes/rooms.ts` |

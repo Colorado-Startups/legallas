@@ -140,7 +140,7 @@ const ROOM_FIELDS = [
 
 test('the example is the room\'s own config apart from the fields a room fills in', { skip: !hasRoomConfig('wrangler.mcp') && 'no room config in this checkout' }, () => {
   const sample = readWranglerConfig('wrangler.mcp', true);
-  const product = (parsed: { vars?: Record<string, unknown> }) => withoutRoomFields(withoutRoomExtras(parsed, ['INSTANCE_NAME', 'ASSISTANT_NAME', 'MCP_TOOL_PREFIX', 'TIME_ZONE', 'REQUIRE_MFA', 'RETAIN_SIGNINS_DAYS', 'RETAIN_AUDIT_DAYS_AFTER_CLOSE']), ROOM_FIELDS);
+  const product = (parsed: { vars?: Record<string, unknown> }) => withoutRoomFields(withoutRoomExtras(parsed, ['INSTANCE_NAME', 'ASSISTANT_NAME', 'MCP_TOOL_PREFIX', 'TIME_ZONE', 'REQUIRE_MFA', 'RETAIN_SIGNINS_DAYS', 'RETAIN_AUDIT_DAYS_AFTER_CLOSE', 'ROOMS_ENABLED']), ROOM_FIELDS);
   assert.deepEqual(product(sample.config), product(readWranglerConfig('wrangler.mcp', false).config));
   assert.equal(sample.config.main, 'mcp/entry-pro.ts', 'the product\'s entry: the full product');
   // Filled in, the example fails closed: no Access team, no published policies and no shared Copilot download.
@@ -154,4 +154,7 @@ test('the example deploys the full product and, filled in, fails closed: checked
   assert.deepEqual([sample.config.vars.TEAM_DOMAIN, sample.config.vars.POLICIES_PUBLISHED, sample.config.vars.COPILOT_REFERENCE_ID], ['', '0', '']);
   // And keeps everything until the room sets a retention schedule (worker/data-retention.ts).
   assert.deepEqual([sample.config.vars.RETAIN_SIGNINS_DAYS, sample.config.vars.RETAIN_AUDIT_DAYS_AFTER_CLOSE], ['', '']);
+  // And ships deal rooms off, like the room Worker's example: a room turns them on in both Workers together (#10).
+  assert.equal(sample.config.vars.ROOMS_ENABLED, undefined);
+  assert.equal(sample.raw.includes('ROOMS_ENABLED'), false);
 });
