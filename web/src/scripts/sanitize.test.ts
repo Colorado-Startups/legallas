@@ -117,6 +117,16 @@ test('a tag that only forms once an inner one is removed goes too', () => {
   assert.equal(stripUnsafe('<<b>script>alert(1)<</b>/script>'), 'alert(1)');
 });
 
+test('no mix of markup fragments leaves a script tag, and cleaning twice equals cleaning once', () => {
+  const parts = ['<', '>', '/', 'script', '[]', '[a]', '(x)', '![]', ': y\n', 'http://e', 'www.e', '<!--', '-->'];
+  const mixes = (n: number): string[] => (n === 0 ? [''] : mixes(n - 1).flatMap((head) => parts.map((p) => head + p)));
+  for (const input of mixes(4)) {
+    const once = stripUnsafe(input);
+    assert.ok(!/<\s*script/i.test(once), `script tag left in the output of ${JSON.stringify(input)}`);
+    assert.equal(stripUnsafe(once), once, `a second pass changed the output of ${JSON.stringify(input)}`);
+  }
+});
+
 test('ordinary prose with angle brackets and colons is left alone', () => {
   assert.equal(stripUnsafe('If x < 5 and y > 3. Data: two items. Note: tel 555.'), 'If x < 5 and y > 3. Data: two items. Note: tel 555.');
 });
