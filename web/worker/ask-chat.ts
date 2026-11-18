@@ -75,6 +75,8 @@ export async function chatStream(
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', Accept: 'text/event-stream' },
       body: JSON.stringify(body),
+      // Never follow a redirect: the ZDR gate and the key are bound to this URL only. A 3xx fails as `<label>_http_3xx`.
+      redirect: 'manual',
       signal,
     });
   } catch {

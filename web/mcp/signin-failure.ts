@@ -39,6 +39,11 @@ export const SIGNIN_FAILURE_PREFIX = `${STORED_NAME}-admin:signin-failure:`;
 export const SIGNIN_FAILURE_TTL_SECONDS = 86_400;
 /** At most this many failures of each group email per 24 hours, so a scanner varying hosts cannot flood the inbox. */
 export const MAX_SIGNIN_FAILURES_PER_GROUP = 10;
+/**
+ * A full group writes `${prefix}${group}-full` (outside the group's own key prefix) for this long, so later failures
+ * skip with one get instead of each listing KV. A freed slot waits at most this long.
+ */
+export const SIGNIN_FAILURE_FULL_TTL_SECONDS = 600;
 /** The library's reason on a Client ID Metadata Document that could not be fetched or checked (CimdFetchError). */
 export const METADATA_RESOLUTION_FAILED = 'metadata_resolution_failed';
 
@@ -107,9 +112,15 @@ export async function recordSignInFailure(env: SignInFailureEnv, failure: SignIn
     const f = normalized(failure);
     const group = `${SIGNIN_FAILURE_PREFIX}${signInGroup(f.where)}:`;
     const key = `${group}${f.where}:${f.code}:${f.host}`;
+    const fullKey = `${SIGNIN_FAILURE_PREFIX}${signInGroup(f.where)}-full`;
     if ((await env.OAUTH_KV.get(key)) !== null) return;
-    const live = await env.OAUTH_KV.list({ prefix: group, limit: MAX_SIGNIN_FAILURES_PER_GROUP });
-    if (live.keys.length >= MAX_SIGNIN_FAILURES_PER_GROUP) {
+    let full = (await env.OAUTH_KV.get(fullKey)) !== null;
+    if (!full) {
+      const live = await env.OAUTH_KV.list({ prefix: group, limit: MAX_SIGNIN_FAILURES_PER_GROUP });
+      full = live.keys.length >= MAX_SIGNIN_FAILURES_PER_GROUP;
+      if (full) await env.OAUTH_KV.put(fullKey, '1', { expirationTtl: SIGNIN_FAILURE_FULL_TTL_SECONDS });
+    }
+    if (full) {
       console.warn('mcp_signin_failure_skipped', 'full', signInGroup(f.where));
       return;
     }

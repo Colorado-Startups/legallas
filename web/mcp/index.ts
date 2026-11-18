@@ -13,7 +13,7 @@ import { liveAi, type AiStatus } from './member-grants.ts';
 import { oauthOptions, rootResourceMetadataRequest } from './oauth.ts';
 import { prepareOAuthRequest, reportOAuthFailure } from './oauth-request.ts';
 import { usePageNames } from './pages/html.ts';
-import { loadAllowedRedirects, mergeRedirectAllow, recordRefusedRedirect } from './redirects.ts';
+import { allowedRedirectsFor, mergeRedirectAllow, recordRefusedRedirect } from './redirects.ts';
 import { withRevocationAudit } from './revoke-audit.ts';
 import { recordSignInFailure } from './signin-failure.ts';
 import { sweepSmokeClients } from './smoke-clients.ts';
@@ -24,11 +24,9 @@ import { sweepRetention } from '../worker/data-retention.ts';
 const mcpEnv = env as unknown as McpEnv;
 // Every page's frame names the room by INSTANCE_NAME (worker/room-names.ts), the same for the whole deployment.
 usePageNames(mcpEnv);
-/** Paths whose handlers check redirect URIs against the allowlist; /mcp traffic skips the KV read. */
-const REDIRECT_PATHS = new Set(['/register', '/authorize', '/admin/clients']);
 /**
  * The OAuth options with `redirectAllow` for the registration callback, which the library calls without env. On
- * REDIRECT_PATHS each request builds its own provider around the list it loaded (the callbacks the owner allowed on
+ * the paths that read the allowlist (allowedRedirectsFor) each request builds its own provider around the list it loaded (the callbacks the owner allowed on
  * /admin/clients), so no request's list sits in module scope. Everywhere else: the configured list alone.
  */
 function optionsWith(redirectAllow: string | undefined) {
@@ -77,9 +75,10 @@ export default {
     if (refused) return withNosniff(refused);
     request = rootResourceMetadataRequest(request) ?? request;
     let oauth = provider;
-    if (REDIRECT_PATHS.has(new URL(request.url).pathname)) {
+    const loaded = await allowedRedirectsFor(request, workerEnv);
+    if (loaded !== null) {
       // /authorize re-checks the redirect against env.MCP_REDIRECT_ALLOW, so the merged list goes into env too.
-      const allow = mergeRedirectAllow(workerEnv.MCP_REDIRECT_ALLOW, await loadAllowedRedirects(workerEnv));
+      const allow = mergeRedirectAllow(workerEnv.MCP_REDIRECT_ALLOW, loaded);
       workerEnv = { ...workerEnv, MCP_REDIRECT_ALLOW: allow };
       oauth = new OAuthProvider<McpEnv>(optionsWith(allow));
     }

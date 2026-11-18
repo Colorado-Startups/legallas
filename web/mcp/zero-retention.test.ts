@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { handleAuthorize } from './authorize.ts';
 import { DECISIONS, FIELDS, type ClientKind, type McpEnv, type Props } from './contract.ts';
-import { CLAUDE_REDIRECT, COUNSEL, fakeEnv, fakeOAuth, getKey, signedRequest } from './oauth-fakes.ts';
+import { CLAUDE_REDIRECT, COUNSEL, fakeEnv, fakeOAuth, getKey, OWNER, signedRequest } from './oauth-fakes.ts';
 import { clearClientKindCache, runTool } from './server.ts';
 import { listedTools } from './tools/index.ts';
 
@@ -55,4 +55,44 @@ test('a room set to zero retention refuses a consumer AI plan', async () => {
   const confirmed = fakeEnv(oauth, { ...ZDR, AI_ZDR_CLIENTS: 'dcr-harvey, dcr-1' } as Partial<McpEnv>);
   assert.equal((await show(confirmed, 'dcr-harvey', HARVEY_REDIRECT)).status, 200);
   assert.equal((await show(confirmed, 'dcr-1', CLAUDE_REDIRECT)).status, 403);
+});
+
+test("a desktop app's shared client id, confirmed for one member, still refuses another; a member entry binds it", async () => {
+  clearClientKindCache();
+  const oauth = fakeOAuth();
+  const DESKTOP = 'https://desktop.example.test/client-metadata';
+  const LOOPBACK = 'http://127.0.0.1:19876/callback';
+  oauth.clients.push({ clientId: DESKTOP, clientName: 'Desktop', redirectUris: [LOOPBACK], tokenEndpointAuthMethod: 'none' });
+  oauth.clients.push({ clientId: 'dcr-desktop', clientName: 'Desktop', redirectUris: [LOOPBACK], tokenEndpointAuthMethod: 'none' });
+  const room = (clients: string) => fakeEnv(oauth, { ...ZDR, AI_ZDR_CLIENTS: clients, MCP_REDIRECT_ALLOW: 'http://127.0.0.1' } as Partial<McpEnv>);
+  const show = async (env: McpEnv, email: string, clientId: string) => {
+    const response = await handleAuthorize(await signedRequest(url(clientId, LOOPBACK), email), env, deps);
+    if (response.status === 403) assert.match(await response.text(), /the room owner hasn&#39;t confirmed this app keeps nothing/);
+    return response.status;
+  };
+  const [tool] = listedTools();
+  const refusedCall = async (env: McpEnv, email: string, clientId: string) => {
+    const props: Props = { email, role: email === OWNER ? 'owner' : 'counsel', clientId, clientName: 'Desktop' };
+    const out = await runTool(tool!, {}, env, props, undefined, new Date(), 'unknown');
+    return /^zero_retention:/.test(String((out.content[0] as { text: string }).text));
+  };
+
+  // A plain shared https id stands for no one member's setup: it confirms nobody.
+  const plain = room(DESKTOP);
+  for (const email of [OWNER, COUNSEL]) {
+    assert.equal(await show(plain, email, DESKTOP), 403, email);
+    assert.equal(await refusedCall(plain, email, DESKTOP), true, email);
+  }
+
+  // The owner confirmed one member's setup: that member connects, the other is refused, at /authorize and per call.
+  const bound = room(` ${OWNER.toUpperCase()}  ${DESKTOP} `);
+  assert.equal(await show(bound, OWNER, DESKTOP), 200);
+  assert.equal(await refusedCall(bound, OWNER, DESKTOP), false);
+  assert.equal(await show(bound, COUNSEL, DESKTOP), 403);
+  assert.equal(await refusedCall(bound, COUNSEL, DESKTOP), true);
+
+  // A per-install registration's id, as /admin/clients lists it, still confirms as a plain entry.
+  const perInstall = room('dcr-desktop');
+  assert.equal(await show(perInstall, COUNSEL, 'dcr-desktop'), 200);
+  assert.equal(await refusedCall(perInstall, COUNSEL, 'dcr-desktop'), false);
 });

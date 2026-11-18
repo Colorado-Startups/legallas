@@ -39,7 +39,7 @@ Once the room's owner has turned on desktop apps (next section):
    then deploy. Any program on a member's computer can then start a sign-in, so leave it out until a member needs it.
 2. In a room set to zero retention only (`AI_POLICY` set to `"zdr"`, `mcp/retention.ts`): check with the member that steps 1 to 4
    above are done, then add their Claude Code client ID (listed on `/admin/clients` after their first sign-in) to
-   `AI_ZDR_CLIENTS`, and deploy. Until then the room refuses it: "the room owner hasn't confirmed this app keeps nothing".
+   `AI_ZDR_CLIENTS` as `member@example.com client-id`, which confirms it for that member only, and deploy. Until then the room refuses it: "the room owner hasn't confirmed this app keeps nothing".
 
 ## Good to know
 

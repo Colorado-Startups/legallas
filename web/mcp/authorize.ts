@@ -200,9 +200,9 @@ async function describe(env: McpEnv, authRequest: AuthRequest, deps: GateDeps): 
 }
 
 /** A zero-retention room's refusal for this app (mcp/retention.ts), or null. Looks the app up only in such a room. */
-async function refusedByRetention(env: McpEnv, clientId: string): Promise<Response | null> {
+async function refusedByRetention(env: McpEnv, clientId: string, email: string): Promise<Response | null> {
   if (!zeroRetentionOnly(env)) return null;
-  const reason = retentionRefusal(env, await resolveClientKind(env, clientId), clientId);
+  const reason = retentionRefusal(env, await resolveClientKind(env, clientId), clientId, email);
   return reason ? messagePage(403, 'Zero retention only', reason) : null;
 }
 
@@ -221,7 +221,7 @@ export async function showConsent(request: Request, env: McpEnv, member: Member,
   if (!isAllowedRedirect(authRequest.redirectUri, env)) return refusedRedirect(authRequest.redirectUri, deps.onRefusedRedirect);
   const details = await describe(env, authRequest, deps);
   if (!details) return unchecked();
-  const refused = await refusedByRetention(env, authRequest.clientId);
+  const refused = await refusedByRetention(env, authRequest.clientId, member.email);
   if (refused) return refused;
   const consent = await env.OAUTH_PROVIDER.beginConsent(authRequest);
   const html = renderConsent({
@@ -322,7 +322,7 @@ async function finishApproval(request: Request, env: McpEnv, member: Member, han
   const details = await describe(env, authRequest, deps);
   if (!details) return unchecked();
   // Checked again, like the redirect: the setting may have changed since the page was shown.
-  const refused = await refusedByRetention(env, authRequest.clientId);
+  const refused = await refusedByRetention(env, authRequest.clientId, member.email);
   if (refused) return refused;
   const clientName = appName(details);
   // The propose consent only when the member ticked it and the room and role allow it now; otherwise the props are

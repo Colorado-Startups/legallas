@@ -95,7 +95,26 @@ interface Scanner {
 
 // ---- Zip ----
 
-/** Entry names from local headers (PK\3\4) and the central directory (PK\1\2), which Office reads. */
+/** Info-ZIP Unicode Path extra field: version, CRC-32 of the header name, then a UTF-8 name some extractors use instead. */
+const UNICODE_PATH = 0x7075;
+
+/** The rule an entry's Unicode Path name breaks, whatever its version or CRC; null when it has none. */
+function unicodePathRule(extra: Uint8Array, decoder: TextDecoder): ActiveRule | null {
+  for (let i = 0; i + 4 <= extra.length; ) {
+    const id = extra[i]! | (extra[i + 1]! << 8);
+    const size = extra[i + 2]! | (extra[i + 3]! << 8);
+    const data = extra.subarray(i + 4, i + 4 + size);
+    const rule = id === UNICODE_PATH && data.length > 5 ? entryRule(decoder.decode(data.subarray(5))) : null;
+    if (rule) return rule;
+    i += 4 + size;
+  }
+  return null;
+}
+
+/**
+ * Entry names from local headers (PK\3\4) and the central directory (PK\1\2), which Office reads, and each one's
+ * Unicode Path name (0x7075) too: either name breaking a rule refuses the file.
+ */
 class ZipScanner implements Scanner {
   finding: ActiveRule | null = null;
   private carry = EMPTY;
@@ -115,8 +134,11 @@ class ZipScanner implements Scanner {
         const at = p + (local ? 26 : 28);
         if (p + fixed > buf.length) return void (this.carry = buf.slice(p));
         const length = buf[at]! | (buf[at + 1]! << 8);
-        if (p + fixed + length > buf.length) return void (this.carry = buf.slice(p));
-        this.finding = entryRule(this.decoder.decode(buf.subarray(p + fixed, p + fixed + length)));
+        const extra = buf[at + 2]! | (buf[at + 3]! << 8);
+        const end = p + fixed + length;
+        if (end + extra > buf.length) return void (this.carry = buf.slice(p));
+        this.finding =
+          entryRule(this.decoder.decode(buf.subarray(p + fixed, end))) ?? unicodePathRule(buf.subarray(end, end + extra), this.decoder);
       }
       i = p + 1;
     }

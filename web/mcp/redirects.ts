@@ -189,6 +189,19 @@ export async function loadAllowedRedirects(env: RedirectKv): Promise<string> {
   }
 }
 
+/** Paths whose handlers check redirect URIs against the allowlist; /mcp traffic skips the KV read. */
+const REDIRECT_PATHS = new Set(['/register', '/authorize', '/admin/clients']);
+
+/**
+ * loadAllowedRedirects for a request whose handler reads the list, else null with no KV call. /register reads it
+ * only on POST (the registration callback), so another method there never lists KV.
+ */
+export async function allowedRedirectsFor(request: Request, env: RedirectKv): Promise<string | null> {
+  const { pathname } = new URL(request.url);
+  if (!REDIRECT_PATHS.has(pathname) || (pathname === '/register' && request.method !== 'POST')) return null;
+  return loadAllowedRedirects(env);
+}
+
 /** MCP_REDIRECT_ALLOW with the loaded owner entries appended, for isAllowedRedirect and redirectAllow(). */
 export function mergeRedirectAllow(configured: string | undefined, loaded: string): string | undefined {
   return [configured, loaded].filter(Boolean).join(',') || undefined;

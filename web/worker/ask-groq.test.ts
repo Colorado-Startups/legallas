@@ -89,7 +89,17 @@ test('a call posts the body to the chat endpoint with the key as a bearer token,
   assert.equal(headers['Content-Type'], 'application/json');
   assert.deepEqual(JSON.parse(String(calls[0]!.init.body)), groqInput(MESSAGES));
   assert.ok(calls[0]!.init.signal instanceof AbortSignal, 'every call has a time limit');
+  assert.equal(calls[0]!.init.redirect, 'manual', 'a redirect is never followed');
   assert.deepEqual(await text(stream), { text: '- READ: It was Tuesday [doc:D1 p:2].', stop: 'stop' });
+});
+
+test('a redirect from Groq is a failure: the turn and the key never reach another host', async () => {
+  for (const status of [301, 302, 307, 308]) {
+    const { fetcher, calls } = fakeFetch(() => new Response(null, { status, headers: { location: 'https://other.example.test/openai/v1/chat/completions' } }));
+    await assert.rejects(groqChat(fetcher, 'k', groqInput(MESSAGES)), (error: unknown) => error instanceof GroqUnavailable && error.message === `groq_http_${status}`);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0]!.init.redirect, 'manual');
+  }
 });
 
 test("Groq's stream reads like Workers AI's: a cut answer's finish_reason is the stop reason", async () => {

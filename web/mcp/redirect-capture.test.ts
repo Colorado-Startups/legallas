@@ -8,6 +8,7 @@ import { ADMIN_CLIENTS_URL, refusedRedirectEmail } from './alert.ts';
 import { ALLOWED_REDIRECT_PREFIX, REFUSED_REDIRECT_PREFIX, type McpEnv } from './contract.ts';
 import { checkRegistration } from './oauth.ts';
 import {
+  allowedRedirectsFor,
   allowRefusedRedirect,
   dismissRefusedRedirect,
   isAllowedRedirect,
@@ -278,4 +279,25 @@ test('isReservedTestHost matches whole labels, any case, with or without a trail
     assert.equal(isReservedTestHost(host), true, host);
   for (const host of ['', 'claude.ai', 'app.harvey.ai', 'myexample.com', 'example.com.evil.app', 'testing', 'mylocalhost', 'example.co'])
     assert.equal(isReservedTestHost(host), false, host);
+});
+
+test('only a request whose handler reads the allowlist lists KV: GET, HEAD and OPTIONS /register never do', async () => {
+  const { env: e, kv: k } = env();
+  k.store.set(allowedKey(CB), { value: '1' });
+  let lists = 0;
+  const namespace = k.namespace as unknown as { list: (options: unknown) => Promise<unknown> };
+  const list = namespace.list.bind(namespace);
+  namespace.list = async (options) => {
+    lists++;
+    return list(options);
+  };
+  const at = (path: string, method: string) => allowedRedirectsFor(new Request(`https://mcp.example.test${path}`, { method }), e);
+  for (const method of ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE']) assert.equal(await at('/register', method), null, method);
+  assert.equal(await at('/mcp', 'POST'), null);
+  assert.equal(await at('/token', 'POST'), null);
+  assert.equal(lists, 0, 'no KV list before a handler that reads the list');
+  assert.equal(await at('/register', 'POST'), `=${CB}`);
+  assert.equal(await at('/authorize', 'GET'), `=${CB}`);
+  assert.equal(await at('/admin/clients', 'GET'), `=${CB}`);
+  assert.equal(lists, 3);
 });
