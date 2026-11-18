@@ -82,6 +82,7 @@ jobs:
             fail "$FILE could not be read at $SHA"
 
           # plan: the repo-level settings to apply. problems: why not to apply any. left, other: what stays with the Settings page.
+          # quality-speed/pages/settings/apply.test.ts runs this program on the file, so an entry it doesn't know fails a pull request.
           jq --arg target "$REPO" '
             # Each repo-level field this may set: its place in GET and PATCH /repos/{owner}/{repo} (default [id]), and only
             # the values that keep its gate at least as strict.
@@ -94,12 +95,13 @@ jobs:
               delete_branch_on_merge: {values: [true]},
               allow_update_branch: {values: [false]},
               squash_merge_commit_message: {values: ["COMMIT_MESSAGES"]},
-              # On only: the merge queue needs it.
-              allow_auto_merge: {values: [true]}
+              # Off only: a merge enters the queue by a call that names the reviewed commit, never by auto-merge.
+              allow_auto_merge: {values: [false]}
             };
             # Repo-level fields in the file that this never sets.
             # Visibility is set by the owner, made once at cut-over; this never flips it either way.
-            def skip: ["repo_visibility", "allow_forking", "dependabot_security_updates", "has_discussions", "has_issues", "has_projects", "has_wiki"];
+            # Security and analysis settings (Dependabot, secret scanning, push protection) sit under another PATCH field.
+            def skip: ["repo_visibility", "allow_forking", "dependabot_security_updates", "secret_scanning", "secret_scanning_push_protection", "has_discussions", "has_issues", "has_projects", "has_wiki"];
             def safe($re; $else): if type == "string" and test($re) then . else $else end;
             if type != "object" or (.settings | type) != "array" then {problems: ["the file has no settings list"], plan: [], left: [], other: []}
             else
