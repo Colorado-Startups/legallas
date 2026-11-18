@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { STORED_NAME } from '../worker/stored-name.ts';
+import { constantTimeEqual } from './constant-time.ts';
 // A second Connect click on the same consent page. The library consumes the consent transaction on the first
 // POST, so a repeat click (the browser cancels the first request and posts again) used to get "This page has
 // expired" while the first request's redirect, with the authorization code, never reached the app (Copilot, as
@@ -37,13 +38,6 @@ async function sha256Hex(value: string): Promise<string> {
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
-function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let difference = 0;
-  for (let i = 0; i < a.length; i++) difference |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return difference === 0;
-}
-
 function readCookie(request: Request, name: string): string | undefined {
   for (const part of (request.headers.get('Cookie') ?? '').split(';')) {
     const separator = part.indexOf('=');
@@ -57,7 +51,7 @@ async function boundCookie(request: Request, handle: string): Promise<{ name: st
   const hash = await sha256Hex(handle);
   const name = `${CONSENT_COOKIE_BASE}-${hash.slice(0, 16)}`;
   const bound = readCookie(request, name);
-  return bound !== undefined && timingSafeEqual(hash, bound) ? { name, hash } : null;
+  return bound !== undefined && (await constantTimeEqual(hash, bound)) ? { name, hash } : null;
 }
 
 async function sealKey(handle: string): Promise<CryptoKey> {

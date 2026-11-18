@@ -16,7 +16,7 @@
   // mcp/entry-pro.ts: the full product, the core server (mcp/index.ts) with pro's tools and pages. A room may fill in
   // mcp/index.ts to run the core server alone.
   "main": "mcp/entry-pro.ts",
-  "compatibility_date": "2026-09-30",
+  "compatibility_date": "2026-11-17",
   // global_fetch_strictly_public: required by workers-oauth-provider to fetch Client ID Metadata Documents.
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   // Stack traces in Workers Logs and Issues map back to the TypeScript source; the map is never served.

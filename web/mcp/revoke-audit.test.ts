@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import { testDb } from '../worker/sqlite-d1.ts';
 import type { AiAuditEntry } from './audit.ts';
 import { MCP_ORIGIN } from './contract.ts';
+import { MAX_PREREAD_BYTES } from './oauth-request.ts';
 import { REVOKE_VIA, grantRefFromToken, viaForGrant, withRevocationAudit, type RevokeAuditEnv } from './revoke-audit.ts';
 
 const ADA = 'ada@firm.example';
@@ -141,6 +142,43 @@ test('a failed audit write keeps the 200 and logs a code, never the token', asyn
   assert.equal(response.status, 200);
   assert.deepEqual(logs, ['mcp_revoke_audit_failed']);
   assert.ok(logs.every((line) => !line.includes('secret')));
+});
+
+test('a form-encoded /token body over MAX_PREREAD_BYTES gets a 413 in the OAuth error shape and never reaches the library', async (t) => {
+  const logs = captureLogs(t);
+  const pad = 'x'.repeat(MAX_PREREAD_BYTES);
+  const cases = [
+    tokenRequest({ token: REFRESH, pad }),
+    tokenRequest({ grant_type: 'authorization_code', code: 'c', pad }),
+    new Request(`${MCP_ORIGIN}/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': String(MAX_PREREAD_BYTES + 1) },
+      body: `token=${REFRESH}`,
+    }),
+  ];
+  for (const request of cases) {
+    const { env, store, audits, audit } = setup();
+    let forwarded = 0;
+    const forward = async () => {
+      forwarded++;
+      return new Response('', { status: 200 });
+    };
+    const response = await withRevocationAudit(request, env, forward, audit);
+    assert.equal(response.status, 413);
+    assert.deepEqual(await response.json(), { error: 'invalid_request', error_description: 'The token request is too large.' });
+    assert.equal(response.headers.get('cache-control'), 'no-store');
+    assert.equal(forwarded, 0);
+    assert.ok(store.has(GRANT_KEY));
+    assert.deepEqual(audits, []);
+  }
+  assert.deepEqual(logs, ['mcp_token_too_large', 'mcp_token_too_large', 'mcp_token_too_large']);
+  // Exactly the limit is still read and revoked.
+  const { env, store, audits, audit } = setup();
+  const fields = { token: REFRESH, pad: '' };
+  fields.pad = 'x'.repeat(MAX_PREREAD_BYTES - new URLSearchParams(fields).toString().length);
+  const atLimit = tokenRequest(fields);
+  assert.equal((await withRevocationAudit(atLimit, env, fakeLibrary(store).forward, audit)).status, 200);
+  assert.equal(audits.length, 1);
 });
 
 test('via falls back to the client record, then a CIMD host, then REVOKE_VIA', async () => {

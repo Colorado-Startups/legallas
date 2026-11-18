@@ -8,6 +8,16 @@
 
 Please do not open a public issue, pull request or commit. A person replies.
 
+## Supported versions
+
+| Version | Security fixes |
+|---|---|
+| Latest `main` | Yes |
+| The newest release tag (`v*`, as `.github/workflows/sbom.yml` matches; none yet) | Yes |
+| Older tags, other branches, forks | No: move to one of the two above |
+
+A room runs the version its owner pinned and gets a fix only when the owner moves the pin ([vulnerability management](docs/security/vulnerability-management.md)).
+
 ## Where the data lives
 
 | | |

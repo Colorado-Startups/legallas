@@ -45,6 +45,12 @@ Read before any `wrangler` command or Cloudflare API call.
 | Deploys, `d1 migrations apply --remote` | "Production releases" |
 | `d1 execute --remote` writes, `secret put`, R2 bucket, AI Search, Access, WAF and zone changes | The owner's OK for that exact change |
 
+| Cloudflare's Workers Best Practices, not adopted | Why |
+|---|---|
+| Traces (`observability.traces`) | Off in all three Wrangler examples: spans can record R2 keys, URLs and so document content |
+| Generated bindings types for `Env` | `npm run types` passes `--include-env=false`; `Env` and `McpEnv` stay hand-written for now |
+| The Workers Vitest integration | Tests run under `node --test` with fakes; CI's Worker dry runs bundle all three Workers |
+
 ## Production releases
 
 - [ ] A reviewed commit whose CI passed

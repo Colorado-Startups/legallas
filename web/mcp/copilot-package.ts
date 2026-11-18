@@ -14,12 +14,13 @@ import { CONNECT_PATH, MCP_ORIGIN, type McpEnv } from './contract.ts';
 import { RETRY_AFTER_SECONDS } from './gates.ts';
 import { AGENT_ZIP_NAME, AGENT_ZIP_PATH, REFERENCE_ID_FIELD } from './pages/connect-copilot.ts';
 import { roomWords } from './room-words.ts';
+import { readLimited } from '../worker/http.ts';
 import { instanceName, ownerFullName } from '../worker/room-settings.ts';
 import { isCompanyRoom } from '../worker/room-shape.ts';
 
 /** The form field /connect posts. */
 export { REFERENCE_ID_FIELD };
-/** A registration ID is at most 256 characters; a body far past that is not a paste of one. */
+/** A registration ID is at most 256 characters; a body far past that is not a paste of one, and is never read whole. */
 export const MAX_FORM_BYTES = 2048;
 const FORM_TYPE = 'application/x-www-form-urlencoded';
 
@@ -35,9 +36,8 @@ type ReadResult = { referenceId: string } | { refused: 'bad_type' | 'too_large' 
 async function readReferenceId(request: Request): Promise<ReadResult> {
   const type = (request.headers.get('content-type') ?? '').split(';')[0]!.trim().toLowerCase(); // safe: split returns at least one item
   if (type !== FORM_TYPE) return { refused: 'bad_type' };
-  if (Number(request.headers.get('content-length') ?? '0') > MAX_FORM_BYTES) return { refused: 'too_large' };
-  const body = await request.text();
-  if (body.length > MAX_FORM_BYTES) return { refused: 'too_large' };
+  const body = await readLimited(request, MAX_FORM_BYTES);
+  if (body === null) return { refused: 'too_large' };
   const referenceId = (new URLSearchParams(body).get(REFERENCE_ID_FIELD) ?? '').trim();
   return REFERENCE_ID_PATTERN.test(referenceId) ? { referenceId } : { refused: 'bad_id' };
 }
@@ -53,9 +53,10 @@ export function roomPackage(company: boolean): Map<string, Uint8Array> {
   return files;
 }
 
+/** The same page for every refusal; 413 for a body over MAX_FORM_BYTES, else 400. */
 function refuse(code: string): Response {
   console.warn('copilot_package_refused', code);
-  return messagePage(400, 'Check the registration ID', REFERENCE_ID_HELP);
+  return messagePage(code === 'too_large' ? 413 : 400, 'Check the registration ID', REFERENCE_ID_HELP);
 }
 
 /** Public; PACKAGE_LIMIT in mcp/index.ts rate limits it. The package holds nothing secret. */

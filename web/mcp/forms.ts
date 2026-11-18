@@ -3,6 +3,7 @@
 // __Host- cookie (SameSite=Strict, HttpOnly) that must match the posted field, plus a same-origin check.
 // No server secret is needed: an attacker can neither read the cookie nor set a __Host- cookie for this host.
 import { LOCAL_HOSTS } from '../worker/auth.ts';
+import { constantTimeEqual } from './constant-time.ts';
 import { MCP_ORIGIN } from './contract.ts';
 import { STORED_NAME } from '../worker/stored-name.ts';
 
@@ -36,20 +37,13 @@ export function formToken(request: Request): { token: string; setCookie: string 
   return { token, setCookie: `${FORM_COOKIE}=${token}; Path=/; Secure; HttpOnly; SameSite=Strict; Max-Age=86400` };
 }
 
-function constantTimeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return diff === 0;
-}
-
-/** True when the POST came from this origin (or localhost in dev) and its token matches the cookie. */
-export function checkForm(request: Request, posted: FormData): boolean {
+/** True when the POST came from this origin (or localhost in dev) and its token matches the cookie. Always awaited: a promise is truthy. */
+export async function checkForm(request: Request, posted: FormData): Promise<boolean> {
   const url = new URL(request.url);
   const origin = request.headers.get('origin');
   const sameOrigin = LOCAL_HOSTS.has(url.hostname) ? origin === url.origin : origin === MCP_ORIGIN;
   if (!sameOrigin) return false;
   const cookie = cookieToken(request);
   const field = posted.get(FORM_FIELD);
-  return cookie !== null && typeof field === 'string' && constantTimeEqual(cookie, field);
+  return cookie !== null && typeof field === 'string' && (await constantTimeEqual(cookie, field));
 }

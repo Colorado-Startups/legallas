@@ -24,18 +24,24 @@ import { sweepRetention } from '../worker/data-retention.ts';
 const mcpEnv = env as unknown as McpEnv;
 // Every page's frame names the room by INSTANCE_NAME (worker/room-names.ts), the same for the whole deployment.
 usePageNames(mcpEnv);
-/** Callbacks the owner allowed on /admin/clients, loaded on REDIRECT_PATHS. Every request loads the same value. */
-let ownerAllowed = '';
 /** Paths whose handlers check redirect URIs against the allowlist; /mcp traffic skips the KV read. */
 const REDIRECT_PATHS = new Set(['/register', '/authorize', '/admin/clients']);
-const options = oauthOptions({
-  redirectAllow: () => mergeRedirectAllow(mcpEnv.MCP_REDIRECT_ALLOW, ownerAllowed),
-  onRefusedRedirect: (uri) => waitUntil(recordRefusedRedirect(mcpEnv, uri)),
-  onSignInFailure: (failure) => waitUntil(recordSignInFailure(mcpEnv, failure)),
-  waitUntil: (promise) => waitUntil(promise),
-  dcrEnabled: () => mcpEnv.DCR_ENABLED,
-  devOrigin: mcpEnv.MCP_DEV_ORIGIN,
-});
+/**
+ * The OAuth options with `redirectAllow` for the registration callback, which the library calls without env. On
+ * REDIRECT_PATHS each request builds its own provider around the list it loaded (the callbacks the owner allowed on
+ * /admin/clients), so no request's list sits in module scope. Everywhere else: the configured list alone.
+ */
+function optionsWith(redirectAllow: string | undefined) {
+  return oauthOptions({
+    redirectAllow: () => redirectAllow,
+    onRefusedRedirect: (uri) => waitUntil(recordRefusedRedirect(mcpEnv, uri)),
+    onSignInFailure: (failure) => waitUntil(recordSignInFailure(mcpEnv, failure)),
+    waitUntil: (promise) => waitUntil(promise),
+    dcrEnabled: () => mcpEnv.DCR_ENABLED,
+    devOrigin: mcpEnv.MCP_DEV_ORIGIN,
+  });
+}
+const options = optionsWith(mcpEnv.MCP_REDIRECT_ALLOW);
 const provider = new OAuthProvider<McpEnv>(options);
 
 /**
@@ -70,13 +76,15 @@ export default {
     const refused = (await rateLimitGate(request, workerEnv)) ?? originGate(request, workerEnv);
     if (refused) return withNosniff(refused);
     request = rootResourceMetadataRequest(request) ?? request;
+    let oauth = provider;
     if (REDIRECT_PATHS.has(new URL(request.url).pathname)) {
       // /authorize re-checks the redirect against env.MCP_REDIRECT_ALLOW, so the merged list goes into env too.
-      ownerAllowed = await loadAllowedRedirects(workerEnv);
-      workerEnv = { ...workerEnv, MCP_REDIRECT_ALLOW: mergeRedirectAllow(workerEnv.MCP_REDIRECT_ALLOW, ownerAllowed) };
+      const allow = mergeRedirectAllow(workerEnv.MCP_REDIRECT_ALLOW, await loadAllowedRedirects(workerEnv));
+      workerEnv = { ...workerEnv, MCP_REDIRECT_ALLOW: allow };
+      oauth = new OAuthProvider<McpEnv>(optionsWith(allow));
     }
     const prepared = await prepareOAuthRequest(request);
-    const response = await withRevocationAudit(prepared.request, workerEnv, (forwarded) => provider.fetch(forwarded, workerEnv, ctx));
+    const response = await withRevocationAudit(prepared.request, workerEnv, (forwarded) => oauth.fetch(forwarded, workerEnv, ctx));
     if (prepared.source) ctx.waitUntil(reportOAuthFailure(workerEnv, prepared.source, response));
     return withNosniff(await shapedPages(response, workerEnv));
   },
@@ -84,21 +92,21 @@ export default {
    * The daily cron (wrangler.mcp.jsonc): the orphan-grant sweep, then the production smoke's old clients, then lapsed
    * public-records requests, then the room's retention schedule (worker/data-retention.ts; each logs its own counts; a
    * failure of one never stops the next). The library injects OAUTH_PROVIDER only on fetch, so pass its helpers.
+   * Awaited, not handed to ctx.waitUntil: the runtime waits up to 15 minutes for the handler's own promise, but only
+   * 30 seconds for waitUntil work once the handler returns (Cloudflare docs, Scheduled Handler and Limits).
    */
-  async scheduled(_controller: ScheduledController, workerEnv: McpEnv, ctx: ExecutionContext): Promise<void> {
+  async scheduled(_controller: ScheduledController, workerEnv: McpEnv): Promise<void> {
     const sweepEnv = { ...workerEnv, OAUTH_PROVIDER: getOAuthApi(options, workerEnv) };
     const failed = (event: string) => (error: unknown) => console.error(JSON.stringify({ event, code: error instanceof Error ? error.name : 'unknown' }));
-    ctx.waitUntil(
-      sweepOrphanGrants(sweepEnv)
-        .then((result) => console.log(JSON.stringify({ event: 'mcp.sweep', ...result })), failed('mcp.sweep_failed'))
-        .then(() => sweepSmokeClients(sweepEnv))
-        .catch(failed('mcp.smoke_sweep_failed'))
-        // Lapsed public-records requests (worker/public-records.ts), whose names must not stay in the room.
-        .then(() => sweepLapsedChecks(workerEnv.DB, new Date()))
-        .then((deleted) => console.log(JSON.stringify({ event: 'mcp.records_sweep', deleted })), failed('mcp.records_sweep_failed'))
-        // Off unless the room sets RETAIN_SIGNINS_DAYS or RETAIN_AUDIT_DAYS_AFTER_CLOSE; a legal hold stops it.
-        .then(() => sweepRetention(workerEnv, new Date()))
-        .catch(failed('mcp.retention_failed')),
-    );
+    await sweepOrphanGrants(sweepEnv)
+      .then((result) => console.log(JSON.stringify({ event: 'mcp.sweep', ...result })), failed('mcp.sweep_failed'))
+      .then(() => sweepSmokeClients(sweepEnv))
+      .catch(failed('mcp.smoke_sweep_failed'))
+      // Lapsed public-records requests (worker/public-records.ts), whose names must not stay in the room.
+      .then(() => sweepLapsedChecks(workerEnv.DB, new Date()))
+      .then((deleted) => console.log(JSON.stringify({ event: 'mcp.records_sweep', deleted })), failed('mcp.records_sweep_failed'))
+      // Off unless the room sets RETAIN_SIGNINS_DAYS or RETAIN_AUDIT_DAYS_AFTER_CLOSE; a legal hold stops it.
+      .then(() => sweepRetention(workerEnv, new Date()))
+      .catch(failed('mcp.retention_failed'));
   },
 } satisfies ExportedHandler<McpEnv>;

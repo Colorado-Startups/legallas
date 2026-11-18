@@ -75,13 +75,37 @@ test('a missing field, the wrong content type and an oversized body are refused'
   form.set('reference_id', REFERENCE_ID);
   assert.equal((await copilotPackage(new Request(URL_, { method: 'POST', body: form }), env)).status, 400, 'multipart');
   const huge = `reference_id=${REFERENCE_ID}&pad=${'x'.repeat(MAX_FORM_BYTES)}`;
-  assert.equal((await copilotPackage(post(huge), env)).status, 400);
+  const tooLarge = await copilotPackage(post(huge), env);
+  assert.equal(tooLarge.status, 413);
+  assert.match(await tooLarge.text(), /Check the registration ID/, 'the same page as every other refusal');
   assert.deepEqual(logs, [
     'copilot_package_refused bad_id',
     'copilot_package_refused bad_type',
     'copilot_package_refused bad_type',
     'copilot_package_refused too_large',
   ]);
+});
+
+test('an oversized body is refused by its declared length, or as it streams, without being read whole', async (t) => {
+  const logs = captureLogs(t);
+  const type = { 'content-type': 'application/x-www-form-urlencoded' };
+  const declared = new Request(URL_, { method: 'POST', headers: { ...type, 'content-length': String(MAX_FORM_BYTES + 1) }, body: `reference_id=${REFERENCE_ID}` });
+  assert.equal((await copilotPackage(declared, env)).status, 413, 'Content-Length alone');
+  assert.equal(declared.bodyUsed, false, 'refused before any read');
+  // A chunked body with no length: 64 chunks of 1 KiB on offer, and the read stops once it passes the limit.
+  let pulled = 0;
+  const endless = new ReadableStream<Uint8Array>({
+    pull(controller) {
+      if (++pulled > 64) controller.close();
+      else controller.enqueue(new Uint8Array(1024).fill(120));
+    },
+  });
+  const streamed = new Request(URL_, { method: 'POST', headers: type, body: endless, duplex: 'half' } as RequestInit);
+  assert.equal((await copilotPackage(streamed, env)).status, 413, 'streamed');
+  assert.ok(pulled < 8, `${pulled} chunks pulled`);
+  const atLimit = `reference_id=${REFERENCE_ID}&pad=`.padEnd(MAX_FORM_BYTES, 'x');
+  assert.equal((await copilotPackage(post(atLimit), env)).status, 200, 'exactly the limit still builds');
+  assert.deepEqual(logs, ['copilot_package_refused too_large', 'copilot_package_refused too_large', 'copilot_package_built']);
 });
 
 test('only POST is allowed', async () => {
