@@ -49,6 +49,36 @@
    "decided": "2026-11-06"
   },
   {
+   "alert": "40018",
+   "targets": [
+    "room-member"
+   ],
+   "paths": "^/api/hold/",
+   "status": "accepted",
+   "reason": "False positive. Every hold route binds the values a request carries as D1 parameters (web/worker/hold.ts: addCustodian, recordAcknowledgment, stamp, releaseHold); its template SQL interpolates only code constants (EVENT, the column and action names). ZAP's differential tests see different answers because hold actions change state: the first release ends the hold, a repeat add or acknowledgment is ignored with 409, a notice stamps a time.",
+   "decided": "2026-11-17"
+  },
+  {
+   "alert": "6-5",
+   "targets": [
+    "room-member"
+   ],
+   "paths": "^/api/hold/",
+   "status": "accepted",
+   "reason": "False positive, and a Worker has no file system: no hold value reaches a file, R2 key, fetch or redirect. Every hold route binds the values a request carries as D1 parameters (web/worker/hold.ts: addCustodian, recordAcknowledgment, stamp, releaseHold); its template SQL interpolates only code constants (EVENT, the column and action names). ZAP's differential tests see different answers because hold actions change state: the first release ends the hold, a repeat add or acknowledgment is ignored with 409, a notice stamps a time.",
+   "decided": "2026-11-17"
+  },
+  {
+   "alert": "40014-2",
+   "targets": [
+    "room-member"
+   ],
+   "paths": "^/api/hold/notice$",
+   "status": "accepted",
+   "reason": "The scan's script string comes back as JSON data (application/json from Response.json in web/worker/http.ts; nosniff and CSP default-src 'none' from web/worker/headers.ts). The hold page puts the notice and custodians in with textContent and el(), never innerHTML (web/src/scripts/hold.ts).",
+   "decided": "2026-11-17"
+  },
+  {
    "alert": "10096",
    "status": "accepted",
    "reason": "The Unix times are RFC 7591's client_id_issued_at in /register answers and numeric constants in the build's script files. Neither says anything about the room.",
@@ -89,16 +119,6 @@
    "status": "accepted",
    "reason": "Informational: ZAP lists answers that differ when it changes the User-Agent header. Neither Worker decides access by User-Agent; the room only records it in its audit log.",
    "decided": "2026-11-06"
-  },
-  {
-   "alert": "6-5",
-   "targets": [
-    "room-member"
-   ],
-   "paths": "^/api/hold/custodians$",
-   "status": "accepted",
-   "reason": "ZAP sent the route's own last segment as a custodian's name and saw a different answer. The name is a D1 bound parameter (web/worker/hold.ts addCustodian) and a Worker has no file system; the answer flips between 201 and 409 because a custodian is added once per hold.",
-   "decided": "2026-11-07"
   },
   {
    "alert": "10027",

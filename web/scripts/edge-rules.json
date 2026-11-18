@@ -1,0 +1,36 @@
+{
+  "_": "The edge rules `npm run harden` checks and adds (scripts/harden.ts), as web/README.md \"Edge rules\" lists them; scripts/harden.test.ts keeps the two equal. Hosts are the README's placeholders: harden swaps in the room's own from wrangler.jsonc and wrangler.mcp.jsonc.",
+  "rateLimit": {
+    "ref": "legallas_signin_rate",
+    "description": "Legallas 1: sign-in rate limit",
+    "action": "block",
+    "expression": "http.request.uri.path in {\"/token\" \"/register\"}",
+    "ratelimit": { "characteristics": ["cf.colo.id", "ip.src"], "period": 10, "requests_per_period": 20, "mitigation_timeout": 10 }
+  },
+  "custom": [
+    {
+      "ref": "legallas_countries",
+      "description": "Legallas 2: members' countries only",
+      "action": "block",
+      "expression": "(http.host eq \"room.example.com\" or (http.host eq \"mcp.room.example.com\" and not starts_with(http.request.uri.path, \"/mcp\") and not starts_with(http.request.uri.path, \"/.well-known/\") and not http.request.uri.path in {\"/token\" \"/register\"})) and not ip.src.country in {\"US\"}"
+    },
+    {
+      "ref": "legallas_no_crawlers",
+      "description": "Legallas 3: no crawlers",
+      "action": "block",
+      "expression": "http.host eq \"room.example.com\" and cf.client.bot"
+    },
+    {
+      "ref": "legallas_scanner_probes",
+      "description": "Legallas 4: scanner probes",
+      "action": "block",
+      "expression": "ends_with(http.request.uri.path, \".php\") or http.request.uri.path contains \"/wp-\" or http.request.uri.path contains \"/.env\" or http.request.uri.path contains \"/.git\""
+    },
+    {
+      "ref": "legallas_attack_tools",
+      "description": "Legallas 5: attack tools",
+      "action": "managed_challenge",
+      "expression": "http.host eq \"room.example.com\" and (http.user_agent eq \"\" or http.user_agent contains \"sqlmap\" or http.user_agent contains \"nikto\" or http.user_agent contains \"nuclei\" or http.user_agent contains \"zgrab\")"
+    }
+  ]
+}
