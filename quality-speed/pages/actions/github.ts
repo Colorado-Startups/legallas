@@ -49,18 +49,21 @@ export class Github {
     }
   }
 
-  /** Runs created in a span. A span past the search limit is split in two, and any run short of the count throws. */
-  private async runsIn(from: number, to: number): Promise<Omit<Run, 'jobs'>[]> {
+  /**
+   * Runs created in a span, from every workflow or from the one at `path`. A span past the search limit is split in two,
+   * and any run short of the count throws.
+   */
+  private async runsIn<R = Omit<Run, 'jobs'>>(from: number, to: number, path = '/actions/runs', query: Query = { exclude_pull_requests: 'true' }): Promise<R[]> {
     const created = `${new Date(from).toISOString().slice(0, 19)}Z..${new Date(to).toISOString().slice(0, 19)}Z`;
-    const first = await this.get<{ total_count: number; workflow_runs: Omit<Run, 'jobs'>[] }>('/actions/runs', { created, per_page: PAGE_SIZE, exclude_pull_requests: 'true' });
+    const first = await this.get<{ total_count: number; workflow_runs: R[] }>(path, { ...query, created, per_page: PAGE_SIZE });
     if (first.total_count >= SEARCH_LIMIT) {
       if (to - from < 2 * MS) throw new Unreadable('more runs in a second than a search can return');
       const middle = from + Math.floor((to - from) / 2 / MS) * MS;
-      return [...(await this.runsIn(from, middle)), ...(await this.runsIn(middle + MS, to))];
+      return [...(await this.runsIn<R>(from, middle, path, query)), ...(await this.runsIn<R>(middle + MS, to, path, query))];
     }
     const runs = [...first.workflow_runs];
     for (let page = 2; runs.length < first.total_count; page += 1) {
-      const next = await this.get<{ workflow_runs: Omit<Run, 'jobs'>[] }>('/actions/runs', { created, per_page: PAGE_SIZE, page, exclude_pull_requests: 'true' });
+      const next = await this.get<{ workflow_runs: R[] }>(path, { ...query, created, per_page: PAGE_SIZE, page });
       if (!next.workflow_runs.length) throw new Unreadable('the runs did not all arrive');
       runs.push(...next.workflow_runs);
     }
@@ -184,15 +187,24 @@ export class Github {
     return this.get<Rule[]>('/rules/branches/main', { per_page: PAGE_SIZE });
   }
 
-  /** Every attempt of every job that ran a token step, in these workflows' runs created since a time (the GitHub App page's read). */
-  async tokenJobs(workflows: readonly { file: string; steps: string[] }[], since: Date): Promise<TokenJob[]> {
-    const created = `>=${since.toISOString().slice(0, 10)}`;
+  /**
+   * Every attempt of every job that ran a token step, in these workflows' completed runs created from `since` to `now`
+   * (the GitHub App page's read). Every page of runs and of each run's jobs is read, so a busy workflow's window is whole;
+   * the read budget (MAX_READS) bounds it, and a window it can't finish throws rather than read short (#8).
+   */
+  async tokenJobs(workflows: readonly { file: string; steps: string[] }[], since: Date, now = new Date()): Promise<TokenJob[]> {
     const jobs: TokenJob[] = [];
     for (const { file, steps } of workflows) {
-      const listed = await this.get<{ workflow_runs: { id: number }[] }>(`/actions/workflows/${file}/runs`, { status: 'completed', created, per_page: PAGE_SIZE });
-      for (const { id } of listed.workflow_runs) {
-        const run = await this.get<{ jobs: TokenJob[] }>(`/actions/runs/${id}/jobs`, { filter: 'all', per_page: PAGE_SIZE });
-        jobs.push(...run.jobs.filter((job) => ranStep(job, steps)));
+      const listed = await this.runsIn<{ id: number }>(since.getTime(), now.getTime(), `/actions/workflows/${file}/runs`, { status: 'completed' });
+      for (const id of new Set(listed.map((run) => run.id))) {
+        const all: TokenJob[] = [];
+        for (let page = 1; ; page += 1) {
+          const data = await this.get<{ total_count: number; jobs: TokenJob[] }>(`/actions/runs/${id}/jobs`, { filter: 'all', per_page: PAGE_SIZE, page });
+          all.push(...data.jobs);
+          if (all.length >= data.total_count) break;
+          if (!data.jobs.length) throw new Unreadable('the jobs of a run did not all arrive');
+        }
+        jobs.push(...all.filter((job) => ranStep(job, steps)));
       }
     }
     return jobs;
