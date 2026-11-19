@@ -32,7 +32,7 @@ were checked against official pages on 2026-10-31 and 2026-11-01 (see "Sources")
 
 ## The owner's terms (2026-11-01)
 
-- **Price and seats:** $99 for the install and setup, in the customer's own Cloudflare account. Whoever bought it can invite
+- **Price and seats:** one flat price for the install and setup, in the customer's own Cloudflare account. Whoever bought it can invite
   people into their data room for free. Anyone who wants their own install buys one.
 - **Groups and funds:** one install per group or fund, run by its manager. Each deal is its own room. Members are invited to
   what they need.
@@ -152,7 +152,7 @@ flowchart LR
   M1 -. "invited by the founder, signs in there, nothing copied" .-> SD
 ```
 
-| Customer | Install ($99 flat) | Rooms | Who is invited (free) |
+| Customer | Install (flat price) | Rooms | Who is invited (free) |
 |---|---|---|---|
 | Founder | Their own | The record, a deal room for a raise, case rooms if needed | Their lawyers as members; investors to the deal room only |
 | Angel on their own | Their own, for their own compliance and records | The record, matter rooms | Their lawyer |
