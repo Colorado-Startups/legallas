@@ -546,8 +546,10 @@ jobs:
           artifact-ids: ${{ needs.live-journeys.outputs.id }}
           merge-multiple: true
           path: ${{ runner.temp }}/key-jobs/live-output
+      # Public law and invented questions, no secret: a law lane takes it on Blacksmith too. lanes.ts sends the first 30
+      # Linux lanes there and the rest to collect-hosted, so a hosted-only step left 6 law pages' lookup tokens missing.
       - name: The law eval's report and library
-        if: matrix.runner != 'choose-runner' && matrix.lane == 'law' && needs.law-eval.outputs.id != ''
+        if: matrix.lane == 'law' && needs.law-eval.outputs.id != ''
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           artifact-ids: ${{ needs.law-eval.outputs.id }}
