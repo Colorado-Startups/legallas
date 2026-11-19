@@ -55,13 +55,13 @@ flowchart LR
 
 ## Sign-off
 
-`manifest.json` has no `signoff_comment`: the list takes no readings and scores 0 until the owner signs off on the pull request.
+Signed off on #76 ([comment 6996196000](https://github.com/Colorado-Startups/legallas/pull/76#issuecomment-6996196000)): `manifest.json` carries `signoff_comment`, so goals only tighten from here.
 
 ## Baseline
 
 | Head | `workers_practices_met` | `edge_rows_checked` | `compat_date_age_days` | `sources_read_hours` | `lane_minutes` | Total |
 |---|---|---|---|---|---|---|
-| This branch, read locally | 100 (18 of 18) | 12 | 2 | missing: no earlier read | missing: no CI job | 0, awaiting sign-off |
+| This branch, read locally | 100 (18 of 18) | 12 | 2 | missing: no earlier read | missing: no CI job | scores from the first readings after merge |
 
 ## Fixes
 
