@@ -42,7 +42,7 @@ function citeList(ctx: Ctx, cites: readonly Cite[] | undefined): string {
   if (!cites || cites.length === 0) return '<span class="bad">no cite</span>';
   const items = cites.map((cite) => {
     const where = ctx.info.paths[cite.doc] || cite.doc;
-    const page = cite.page === null ? '' : ` at ${cite.page}`;
+    const page = cite.page === null ? '' : ` at ${escapeHtml(cite.page)}`;
     const note = (cite as Cite & { note?: string }).note;
     return `<li><span class="mono">${escapeHtml(where)}${page}</span>${note ? ` (${marked(note)})` : ''}</li>`;
   });
@@ -57,9 +57,9 @@ function table(head: readonly string[], rows: readonly string[][]): string {
 }
 
 function summarySection(info: BuildInfo, sha: string | null): string {
-  const counts = Object.entries(info.counts).map(([k, v]) => `<li>${escapeHtml(k)}: <b>${v}</b></li>`).join('');
+  const counts = Object.entries(info.counts).map(([k, v]) => `<li>${escapeHtml(k)}: <b>${escapeHtml(v)}</b></li>`).join('');
   const catalog = info.catalog
-    ? `Catalog: ${info.catalog.rows} rows, ${info.catalog.notInRoom} not in the room, ${info.catalog.skipped} skipped.`
+    ? `Catalog: ${escapeHtml(info.catalog.rows)} rows, ${escapeHtml(info.catalog.notInRoom)} not in the room, ${escapeHtml(info.catalog.skipped)} skipped.`
     : 'No catalog.';
   const built = sha ? `sha256 <code>${escapeHtml(sha)}</code>` : `<span class="bad">Refused: ${escapeHtml(info.validation)}</span>`;
   return `<p>Built ${escapeHtml(info.builtAt)}. ${built}</p>
@@ -100,7 +100,7 @@ function caseRows(ctx: Ctx, c: PriorCase): string[][] {
 
 function metaSection(ctx: Ctx, matter: Matter): string {
   const m = matter.meta;
-  const prior = m.priorCase ? `<h3>Prior case (${priorStatus})</h3>${table(['Field', 'Value'], caseRows(ctx, m.priorCase))}` : '';
+  const prior = m.priorCase ? `<h3>Prior case (${escapeHtml(priorStatus)})</h3>${table(['Field', 'Value'], caseRows(ctx, m.priorCase))}` : '';
   const terms = m.definedTerms.map((t) => [marked(t.term), marked(t.means)]);
   return `<h2>Matter</h2>${table(['Field', 'Value'], caseRows(ctx, m))}${prior}<h3>Defined terms</h3>${table(['Term', 'Means'], terms)}`;
 }

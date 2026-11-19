@@ -36,7 +36,7 @@ import { redirectFor } from './redirects.ts';
 import { roomNamesOf } from './room-names.ts';
 import { servePage } from './room-shape.ts';
 import { findRoomGuest, roomsEnabled } from './rooms.ts';
-import { handleGuest, OWNER_ROOM_ROUTES } from './routes/rooms.ts';
+import { escapeHtml, handleGuest, OWNER_ROOM_ROUTES } from './routes/rooms.ts';
 import { handleSync } from './routes/sync.ts';
 import { trackSignIn } from './signins.ts';
 import { isSyncPath, syncEnabled } from './sync.ts';
@@ -65,7 +65,7 @@ function doorPage(env: Pick<Env, 'INSTANCE_NAME'>, main: string): Response {
     '<meta name="viewport" content="width=device-width, initial-scale=1">' +
     '<meta name="robots" content="noindex"><meta name="color-scheme" content="light">' +
     '<link rel="icon" href="/welcome/favicon.svg" type="image/svg+xml">' +
-    `<link rel="stylesheet" href="/welcome/door.css"><title>${roomNamesOf(env).instanceName}</title></head>` +
+    `<link rel="stylesheet" href="/welcome/door.css"><title>${escapeHtml(roomNamesOf(env).instanceName)}</title></head>` +
     `<body><main class="door door-compact">${roomMark()(false)}${main}</main></body></html>`;
   return withSecurityHeaders(
     new Response(body, { status: 403, headers: { 'Content-Type': 'text/html; charset=utf-8' } }),
