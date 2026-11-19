@@ -143,6 +143,14 @@ test("window: 28 days; another base branch left out everywhere", () => {
   assert.equal(v.required_gates_on_merged_head.value, 100);
 });
 
+test("first time: a ready pull request with no CI run after it is left out, not a miss", () => {
+  const unread = fact(72, 2, { ci_green_first_time: null });
+  const v = m(data([...many(20, 1, 5), unread]));
+  assert.equal(v.ci_green_first_time.n, 20);
+  assert.equal(v.ci_green_first_time.value, 100);
+  assert.equal(v.no_blocking_findings.n, 21, "still a submission");
+});
+
 test("closed without merging counts in first time and Blocking once it was ready; drafts never ready do not", () => {
   const closed = fact(70, 2, { state: "closed", merge_sha: null, gate_misses: null, template_complete: null, ci_green_first_time: false, drew_blocking: true });
   const draft = fact(71, 2, { state: "closed", ready_at: null, ci_green_first_time: null, drew_blocking: null, gate_misses: null, template_complete: null });

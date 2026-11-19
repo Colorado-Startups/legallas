@@ -150,6 +150,33 @@ test("collect: a gate workflow the repository does not have has no deleted runs;
   await assert.rejects(collect(api([], `${R}/actions/workflows/claude-review.yml/runs`), REPO, NOW, OPTS));
 });
 
+test("collect: a BLOCK verdict naming a commit GitHub can't find is skipped; another failure on it still throws", async () => {
+  const R = `repos/${REPO}`;
+  const gone = "f".repeat(40);
+  const user = { type: "User" };
+  const comments = [
+    { body: `Review: BLOCK at ${gone}`, user, author_association: "MEMBER" },
+    { body: `Review: MERGE at ${head(2)}`, user, author_association: "MEMBER" },
+  ];
+  const run = (get: Getter) =>
+    collect(
+      async (path: string) => {
+        const bare = path.split("?")[0] ?? path;
+        if (bare === `${R}/issues/2/comments`) return /[?&]page=1(&|$)/.test(path) ? comments : [];
+        if (bare === `${R}/compare/main...${head(2)}`) return { files: [{ filename: "a.ts", status: "modified", sha: "s1" }] };
+        return get(path);
+      },
+      REPO,
+      NOW,
+      OPTS,
+    );
+  const out = await run(api([], undefined, [`${R}/compare/main...${gone}`]));
+  const f = out.pulls.find((p) => p.number === 2)!;
+  assert.deepEqual(f.gate_misses, [], "an unknown commit carries no change to compare");
+  assert.equal(f.drew_blocking, true, "the verdict itself still counts as drawn");
+  await assert.rejects(run(api([], `${R}/compare/main...${gone}`)));
+});
+
 test("collect: a failed read throws, so the run writes every metric missing", async () => {
   await assert.rejects(collect(api([], `repos/${REPO}/pulls/2/comments`), REPO, NOW, OPTS));
   await assert.rejects(collect(api([], `repos/${REPO}/issues/2/comments`), REPO, NOW, OPTS));

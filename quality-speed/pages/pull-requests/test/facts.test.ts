@@ -245,6 +245,12 @@ test("first time: measured at ready for review, not on draft pushes", () => {
   assert.equal(pullFacts(i).ci_green_first_time, true);
 });
 
+test("first time: no CI run once ready leaves it unmeasured, never a miss", () => {
+  const i = input();
+  i.timeline = [{ event: "ready_for_review", created_at: "2030-01-01T10:20:00Z" }];
+  assert.equal(pullFacts(i).ci_green_first_time, null);
+});
+
 test("first time: DCO skipped passes only for a bot; a bot has no template", () => {
   const i = input();
   i.runs[2] = run(3, DCO_WORKFLOW, H1, "2030-01-01T10:00:02Z", "skipped");

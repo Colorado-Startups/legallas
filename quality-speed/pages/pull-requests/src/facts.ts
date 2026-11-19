@@ -136,7 +136,7 @@ export interface PullFacts {
   size_lines: number;
   /** Merged only: what failed among the required gates on the merged head; [] when all held. */
   gate_misses: GateMiss[] | null;
-  /** Null if it never left draft. */
+  /** Null if it never left draft, or no CI run started once it was ready: unmeasured, never a miss. */
   ci_green_first_time: boolean | null;
   /** Null if it never left draft. */
   drew_blocking: boolean | null;
@@ -426,11 +426,9 @@ export function pullFacts(input: PullInput): PullFacts {
   const ciRuns = input.runs.filter((r) => r.path === CI_WORKFLOW).sort(byCreated);
   const firstReady = ready === null ? undefined : ciRuns.find((r) => Date.parse(r.created_at) >= Date.parse(ready) - 5000);
   const ciFirst =
-    ready === null
+    firstReady === undefined
       ? null
-      : firstReady !== undefined &&
-        passedFirstTime(input, CI_WORKFLOW, firstReady.head_sha, false) &&
-        passedFirstTime(input, DCO_WORKFLOW, firstReady.head_sha, bot);
+      : passedFirstTime(input, CI_WORKFLOW, firstReady.head_sha, false) && passedFirstTime(input, DCO_WORKFLOW, firstReady.head_sha, bot);
 
   const blockingVerdict =
     reviewRuns.some((r) => reviewAttempts(input.reviewJobs[r.id]).some((a) => a.verdict === "blocking")) ||

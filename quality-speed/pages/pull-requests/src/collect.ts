@@ -223,7 +223,17 @@ async function pullInput(rd: Readers, pull: RawPull, listing: RawPull[], bases: 
   let blockingSameChange = false;
   if (pull.merged_at && blockedHeads.size > 0) {
     const merged = await rd.changeOf(pull.head.sha);
-    for (const h of blockedHeads) if ((await rd.changeOf(h)) === merged) blockingSameChange = true;
+    for (const h of blockedHeads) {
+      // A verdict's text names its head; one GitHub can't find (mistyped, or pruned) proves nothing, so it is skipped.
+      let change: string;
+      try {
+        change = await rd.changeOf(h);
+      } catch (error) {
+        if (error instanceof NotFound) continue;
+        throw error;
+      }
+      if (change === merged) blockingSameChange = true;
+    }
   }
 
   // When the review that read the body started: the newest passing review on the merged head.

@@ -32,8 +32,8 @@ The owner's decision (Project card "Pull requests page: pull requests, review, m
 | Fact | Read from |
 |---|---|
 | `gate_misses` | A `Review: MERGE at <merged head>` verdict and no `BLOCK` there; `ci.yml` and `dco.yml` green on the head. No behind-main check |
-| `ci_green_first_time` | The head of the first CI run at or after "ready" |
-| `drew_blocking` | A `Review: BLOCK` verdict too |
+| `ci_green_first_time` | The head of the first CI run at or after "ready"; with none, unmeasured, never a miss |
+| `drew_blocking` | A `Review: BLOCK` verdict too. A verdict naming a commit GitHub can't find is skipped in the same-change check |
 
 ## Sources
 
