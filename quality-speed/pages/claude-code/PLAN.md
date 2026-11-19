@@ -167,7 +167,7 @@ For `tokens_per_merged_change`. Measured on Legallas session transcripts, 3 days
 
 | Considered, not taken | Why |
 |---|---|
-| `disableClaudeAiConnectors`: 712 of 869 deferred tool names are connectors | Acts only on connectors Claude Code fetches; the desktop app delivers them in-process ([MCP](https://code.claude.com/docs/en/mcp#how-connectors-reach-claude-code)). Account plugins and connectors, about 30 K of the base by estimate, are the owner's account: Git Crafter |
+| `disableClaudeAiConnectors`: 712 of 869 deferred tool names are connectors | Not a lever: every plugin, skill and connector stays on app-wide ([Claudius: All on, app-wide](https://github.com/Colorado-Startups/claudius/blob/main/templates/claude/README.md#all-on-app-wide)). Account plugins and connectors are about 30 K of the base by estimate |
 | `CLAUDE_CODE_SUBAGENT_MODEL` | Fewer dollars, not fewer tokens |
 | `BASH_MAX_OUTPUT_LENGTH` under 30,000 | 4 % of Bash output characters sit past 15,000 |
 | `SLASH_COMMAND_TOOL_CHAR_BUDGET` | Skill names alone are 22.9 K of the listing's 32.5 K characters |
