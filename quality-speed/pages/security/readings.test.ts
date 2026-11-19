@@ -187,7 +187,7 @@ test('everything counted as open is listed, so each one can be found', () => {
   const counts = sastCounts(0, twoHits, options([entry, { ...entry, path: 'web/gone.ts' }]));
   assert.deepEqual(counts?.unjudged, [{ rule: 'real', path: 'web/a.ts', line: 1, hash: 'h1' }]);
   assert.deepEqual(counts?.staleReasons, [{ rule: 'read', path: 'web/gone.ts', hash: 'h2' }]);
-  assert.deepEqual(counts?.auditedOff, [{ rule: 'named-rule', hits: 2, read: 1 }]);
+  assert.deepEqual(counts?.auditedOff, [{ rule: 'named-rule', hits: 2, read: 1, at: ['web/c.ts:1', 'web/e.ts:1'] }]);
   assert.equal(counts?.open, 3, 'the three lists add up to the count');
 });
 
