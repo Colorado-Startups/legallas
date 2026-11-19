@@ -25,6 +25,8 @@ export type ConfigId = keyof typeof CONFIGS;
 export const CHECKS = ['date', 'node', 'maps', 'urls', 'logs'] as const;
 export type Check = (typeof CHECKS)[number];
 const HARDEN = 'web/scripts/harden.ts';
+/** The first compatibility date with nodejs_compat on by default. */
+const NODE_DEFAULT_FROM = Date.parse('2026-08-04T00:00:00Z');
 
 export interface Item {
   n: number;
@@ -32,6 +34,9 @@ export interface Item {
   settled: 'met' | 'fixed' | 'accepted';
   pr: number;
   check?: Check;
+  /** An accepted item's own date (YYYY-MM-DD) and reason. Without both it counts as a gap. */
+  accepted?: string;
+  reason?: string;
 }
 export interface Practices {
   guide: string;
@@ -87,7 +92,8 @@ export function readConfig(text: string | null, now: Date): ConfigReading | null
     age,
     checks: {
       date: age <= DATE_GOAL_DAYS,
-      node: flags.includes('nodejs_compat'),
+      // Dates from 2026-08-04 turn nodejs_compat on unless no_nodejs_compat opts out (Cloudflare's compatibility flags).
+      node: flags.includes('nodejs_compat') || (date >= NODE_DEFAULT_FROM && !flags.includes('no_nodejs_compat')),
       maps: c.upload_source_maps === true,
       urls: c.workers_dev === false && c.preview_urls === false,
       logs: obs.enabled === true && obs.logs?.enabled === true,
@@ -110,14 +116,22 @@ export function itemPasses(item: Item, configs: Configs): boolean | undefined {
   return read.every((c) => c!.checks[item.check!]); // safe: none null
 }
 
-/** Met over applicable items: an accepted item is out of both, unless its check fails. Null when a config can't be read. */
+/** An accepted item that records its own date and reason. */
+export const acceptedWithReason = (item: Item): boolean =>
+  item.settled === 'accepted' && typeof item.reason === 'string' && item.reason.trim() !== '' && typeof item.accepted === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item.accepted) && Number.isFinite(Date.parse(item.accepted));
+
+/** Met over applicable items: an accepted item is out of both, unless its check fails or it lacks its date or reason. Null when a config can't be read. */
 export function practicesMet(practices: Practices, configs: Configs): { value: number; n: number } | null {
   let met = 0;
   let applicable = 0;
   for (const item of practices.items) {
     const pass = itemPasses(item, configs);
     if (pass === undefined) return null;
-    if (item.settled === 'accepted' && pass) continue;
+    if (item.settled === 'accepted') {
+      if (pass && acceptedWithReason(item)) continue;
+      applicable++;
+      continue;
+    }
     applicable++;
     if (pass) met++;
   }

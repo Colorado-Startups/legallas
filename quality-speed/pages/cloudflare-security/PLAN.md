@@ -23,7 +23,7 @@ flowchart LR
 
 | Metric | Lens | Goal | Floor | Weight | `min_samples` | Why |
 |---|---|---|---|---|---|---|
-| `workers_practices_met` | quality | 100% | 50% | 2 | 1 | Met over applicable items. An accepted item leaves both, unless its config check fails |
+| `workers_practices_met` | quality | 100% | 50% | 2 | 1 | Met over applicable items. An accepted item leaves both, unless its config check fails or it lacks its own `accepted` date and `reason` |
 | `edge_rows_checked` | quality | 12 | 6 | 1 | 1 | Rows in `harden.ts`'s `checkAll`, against the README's 12 |
 | `compat_date_age_days` | speed | 60 | 180 | 2 | 3 | Oldest of the three examples' `compatibility_date` |
 | `sources_read_hours` | speed | 26 | 168 | 1 | 1 | Hours since the last complete read before this run (`facts/reads.json`): a daily lane keeps it near 24 |
@@ -32,7 +32,7 @@ flowchart LR
 | Config check, each of the three examples | Item |
 |---|---|
 | Date: `compatibility_date` within 60 days | 1 |
-| Node: `nodejs_compat` in `compatibility_flags` | 2 |
+| Node: `nodejs_compat` in `compatibility_flags`, or a date from 2026-08-04 without `no_nodejs_compat` | 2 |
 | Maps: `upload_source_maps` true | 3 |
 | URLs: `workers_dev` and `preview_urls` false | 7 |
 | Logs: `observability` and its `logs` on | 16 (traces: accepted) |
@@ -61,13 +61,13 @@ flowchart LR
 
 | Head | `workers_practices_met` | `edge_rows_checked` | `compat_date_age_days` | `sources_read_hours` | `lane_minutes` | Total |
 |---|---|---|---|---|---|---|
-| This branch, read locally | 94.44 (17 of 18) | 12 | 2 | missing: no earlier read | missing: no CI job | 0, awaiting sign-off |
+| This branch, read locally | 100 (18 of 18) | 12 | 2 | missing: no earlier read | missing: no CI job | 0, awaiting sign-off |
 
 ## Fixes
 
 | Fix | Metric | Action |
 |---|---|---|
-| Guide met | `workers_practices_met` | `nodejs_compat` in `wrangler.backup.example.jsonc` |
+| Guide met | `workers_practices_met` | At goal |
 | Every edge row | `edge_rows_checked` | At goal |
 | Date current | `compat_date_age_days` | Move the date in all three examples before 60 days |
 | Daily read | `sources_read_hours` | The second daily run |

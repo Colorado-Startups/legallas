@@ -7,7 +7,7 @@ import type { PassState, RoadFixProps } from '../../core/charts/index.ts';
 import { fixGain } from '../../core/charts/road.ts';
 import type { Detail } from '../../core/detail.ts';
 import { combine, type PageScore, type ScoredRow } from '../../core/score.ts';
-import { CHECKS, CONFIGS, PRACTICES, type ConfigId } from './collect.ts';
+import { acceptedWithReason, CHECKS, CONFIGS, PRACTICES, type ConfigId } from './collect.ts';
 
 const LABELS: Record<string, string> = {
   workers_practices_met: 'Guide met',
@@ -47,7 +47,7 @@ export function itemState(item: (typeof PRACTICES.items)[number], detail: Detail
     if (v.some((x) => x === undefined)) return 'missing';
     if (v.some((x) => x === 0)) return 'fail';
   }
-  return item.settled;
+  return item.settled === 'accepted' && !acceptedWithReason(item) ? 'fail' : item.settled;
 }
 
 export function render({ score: page, metrics, detail }: PageContext): PageOutput {

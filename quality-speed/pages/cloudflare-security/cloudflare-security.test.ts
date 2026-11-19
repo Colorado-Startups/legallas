@@ -9,7 +9,7 @@ import { frameWords } from '../../core/build.ts';
 import { roadState } from '../../core/charts/charts.js';
 import { countWords, MAX_WORDS } from '../../core/guard.ts';
 import { scorePage } from '../../core/score.ts';
-import { collect, detail, edgeRows, practicesMet, PRACTICES, readConfig, readGap, stripJsonc, type ConfigReading, type Configs } from './collect.ts';
+import { acceptedWithReason, collect, detail, edgeRows, practicesMet, PRACTICES, readConfig, readGap, stripJsonc, type ConfigReading, type Configs } from './collect.ts';
 import { configStates, itemState, render, roadFixes } from './page.ts';
 
 const raw = JSON.parse(readFileSync(new URL('./manifest.json', import.meta.url), 'utf8'));
@@ -36,6 +36,10 @@ test('a JSONC config reads each check; a broken or dateless one reads null, neve
   assert.deepEqual(readConfig(CONFIG, NOW), good);
   const old = readConfig(CONFIG.replace('2026-11-17', '2026-08-01').replace('"nodejs_compat",', '').replace('"preview_urls": false', '"preview_urls": true'), NOW);
   assert.deepEqual(old, { age: 109, checks: { date: false, node: false, maps: true, urls: false, logs: true } });
+  const bare = CONFIG.replace('"compatibility_flags": ["nodejs_compat",],', '');
+  assert.equal(readConfig(bare, NOW)?.checks.node, true, 'a date from 2026-08-04 turns nodejs_compat on');
+  assert.equal(readConfig(CONFIG.replace('"nodejs_compat",', '"no_nodejs_compat"'), NOW)?.checks.node, false, 'no_nodejs_compat opts out: a gap');
+  assert.equal(readConfig(bare.replace('2026-11-17', '2026-08-03'), NOW)?.checks.node, false, 'an older date with no flag');
   assert.equal(readConfig(null, NOW), null);
   assert.equal(readConfig('{', NOW), null);
   assert.equal(readConfig('{ "compatibility_date": "soon" }', NOW), null);
@@ -59,6 +63,13 @@ test('accepted items leave the share; a failed check counts against it, even on 
   const noLogs = { ...all(good), mcp: { ...good, checks: { ...good.checks, logs: false } } };
   assert.deepEqual(practicesMet(PRACTICES, noLogs), { value: 94.74, n: 19 });
   assert.equal(practicesMet(PRACTICES, { ...all(good), room: null }), null);
+  const accepted = PRACTICES.items.filter((i) => i.settled === 'accepted');
+  assert.ok(accepted.every(acceptedWithReason), 'every accepted item has its own date and reason');
+  for (const drop of ['reason', 'accepted'] as const) {
+    const items = PRACTICES.items.map((i) => (i.n === 21 ? { ...i, [drop]: undefined } : i));
+    assert.deepEqual(practicesMet({ ...PRACTICES, items }, all(good)), { value: 94.74, n: 19 }, `an accepted item without its ${drop} is a gap`);
+    assert.equal(itemState(items.find((i) => i.n === 21)!, null), 'fail'); // safe: in practices.json
+  }
 });
 
 test('records pass the format; a failed read writes missing, never 0', () => {
@@ -98,7 +109,7 @@ test('the page renders with nothing measured, in the word limit; every metric at
   assert.equal(empty.score.total, 0);
   assert.match(empty.body, /Guide met/);
   assert.ok(countWords(empty.body) + frameWords('cloudflare-security') <= MAX_WORDS, `visible words: ${countWords(empty.body)} + ${frameWords('cloudflare-security')}`);
-  assert.doesNotMatch(empty.body, /—/);
+  assert.doesNotMatch(empty.body, /\u2014/);
   const full = page(atGoal).score;
   assert.deepEqual([full.quality, full.speed, full.consumption, full.total], [100, 100, 100, 100]);
   const rows = joinMetrics(manifest, []).map((m, i) => ({ id: m.id, lens: m.lens, weight: m.weight, group: m.group, score: empty.score.metrics[i]?.score ?? 0 }));
