@@ -143,6 +143,10 @@ if (import.meta.main) {
           hashOf: findingHash,
         })
       : null;
+    // Each thing counted as open, so it can be found and fixed without a second scan (#77). The code and the rules are public.
+    for (const f of sast?.unjudged ?? []) console.log(`::notice title=Semgrep open::${f.rule} ${f.path}:${f.line ?? '?'} ${f.hash ?? 'unread'}`);
+    for (const e of sast?.staleReasons ?? []) console.log(`::notice title=Semgrep stale reason::${e.rule} ${e.path} ${e.hash}`);
+    for (const a of sast?.auditedOff ?? []) console.log(`::notice title=Semgrep audited rule::${a.rule}: ${a.hits} hits, the audit read ${a.read}`);
     const scorecard = r.json<ScorecardOutput>('scorecard.json');
 
     // If osv-scanner reports what Dependabot doesn't, Dependabot has gone quiet, so its zeros mean nothing.
