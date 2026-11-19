@@ -727,6 +727,54 @@
      "metric": "legallas.security.time_to_fix_critical_high_hours"
     }
    ]
+  },
+  {
+   "id": "edge",
+   "name": "Edge",
+   "why": "A room's Workers on Cloudflare, from the Workers guide to a current runtime, deployed only from reviewed code",
+   "ideal": "Every Workers item in Cloudflare's guide is met or recorded with a reason, on a current compatibility date, deployed only from reviewed code.",
+   "sources": [
+    {"title": "Cloudflare Docs: Workers Best Practices", "url": "https://developers.cloudflare.com/workers/best-practices/workers-best-practices/", "date": "2026-11-18"}
+   ],
+   "critical_path": [
+    "guide",
+    "date",
+    "gates"
+   ],
+   "steps": [
+    {
+     "id": "guide",
+     "name": "Workers guide",
+     "tools": [
+      "practices.json",
+      "Wrangler examples"
+     ],
+     "rule": "Every guide item is met in the example configs and code, or accepted with a reason.",
+     "rule_ref": "https://developers.cloudflare.com/workers/best-practices/workers-best-practices/",
+     "metric": "legallas.cloudflare-security.workers_practices_met"
+    },
+    {
+     "id": "date",
+     "name": "Compatibility date",
+     "tools": [
+      "Wrangler examples"
+     ],
+     "rule": "The three example configs' compatibility date is under 60 days old.",
+     "rule_ref": "quality-speed/pages/cloudflare-security/manifest.json",
+     "metric": "legallas.cloudflare-security.compat_date_age_days"
+    },
+    {
+     "id": "gates",
+     "name": "Reviewed deploys",
+     "tools": [
+      "Rulesets",
+      "Required checks"
+     ],
+     "rule": "Only a reviewed commit whose CI passed reaches a Worker: rulesets and required checks stay on.",
+     "rule_ref": "web/README.md",
+     "metric": "legallas.settings.gates_intact"
+    }
+   ]
   }
  ]
 }
