@@ -31,6 +31,7 @@ const SETTLE_CAP_MS = 19_000;
 const WIDTH = 1280;
 const HEIGHT = 800;
 const WAIT_MS = 30_000;
+
 /** ASK_LIMIT lets 6 questions through a minute (wrangler.example.jsonc); a little slower, so no sample is refused. */
 const ASK_SPACING_MS = 10_500;
 /** Ask's model is canned, so its timings aren't scored: a few samples show it works, without a wait of 10 seconds each. */
@@ -468,7 +469,7 @@ const plain = (text: string) => text.replace(/<\/?case-record>/g, ' ').replace(/
  * the page before. Twelve words: long enough not to match by chance, short enough to end before the page does.
  */
 export function quoteOf(passage: string, page: number): string {
-  const cite = new RegExp(`\\[[^\\]]* p\\. ${page}\\]`).exec(passage);
+  const cite = [...passage.matchAll(/\[[^\]]* p\. (\d+)\]/g)].find((found) => found[1] === String(page));
   const from = cite ? passage.slice(cite.index + cite[0].length) : passage;
   return plain(from.replace(/\u2026\s*$/, '')).split(' ').slice(0, 12).join(' ');
 }

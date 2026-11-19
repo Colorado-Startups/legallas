@@ -18,7 +18,11 @@ const EXT = /\.(ts|tsx|js|mjs|cjs|md|ya?ml|json|jsonc|toml|swift|sh|py|astro|css
 const TOP_DIRS = new Set(['web', 'docs', 'Sources', 'Tests', 'LegallasApp', 'templates', '.github', '.claude', 'quality-speed']);
 const WEB_DIRS = new Set(['worker', 'mcp', 'src', 'scripts', 'connect', 'migrations', 'fixtures', 'public']);
 const PLACEHOLDER = /[*?<>{}$…|]|\.\.\.|\s/;
-const ENV = /^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+$/;
+/** An environment name: capitals and digits in two or more parts joined by `_`, the first starting with a letter. Checked a part at a time. */
+function isEnv(code: string): boolean {
+  const [head = '', ...rest] = code.split('_');
+  return rest.length > 0 && /^[A-Z][A-Z0-9]*$/.test(head) && rest.every((part) => /^[A-Z0-9]+$/.test(part));
+}
 const TOOL = /^legallas_[a-z_]+$/;
 const BARE_FILE = /(?<![\w./-])([\w-]+(?:\.[\w-]+)*\.(?:sh|ts|py|md|ya?ml|jsonc?|toml|swift))(?![\w/-])/g;
 
@@ -57,14 +61,20 @@ function bases(from: string): string[] {
   return [...new Set(out)];
 }
 
-const HOST = /^[a-z0-9-]+(\.[a-z0-9-]+)*\.(com|gov|org|net|io|dev|ai|us|uk|app|co)$/;
+const TLDS = new Set(['com', 'gov', 'org', 'net', 'io', 'dev', 'ai', 'us', 'uk', 'app', 'co']);
+/** A host name: labels joined by dots, ending in a known top-level domain. Checked a label at a time. */
+function isHost(name: string): boolean {
+  const labels = name.split('.');
+  const tld = labels.pop() ?? '';
+  return labels.length > 0 && TLDS.has(tld) && labels.every((label) => /^[a-z0-9-]+$/.test(label));
+}
 
 export function looksLikePath(s: string): boolean {
   if (PLACEHOLDER.test(s) || s.startsWith('~') || s.startsWith('/') || s.startsWith('@') || /^[a-z]+:/i.test(s)) return false;
   if (!/^[\w.@/-]+$/.test(s)) return false;
   if (/^Colorado-Startups\//.test(s) || /^\.[a-z]+$/.test(s)) return false;
   const first = s.replace(/^\.\//, '').split('/')[0] ?? '';
-  if (HOST.test(first)) return false;
+  if (isHost(first)) return false;
   // A bare name ending .js is an npm package (punycode.js), not a file here.
   if (!s.includes('/') && s.endsWith('.js')) return false;
   if (EXT.test(s)) return true;
@@ -119,7 +129,7 @@ export function commandNames(text: string): { kind: string; name: string }[] {
 }
 
 function checkSpan(c: Corpus, ctx: Context, from: string, line: number, code: string, out: DeadName[]): void {
-  if (ENV.test(code)) {
+  if (isEnv(code)) {
     if (!ctx.codeText.includes(code) && !ctx.expectedAbsent.has(code)) out.push({ path: from, line, name: code, kind: 'name' });
     return;
   }

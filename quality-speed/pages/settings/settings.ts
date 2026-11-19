@@ -3,6 +3,7 @@
 // expected-settings.json. A reading is either a value or unread: a failed or refused read never becomes a value.
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { globMatch } from '../../core/glob.ts';
 import { ACTIONS_APP_ID, type EnvBody, type Json, type Read, type RulesetBody, type Snapshot } from './reads.ts';
 
 export type Value = boolean | number | string | string[];
@@ -239,7 +240,6 @@ function selectedField(ctx: Ctx, name: string): Reading {
   return typeof v === 'boolean' ? val(v) : UNREAD;
 }
 
-const GLOB = (pattern: string) => new RegExp(`^${pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*')}$`);
 /** True when every action on main is SHA-pinned and allowed by the actions policy. */
 export function allowlistCovers(uses: string[], allowed: string, selected: Record<string, Json> | null): boolean {
   for (const ref of uses) {
@@ -251,7 +251,7 @@ export function allowlistCovers(uses: string[], allowed: string, selected: Recor
     const owner = ref.split('/')[0];
     const githubOwned = selected.github_owned_allowed === true && (owner === 'actions' || owner === 'github');
     const patterns = Array.isArray(selected.patterns_allowed) ? (selected.patterns_allowed as string[]) : [];
-    if (!githubOwned && !patterns.some((p) => GLOB(p).test(ref) || GLOB(p).test(ref.slice(0, at)))) return false;
+    if (!githubOwned && !patterns.some((p) => globMatch(p, ref) || globMatch(p, ref.slice(0, at)))) return false;
   }
   return true;
 }

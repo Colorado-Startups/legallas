@@ -47,7 +47,7 @@ export function duplication(inputs: DupInput[], block = BLOCK): DupResult {
     if (distinct.length < 2) continue;
     for (const w of list) {
       const row = marked[w.f];
-      if (row) for (let k = w.i; k < w.i + block; k++) row[k] = true;
+      if (row) row.fill(true, w.i, w.i + block);
     }
   }
   let codeLines = 0;

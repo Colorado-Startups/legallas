@@ -10,6 +10,7 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { MetricRecord } from '../../contract/format.ts';
+import { globMatch } from '../../core/glob.ts';
 import { laneRecord } from '../../core/lane/collect.ts';
 import { stripHtmlComments } from '../../core/escape.ts';
 
@@ -71,8 +72,7 @@ function rules(settings: unknown, key: 'allow' | 'deny' | 'ask'): string[] {
 /** Whether a deny or ask rule reaches an MCP tool: by its name, its server's name, or a glob over the whole name. A scoped rule, with parentheses, never does. */
 export function reaches(rule: string, tool: string): boolean {
   if (rule.includes('(')) return false;
-  const glob = rule.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replaceAll('*', '.*');
-  return new RegExp(`^${glob}$`).test(tool) || tool.startsWith(`${rule}__`);
+  return globMatch(rule, tool) || tool.startsWith(`${rule}__`);
 }
 
 /** Whether the settings meet one repo row. */

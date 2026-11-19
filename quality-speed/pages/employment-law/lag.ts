@@ -29,7 +29,8 @@ export function sources(plan: string, units: ReadonlySet<string>): Source[] {
   const checked = /^checked = "(\d{4}-\d{2}-\d{2})"$/m.exec(preamble.slice(0, preamble.search(/^\[/m)))?.[1] ?? '';
   const out = new Map<string, Source>();
   for (const unit of blocks) {
-    const field = (key: string) => new RegExp(`^${key} = "(.*)"$`, 'm').exec(unit)?.[1] ?? '';
+    const start = (key: string) => `${key} = "`;
+    const field = (key: string) => unit.split(/[\n\r\u2028\u2029]/).find((l) => l.length > start(key).length && l.startsWith(start(key)) && l.endsWith('"'))?.slice(start(key).length, -1) ?? '';
     if (!units.has(`unit:${field('id')}`)) continue;
     const cfr = /\b(\d+) CFR Part (\d+)\b/.exec(field('citation'));
     if (cfr) out.set(`cfr-${cfr[1]}-${cfr[2]}`, { kind: 'cfr', title: cfr[1]!, part: cfr[2]!, since: /\d{4}-\d{2}-\d{2}/.exec(field('as_of'))?.[0] ?? checked });

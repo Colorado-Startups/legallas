@@ -143,14 +143,29 @@ export function bannedClaim(text: string): boolean {
   return clauses(text).some((c) => [listJoin(c), listJoin(dropAside(c))].some((form) => BANNED.some((re) => unnegated(form, re))));
 }
 
+/** Whether `text` holds `footer`, with any number where the footer says "version N". By position: the footer is never made into a pattern. */
+function holdsFooter(text: string, footer: string): boolean {
+  const cut = footer.indexOf('version N');
+  if (cut === -1) return text.includes(footer);
+  const before = `${footer.slice(0, cut)}version `;
+  const after = footer.slice(cut + 'version N'.length);
+  for (let at = text.indexOf(before); at !== -1; at = text.indexOf(before, at + 1)) {
+    let end = at + before.length;
+    while (/\d/.test(text[end] ?? '')) {
+      end += 1;
+      if (text.startsWith(after, end)) return true;
+    }
+  }
+  return false;
+}
+
 export function wording(d: Doc, n: { short: string; footer: string }): boolean {
   if (!d.fm || !n.short || !n.footer) return false;
   const text = flat(d.body);
   if (!text.includes(flat(n.short)) || !text.includes('No lawyer has reviewed')) return false;
   if (usesFields(d)) {
     const footer = n.footer.replace('[ID]', d.id).replace('[version]', 'version N').replace('[date]', dateOf(d.fm));
-    const re = new RegExp(footer.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace('version N', 'version \\d+'));
-    if (!re.test(text)) return false;
+    if (!holdsFooter(text, footer)) return false;
   }
   return !bannedClaim(d.body);
 }

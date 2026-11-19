@@ -64,7 +64,14 @@ const ENTITY = /&(?:amp|lt|gt|quot|#39);/g;
 /** What can hold case content, by the names code would reach it through. */
 export const NEVER_PUBLISHED = /proposal_events|audit_log|audit\/coverage-|ask-eval-|scripts\/coverage|mcp\/audit|replica-eval|ask-replica/i;
 /** Git Crafter's build writes a page with its script and style inline; json, css, js and svg leave room for a split build. */
-const PROCESS_FILE = /^process\/(?:[a-z0-9][a-z0-9-]{0,63}\/)*[a-z0-9][a-z0-9-]{0,63}\.(?:html|json|css|js|svg)$/;
+const PROCESS_FOLDER = /^[a-z0-9][a-z0-9-]{0,63}$/;
+const PROCESS_NAME = /^[a-z0-9][a-z0-9-]{0,63}\.(?:html|json|css|js|svg)$/;
+/** Under `process/`, in folders with plain names. Checked a part at a time, so no pattern repeats a repeat. */
+function isProcessFile(file: string): boolean {
+  const [top, ...folders] = file.split('/');
+  const name = folders.pop() ?? '';
+  return top === 'process' && folders.every((folder) => PROCESS_FOLDER.test(folder)) && PROCESS_NAME.test(name);
+}
 const GIT_CRAFTER_LINK = /^https:\/\/github\.com\/SoulCraft-Org\/git-crafter\/(?!.*\.\.)[A-Za-z0-9/_.#-]*$/;
 /**
  * The hosts the Process maps cite. Ours (process/*.json) fail their PR's test until added here. The library maps a `use` pulls in
@@ -218,7 +225,7 @@ function checkHtml(file: string, html: string, options: GuardOptions, errors: st
 
 /** A Process page file: on the extension list, under the cap, and its text scanned. */
 function checkProcessFile(site: string, file: string, errors: string[]): void {
-  if (!PROCESS_FILE.test(file) || SECRET.test(file)) return void errors.push('site: a file is not on the list');
+  if (!isProcessFile(file) || SECRET.test(file)) return void errors.push('site: a file is not on the list');
   const bytes = lstatSync(path.join(site, file)).size;
   // A big file is still scanned, so one run shows every rule it breaks.
   if (bytes > MAX_PROCESS_BYTES) errors.push(`${file}: ${bytes} bytes, the limit is ${MAX_PROCESS_BYTES}`);

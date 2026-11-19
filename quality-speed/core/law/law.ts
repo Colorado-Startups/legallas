@@ -57,8 +57,12 @@ export interface Value {
 export const FRESH_DAYS = 365;
 const DAY = 86_400_000;
 const NEED_KEYS = new Set(['id', 'path', 'need', 'source', 'checked', 'covered_by', 'flags']);
-const ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const REF = /^(?:unit|item):[a-z0-9.-]+$|^template:[a-z0-9-]+(?:\/[a-z0-9-]+)*$/;
+const WORD = /^[a-z0-9]+$/;
+const SLUG = /^[a-z0-9-]+$/;
+/** Lowercase words joined by hyphens, checked a word at a time so no pattern repeats a repeat. */
+const isId = (id: string) => id.split('-').every((word) => WORD.test(word));
+/** `unit:<id>`, `item:<id>`, or `template:<folder>/<name>`. */
+const isRef = (ref: string) => /^(?:unit|item):[a-z0-9.-]+$/.test(ref) || (ref.startsWith('template:') && ref.slice('template:'.length).split('/').every((part) => SLUG.test(part)));
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 /** A flag's text is at least this many words, so a fragment such as "a" can't match any document. */
 const FLAG_WORDS = 3;
@@ -100,8 +104,12 @@ export function tables(toml: string, name: string): string[] {
   return out.map((lines) => lines.join('\n'));
 }
 
-/** The first `key = "value"` line, or null. Top-level keys come before a table's sub-tables. */
-export const field = (text: string, key: string) => new RegExp(`^${key} = "(.*)"$`, 'm').exec(text)?.[1] ?? null;
+/** The first `key = "value"` line, or null. Top-level keys come before a table's sub-tables. Read a line at a time: the key is never made into a pattern. */
+export function field(text: string, key: string): string | null {
+  const start = `${key} = "`;
+  const line = text.split(/[\n\r\u2028\u2029]/).find((l) => l.length > start.length && l.startsWith(start) && l.endsWith('"'));
+  return line === undefined ? null : line.slice(start.length, -1);
+}
 
 /** True when `date` lies within FRESH_DAYS before `now`. */
 export function freshDate(date: string | null, now: Date): boolean {
@@ -192,19 +200,19 @@ export function parseNeeds(raw: unknown, slug: string, holdings: Holdings): Need
   const ids = new Set<string>();
   for (const [i, entry] of list.needs.entries()) {
     const n = entry as Partial<Need>;
-    const at = `${slug}: need ${typeof n.id === 'string' && ID.test(n.id) ? n.id : i}`;
+    const at = `${slug}: need ${typeof n.id === 'string' && isId(n.id) ? n.id : i}`;
     if (typeof entry !== 'object' || entry === null) {
       errors.push(`${at}: not an object`);
       continue;
     }
     for (const key of Object.keys(entry)) if (!NEED_KEYS.has(key)) errors.push(`${at}: unknown field`);
-    if (typeof n.id !== 'string' || !ID.test(n.id) || ids.has(n.id)) errors.push(`${at}: id must be unique lowercase words joined by hyphens`);
+    if (typeof n.id !== 'string' || !isId(n.id) || ids.has(n.id)) errors.push(`${at}: id must be unique lowercase words joined by hyphens`);
     else ids.add(n.id);
     if (!holdings.paths.includes(n.path as string)) errors.push(`${at}: path is not in the plan's vocabulary`);
     if (typeof n.need !== 'string' || n.need.length === 0 || n.need.length > 60 || /\n/.test(n.need)) errors.push(`${at}: need is one line of at most 60 characters`);
     if (!officialSource(n.source, holdings.hosts)) errors.push(`${at}: source is not an https page on a .gov host or a plan host`);
     if (n.checked !== null && !(typeof n.checked === 'string' && DATE.test(n.checked))) errors.push(`${at}: checked is a date or null`);
-    if (!Array.isArray(n.covered_by) || !n.covered_by.every((r) => typeof r === 'string' && REF.test(r)) || new Set(n.covered_by).size !== n.covered_by.length) {
+    if (!Array.isArray(n.covered_by) || !n.covered_by.every((r) => typeof r === 'string' && isRef(r)) || new Set(n.covered_by).size !== n.covered_by.length) {
       errors.push(`${at}: covered_by is a list of distinct unit:, template: or item: references`);
     }
     const flagsOk = (f: unknown) => typeof f === 'object' && f !== null && Object.keys(f).every((k) => k === 'kind' || k === 'text') &&

@@ -56,7 +56,7 @@ export function parseRunArgs(args: readonly string[]): RunOptions {
     else if (args[i] === '--room') options.room = path.resolve(value);
     else if (args[i] === '--questions') options.questions = path.resolve(value);
     else if (args[i] === '--record' && /^[a-z-]{1,20}$/.test(value)) options.record = value;
-    else if (args[i] === '--only' && /^[a-z-]+(,[a-z-]+)*$/.test(value)) options.only = value.split(',');
+    else if (args[i] === '--only' && value.split(',').every((name) => /^[a-z-]+$/.test(name))) options.only = value.split(',');
     else if (args[i] === '--samples' && /^[1-9][0-9]?$/.test(value)) options.samples = Number(value);
     else throw new Error(USAGE);
   }

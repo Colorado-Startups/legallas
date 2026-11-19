@@ -22,7 +22,8 @@ export function lagDays(asOf: string, amendments: readonly string[], now: Date):
 /** Each title 17 part a relied-on unit stores, with the date its as_of names. */
 export function parts(plan: string, units: ReadonlySet<string>): { part: string; asOf: string }[] {
   return plan.split(/^\[\[unit\]\]$/m).slice(1).flatMap((unit) => {
-    const field = (key: string) => new RegExp(`^${key} = "(.*)"$`, 'm').exec(unit)?.[1] ?? '';
+    const start = (key: string) => `${key} = "`;
+    const field = (key: string) => unit.split(/[\n\r\u2028\u2029]/).find((l) => l.length > start(key).length && l.startsWith(start(key)) && l.endsWith('"'))?.slice(start(key).length, -1) ?? '';
     const asOf = /\d{4}-\d{2}-\d{2}/.exec(field('as_of'))?.[0];
     if (!units.has(`unit:${field('id')}`) || !asOf || !field('citation').startsWith('17 CFR Part')) return [];
     return [...field('citation').matchAll(/\b(2\d\d)\b/g)].map((m) => ({ part: m[1]!, asOf }));
