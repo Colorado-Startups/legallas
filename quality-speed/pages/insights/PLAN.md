@@ -76,8 +76,9 @@ reverts commit" with a merged commit. Only a repaired change merged into `main` 
 fenced code are skipped.
 
 **The reviewed list** (`reviewed.json`, numbers and one date) holds the real repairs found by reading every merged pull
-request up to `reviewed_through` (`#50`, `#52`, `#55`, `#57`, `#63`, `#64`, from the first review), the issue that
-orders the backlog (`#33`), and the Legallas board's project number (`backlog_board`, 1). The detector reads only a pull request's text and merge order, and the pull request list holds
+request up to `reviewed_through` (`#36`, `#40`, `#57`, from the 2026-11-19 review of this repository's 57 merges: the
+first review's numbers were the earlier private repository's, so recall failed here), the issue that
+orders the backlog (`#33`, a number from that repository too: here a pull request, so it excludes nothing), and the Legallas board's project number (`backlog_board`, 1). The detector reads only a pull request's text and merge order, and the pull request list holds
 every one, so the drill checks every entry whatever its age, and fails on a miss or an empty list: a change to the
 detector or to GitHub's records that loses real repairs shows as red. The drill also fails once `reviewed_through` is more
 than 35 days old, so "no events" keeps resting on current phrasing. Refreshing it is a monthly task: read every pull
