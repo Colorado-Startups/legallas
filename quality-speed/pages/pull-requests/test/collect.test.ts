@@ -72,7 +72,7 @@ function api(calls: string[], failOn?: string, absent: string[] = []): Getter {
     [`${R}/issues/3/timeline`]: [],
     [`${R}/issues/9/timeline`]: [{ event: "ready_for_review", created_at: "2030-02-28T10:00:00Z" }],
     [`${R}/pulls/2/comments`]: [],
-    [`${R}/issues/2/comments`]: [{ body: `Review: MERGE at ${head(2)}\nTokens: 1200`, user: { type: "User" }, author_association: "MEMBER" }],
+    [`${R}/issues/2/comments`]: [{ body: `Review: MERGE at ${head(2)}`, user: { type: "User" }, author_association: "MEMBER", created_at: "2030-02-27T10:05:03Z" }],
     [`${R}/issues/3/comments`]: [],
     [`${R}/pulls/3/comments`]: [{ body: "Blocking: a secret", user: { type: "Bot" } }],
     [`${R}/pulls/2/commits`]: [{ commit: { message: "x" } }],
@@ -129,8 +129,8 @@ test("collect: merged and closed pull requests in range, open ones, and direct p
   assert.equal(f.ci_green_first_time, false, "CI passed only on a rerun");
   assert.equal(f.template_complete, true);
   assert.equal(f.open_minutes, 20);
-  assert.deepEqual(f.review_result_minutes, [2]);
-  assert.deepEqual([f.verdicts, f.review_tokens, f.ci_heads], [1, [1200], 1]);
+  assert.deepEqual(f.review_result_minutes, [5], "the head's first run to the verdict");
+  assert.deepEqual([f.verdicts, f.ci_heads], [1, 1]);
   assert.equal(out.pulls[1]!.drew_blocking, true);
   assert.deepEqual(out.open, [{ number: 9, created_at: "2030-02-27T10:00:00Z", ever_ready: true, excluded: "site_only" }]);
   assert.deepEqual(out.direct_pushes, [{ sha: "f1", at: "2030-02-28T08:00:00Z" }]);

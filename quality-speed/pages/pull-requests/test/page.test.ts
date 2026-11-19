@@ -45,7 +45,6 @@ function fact(n: number, daysAgo: number, over: Partial<PullFacts> = {}): PullFa
     ci_heads: 1,
     final_push_minutes: 2,
     verdicts: 1,
-    review_tokens: [30000],
     stacked: false,
     ...over,
   };

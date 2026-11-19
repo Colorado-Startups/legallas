@@ -39,7 +39,6 @@ function fact(n: number, daysAgo: number, over: Partial<PullFacts> = {}): PullFa
     ci_heads: 1,
     final_push_minutes: 2,
     verdicts: 1,
-    review_tokens: [30000],
     stacked: false,
     ...over,
   };
@@ -55,7 +54,7 @@ function many(count: number, from: number, daysAgo: number, over: Partial<PullFa
 }
 
 /** measure() with every id present, for terse asserts. */
-function m(d: Collected, now = NOW): Record<string, Measured> & Record<"pushes_per_merge" | "final_push_to_merge_p50" | "review_rounds" | "review_tokens_p50" | "big_changes_stacked" | "required_gates_on_merged_head" | "ci_green_first_time" | "no_blocking_findings" | "no_rework_7d" | "small_changes" | "template_complete" | "open_to_merge_p50" | "open_to_merge_p90" | "review_result_p90" | "queue_wait_p50" | "queue_wait_p90" | "queue_ejections_pct" | "queue_minutes_per_merge" | "queue_prs_per_group_p50", Measured> {
+function m(d: Collected, now = NOW): Record<string, Measured> & Record<"pushes_per_merge" | "final_push_to_merge_p50" | "review_rounds" | "big_changes_stacked" | "required_gates_on_merged_head" | "ci_green_first_time" | "no_blocking_findings" | "no_rework_7d" | "small_changes" | "template_complete" | "open_to_merge_p50" | "open_to_merge_p90" | "review_result_p90" | "queue_wait_p50" | "queue_wait_p90" | "queue_ejections_pct" | "queue_minutes_per_merge" | "queue_prs_per_group_p50", Measured> {
   return measure(d, now) as ReturnType<typeof m>;
 }
 
@@ -274,11 +273,10 @@ const atGoal = () => Array.from({ length: 10 }, (_, g) => many(5, 1 + g * 5, 1 +
 const score = (d: Collected, now = NOW) => scorePage("pull-requests", signed, withLane(records(d, manifest, NOW, URL_)), now);
 
 test("score: too few samples, stale, missing or a failed read scores 0", () => {
-  // Too few samples: Quality, Speed, queue minutes and review tokens 0, while the lane's minutes stay at goal, a third of
-  // Consumption. Stacked reads no_events (nothing big), at 100 only while small_changes proves it, which it can't here.
+  // Too few samples: Quality, Speed and queue minutes 0, while the lane's minutes stay at goal, half of Consumption. Stacked reads no_events (nothing big), at 100 only while small_changes proves it, which it can't here.
   const few = score(data(many(5, 1, 2)));
-  assert.deepEqual([few.quality, few.speed, few.consumption], [0, 0, 33]);
-  assert.equal(few.total, 11);
+  assert.deepEqual([few.quality, few.speed, few.consumption], [0, 0, 50]);
+  assert.equal(few.total, 16);
   const full = data(atGoal());
   assert.equal(score(full).total, 100);
   assert.equal(score(full, new Date(NOW.getTime() + 49 * 3600000)).total, 0, "older than 48 hours");
@@ -296,25 +294,22 @@ test("score: all at goal reads exactly 100; a missed gate lowers it and caps not
   assert.ok(missed.total < 100, `total ${missed.total}`);
 });
 
-test("moved and new metrics: pushes, last push, review rounds and tokens, stacks", () => {
+test("moved and new metrics: pushes, last push, review rounds, stacks", () => {
   const pulls = [
     ...many(8, 1, 2),
-    fact(9, 2, { ci_heads: 3, verdicts: 2, review_tokens: [50000, 70000], final_push_minutes: 10 }),
-    fact(10, 2, { state: "closed", ci_heads: 2, verdicts: 1, review_tokens: [] }),
-    fact(11, 20, { verdicts: 0, review_tokens: [] }),
+    fact(9, 2, { ci_heads: 3, verdicts: 2, final_push_minutes: 10 }),
+    fact(10, 2, { state: "closed", ci_heads: 2, verdicts: 1 }),
+    fact(11, 20, { verdicts: 0 }),
   ];
   const r = m(data(pulls));
   // Pushes: 8 + 3 + 2 + 1 over 10 merges. Rounds, last 7 days only: 8 + 2 + 1 over 9 merges.
   assert.equal(r.pushes_per_merge.value, 1.4);
   assert.equal(r.review_rounds.value, 11 / 9);
-  assert.equal(r.review_tokens_p50.value, 30000);
   assert.equal(r.final_push_to_merge_p50.value, 2);
   assert.equal(r.big_changes_stacked.none, true, "nothing big: no events");
   // A recent merge with no verdict proves no review: missing, never cheap. A merge with no CI run, the same for pushes.
   assert.equal(m(data([...pulls, fact(12, 1, { verdicts: 0, ci_heads: 0 })])).review_rounds.value, null);
   assert.equal(m(data([...pulls, fact(12, 1, { ci_heads: 0 })])).pushes_per_merge.value, null);
-  // No verdict carries a Tokens line yet: missing.
-  assert.equal(m(data(many(5, 1, 2, { review_tokens: [] }))).review_tokens_p50.value, null);
   // Big: two lone ones over 400 lines, two stack layers (one small): half stacked.
   const big = m(data([...many(5, 1, 2), fact(6, 2, { size_lines: 900 }), fact(7, 2, { size_lines: 500 }), fact(8, 2, { stacked: true }), fact(9, 2, { stacked: true, size_lines: 900 })]));
   assert.deepEqual([big.big_changes_stacked.value, big.big_changes_stacked.n], [50, 4]);

@@ -159,7 +159,6 @@ export function measure(data: Collected, now: Date): Record<string, Measured> {
   const recent = counted.filter((f) => inRange(f.ended_at, end - REVIEW_DAYS * DAY, end));
   const recentMerged = recent.filter((f) => f.state === "merged");
   const rounds = per(sum(recent.map((f) => f.verdicts)), recentMerged, recentMerged.every((f) => f.verdicts > 0));
-  const tokens = recent.flatMap((f) => f.review_tokens);
   // Stacks: a merge over the size goal, or a stack layer. Stacked ones count; a lone big merge is a miss. None of either:
   // nothing was big, which small_changes proves.
   const big = countedMerged.filter((f) => f.stacked || f.size_lines > SMALL_MAX_LINES);
@@ -185,7 +184,6 @@ export function measure(data: Collected, now: Date): Record<string, Measured> {
     pushes_per_merge: pushed,
     final_push_to_merge_p50: { value: percentile(finals, 0.5), n: finals.length },
     review_rounds: rounds,
-    review_tokens_p50: { value: percentile(tokens, 0.5), n: tokens.length },
     big_changes_stacked: stacked,
     // The lane's job minutes, which no fact holds: missing here, and collect.ts puts core/lane's laneRecord() in its place.
     lane_minutes: { value: null, n: 0 },

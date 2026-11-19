@@ -231,18 +231,6 @@
       "max_age_hours": 48,
       "min_samples": 10,
       "goal_source": "https://martinfowler.com/articles/continuousIntegration.html"
-    },
-    {
-      "id": "review_tokens_p50",
-      "lens": "consumption",
-      "unit": "tokens",
-      "direction": "lower",
-      "floor": 200000,
-      "goal": 50000,
-      "weight": 1,
-      "max_age_hours": 48,
-      "min_samples": 10,
-      "goal_source": "https://claude.dev/blog/solving-code-review-at-anthropic"
     }
   ],
   "changes": [
@@ -257,6 +245,7 @@
     {"date": "2026-11-09", "metric": "review_rounds", "field": "added", "from": null, "to": "review_rounds", "reason": "added_toward_ideal", "issue": 957},
     {"date": "2026-11-09", "metric": "big_changes_stacked", "field": "added", "from": null, "to": "big_changes_stacked", "reason": "added_toward_ideal", "issue": 957},
     {"date": "2026-11-09", "metric": "final_push_to_merge_p50", "field": "added", "from": null, "to": "final_push_to_merge_p50", "reason": "added_toward_ideal", "issue": 957},
-    {"date": "2026-11-09", "metric": "review_tokens_p50", "field": "added", "from": null, "to": "review_tokens_p50", "reason": "added_toward_ideal", "issue": 957}
+    {"date": "2026-11-09", "metric": "review_tokens_p50", "field": "added", "from": null, "to": "review_tokens_p50", "reason": "added_toward_ideal", "issue": 957},
+    {"date": "2026-11-19", "metric": "review_tokens_p50", "field": "retired", "from": null, "to": null, "reason": "not_measurable", "issue": 91}
   ]
 }

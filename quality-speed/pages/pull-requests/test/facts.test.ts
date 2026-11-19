@@ -5,7 +5,6 @@ import {
   CI_WORKFLOW,
   DCO_WORKFLOW,
   type PullInput,
-  REVIEW_TIMEOUT_MINUTES,
   REVIEW_WORKFLOW,
   type RawJob,
   type RawRun,
@@ -70,7 +69,7 @@ const BLOCKED = () => [job("success", "failure", "failure")];
 // Heads as GitHub gives them, so a verdict can name one.
 const H1 = "1".repeat(40);
 const H2 = "2".repeat(40);
-const verdictComment = (kind: "MERGE" | "BLOCK", sha: string) => ({ body: `Review: ${kind} at ${sha}`, user: { type: "User" }, author_association: "MEMBER" });
+const verdictComment = (kind: "MERGE" | "BLOCK", sha: string, at = "2030-01-01T10:15:00Z") => ({ body: `Review: ${kind} at ${sha}`, user: { type: "User" }, author_association: "MEMBER", created_at: at });
 
 function run(id: number, path: string, sha: string, created: string, conclusion: string, attempt = 1): RawRun {
   return { id, path, head_sha: sha, run_attempt: attempt, conclusion, created_at: created };
@@ -192,8 +191,8 @@ test("facts: a clean pull request", () => {
   assert.equal(f.template_complete, true);
   assert.equal(f.edit_checked, true);
   assert.equal(f.open_minutes, 30);
-  // Run 1 is superseded only if cancelled; both finish at 10:12:00.
-  assert.deepEqual(f.review_result_minutes, [718 / 60, 2]);
+  // H2's first run at 10:10:00, its verdict at 10:15:00.
+  assert.deepEqual(f.review_result_minutes, [5]);
   assert.equal(JSON.stringify(f).includes("widget"), false, "no file or branch names in facts");
 });
 
@@ -275,17 +274,13 @@ test("blocking: a bot's inline Blocking comment or a Blocking verdict; a person'
   assert.deepEqual(rerun.gate_misses, ["blocking_verdict"], "the same change on a new head (an empty commit) is still blocked");
 });
 
-test("review time: a crash or a timeout counts as the timeout; a superseded cancel is left out", () => {
-  const crash = pullFacts(input({ reviewJobs: { 1: [job("failure", "skipped", "failure")], 4: PASS() } }));
-  assert.deepEqual(crash.review_result_minutes, [REVIEW_TIMEOUT_MINUTES, 2]);
-  const i = input({ reviewJobs: { 1: [job("success", null, "cancelled", 1, "2030-01-01T10:11:00Z")], 4: PASS() } });
-  i.runs[0] = run(1, REVIEW_WORKFLOW, H1, "2030-01-01T10:00:02Z", "cancelled");
-  assert.deepEqual(pullFacts(i).review_result_minutes, [2], "run 4 started before run 1 was cancelled");
-  const timeout = input({ reviewJobs: { 1: [job("success", null, "cancelled", 1, "2030-01-01T10:05:00Z")], 4: PASS() } });
-  timeout.runs[0] = run(1, REVIEW_WORKFLOW, H1, "2030-01-01T10:00:02Z", "cancelled");
-  assert.deepEqual(pullFacts(timeout).review_result_minutes, [REVIEW_TIMEOUT_MINUTES, 2], "cancelled with no newer run");
-  const skipped = pullFacts(input({ reviewJobs: { 1: SKIPPED(), 4: PASS() } }));
-  assert.deepEqual(skipped.review_result_minutes, [2]);
+test("review time: push to verdict per round; a verdict with no run on its head, or no time, is left out", () => {
+  const rounds = pullFacts(input({ issueComments: [verdictComment("BLOCK", H1, "2030-01-01T10:03:02Z"), verdictComment("MERGE", H2)] }));
+  assert.deepEqual(rounds.review_result_minutes, [3, 5]);
+  const early = pullFacts(input({ issueComments: [verdictComment("MERGE", H2, "2030-01-01T10:09:00Z")] }));
+  assert.deepEqual(early.review_result_minutes, [0], "a verdict before its head's first run reads 0, never negative");
+  const noRun = pullFacts(input({ issueComments: [verdictComment("MERGE", "3".repeat(40)), { ...verdictComment("MERGE", H2), created_at: undefined }] }));
+  assert.deepEqual(noRun.review_result_minutes, []);
 });
 
 test("template: an edit after the review read it fails it; an unchecked body is flagged", () => {
@@ -442,7 +437,7 @@ test("queue runs: each job rounded up to the minute, skipped and unfinished jobs
   assert.equal(jobMinutes([]), 0);
 });
 
-test("facts: pushes, the final push to merge, verdicts with their tokens, stack layers", () => {
+test("facts: pushes, the final push to merge, verdicts, stack layers", () => {
   const user = { type: "User" };
   const comments = [
     { body: "Review: BLOCK at aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\nTokens: 41,200\nfix x", user, author_association: "MEMBER" },
@@ -451,7 +446,7 @@ test("facts: pushes, the final push to merge, verdicts with their tokens, stack 
     { body: "Review: MERGE at abc", user, author_association: "MEMBER" },
   ];
   const f = pullFacts(input({ issueComments: comments }));
-  assert.deepEqual([f.ci_heads, f.final_push_minutes, f.verdicts, f.review_tokens, f.stacked], [2, 20, 2, [41200], false]);
+  assert.deepEqual([f.ci_heads, f.final_push_minutes, f.verdicts, f.stacked], [2, 20, 2, false]);
   assert.equal(pullFacts(input({ stackBase: true })).stacked, true, "another pull request targets its branch");
   assert.equal(pullFacts(input({ timeline: [{ event: "base_ref_changed", created_at: "2030-01-01T10:05:00Z" }] })).stacked, true, "retargeted");
 });
