@@ -9,6 +9,7 @@
 | Elsewhere | Install, setup, licensing, signing, sales, and their issues: not in this repository |
 | Read too | `CONTRIBUTING.md` (outside contributors, merge paths, governance), `CODE_OF_CONDUCT.md`, `SECURITY.md`. `AGENTS.md` links here, so every coding agent has these rules |
 | Web work | `web/README.md` first: setup, commands, Cloudflare rules |
+| Plugins, skills, connectors, agents, tools | All stay on in the Claude desktop app for every Cowork and Code session. A session ignores what it does not need by not loading it; sub-sessions get the full suite too. Never turn one off app-wide or in this repo's settings ([Claudius: All on, app-wide](https://github.com/Colorado-Startups/claudius/blob/main/templates/claude/README.md#all-on-app-wide)) |
 | "core", "pro" | In the code, the two slots a room's entry picks from: `worker/room.ts` or `worker/entry-pro.ts`, `mcp/index.ts` or `mcp/entry-pro.ts`. Both here, same licence. Core never imports pro |
 
 ## Start here
