@@ -67,6 +67,11 @@ const PASS = () => [job("success", "success", "success")];
 const SKIPPED = () => [{ name: "claude-review", run_attempt: 1, conclusion: "skipped", completed_at: "2030-01-01T10:00:05Z", steps: [] }];
 const BLOCKED = () => [job("success", "failure", "failure")];
 
+// Heads as GitHub gives them, so a verdict can name one.
+const H1 = "1".repeat(40);
+const H2 = "2".repeat(40);
+const verdictComment = (kind: "MERGE" | "BLOCK", sha: string) => ({ body: `Review: ${kind} at ${sha}`, user: { type: "User" }, author_association: "MEMBER" });
+
 function run(id: number, path: string, sha: string, created: string, conclusion: string, attempt = 1): RawRun {
   return { id, path, head_sha: sha, run_attempt: attempt, conclusion, created_at: created };
 }
@@ -84,7 +89,7 @@ function input(over: Partial<PullInput> = {}): PullInput {
       draft: false,
       user: { type: "User" },
       base: { ref: "main", sha: "base1" },
-      head: { ref: "claude/widget", sha: "head2" },
+      head: { ref: "claude/widget", sha: H2 },
     },
     files: [
       { filename: "web/src/widget.ts", additions: 30, deletions: 5 },
@@ -94,22 +99,21 @@ function input(over: Partial<PullInput> = {}): PullInput {
     reviewComments: [],
     commits: [{ commit: { message: "Widget\n\nSigned-off-by: someone" } }],
     runs: [
-      run(1, REVIEW_WORKFLOW, "head1", "2030-01-01T10:00:02Z", "success"),
-      run(2, CI_WORKFLOW, "head1", "2030-01-01T10:00:02Z", "success"),
-      run(3, DCO_WORKFLOW, "head1", "2030-01-01T10:00:02Z", "success"),
-      run(4, REVIEW_WORKFLOW, "head2", "2030-01-01T10:10:00Z", "success"),
-      run(5, CI_WORKFLOW, "head2", "2030-01-01T10:10:00Z", "success"),
-      run(6, DCO_WORKFLOW, "head2", "2030-01-01T10:10:00Z", "success"),
+      run(1, REVIEW_WORKFLOW, H1, "2030-01-01T10:00:02Z", "success"),
+      run(2, CI_WORKFLOW, H1, "2030-01-01T10:00:02Z", "success"),
+      run(3, DCO_WORKFLOW, H1, "2030-01-01T10:00:02Z", "success"),
+      run(4, REVIEW_WORKFLOW, H2, "2030-01-01T10:10:00Z", "success"),
+      run(5, CI_WORKFLOW, H2, "2030-01-01T10:10:00Z", "success"),
+      run(6, DCO_WORKFLOW, H2, "2030-01-01T10:10:00Z", "success"),
     ],
     firstAttempt: {},
     reviewJobs: { 1: PASS(), 4: PASS() },
     rules: RULES,
-    behindMain: 0,
     blockingSameChange: false,
     fixes: [],
     reworkUnknown: false,
     editedAfterReview: false,
-    issueComments: [],
+    issueComments: [verdictComment("MERGE", H2)],
     stackBase: false,
     ...over,
   };
@@ -193,65 +197,63 @@ test("facts: a clean pull request", () => {
   assert.equal(JSON.stringify(f).includes("widget"), false, "no file or branch names in facts");
 });
 
-test("gate: a skipped review on the merged head is a miss", () => {
-  assert.deepEqual(pullFacts(input({ reviewJobs: { 1: PASS(), 4: SKIPPED() } })).gate_misses, ["review_not_run"]);
+test("gate: no MERGE verdict on the merged head is a miss; one on an earlier head does not cover it", () => {
+  assert.deepEqual(pullFacts(input({ issueComments: [] })).gate_misses, ["review_not_run"]);
+  assert.deepEqual(pullFacts(input({ issueComments: [verdictComment("MERGE", H1)] })).gate_misses, ["review_not_run"]);
+  const bot = { ...verdictComment("MERGE", H2), user: { type: "Bot" } };
+  assert.deepEqual(pullFacts(input({ issueComments: [bot] })).gate_misses, ["review_not_run"], "a bot can't post one");
 });
 
-test("gate: a pass on an earlier head does not cover the merged head", () => {
-  const i = input();
-  i.runs = i.runs.filter((r) => r.id !== 4);
-  assert.deepEqual(pullFacts(i).gate_misses, ["review_not_run"]);
-});
-
-test("gate: re-running the review until it passes does not override a Blocking verdict", () => {
-  const f = pullFacts(input({ reviewJobs: { 1: PASS(), 4: [job("success", "failure", "failure", 1), job("success", "success", "success", 2)] } }));
+test("gate: a BLOCK verdict on the merged head is a miss, even beside a MERGE", () => {
+  const f = pullFacts(input({ issueComments: [verdictComment("BLOCK", H2), verdictComment("MERGE", H2)] }));
   assert.deepEqual(f.gate_misses, ["blocking_verdict"]);
   assert.equal(f.drew_blocking, true);
 });
 
-test("gate: editing the review workflow, red CI, red DCO, or merging behind main are misses", () => {
-  const wf = input();
-  wf.files.push({ filename: REVIEW_WORKFLOW, additions: 1, deletions: 1 });
-  assert.deepEqual(pullFacts(wf).gate_misses, ["review_workflow_changed"]);
+test("gate: red CI or red DCO are misses", () => {
   const ci = input();
-  ci.runs[4] = run(5, CI_WORKFLOW, "head2", "2030-01-01T10:10:00Z", "failure");
+  ci.runs[4] = run(5, CI_WORKFLOW, H2, "2030-01-01T10:10:00Z", "failure");
   assert.deepEqual(pullFacts(ci).gate_misses, ["ci_not_green"]);
   const dco = input();
-  dco.runs[5] = run(6, DCO_WORKFLOW, "head2", "2030-01-01T10:10:00Z", "skipped");
+  dco.runs[5] = run(6, DCO_WORKFLOW, H2, "2030-01-01T10:10:00Z", "skipped");
   assert.deepEqual(pullFacts(dco).gate_misses, ["dco_not_green"]);
-  assert.deepEqual(pullFacts(input({ behindMain: 2 })).gate_misses, ["behind_main"]);
-  assert.deepEqual(pullFacts(input({ behindMain: null })).gate_misses, ["behind_main"], "unknown is a miss");
 });
 
 test("gate: a CI rerun that passed on the merged head is green", () => {
   const i = input();
-  i.runs[4] = run(5, CI_WORKFLOW, "head2", "2030-01-01T10:10:00Z", "success", 2);
+  i.runs[4] = run(5, CI_WORKFLOW, H2, "2030-01-01T10:10:00Z", "success", 2);
   assert.deepEqual(pullFacts(i).gate_misses, []);
 });
 
 test("first time: CI failing first, passing on rerun, is not first-pass", () => {
   const i = input();
-  i.runs[1] = run(2, CI_WORKFLOW, "head1", "2030-01-01T10:00:02Z", "success", 2);
+  i.runs[1] = run(2, CI_WORKFLOW, H1, "2030-01-01T10:00:02Z", "success", 2);
   i.firstAttempt = { 2: "failure" };
   assert.equal(pullFacts(i).ci_green_first_time, false);
 });
 
 test("first time: a cancelled CI on the first head is not first-pass", () => {
   const i = input();
-  i.runs[1] = run(2, CI_WORKFLOW, "head1", "2030-01-01T10:00:02Z", "cancelled");
+  i.runs[1] = run(2, CI_WORKFLOW, H1, "2030-01-01T10:00:02Z", "cancelled");
   assert.equal(pullFacts(i).ci_green_first_time, false);
 });
 
 test("first time: measured at ready for review, not on draft pushes", () => {
   const i = input();
   i.timeline = [{ event: "ready_for_review", created_at: "2030-01-01T10:09:59Z" }];
-  i.runs[1] = run(2, CI_WORKFLOW, "head1", "2030-01-01T10:00:02Z", "failure");
+  i.runs[1] = run(2, CI_WORKFLOW, H1, "2030-01-01T10:00:02Z", "failure");
   assert.equal(pullFacts(i).ci_green_first_time, true);
+});
+
+test("first time: no CI run once ready leaves it unmeasured, never a miss", () => {
+  const i = input();
+  i.timeline = [{ event: "ready_for_review", created_at: "2030-01-01T10:20:00Z" }];
+  assert.equal(pullFacts(i).ci_green_first_time, null);
 });
 
 test("first time: DCO skipped passes only for a bot; a bot has no template", () => {
   const i = input();
-  i.runs[2] = run(3, DCO_WORKFLOW, "head1", "2030-01-01T10:00:02Z", "skipped");
+  i.runs[2] = run(3, DCO_WORKFLOW, H1, "2030-01-01T10:00:02Z", "skipped");
   assert.equal(pullFacts(i).ci_green_first_time, false);
   i.pull.user = { type: "Bot" };
   const f = pullFacts(i);
@@ -267,6 +269,8 @@ test("blocking: a bot's inline Blocking comment or a Blocking verdict; a person'
   const verdict = pullFacts(input({ reviewJobs: { 1: BLOCKED(), 4: PASS() } }));
   assert.equal(verdict.drew_blocking, true, "a summary-only finding still shows as a Blocking verdict");
   assert.deepEqual(verdict.gate_misses, [], "fixed before the merged head");
+  const earlier = pullFacts(input({ issueComments: [verdictComment("BLOCK", H1), verdictComment("MERGE", H2)] }));
+  assert.deepEqual([earlier.drew_blocking, earlier.gate_misses], [true, []], "a BLOCK verdict fixed before the merged head");
   const rerun = pullFacts(input({ reviewJobs: { 1: BLOCKED(), 4: PASS() }, blockingSameChange: true }));
   assert.deepEqual(rerun.gate_misses, ["blocking_verdict"], "the same change on a new head (an empty commit) is still blocked");
 });
@@ -275,10 +279,10 @@ test("review time: a crash or a timeout counts as the timeout; a superseded canc
   const crash = pullFacts(input({ reviewJobs: { 1: [job("failure", "skipped", "failure")], 4: PASS() } }));
   assert.deepEqual(crash.review_result_minutes, [REVIEW_TIMEOUT_MINUTES, 2]);
   const i = input({ reviewJobs: { 1: [job("success", null, "cancelled", 1, "2030-01-01T10:11:00Z")], 4: PASS() } });
-  i.runs[0] = run(1, REVIEW_WORKFLOW, "head1", "2030-01-01T10:00:02Z", "cancelled");
+  i.runs[0] = run(1, REVIEW_WORKFLOW, H1, "2030-01-01T10:00:02Z", "cancelled");
   assert.deepEqual(pullFacts(i).review_result_minutes, [2], "run 4 started before run 1 was cancelled");
   const timeout = input({ reviewJobs: { 1: [job("success", null, "cancelled", 1, "2030-01-01T10:05:00Z")], 4: PASS() } });
-  timeout.runs[0] = run(1, REVIEW_WORKFLOW, "head1", "2030-01-01T10:00:02Z", "cancelled");
+  timeout.runs[0] = run(1, REVIEW_WORKFLOW, H1, "2030-01-01T10:00:02Z", "cancelled");
   assert.deepEqual(pullFacts(timeout).review_result_minutes, [REVIEW_TIMEOUT_MINUTES, 2], "cancelled with no newer run");
   const skipped = pullFacts(input({ reviewJobs: { 1: SKIPPED(), 4: PASS() } }));
   assert.deepEqual(skipped.review_result_minutes, [2]);

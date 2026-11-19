@@ -25,6 +25,16 @@ The owner's decision (Project card "Pull requests page: pull requests, review, m
 | `verdicts`, `review_tokens` | Issue comments: first line `Review: MERGE at <sha>` (or BLOCK), line 2 `Tokens: n` |
 | `stacked` | A `base_ref_changed` event, or another pull request targets the branch |
 
+## Gates, 2026-11-19 (#87)
+
+`claude-review` was retired on 2026-11-05, and the ruleset's status checks aren't strict (merge queue). Facts v9:
+
+| Fact | Read from |
+|---|---|
+| `gate_misses` | A `Review: MERGE at <merged head>` verdict and no `BLOCK` there; `ci.yml` and `dco.yml` green on the head. No behind-main check |
+| `ci_green_first_time` | The head of the first CI run at or after "ready"; with none, unmeasured, never a miss |
+| `drew_blocking` | A `Review: BLOCK` verdict too. A verdict naming a commit GitHub can't find is skipped in the same-change check |
+
 ## Sources
 
 Primary sources, read on 2026-11-02, unless marked secondary.

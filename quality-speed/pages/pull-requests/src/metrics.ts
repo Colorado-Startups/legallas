@@ -101,6 +101,7 @@ export function measure(data: Collected, now: Date): Record<string, Measured> {
   // Closed without merging counts too, once it was ready: closing and
   // reopening must not hide a red first run or a Blocking finding.
   const submitted = counted.filter((f) => f.ready_at !== null);
+  const firstRead = submitted.flatMap((f) => (f.ci_green_first_time === null ? [] : [f.ci_green_first_time]));
 
   // The gate: every merge into main but this site's own. Each push to main
   // without a pull request and each deleted CI, DCO or review run is a miss.
@@ -166,7 +167,8 @@ export function measure(data: Collected, now: Date): Record<string, Measured> {
 
   return {
     required_gates_on_merged_head: { value: share(gates), n: gates.length },
-    ci_green_first_time: { value: share(submitted.map((f) => f.ci_green_first_time === true)), n: submitted.length },
+    // No CI run after "ready" is no reading, never a miss.
+    ci_green_first_time: { value: share(firstRead), n: firstRead.length },
     no_blocking_findings: { value: share(submitted.map((f) => f.drew_blocking === false)), n: submitted.length },
     no_rework_7d: { value: share(matured.map((f) => !redone.has(f.number))), n: matured.length },
     small_changes: { value: share(countedMerged.map((f) => f.size_lines <= SMALL_MAX_LINES)), n: countedMerged.length },

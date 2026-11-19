@@ -55,6 +55,7 @@ import {
   queuePull,
   readyAt,
   reviewAttempts,
+  verdictLines,
 } from "./facts.ts";
 import { type Getter, type GraphQL, NotFound, RateLimited, fetchGetter, getAll, ghGetter, graphqlClient } from "./github.ts";
 import { type Collected, type DeletedRun, type Manifest, type OpenPull, WINDOW_DAYS, failedRecords, records } from "./metrics.ts";
@@ -148,16 +149,6 @@ async function changeAt(get: Getter, repo: string, sha: string): Promise<string>
   return cmp.files.map((f) => `${f.status} ${f.sha} ${f.filename}`).sort().join("\n");
 }
 
-/** Commits main had at the merge that the merged head lacked. */
-async function behindMain(rd: Readers, pull: RawPull): Promise<number | null> {
-  if (!pull.merge_commit_sha) return null;
-  const merge = (await rd.get(`repos/${rd.repo}/commits/${pull.merge_commit_sha}`)) as { parents?: { sha: string }[] };
-  const parent = merge.parents?.[0]?.sha;
-  if (!parent) return null;
-  const cmp = (await rd.get(`repos/${rd.repo}/compare/${parent}...${pull.head.sha}`)) as { behind_by?: number };
-  return typeof cmp.behind_by === "number" ? cmp.behind_by : null;
-}
-
 /** The body was edited after `since` (when the passing review that read it started). */
 async function editedAfter(rd: Readers, pull: RawPull, since: string): Promise<boolean | null> {
   if (!rd.graphql || !pull.merged_at) return null;
@@ -224,12 +215,25 @@ async function pullInput(rd: Readers, pull: RawPull, listing: RawPull[], bases: 
   // merged head (an empty commit, or main merged in) was rerun away.
   const reviewRuns = runs.filter((x) => x.path === REVIEW_WORKFLOW);
   const blockedHeads = new Set(
-    reviewRuns.filter((x) => x.head_sha !== pull.head.sha && reviewAttempts(reviewJobs[x.id]).some((a) => a.verdict === "blocking")).map((x) => x.head_sha),
+    [
+      ...reviewRuns.filter((x) => reviewAttempts(reviewJobs[x.id]).some((a) => a.verdict === "blocking")).map((x) => x.head_sha),
+      ...verdictLines(issueComments).filter((v) => v.kind === "BLOCK").map((v) => v.sha),
+    ].filter((sha) => sha !== pull.head.sha),
   );
   let blockingSameChange = false;
   if (pull.merged_at && blockedHeads.size > 0) {
     const merged = await rd.changeOf(pull.head.sha);
-    for (const h of blockedHeads) if ((await rd.changeOf(h)) === merged) blockingSameChange = true;
+    for (const h of blockedHeads) {
+      // A verdict's text names its head; one GitHub can't find (mistyped, or pruned) proves nothing, so it is skipped.
+      let change: string;
+      try {
+        change = await rd.changeOf(h);
+      } catch (error) {
+        if (error instanceof NotFound) continue;
+        throw error;
+      }
+      if (change === merged) blockingSameChange = true;
+    }
   }
 
   // When the review that read the body started: the newest passing review on the merged head.
@@ -246,7 +250,6 @@ async function pullInput(rd: Readers, pull: RawPull, listing: RawPull[], bases: 
     firstAttempt,
     reviewJobs,
     rules,
-    behindMain: pull.merged_at ? await behindMain(rd, pull) : null,
     blockingSameChange,
     fixes,
     reworkUnknown,
