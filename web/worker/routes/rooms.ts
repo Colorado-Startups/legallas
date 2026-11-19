@@ -295,7 +295,7 @@ export function folderIndex(room: GuestRoom, folders: readonly string[], rows: r
     .map((folder) => {
       const inside = rows.filter((row) => home(row) === folder);
       const date = newest(inside);
-      const head = `<p class="door-help" data-folder><strong>${escapeHtml(folder.split('/').pop()!)}</strong>, ${date ? `updated ${date}` : 'no documents yet'}</p>`;
+      const head = `<p class="door-help" data-folder><strong>${escapeHtml(folder.split('/').pop()!)}</strong>, ${date ? `updated ${escapeHtml(date)}` : 'no documents yet'}</p>`;
       return inside.length ? `${head}<ul class="door-steps">${inside.map((row) => item(room, row)).join('')}</ul>` : head;
     })
     .join('');
@@ -315,7 +315,7 @@ async function home(c: GuestContext): Promise<Response> {
       const folders = rows.length ? await listRoomFolders(c.env.DB, room.id) : [];
       const first = startHere(rows);
       const start = first.length ? `<p class="door-help">Start here</p><ul class="door-steps" data-start-here>${first.map((row) => item(room, row)).join('')}</ul>` : '';
-      items = rows.length ? `<p class="door-help" data-updated>Last updated ${newest(rows)}.</p>${start}${folderIndex(room, folders, rows)}` : '<p class="door-lede">No documents yet.</p>';
+      items = rows.length ? `<p class="door-help" data-updated>Last updated ${escapeHtml(newest(rows) ?? '')}.</p>${start}${folderIndex(room, folders, rows)}` : '<p class="door-lede">No documents yet.</p>';
     } catch (error) {
       if (!(error instanceof PrivilegeMarksUnavailable)) throw error;
       items = '<p class="door-lede">This room is unavailable for now.</p>';

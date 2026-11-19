@@ -2,9 +2,9 @@
   "rules_not_scored": [
     {
       "rule": "html-in-template-string",
-      "audited_hits": 171,
+      "audited_hits": 268,
       "not_counted_under": "quality-speed/",
-      "reason": "It fires on every HTML template, so it says nothing about any one of them. Two audits on 2026-11-02 read the templates in the product and traced each value to its escaping, and found no injection (PLAN.md). Any other count than the one they read counts as open until someone reads the difference. The site under quality-speed/ is left out: it reaches only repository members, under a strict policy, and the format lets through only numbers, dates and ids"
+      "reason": "It fires on every HTML template, so it says nothing about any one of them. An audit on 2026-11-19 read all 268 hits in the product, traced each value to its escaping, and found none that reaches a page raw; seven that leaned on a check made elsewhere now escape where they land (PLAN.md). Any other count than the one it read counts as open until someone reads the difference. The site under quality-speed/ is left out. It is public. The same audit read its page code: each value drawn is a constant, a number, or text escaped by the chart kit's esc(), each page carries a strict Content-Security-Policy, and the publish guard refuses markup and links outside its allow-lists"
     }
   ],
   "sast": [
