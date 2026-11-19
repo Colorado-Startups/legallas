@@ -48,7 +48,12 @@ function unindent(xml: string): string {
 export function cfrAnnualSection(xml: string, title: number, number: string): CfrAnnualSection {
   const where = `${title} C.F.R. § ${number}`;
   if (!/<\/CFRGRANULE>\s*$/.test(xml)) throw new Error(`${where}: the file is cut short, with no closing CFRGRANULE`);
-  const field = (tag: string) => htmlText(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`).exec(xml)?.[1] ?? '');
+  // The first <TAG>...</TAG>, found by position: the tag is never made into a pattern.
+  const field = (tag: string) => {
+    const from = xml.indexOf(`<${tag}>`);
+    const to = from === -1 ? -1 : xml.indexOf(`</${tag}>`, from + tag.length + 2);
+    return htmlText(to === -1 ? '' : xml.slice(from + tag.length + 2, to));
+  };
   if (field('CFRTITLE') !== String(title)) throw new Error(`${where}: the file is from title ${field('CFRTITLE') || 'unknown'}`);
   const revised = field('DATE');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(revised)) throw new Error(`${where}: the file does not say which edition it is`);

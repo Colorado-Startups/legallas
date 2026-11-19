@@ -5,6 +5,7 @@
 // and a change has to keep compiling, for no behaviour.
 import type * as TS from 'typescript';
 import { dirname, join, relative, resolve } from 'node:path';
+import { pathGlobMatch } from '../../../core/glob.ts';
 
 /** The compiler's "declared but never used" family of diagnostics. */
 const UNUSED_CODES = new Set([6133, 6138, 6192, 6196, 6198, 6199, 6205]);
@@ -61,20 +62,7 @@ const RESOLVE_SUFFIXES = ['', '.ts', '.tsx', '.mjs', '.js', '/index.ts', '/index
 export function globTargets(fromFile: string, pattern: string, files: readonly string[]): string[] {
   if (!pattern.startsWith('.')) return [];
   const full = join(dirname(fromFile), pattern);
-  let re = '';
-  for (let k = 0; k < full.length; k++) {
-    const c = full[k];
-    if (c === '*' && full[k + 1] === '*') {
-      re += '.*';
-      k++;
-    } else if (c === '*') re += '[^/]*';
-    else if (c === '{') re += '(';
-    else if (c === '}') re += ')';
-    else if (c === ',') re += '|';
-    else re += (c ?? '').replace(/[.+?^$()|[\]\\]/g, '\\$&');
-  }
-  const matcher = new RegExp(`^${re}$`);
-  return files.filter((f) => matcher.test(f));
+  return files.filter((f) => pathGlobMatch(full, f));
 }
 
 function resolveSpecifier(fromFile: string, spec: string, exists: (path: string) => boolean): string | undefined {

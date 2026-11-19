@@ -50,9 +50,14 @@ export function readableLines(c: Corpus, path: string): string[] | null {
   return c.read(path).split(/\r?\n/).map((l) => (l.trim().startsWith('#') ? l.trim().replace(/^#+\s?/, '') : ''));
 }
 
+/** The only places this file compiles a pattern, one per way of matching. Each comes from this page's own questions.json, which is reviewed like code. */
+const anyCase = (pattern: string) => new RegExp(pattern, 'i');
+const perLine = (pattern: string) => new RegExp(pattern, 'm');
+const everyLine = (pattern: string) => new RegExp(pattern, 'gm');
+
 /** First line where `pattern` matches, joining each line with the next so a phrase may wrap. */
 export function findLine(lines: string[], pattern: string): number | null {
-  const re = new RegExp(pattern, 'i');
+  const re = anyCase(pattern);
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i] ?? '';
     const next = lines[i + 1] ?? '';
@@ -93,7 +98,7 @@ export function docValue(c: Corpus, q: Question): string | null {
   const lines = readableLines(c, q.doc.path);
   const line = lines ? findLine(lines, q.doc.pattern) : null;
   if (!lines || line === null) return null;
-  const re = new RegExp(q.doc.pattern, 'i');
+  const re = anyCase(q.doc.pattern);
   const m = re.exec(lines[line - 1] ?? '') ?? re.exec(`${lines[line - 1] ?? ''} ${lines[line] ?? ''}`);
   return m?.[1] ?? null;
 }
@@ -107,17 +112,17 @@ export function checkTruth(c: Corpus, t: Truth, stated: string | null = null): b
       return Object.hasOwn(JSON.parse(c.read('web/package.json')).scripts ?? {}, t.name);
     }
     case 'grep':
-      return c.fileSet.has(t.path) && new RegExp(t.pattern, 'm').test(codeOf(c, t.path, t.comments));
+      return c.fileSet.has(t.path) && perLine(t.pattern).test(codeOf(c, t.path, t.comments));
     case 'count':
-      return c.fileSet.has(t.path) && (codeOf(c, t.path, t.comments).match(new RegExp(t.pattern, 'gm')) ?? []).length === t.equals;
+      return c.fileSet.has(t.path) && (codeOf(c, t.path, t.comments).match(everyLine(t.pattern)) ?? []).length === t.equals;
     case 'count_as_doc':
-      return stated !== null && c.fileSet.has(t.path) && (codeOf(c, t.path, t.comments).match(new RegExp(t.pattern, 'gm')) ?? []).length === Number(stated);
+      return stated !== null && c.fileSet.has(t.path) && (codeOf(c, t.path, t.comments).match(everyLine(t.pattern)) ?? []).length === Number(stated);
   }
 }
 
 function conflictsOf(c: Corpus, patterns: string[]): { path: string; line: number }[] {
   if (patterns.length === 0) return [];
-  const res = patterns.map((p) => new RegExp(p, 'i'));
+  const res = patterns.map((p) => anyCase(p));
   const out: { path: string; line: number }[] = [];
   const scan = (path: string, lines: string[]) => {
     for (let i = 0; i < lines.length; i++) {
@@ -160,9 +165,9 @@ export function checkQuestions(c: Corpus, questions: Question[]): QuestionResult
  * changing; with no proven value, every answer to it is wrong.
  */
 export function grade(q: Question, answer: string, stated: string | null = null): boolean {
-  if ((q.reject ?? []).some((p) => new RegExp(p, 'i').test(answer))) return false;
+  if ((q.reject ?? []).some((p) => anyCase(p).test(answer))) return false;
   return q.accept.every((p) => {
-    if (!p.includes('{doc}')) return new RegExp(p, 'i').test(answer);
-    return stated !== null && new RegExp(p.replaceAll('{doc}', stated.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), 'i').test(answer);
+    if (!p.includes('{doc}')) return anyCase(p).test(answer);
+    return stated !== null && anyCase(p.replaceAll('{doc}', stated.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))).test(answer);
   });
 }
