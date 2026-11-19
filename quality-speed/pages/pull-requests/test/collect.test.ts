@@ -14,6 +14,9 @@ const OPTS = { git: "/nonexistent", hasCommit: () => true };
 const TEMPLATE = "## What\n## Why\n## Checklist\n- [ ] One\n- [ ] No secrets\n";
 const BODY = "## What\nA.\n## Why\nB.\n## Checklist\n- [x] One\n- [x] No secrets\n";
 
+// A head as GitHub gives it, so a verdict can name one.
+const head = (n: number) => String(n).repeat(40);
+
 function pull(n: number, merged: string | null, closed: string | null = merged, base = "main") {
   return {
     number: n,
@@ -27,7 +30,7 @@ function pull(n: number, merged: string | null, closed: string | null = merged, 
     draft: false,
     user: { type: "User" },
     base: { ref: base, sha: "b0" },
-    head: { ref: `claude/change-${n}`, sha: `h${n}` },
+    head: { ref: `claude/change-${n}`, sha: head(n) },
   };
 }
 
@@ -69,16 +72,16 @@ function api(calls: string[], failOn?: string, absent: string[] = []): Getter {
     [`${R}/issues/3/timeline`]: [],
     [`${R}/issues/9/timeline`]: [{ event: "ready_for_review", created_at: "2030-02-28T10:00:00Z" }],
     [`${R}/pulls/2/comments`]: [],
-    [`${R}/issues/2/comments`]: [{ body: "Review: MERGE at aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\nTokens: 1200", user: { type: "User" }, author_association: "MEMBER" }],
+    [`${R}/issues/2/comments`]: [{ body: `Review: MERGE at ${head(2)}\nTokens: 1200`, user: { type: "User" }, author_association: "MEMBER" }],
     [`${R}/issues/3/comments`]: [],
     [`${R}/pulls/3/comments`]: [{ body: "Blocking: a secret", user: { type: "Bot" } }],
     [`${R}/pulls/2/commits`]: [{ commit: { message: "x" } }],
     [`${R}/pulls/3/commits`]: [{ commit: { message: "y" } }],
     [`${R}/actions/runs`]: {
       workflow_runs: [
-        { id: 10, path: ".github/workflows/claude-review.yml", head_sha: "h2", run_attempt: 1, conclusion: "success", created_at: "2030-02-27T10:00:03Z" },
-        { id: 11, path: ".github/workflows/ci.yml", head_sha: "h2", run_attempt: 2, conclusion: "success", created_at: "2030-02-27T10:00:03Z" },
-        { id: 12, path: ".github/workflows/dco.yml", head_sha: "h2", run_attempt: 1, conclusion: "success", created_at: "2030-02-27T10:00:03Z" },
+        { id: 10, path: ".github/workflows/claude-review.yml", head_sha: head(2), run_attempt: 1, conclusion: "success", created_at: "2030-02-27T10:00:03Z" },
+        { id: 11, path: ".github/workflows/ci.yml", head_sha: head(2), run_attempt: 2, conclusion: "success", created_at: "2030-02-27T10:00:03Z" },
+        { id: 12, path: ".github/workflows/dco.yml", head_sha: head(2), run_attempt: 1, conclusion: "success", created_at: "2030-02-27T10:00:03Z" },
       ],
     },
     [`${R}/actions/runs/11/attempts/1`]: { conclusion: "failure" },
@@ -90,8 +93,6 @@ function api(calls: string[], failOn?: string, absent: string[] = []): Getter {
         { name: "swift", conclusion: "skipped", started_at: "2030-02-27T10:14:41Z", completed_at: "2030-02-27T10:14:30Z" },
       ],
     },
-    [`${R}/commits/m2`]: { parents: [{ sha: "p2" }] },
-    [`${R}/compare/p2...h2`]: { behind_by: 0 },
     [`${R}/actions/workflows/claude-review.yml/runs`]: { workflow_runs: [{ run_number: 7 }, { run_number: 5 }, { run_number: 4 }] },
     [`${R}/actions/workflows/ci.yml/runs`]: { workflow_runs: [{ run_number: 3 }, { run_number: 1 }] },
     [`${R}/actions/workflows/dco.yml/runs`]: { workflow_runs: [] },
@@ -151,7 +152,7 @@ test("collect: a gate workflow the repository does not have has no deleted runs;
 
 test("collect: a failed read throws, so the run writes every metric missing", async () => {
   await assert.rejects(collect(api([], `repos/${REPO}/pulls/2/comments`), REPO, NOW, OPTS));
-  await assert.rejects(collect(api([], `repos/${REPO}/compare/p2...h2`), REPO, NOW, OPTS));
+  await assert.rejects(collect(api([], `repos/${REPO}/issues/2/comments`), REPO, NOW, OPTS));
 });
 
 test("collect: a base with no template or .gitattributes leaves only template_complete unread", async () => {
@@ -180,8 +181,6 @@ test("collect: a merge git cannot read counts every earlier merge in its window 
     [`${R}/pulls/4/comments`]: [],
     [`${R}/issues/4/comments`]: [],
     [`${R}/pulls/4/commits`]: [],
-    [`${R}/commits/m4`]: { parents: [{ sha: "p4" }] },
-    [`${R}/compare/p4...h4`]: { behind_by: 0 },
   };
   const get = api([]);
   const out = await collect(

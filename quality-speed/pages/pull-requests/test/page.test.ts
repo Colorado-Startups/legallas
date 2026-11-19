@@ -52,7 +52,7 @@ function fact(n: number, daysAgo: number, over: Partial<PullFacts> = {}): PullFa
 }
 
 function data(count = 50): Collected {
-  const pulls = Array.from({ length: count }, (_, i) => fact(i + 1, i < count / 2 ? 2 : 12, i % 7 === 0 ? { size_lines: 900, gate_misses: ['behind_main'] } : {}));
+  const pulls = Array.from({ length: count }, (_, i) => fact(i + 1, i < count / 2 ? 2 : 12, i % 7 === 0 ? { size_lines: 900, gate_misses: ['ci_not_green'] } : {}));
   return { pulls, open: [], direct_pushes: [], deleted_runs: [], queue_runs: [] };
 }
 

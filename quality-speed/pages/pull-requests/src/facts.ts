@@ -98,8 +98,6 @@ export interface PullInput {
   /** Jobs of every attempt of each review run, by run id. */
   reviewJobs: Record<number, RawJob[]>;
   rules: Rules;
-  /** Commits main had that the merged head lacked; null when unknown or not merged. */
-  behindMain: number | null;
   /** The merged head carries the same change as a head that drew a Blocking verdict (an empty commit, or main merged in). */
   blockingSameChange: boolean;
   /** Earlier merges, within REWORK_DAYS before this one, whose lines it rewrites (src/rework.ts). */
@@ -115,17 +113,10 @@ export interface PullInput {
 }
 
 /** Bumped whenever the facts a pull request yields change meaning. */
-export const FACTS_VERSION = 8;
+export const FACTS_VERSION = 9;
 
 /** Why the required gates did not hold on the merged head. Closed list. */
-export const GATE_MISSES = [
-  "review_not_run",
-  "blocking_verdict",
-  "review_workflow_changed",
-  "ci_not_green",
-  "dco_not_green",
-  "behind_main",
-] as const;
+export const GATE_MISSES = ["review_not_run", "blocking_verdict", "ci_not_green", "dco_not_green"] as const;
 export type GateMiss = (typeof GATE_MISSES)[number];
 
 export interface PullFacts {
@@ -376,19 +367,19 @@ function byCreated(a: RawRun, b: RawRun): number {
   return Date.parse(a.created_at) - Date.parse(b.created_at);
 }
 
-/** What failed among the required gates on the merged head. */
+/**
+ * What failed among the required gates on the merged head: the merging skill's `Review: MERGE` verdict at that head and no
+ * `BLOCK` there, and `ci.yml` and `dco.yml` green on it. No up-to-date rule: the ruleset's status checks aren't strict, and
+ * the merge queue tests each change with main.
+ */
 export function gateMisses(input: PullInput, bot: boolean): GateMiss[] {
   const head = input.pull.head.sha;
-  const attempts = input.runs
-    .filter((r) => r.path === REVIEW_WORKFLOW && r.head_sha === head)
-    .flatMap((r) => reviewAttempts(input.reviewJobs[r.id]));
+  const atHead = verdictLines(input.issueComments).filter((v) => v.sha === head);
   const out: GateMiss[] = [];
-  if (!attempts.some((a) => a.verdict === "pass")) out.push("review_not_run");
-  if (attempts.some((a) => a.verdict === "blocking") || input.blockingSameChange) out.push("blocking_verdict");
-  if (input.files.some((f) => f.filename === REVIEW_WORKFLOW)) out.push("review_workflow_changed");
+  if (!atHead.some((v) => v.kind === "MERGE")) out.push("review_not_run");
+  if (atHead.some((v) => v.kind === "BLOCK") || input.blockingSameChange) out.push("blocking_verdict");
   if (!greenOnHead(input, CI_WORKFLOW, head, false)) out.push("ci_not_green");
   if (!greenOnHead(input, DCO_WORKFLOW, head, bot)) out.push("dco_not_green");
-  if (input.behindMain !== 0) out.push("behind_main");
   return out;
 }
 
@@ -430,9 +421,10 @@ export function pullFacts(input: PullInput): PullFacts {
   const ready = readyAt(pull, input.timeline);
   const reviewRuns = input.runs.filter((r) => r.path === REVIEW_WORKFLOW).sort(byCreated);
 
-  // The head at "ready for review": the head of the first review run started
-  // at or after that moment (opened, or ready_for_review).
-  const firstReady = ready === null ? undefined : reviewRuns.find((r) => Date.parse(r.created_at) >= Date.parse(ready) - 5000);
+  // The head at "ready for review": the head of the first CI run started at or
+  // after that moment (opened, or ready_for_review).
+  const ciRuns = input.runs.filter((r) => r.path === CI_WORKFLOW).sort(byCreated);
+  const firstReady = ready === null ? undefined : ciRuns.find((r) => Date.parse(r.created_at) >= Date.parse(ready) - 5000);
   const ciFirst =
     ready === null
       ? null
@@ -440,7 +432,9 @@ export function pullFacts(input: PullInput): PullFacts {
         passedFirstTime(input, CI_WORKFLOW, firstReady.head_sha, false) &&
         passedFirstTime(input, DCO_WORKFLOW, firstReady.head_sha, bot);
 
-  const blockingVerdict = reviewRuns.some((r) => reviewAttempts(input.reviewJobs[r.id]).some((a) => a.verdict === "blocking"));
+  const blockingVerdict =
+    reviewRuns.some((r) => reviewAttempts(input.reviewJobs[r.id]).some((a) => a.verdict === "blocking")) ||
+    verdictLines(input.issueComments).some((v) => v.kind === "BLOCK");
   const blockingComment = input.reviewComments.some((c) => c.user?.type === "Bot" && /^\W*Blocking:/i.test(c.body ?? ""));
 
   return {
@@ -470,21 +464,34 @@ export function pullFacts(input: PullInput): PullFacts {
 }
 
 /** The merging skill's verdict line, as ci-overview's `MARKER` (Git Crafter `github-reviews.mjs`). */
-export const VERDICT = /^Review: (MERGE|BLOCK) at [0-9a-f]{40}$/;
+export const VERDICT = /^Review: (MERGE|BLOCK) at ([0-9a-f]{40})$/;
 /** Its optional second line: the reviewer's tokens. */
 export const TOKENS = /^Tokens: ([\d,]+)$/;
 /** Who can post one: a person with access to the private repository; bots are out. */
 const VERDICT_AUTHORS = new Set(["OWNER", "MEMBER", "COLLABORATOR", "CONTRIBUTOR"]);
 
-/** The verdicts among the comments, each with its tokens, or null without a `Tokens:` line. */
-export function verdicts(comments: RawIssueComment[]): (number | null)[] {
+/** One verdict: what it said, the head it read, and its tokens, or null without a `Tokens:` line. */
+export interface Verdict {
+  kind: "MERGE" | "BLOCK";
+  sha: string;
+  tokens: number | null;
+}
+
+/** The verdicts among the comments. */
+export function verdictLines(comments: RawIssueComment[]): Verdict[] {
   return comments.flatMap((c) => {
     if (c.user?.type !== "User" || !VERDICT_AUTHORS.has(c.author_association)) return [];
     const [first, second] = String(c.body ?? "").replace(/\r/g, "").split("\n");
-    if (!VERDICT.test(first ?? "")) return [];
+    const m = VERDICT.exec(first ?? "");
+    if (!m) return [];
     const t = TOKENS.exec(second ?? "")?.[1];
-    return [t === undefined ? null : Number(t.replace(/,/g, ""))];
+    return [{ kind: m[1] as Verdict["kind"], sha: m[2]!, tokens: t === undefined ? null : Number(t.replace(/,/g, "")) }];
   });
+}
+
+/** The verdicts' tokens, in order. */
+export function verdicts(comments: RawIssueComment[]): (number | null)[] {
+  return verdictLines(comments).map((v) => v.tokens);
 }
 
 const QUEUE_EVENTS = new Set(["added_to_merge_queue", "removed_from_merge_queue"]);

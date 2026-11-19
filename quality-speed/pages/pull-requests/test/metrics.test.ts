@@ -283,7 +283,7 @@ test("score: all at goal reads exactly 100; a missed gate lowers it and caps not
   const all = score(data(pulls));
   assert.deepEqual([all.quality, all.speed, all.total], [100, 100, 100]);
   assert.equal(all.consumption, 100, "lane_minutes at goal too");
-  pulls[0]!.gate_misses = ["behind_main"];
+  pulls[0]!.gate_misses = ["ci_not_green"];
   const missed = score(data(pulls));
   assert.ok(missed.total < 100, `total ${missed.total}`);
 });
