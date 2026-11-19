@@ -1,12 +1,9 @@
 {
-  "reviewed_through": "2026-11-02",
+  "reviewed_through": "2026-11-19",
   "repairs": [
-    { "pr": 50, "repairs": 42 },
-    { "pr": 52, "repairs": 50 },
-    { "pr": 55, "repairs": 41 },
-    { "pr": 57, "repairs": 56 },
-    { "pr": 63, "repairs": 59 },
-    { "pr": 64, "repairs": 60 }
+    { "pr": 36, "repairs": 32 },
+    { "pr": 40, "repairs": 19 },
+    { "pr": 57, "repairs": 54 }
   ],
   "not_backlog_issues": [33],
   "backlog_board": 1
