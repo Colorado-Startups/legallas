@@ -185,7 +185,7 @@ test('code that can only be read says what a room sets too: the messages behind 
   assert.match(read('src/pages/regulator/index.astro'), /\{priorCaseLabel\}<\/a>/);
   assert.match(read('src/scripts/brief/page.ts'), /Drafting brief for a \$\{currentPleading\} complaint/);
   assert.match(read('src/scripts/claims.ts'), /in the \$\{priorStatus\} \$\{pleading\}/);
-  assert.match(read('scripts/matter/report.ts'), /Prior case \(\$\{priorStatus\}\)/);
+  assert.match(read('scripts/matter/report.ts'), /Prior case \(\$\{escapeHtml\(priorStatus\)\}\)/);
 });
 
 test('a stored manifest\'s own claim type is refused by default and accepted once the room names it', () => {
