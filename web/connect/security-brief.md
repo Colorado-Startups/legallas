@@ -9,7 +9,8 @@ steps for members and IT are public at https://mcp.room.example.com/connect.
 legallas-mcp is a read-only remote MCP server. It lets a person who is already a member of the room use
 Harvey, Microsoft Copilot or Claude to search and read the room: its documents, the visuals and the comment
 threads, as text. Claude can also receive small original files and images of the visuals, one at a time on
-request. Each member signs in as themselves with an email code; the server checks their room membership on every
+request. Each member signs in as themselves with an email code, plus a security key or biometric where the room
+requires one; the server checks their room membership on every
 call, cannot write anything while the room's three optional tools stay off (their default, see Optional tools), and
 logs who read which document and each original file or visual image it sent, without storing what they asked. It runs
 no AI model of its own: the member's AI tool does the reasoning under their organization's agreements with that provider.
@@ -18,7 +19,8 @@ no AI model of its own: the member's AI tool does the reasoning under their orga
 
 ```
 Member, in Harvey / Microsoft 365 Copilot / Claude
-   |  1. sign-in: room email + one-time email code (Cloudflare Access), then a consent page
+   |  1. sign-in: room email + one-time email code (Cloudflare Access), plus a security key or biometric
+   |     where the room requires one, then a consent page
    |  2. tool calls over HTTPS with a bearer token for this server only
    v
 legallas-mcp (Cloudflare Worker, mcp.room.example.com)
@@ -50,7 +52,7 @@ and every original file or visual image sent is written to the audit log.
 | Access | One scope, `case.read`. Nine read tools, all marked read-only: eight for the room, and law search while the law library is on. None can create, change, delete, upload or comment. Comment threads can be read, never posted to, and they follow the room's privilege rules for the member's role |
 | Optional tools | Three more, off by default. Listed only when the owner turns the setting on for the room, the member ticks it when connecting, and their role may propose. **Proposals** (`PROPOSALS_ENABLED`): writes a pending draft, filled template, or message or filing for a person to send or file, that a person approves in the room; the room never sends or files. With the company checklist on too (`CHECKLIST_ENABLED`), a second tool proposes a checklist change, which only the owner approves. **Public records check** (`PUBLIC_RECORDS`): once the member approves a name in the room, sends it to public sites |
 | Identity | Per member. No shared accounts, API keys or service credentials. The grant is tied to the member's verified email |
-| Sign-in | Cloudflare Access one-time email code, limited to addresses the owner has invited one by one (never a whole domain), and to sign-ins from the United States |
+| Sign-in | Cloudflare Access one-time email code, plus a security key or device biometric where the room's Access policy requires one (Access's own MFA; the room can also refuse any session without one, `REQUIRE_MFA`), limited to addresses the owner has invited one by one (never a whole domain), and to sign-ins from the United States |
 | Membership | Re-read from the room's database on every tool call. Removing a member from the room cuts every connection they made at once |
 | OAuth | OAuth 2.1 authorization code flow. PKCE is S256 only (the OAuth library, `@cloudflare/workers-oauth-provider` 1.2.4, refuses `plain`), and required of every client without a secret; a client with a secret (such as the per-firm Microsoft client) may sign in without it. Metadata per RFC 8414 and RFC 9728; dynamic client registration per RFC 7591 (Harvey, Copilot Studio); Client ID Metadata Documents (Claude); one static client per firm for Microsoft's Teams Developer Portal |
 | Self-registration | Each room sets this. When open, Harvey and Copilot Studio register themselves, with guards: only allowlisted callback URLs are accepted, client metadata is capped at 4 KB and the app name at 80 characters, and a registration left unused for 30 days expires. A registration, or a sign-in from an app that never registers, with a callback outside the allowlist is refused; the owner is alerted and can allow it with one click |
