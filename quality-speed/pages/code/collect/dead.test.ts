@@ -19,6 +19,10 @@ test('glob patterns resolve against the importing file', () => {
   assert.deepEqual(globTargets('web/src/c.astro', './s/*.ts', files), ['web/src/s/a.ts']);
   assert.deepEqual(globTargets('web/src/c.astro', './s/**/*.ts', files), ['web/src/s/deep/b.ts']);
   assert.deepEqual(globTargets('web/src/c.astro', '@brand/*.ts', files), []);
+  assert.deepEqual(globTargets('web/src/c.astro', './{s,t}/*.ts', files), ['web/src/s/a.ts'], 'one of two folders');
+  assert.deepEqual(globTargets('web/src/c.astro', './*.{ts,mjs}', files), ['web/src/t.mjs'], 'either ending');
+  assert.deepEqual(globTargets('web/src/c.astro', './**/*.ts', files), ['web/src/s/a.ts', 'web/src/s/deep/b.ts'], 'a folder at any depth');
+  assert.deepEqual(globTargets('web/src/c.astro', './s/a.t?', files), [], 'a character that meant something in a pattern stands for itself');
 });
 
 test('an export nothing imports and its own file never uses is dead; a test import keeps one alive', { skip: needsTs }, () => {

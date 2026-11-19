@@ -29,7 +29,8 @@ function readTemplate(path: string): ChecklistTemplate | null {
     return null;
   }
   const frontMatter = /^---\n([\s\S]*?)\n---/.exec(text)?.[1] ?? '';
-  const field = (name: string) => new RegExp(`^${name}: (.+)$`, 'm').exec(frontMatter)?.[1]?.trim();
+  // By position: the field name is never made into a pattern.
+  const field = (name: string) => frontMatter.split('\n').find((line) => line.startsWith(`${name}: `) && line.length > name.length + 2)?.slice(name.length + 2).trim();
   const [title, source, licence, lawChecked, entities] = [field('title'), field('source'), field('licence'), field('date_checked'), field('entity')];
   if (!title || !source || licence !== 'CC0-1.0' || !lawChecked || !entities) return null;
   // The templates say delaware-corporation; the list says delaware-c-corporation.

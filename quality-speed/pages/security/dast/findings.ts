@@ -143,7 +143,7 @@ export function validateTriage(value: unknown): { triage: Triage; errors: string
     }
     if (entry.paths !== undefined) {
       try {
-        new RegExp(entry.paths);
+        pathPattern(entry.paths);
       } catch {
         errors.push(`${at}.paths must be a regular expression`);
       }
@@ -178,10 +178,15 @@ export interface Finding {
   fixedIn?: string;
 }
 
+/** The one place a triage entry's `paths` is compiled. It comes from this page's own triage file, which is reviewed like code. */
+function pathPattern(paths: string): RegExp {
+  return new RegExp(paths);
+}
+
 const covers = (entry: TriageEntry, alert: Pick<Alert, 'alertRef' | 'pluginId' | 'target'>, path?: string) =>
   (entry.alert === alert.alertRef || entry.alert === alert.pluginId) &&
   (entry.targets === undefined || entry.targets.includes(alert.target)) &&
-  (path === undefined || entry.paths === undefined || new RegExp(entry.paths).test(path));
+  (path === undefined || entry.paths === undefined || pathPattern(entry.paths).test(path));
 
 const place = (instance: Instance) => `${instance.method} ${instance.path}`;
 const unique = (items: readonly string[]) => [...new Set(items)].sort();

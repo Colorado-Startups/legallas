@@ -80,9 +80,12 @@ function readableLines(c: Corpus, path: string): string[] | null {
   return c.docs.get(path) ?? c.read(path).split(/\r?\n/).map((l) => (l.trim().startsWith('#') ? l.trim().replace(/^#+\s?/, '') : ''));
 }
 
+/** The one place this file compiles a pattern. Each comes from this page's own questions.json, which is reviewed like code. */
+const compile = (pattern: string, flags: string) => new RegExp(pattern, flags);
+
 /** First line where `pattern` matches, joining each line with the next so a phrase may wrap. */
 export function findLine(lines: string[], pattern: string): number | null {
-  const re = new RegExp(pattern, 'i');
+  const re = compile(pattern, 'i');
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i] ?? '';
     const next = lines[i + 1] ?? '';
@@ -113,20 +116,20 @@ export function docValue(c: Corpus, q: Question): string | null {
   const lines = readableLines(c, q.doc.path);
   const line = lines ? findLine(lines, q.doc.pattern) : null;
   if (!lines || line === null) return null;
-  const re = new RegExp(q.doc.pattern, 'i');
+  const re = compile(q.doc.pattern, 'i');
   const m = re.exec(lines[line - 1] ?? '') ?? re.exec(`${lines[line - 1] ?? ''} ${lines[line] ?? ''}`);
   return m?.[1] ?? null;
 }
 
 export function checkTruth(c: Corpus, t: Truth, stated: string | null = null): boolean {
-  const count = (path: string, pattern: string, comments?: boolean) => (codeOf(c, path, comments).match(new RegExp(pattern, 'gm')) ?? []).length;
+  const count = (path: string, pattern: string, comments?: boolean) => (codeOf(c, path, comments).match(compile(pattern, 'gm')) ?? []).length;
   switch (t.kind) {
     case 'file':
       return c.fileSet.has(t.path);
     case 'script':
       return c.fileSet.has('web/package.json') && Object.hasOwn(JSON.parse(c.read('web/package.json')).scripts ?? {}, t.name);
     case 'grep':
-      return c.fileSet.has(t.path) && new RegExp(t.pattern, 'm').test(codeOf(c, t.path, t.comments));
+      return c.fileSet.has(t.path) && compile(t.pattern, 'm').test(codeOf(c, t.path, t.comments));
     case 'count':
       return c.fileSet.has(t.path) && count(t.path, t.pattern, t.comments) === t.equals;
     case 'count_as_doc':
@@ -136,7 +139,7 @@ export function checkTruth(c: Corpus, t: Truth, stated: string | null = null): b
 
 /** Lines in any doc or config comment that say what a conflict pattern matches. */
 function conflictsOf(c: Corpus, patterns: string[]): number {
-  const res = patterns.map((p) => new RegExp(p, 'i'));
+  const res = patterns.map((p) => compile(p, 'i'));
   let n = 0;
   for (const lines of [...c.docs.values(), ...c.comments.values()]) {
     for (let i = 0; i < lines.length; i++) {
