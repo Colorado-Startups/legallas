@@ -65,7 +65,7 @@ investors; the raise documents, understood and finalized; securities law complia
 and effectively with less spent on lawyers; and if litigation comes, a place for the documents that the founder's lawyers can
 access.
 
-**Price:** $99 flat, for anyone: "the install and setup is the product at $99 and anyone can buy it for that." Whoever bought it can
+**Price:** one flat price for the install and setup, the same for anyone. Whoever bought it can
 invite people into their data room, and invited people join free. "Anyone else who wants their own install and setup, wether it's
 a VC/Angel/Startup buys it and downloads it." Not on sale yet. Customers also pay Cloudflare directly, about $5 a month.
 
@@ -193,7 +193,7 @@ Angel groups and VC funds get their own checklists and templates, built after th
 
 ## What's open and what's closed
 
-Anyone may build the open code and run it themselves. The $99 pays for a signed install and a guided setup.
+Anyone may build the open code and run it themselves. The paid product is a signed install and a guided setup.
 
 | Open: this repository (Apache-2.0, DCO) | Closed, kept private |
 |---|---|
