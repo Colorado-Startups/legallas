@@ -1,5 +1,6 @@
 {
   "page": "cloudflare-security",
+  "signoff_comment": 6996196000,
   "metrics": [
     { "id": "workers_practices_met", "lens": "quality", "unit": "percent", "direction": "higher", "floor": 50, "goal": 100, "weight": 2, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://developers.cloudflare.com/workers/best-practices/workers-best-practices/" },
     { "id": "edge_rows_checked", "lens": "quality", "unit": "count", "direction": "higher", "floor": 6, "goal": 12, "weight": 1, "max_age_hours": 48, "min_samples": 1, "goal_source": "https://github.com/Colorado-Startups/legallas/blob/main/web/README.md#edge-rules-cloudflare-waf-free-plan" },
