@@ -167,6 +167,11 @@ export interface SastCounts {
   parseWarnings: number;
   /** Every security finding by rule, tests included, for the page's table. */
   byRule: Record<string, number>;
+  /** What `open` is made of, so each one can be found and fixed: the three lists add up to it. */
+  unjudged: { rule: string; path: string; line: number | null; hash: string | null }[];
+  staleReasons: { rule: string; path: string; hash: string }[];
+  /** An audited rule whose hits differ from what the audit read, with where each counted hit is, for the next audit. */
+  auditedOff: { rule: string; hits: number; read: number; at: string[] }[];
 }
 
 export interface SastOptions {
@@ -189,8 +194,8 @@ export function sastCounts(rc: number | null, report: SemgrepOutput | null, opti
   const usable = triage.filter((entry) => entry.reason.trim().length >= MIN_REASON_LENGTH);
   const used = new Set<TriageEntry>();
   const byRule: Record<string, number> = {};
-  const auditedHits = new Map<string, number>();
-  let open = 0;
+  const auditedHits = new Map<string, string[]>();
+  const unjudged: SastCounts['unjudged'] = [];
   let triaged = 0;
   for (const finding of report.results) {
     if (finding.extra.metadata?.category !== 'security') continue;
@@ -200,7 +205,7 @@ export function sastCounts(rc: number | null, report: SemgrepOutput | null, opti
     const named = audited.find((entry) => entry.rule === rule);
     if (named) {
       const counted = !isTestFile(finding.path) && !(named.not_counted_under && path.startsWith(named.not_counted_under));
-      if (counted) auditedHits.set(rule, (auditedHits.get(rule) ?? 0) + 1);
+      if (counted) auditedHits.set(rule, [...(auditedHits.get(rule) ?? []), `${path}:${finding.start?.line ?? '?'}`]);
       continue;
     }
     if (!countsAsFinding(finding, audited)) continue;
@@ -211,18 +216,22 @@ export function sastCounts(rc: number | null, report: SemgrepOutput | null, opti
       used.add(entry);
       triaged += 1;
     } else {
-      open += 1;
+      unjudged.push({ rule, path, line: finding.start?.line ?? null, hash });
     }
   }
-  const stale = usable.length - used.size;
+  const staleReasons = usable.filter((entry) => !used.has(entry)).map((entry) => ({ rule: entry.rule, path: entry.path, hash: entry.line_hash }));
+  const stale = staleReasons.length;
+  const auditedOff: SastCounts['auditedOff'] = [];
   let auditedCount = 0;
   let unaudited = 0;
   for (const entry of audited) {
-    const hits = auditedHits.get(entry.rule) ?? 0;
+    const at = auditedHits.get(entry.rule) ?? [];
+    const hits = at.length;
     auditedCount += Math.min(hits, entry.audited_hits);
     unaudited += Math.abs(hits - entry.audited_hits);
+    if (hits !== entry.audited_hits) auditedOff.push({ rule: entry.rule, hits, read: entry.audited_hits, at });
   }
-  return { open: open + stale + unaudited, triaged, stale, audited: auditedCount, scanned, parseWarnings: report.errors.length, byRule };
+  return { open: unjudged.length + stale + unaudited, triaged, stale, audited: auditedCount, scanned, parseWarnings: report.errors.length, byRule, unjudged, staleReasons, auditedOff };
 }
 
 // OpenSSF Scorecard.

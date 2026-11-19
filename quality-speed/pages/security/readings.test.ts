@@ -164,7 +164,10 @@ const entry: TriageEntry = { rule: 'read', path: 'web/b.ts', line_hash: 'h2', re
 const options = (triage: readonly TriageEntry[], more = {}) => ({ triage, audited: NOT_SCORED, codeFiles: 1000, hashOf: (f: SemgrepFinding) => `h${f.start?.line}`, ...more });
 
 test('Semgrep counts findings, and triage needs the exact rule, path and line', () => {
-  assert.deepEqual(sastCounts(0, report, options([])), { open: 2, triaged: 0, stale: 0, audited: 1, scanned: 1000, parseWarnings: 0, byRule: { real: 1, read: 1, 'named-rule': 1 } });
+  assert.deepEqual(sastCounts(0, report, options([])), {
+    open: 2, triaged: 0, stale: 0, audited: 1, scanned: 1000, parseWarnings: 0, byRule: { real: 1, read: 1, 'named-rule': 1 },
+    unjudged: [{ rule: 'real', path: 'web/a.ts', line: 1, hash: 'h1' }, { rule: 'read', path: 'web/b.ts', line: 2, hash: 'h2' }], staleReasons: [], auditedOff: [],
+  });
   assert.equal(sastCounts(0, report, options([entry]))?.open, 1);
   assert.equal(sastCounts(0, report, options([entry]))?.triaged, 1);
   assert.equal(sastCounts(0, report, options([{ ...entry, path: 'web/other.ts' }]))?.triaged, 0, 'the same rule elsewhere');
@@ -177,6 +180,15 @@ test('a mark is not a reason, and a reason for a finding that has gone counts ag
   const stale = sastCounts(0, report, options([entry, { ...entry, path: 'web/gone.ts' }]));
   assert.equal(stale?.stale, 1);
   assert.equal(stale?.open, 2, 'one real finding and one stale reason');
+});
+
+test('everything counted as open is listed, so each one can be found', () => {
+  const twoHits = { ...report, results: [...(report.results ?? []), semgrep('named-rule', 'web/e.ts')] };
+  const counts = sastCounts(0, twoHits, options([entry, { ...entry, path: 'web/gone.ts' }]));
+  assert.deepEqual(counts?.unjudged, [{ rule: 'real', path: 'web/a.ts', line: 1, hash: 'h1' }]);
+  assert.deepEqual(counts?.staleReasons, [{ rule: 'read', path: 'web/gone.ts', hash: 'h2' }]);
+  assert.deepEqual(counts?.auditedOff, [{ rule: 'named-rule', hits: 2, read: 1, at: ['web/c.ts:1', 'web/e.ts:1'] }]);
+  assert.equal(counts?.open, 3, 'the three lists add up to the count');
 });
 
 test('one judgment covers one finding, so a copied line needs its own', () => {
