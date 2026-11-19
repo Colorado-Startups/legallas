@@ -41,6 +41,7 @@ export interface RawComment {
 /** A conversation comment, as the issue comments listing gives it. */
 export interface RawIssueComment extends RawComment {
   author_association: string;
+  created_at?: string;
 }
 
 export interface RawRun {
@@ -113,7 +114,7 @@ export interface PullInput {
 }
 
 /** Bumped whenever the facts a pull request yields change meaning. */
-export const FACTS_VERSION = 9;
+export const FACTS_VERSION = 10;
 
 /** Why the required gates did not hold on the merged head. Closed list. */
 export const GATE_MISSES = ["review_not_run", "blocking_verdict", "ci_not_green", "dco_not_green"] as const;
@@ -146,7 +147,7 @@ export interface PullFacts {
   edit_checked: boolean;
   /** Opening to merge, or to close. */
   open_minutes: number;
-  /** Trigger to result, per review run; runs with no verdict count as REVIEW_TIMEOUT_MINUTES. */
+  /** Push to verdict, per verdict: the first run on the verdict's head to the verdict comment. */
   review_result_minutes: number[];
   /** Earlier merges, within REWORK_DAYS before this one, whose lines this one deletes or changes. */
   fixes: number[];
@@ -164,8 +165,6 @@ export interface PullFacts {
   final_push_minutes: number | null;
   /** Review verdicts posted (the merging skill's `Review: MERGE|BLOCK at <sha>`): one per round. */
   verdicts: number;
-  /** Each verdict's second line, `Tokens: n`, where it has one. */
-  review_tokens: number[];
   /** A layer of a stack: retargeted (base_ref_changed), or another pull request targets its branch. */
   stacked: boolean;
 }
@@ -174,8 +173,6 @@ export const REVIEW_WORKFLOW = ".github/workflows/claude-review.yml";
 export const CI_WORKFLOW = ".github/workflows/ci.yml";
 export const DCO_WORKFLOW = ".github/workflows/dco.yml";
 export const REVIEW_JOB = "claude-review";
-/** The review job's timeout-minutes: a run with no verdict counts this long. */
-export const REVIEW_TIMEOUT_MINUTES = 30;
 export const REWORK_DAYS = 7;
 
 const LOCKFILES = new Set([
@@ -384,28 +381,14 @@ export function gateMisses(input: PullInput, bot: boolean): GateMiss[] {
 }
 
 /**
- * Minutes from the event that started each review run to the review job's
- * verdict, first attempt. A run that ran with no verdict (crash, timeout,
- * manual cancel) counts as the job's timeout. A run cancelled because a newer
- * review run of the same pull request started is left out.
+ * Minutes from the push that started each review round to its verdict: the first run on the verdict's head (a push starts
+ * every workflow) to the verdict comment. A verdict with no run on its head, or no time, is left out.
  */
 export function reviewResultMinutes(input: PullInput): number[] {
-  const runs = input.runs.filter((r) => r.path === REVIEW_WORKFLOW).sort(byCreated);
-  const out: number[] = [];
-  for (const run of runs) {
-    if (run.conclusion === "skipped") continue;
-    const first = reviewAttempts(input.reviewJobs[run.id]).find((a) => a.attempt === 1);
-    if (first && !first.ran) continue;
-    const end = first?.completed_at ?? null;
-    const superseded = runs.some(
-      (r) => r.id !== run.id && Date.parse(r.created_at) > Date.parse(run.created_at) && (end === null || Date.parse(r.created_at) <= Date.parse(end)),
-    );
-    const cancelled = run.conclusion === "cancelled" || first?.cancelled === true;
-    if (cancelled && superseded) continue;
-    if (first && first.verdict !== "none" && end) out.push(minutesBetween(run.created_at, end));
-    else out.push(REVIEW_TIMEOUT_MINUTES);
-  }
-  return out;
+  return verdictLines(input.issueComments).flatMap((v) => {
+    const starts = input.runs.filter((r) => r.head_sha === v.sha).map((r) => Date.parse(r.created_at));
+    return v.at === null || starts.length === 0 ? [] : [Math.max(0, (Date.parse(v.at) - Math.min(...starts)) / 60000)];
+  });
 }
 
 export function pullFacts(input: PullInput): PullFacts {
@@ -463,33 +446,23 @@ export function pullFacts(input: PullInput): PullFacts {
 
 /** The merging skill's verdict line, as ci-overview's `MARKER` (Git Crafter `github-reviews.mjs`). */
 export const VERDICT = /^Review: (MERGE|BLOCK) at ([0-9a-f]{40})$/;
-/** Its optional second line: the reviewer's tokens. */
-export const TOKENS = /^Tokens: ([\d,]+)$/;
 /** Who can post one: a person with access to the private repository; bots are out. */
 const VERDICT_AUTHORS = new Set(["OWNER", "MEMBER", "COLLABORATOR", "CONTRIBUTOR"]);
 
-/** One verdict: what it said, the head it read, and its tokens, or null without a `Tokens:` line. */
+/** One verdict: what it said, the head it read, and when, or null without a time. */
 export interface Verdict {
   kind: "MERGE" | "BLOCK";
   sha: string;
-  tokens: number | null;
+  at: string | null;
 }
 
 /** The verdicts among the comments. */
 export function verdictLines(comments: RawIssueComment[]): Verdict[] {
   return comments.flatMap((c) => {
     if (c.user?.type !== "User" || !VERDICT_AUTHORS.has(c.author_association)) return [];
-    const [first, second] = String(c.body ?? "").replace(/\r/g, "").split("\n");
-    const m = VERDICT.exec(first ?? "");
-    if (!m) return [];
-    const t = TOKENS.exec(second ?? "")?.[1];
-    return [{ kind: m[1] as Verdict["kind"], sha: m[2]!, tokens: t === undefined ? null : Number(t.replace(/,/g, "")) }];
+    const m = VERDICT.exec(String(c.body ?? "").replace(/\r/g, "").split("\n")[0] ?? "");
+    return m ? [{ kind: m[1] as Verdict["kind"], sha: m[2]!, at: c.created_at ?? null }] : [];
   });
-}
-
-/** The verdicts' tokens, in order. */
-export function verdicts(comments: RawIssueComment[]): (number | null)[] {
-  return verdictLines(comments).map((v) => v.tokens);
 }
 
 const QUEUE_EVENTS = new Set(["added_to_merge_queue", "removed_from_merge_queue"]);
@@ -529,15 +502,14 @@ export function queueFacts(timeline: RawEvent[], mergedAt: string | null): Pick<
   return { queue_minutes: end === null ? null : ms / 60000, queue_ejected: ejected };
 }
 
-/** Pushes, the final push's time to merge, review rounds and their tokens, and whether it was a stack layer. */
-export function pushFacts(input: PullInput, merged: boolean): Pick<PullFacts, "ci_heads" | "final_push_minutes" | "verdicts" | "review_tokens" | "stacked"> {
+/** Pushes, the final push's time to merge, review rounds, and whether it was a stack layer. */
+export function pushFacts(input: PullInput, merged: boolean): Pick<PullFacts, "ci_heads" | "final_push_minutes" | "verdicts" | "stacked"> {
   const onHead = input.runs.filter((r) => r.head_sha === input.pull.head.sha).map((r) => Date.parse(r.created_at));
-  const v = verdicts(input.issueComments);
+  const v = verdictLines(input.issueComments);
   return {
     ci_heads: new Set(input.runs.filter((r) => r.path === CI_WORKFLOW).map((r) => r.head_sha)).size,
     final_push_minutes: merged && onHead.length > 0 ? (Date.parse(input.pull.merged_at!) - Math.min(...onHead)) / 60000 : null,
     verdicts: v.length,
-    review_tokens: v.filter((t): t is number => t !== null),
     stacked: input.stackBase || input.timeline.some((e) => e.event === "base_ref_changed"),
   };
 }

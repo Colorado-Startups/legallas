@@ -32,7 +32,6 @@ const LABELS: Record<string, string> = {
   pushes_per_merge: 'Pushes',
   final_push_to_merge_p50: 'Final',
   review_rounds: 'Rounds',
-  review_tokens_p50: 'Tokens',
   big_changes_stacked: 'Stacked',
   lane_minutes: 'Lane',
 };
@@ -43,7 +42,7 @@ export const SECTIONS: { title: string; ids: string[] }[] = [
     title: 'Pull requests',
     ids: ['required_gates_on_merged_head', 'ci_green_first_time', 'no_rework_7d', 'small_changes', 'template_complete', 'pushes_per_merge', 'open_to_merge_p50', 'open_to_merge_p90', 'final_push_to_merge_p50', 'lane_minutes'],
   },
-  { title: 'Review', ids: ['no_blocking_findings', 'review_rounds', 'review_result_p90', 'review_tokens_p50'] },
+  { title: 'Review', ids: ['no_blocking_findings', 'review_rounds', 'review_result_p90'] },
   { title: 'Merge queue', ids: ['queue_ejections_pct', 'queue_wait_p50', 'queue_wait_p90', 'queue_prs_per_group_p50', 'queue_minutes_per_merge'] },
   { title: 'Stacks', ids: ['big_changes_stacked'] },
 ];
