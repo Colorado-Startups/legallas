@@ -10,7 +10,7 @@ export const REPO = 'legallas';
  * folder, in GitHub's tab order; law, templates included.
  */
 export const PAGE_GROUPS = {
-  product: ['data-room', 'ai-connectors', 'sync', 'build', 'launch-readiness', 'mac-app', 'compliance', 'reliability'],
+  product: ['data-room', 'ai-connectors', 'sync', 'build', 'launch-readiness', 'mac-app', 'compliance', 'reliability', 'cloudflare-security'],
   claude: ['claude-code', 'claude-documentation', 'claude-settings', 'agents', 'projects'],
   repo: ['code', 'repo-documentation', 'issues', 'pull-requests', 'actions', 'testing', 'ci-overview', 'security', 'insights', 'settings', 'github-app'],
   law: [
@@ -50,6 +50,7 @@ export const PUBLIC_PAGES: readonly PageSlug[] = PAGES.filter((page) =>
   (
     [
       ...PAGE_GROUPS.product,
+      'cloudflare-security',
       'projects',
       'code',
       'pull-requests',

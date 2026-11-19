@@ -17,7 +17,7 @@ flowchart LR
 
 | File | Is |
 |---|---|
-| `maps.json` | 16 maps (8 own, 8 from the Git Crafter library), 2 to 6 steps each, one metric a step |
+| `maps.json` | 17 maps (9 own, 8 from the Git Crafter library), 2 to 6 steps each, one metric a step |
 | `adapt.ts` | Legallas records and goals to Git Crafter's run format |
 | `quality.json` | The Quality config the action reads: `out/` |
 | `config.json` | The Process page config |
@@ -45,14 +45,15 @@ flowchart LR
 | `template` | need `templates.coverage` · rights `templates.right_to_ship` · fields `templates.fields_work` · wording `templates.wording` · fill `templates.fill_ms_p95` · size `templates.template_part_tokens_max` |
 | `test` | risk `testing.risks_proven` · mutate `testing.risk_mutation_score` · flaky `testing.flaky_tests` · fast `testing.web_test_step_p50` · CPU `testing.suite_cpu_minutes` |
 | `release` | build `mac-app.swift_jobs_passing` · time `mac-app.swift_job_minutes_p50` · bundle `mac-app.app_bundle_verified` · repeat `build.release_reproducible` · conditions `launch-readiness.conditions_met` · minutes `launch-readiness.lane_minutes` |
+| `edge` | Workers guide `cloudflare-security.workers_practices_met` · compatibility date `cloudflare-security.compat_date_age_days` · reviewed deploys `settings.gates_intact` (its own map: `secure` already holds 6) |
 | `assure` | cover `compliance.policy_areas_covered` · evidence `compliance.evidence_refs_dead` · review `compliance.policy_review_age_days` · restore `compliance.restore_drill_age_days` · least access `github-app.app_permissions_off` · minutes `compliance.lane_minutes` |
 
 | Coverage | |
 |---|---|
-| Pages with a step on a map | 19 of the 28 public pages; no step names a private page |
-| The other 9 public pages | Law pages. They run the `law` map's process; `sec` stands for all 10 |
+| Pages with a step on a map | 20 of the 30 public pages; no step names a private page |
+| The other 10 public pages | 9 law pages, which run the `law` map's process (`sec` stands for all 10), and `pull-requests`, which lost its map while private |
 | Steps dropped | 8: their only measurement is on a private page, or none exists (`adopt` update) |
-| Maps with an ideal and a dated source | 16 of 16: 8 own in `maps.json`, 8 from the library |
+| Maps with an ideal and a dated source | 17 of 17: 9 own in `maps.json`, 8 from the library |
 | Page size | Each map adds about 17 KB; the guard's limit, 384,000 bytes, holds about 19. `sync` and `connect` share one map to stay under it |
 | Library maps not used | 3: `decide`, `guard` (no blockers page), `delivery` (4 of its 5 steps measure private pages) |
 

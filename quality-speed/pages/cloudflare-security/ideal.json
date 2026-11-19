@@ -1,0 +1,18 @@
+{
+  "ideal": "Every Workers item in Cloudflare's guide is met or recorded with a reason, on a current compatibility date, with every edge row checkable.",
+  "sources": [
+    {
+      "title": "Cloudflare Docs: Workers Best Practices",
+      "url": "https://developers.cloudflare.com/workers/best-practices/workers-best-practices/",
+      "date": "2026-11-18"
+    },
+    {
+      "title": "Martin Fowler: Continuous Integration",
+      "url": "https://martinfowler.com/articles/continuousIntegration.html",
+      "date": "2024-01-18"
+    }
+  ],
+  "quality": "Every guide item met in the example configs and code, or accepted with a reason; harden.ts checks all 12 edge rows.",
+  "speed": "The compatibility date is under 60 days old, and the page reads its sources every day.",
+  "consumption": "This page's CI lane runs in 5 minutes or less."
+}

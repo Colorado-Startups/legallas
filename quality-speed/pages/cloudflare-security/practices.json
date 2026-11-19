@@ -1,0 +1,29 @@
+{
+  "about": "Cloudflare's Workers Best Practices guide, item by item, as the product meets it. A config item also passes its check in all three web/wrangler*.example.jsonc files on every run. accepted: not adopted, with its own reason and date, as web/README.md records it. Changed only by a reviewed pull request.",
+  "guide": "https://developers.cloudflare.com/workers/best-practices/workers-best-practices/",
+  "guide_date": "2026-11-18",
+  "reviewed": "2026-11-18",
+  "items": [
+    { "n": 1, "label": "Compatibility date", "settled": "fixed", "pr": 71, "check": "date" },
+    { "n": 2, "label": "nodejs_compat", "settled": "met", "pr": 71, "check": "node" },
+    { "n": 3, "label": "Source maps", "settled": "met", "pr": 71, "check": "maps" },
+    { "n": 4, "label": "Binding types", "settled": "accepted", "pr": 71, "accepted": "2026-11-18", "reason": "npm run types passes --include-env=false; Env and McpEnv stay hand-written for now" },
+    { "n": 5, "label": "Secrets", "settled": "met", "pr": 71 },
+    { "n": 6, "label": "Environments", "settled": "met", "pr": 71 },
+    { "n": 7, "label": "Domains, no public URLs", "settled": "met", "pr": 71, "check": "urls" },
+    { "n": 8, "label": "Bounded bodies", "settled": "fixed", "pr": 71 },
+    { "n": 9, "label": "waitUntil", "settled": "fixed", "pr": 71 },
+    { "n": 10, "label": "Bindings, not REST", "settled": "met", "pr": 71 },
+    { "n": 11, "label": "Queues, Workflows", "settled": "met", "pr": 71 },
+    { "n": 12, "label": "Service bindings", "settled": "met", "pr": 71 },
+    { "n": 13, "label": "Hyperdrive", "settled": "met", "pr": 71 },
+    { "n": 14, "label": "WebSockets in Durable Objects", "settled": "met", "pr": 71 },
+    { "n": 15, "label": "Static Assets", "settled": "met", "pr": 71 },
+    { "n": 16, "label": "Logs and traces", "settled": "accepted", "pr": 71, "accepted": "2026-11-18", "reason": "Traces off in all three Wrangler examples: spans can record R2 keys, URLs and so document content", "check": "logs" },
+    { "n": 17, "label": "No request state in globals", "settled": "fixed", "pr": 71 },
+    { "n": 18, "label": "Await every promise", "settled": "met", "pr": 71 },
+    { "n": 19, "label": "Web Crypto", "settled": "fixed", "pr": 71 },
+    { "n": 20, "label": "No passThroughOnException", "settled": "met", "pr": 71 },
+    { "n": 21, "label": "Vitest integration", "settled": "accepted", "pr": 71, "accepted": "2026-11-18", "reason": "Tests run under node --test with fakes; CI's Worker dry runs bundle all three Workers" }
+  ]
+}

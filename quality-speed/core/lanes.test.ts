@@ -226,6 +226,6 @@ test('the real plan holds no private page, no private lane and no lane that take
   // quality-speed.yml's admin-read runs only for an admin lane outside the App's pages (.github/scripts/app_lanes.py).
   assert.deepEqual(rows.filter((row) => row.admin && !['settings', 'projects', 'github-app'].includes(row.slug)), []);
   // Fail closed: a page is public only by being named, so every page is one or the other.
-  assert.equal(PUBLIC_PAGES.length, 29);
+  assert.equal(PUBLIC_PAGES.length, 30);
   assert.equal(PAGES.length - PUBLIC_PAGES.length, 6);
 });
