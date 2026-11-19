@@ -382,12 +382,14 @@ export function gateMisses(input: PullInput, bot: boolean): GateMiss[] {
 
 /**
  * Minutes from the push that started each review round to its verdict: the first run on the verdict's head (a push starts
- * every workflow) to the verdict comment. A verdict with no run on its head, or no time, is left out.
+ * every workflow) to the verdict comment. A verdict with no run on its head, no time, or a time before that run is left out:
+ * it can't time a round, and a 0 would pull the p90 down.
  */
 export function reviewResultMinutes(input: PullInput): number[] {
   return verdictLines(input.issueComments).flatMap((v) => {
     const starts = input.runs.filter((r) => r.head_sha === v.sha).map((r) => Date.parse(r.created_at));
-    return v.at === null || starts.length === 0 ? [] : [Math.max(0, (Date.parse(v.at) - Math.min(...starts)) / 60000)];
+    const minutes = v.at === null || starts.length === 0 ? NaN : (Date.parse(v.at) - Math.min(...starts)) / 60000;
+    return minutes >= 0 ? [minutes] : [];
   });
 }
 

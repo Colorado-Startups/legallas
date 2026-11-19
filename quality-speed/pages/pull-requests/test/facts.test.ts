@@ -278,7 +278,7 @@ test("review time: push to verdict per round; a verdict with no run on its head,
   const rounds = pullFacts(input({ issueComments: [verdictComment("BLOCK", H1, "2030-01-01T10:03:02Z"), verdictComment("MERGE", H2)] }));
   assert.deepEqual(rounds.review_result_minutes, [3, 5]);
   const early = pullFacts(input({ issueComments: [verdictComment("MERGE", H2, "2030-01-01T10:09:00Z")] }));
-  assert.deepEqual(early.review_result_minutes, [0], "a verdict before its head's first run reads 0, never negative");
+  assert.deepEqual(early.review_result_minutes, [], "a verdict before its head's first run is left out, never 0");
   const noRun = pullFacts(input({ issueComments: [verdictComment("MERGE", "3".repeat(40)), { ...verdictComment("MERGE", H2), created_at: undefined }] }));
   assert.deepEqual(noRun.review_result_minutes, []);
 });
