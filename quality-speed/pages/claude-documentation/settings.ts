@@ -2,6 +2,8 @@
 // settings_match, deny_rules_kept, drift_open_hours: each repo row of expected.json against .claude/settings.json, and how
 // long a row has been short. Moved from the Claude settings page with expected.json, unchanged.
 
+import { globMatch } from '../../core/glob.ts';
+
 export const SETTINGS = '.claude/settings.json';
 export const EXPECTED = 'quality-speed/pages/claude-documentation/expected.json';
 /** Where expected.json lived before the move, so drift's history walk reaches past it. */
@@ -41,8 +43,7 @@ function rules(settings: unknown, key: 'allow' | 'deny' | 'ask'): string[] {
 /** Whether a deny or ask rule reaches an MCP tool: by its name, its server's name, or a glob over the whole name. A scoped rule, with parentheses, never does. */
 export function reaches(rule: string, tool: string): boolean {
   if (rule.includes('(')) return false;
-  const glob = rule.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replaceAll('*', '.*');
-  return new RegExp(`^${glob}$`).test(tool) || tool.startsWith(`${rule}__`);
+  return globMatch(rule, tool) || tool.startsWith(`${rule}__`);
 }
 
 /** Whether the settings meet one repo row. */

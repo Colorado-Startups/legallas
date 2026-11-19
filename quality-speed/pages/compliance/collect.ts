@@ -13,7 +13,6 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import type { MetricRecord } from '../../contract/format.ts';
 import type { Detail, Reading } from '../../core/detail.ts';
-import { escapeRegExp } from '../../core/escape.ts';
 import { laneRecord } from '../../core/lane/collect.ts';
 
 const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
@@ -41,19 +40,28 @@ export const ATTESTATIONS = [
 ] as const;
 
 /** A dated version line, which every policy carries: "Version 1.0, 2026-11-05." */
-const VERSION = /\bVersion \d+(?:\.\d+)*, \d{4}-\d{2}-\d{2}\b/;
+const VERSION = /\bVersion (\d[\d.]*), \d{4}-\d{2}-\d{2}\b/g;
+/** The pattern takes any run of digits and dots, and the number is then checked a part at a time, so no pattern repeats a repeat. */
+const isDated = (text: string) => [...text.matchAll(VERSION)].some((found) => (found[1] ?? '').split('.').every((part) => /^\d+$/.test(part)));
 const TICKED = /`([^`\n]+)`/g;
 /**
  * A repository path: folders with an optional file, or a file with a known extension. Never `..` or `/x`. A bare dotfile isn't
  * one: policies name ignored local files such as a secrets file, whose absence is the point.
  */
-const IN_FOLDER = /^(?:\.?[A-Za-z0-9_][A-Za-z0-9_.-]*\/)+(?:[A-Za-z0-9_][A-Za-z0-9_.-]*)?$/;
+const FOLDER = /^\.?[A-Za-z0-9_][A-Za-z0-9_.-]*$/;
+const NAME = /^[A-Za-z0-9_][A-Za-z0-9_.-]*$/;
+/** One or more folders, then a file name or nothing. Checked a part at a time, so no pattern repeats a repeat. */
+function inFolder(token: string): boolean {
+  const folders = token.split('/');
+  const last = folders.pop() ?? '';
+  return folders.length > 0 && folders.every((folder) => FOLDER.test(folder)) && (last === '' || NAME.test(last));
+}
 const FILE = /^[A-Za-z0-9_][A-Za-z0-9_.-]*\.(?:md|ts|js|mjs|json|jsonc|ya?ml|toml|sh|py|swift|sql|txt)$/;
 /** A symbol named beside its file, either way round: `file` (`symbol`), or `symbol` in `file`. */
 const SYMBOL_AFTER = /`([^`\s]+)`\s*\(`([A-Za-z_$][\w$]*)`\)/g;
 const SYMBOL_BEFORE = /`([A-Za-z_$][\w$]*)` in `([^`\s]+)`/g;
 
-export const isPath = (token: string) => IN_FOLDER.test(token) || FILE.test(token);
+export const isPath = (token: string) => inFolder(token) || FILE.test(token);
 
 export interface Ref {
   path: string;
@@ -87,14 +95,28 @@ export function resolves(ref: Ref, lookup: Lookup): boolean {
   const found = lookup(ref.path.replace(/\/$/, ''));
   if (found === null) return false;
   if (ref.symbol === undefined) return true;
-  return found !== 'dir' && new RegExp(`(?<![\\w$])${escapeRegExp(ref.symbol)}(?![\\w$])`).test(found);
+  return found !== 'dir' && hasWord(found, ref.symbol);
+}
+
+const WORD_CHAR = /[\w$]/;
+/** Whether `word` stands in `text` with no letter, digit, `_` or `$` on either side. By position: the word is never made into a pattern. */
+function hasWord(text: string, word: string): boolean {
+  if (word === '') return false;
+  for (let at = text.indexOf(word); at !== -1; at = text.indexOf(word, at + 1)) {
+    const before = text[at - 1];
+    const after = text[at + word.length];
+    if (!(before !== undefined && WORD_CHAR.test(before)) && !(after !== undefined && WORD_CHAR.test(after))) return true;
+  }
+  return false;
 }
 
 /** Data rows of the table under a `## <heading>`, as cells; the header and its rule line are left out. */
 export function tableRows(text: string, heading: string): string[][] {
-  const at = text.search(new RegExp(`^## ${heading}\\s*$`, 'm'));
+  const all = text.split('\n');
+  const title = `## ${heading}`;
+  const at = all.findIndex((line) => line.startsWith(title) && line.slice(title.length).trim() === '');
   if (at < 0) return [];
-  const section = text.slice(at).split('\n').slice(1);
+  const section = all.slice(at + 1);
   const end = section.findIndex((line) => line.startsWith('## '));
   const lines = (end < 0 ? section : section.slice(0, end)).filter((line) => line.startsWith('|'));
   return lines.slice(2).map((line) => line.split('|').slice(1, -1).map((cell) => cell.trim()));
@@ -116,7 +138,7 @@ export interface PolicyReading {
 export function readPolicy(id: string, text: string | null, lookup: Lookup, age: number | null): PolicyReading {
   if (text === null) return { id, present: false, dated: false, refs: 0, dead: 0, gaps: 0, age: null };
   const refs = references(text);
-  return { id, present: true, dated: VERSION.test(text), refs: refs.length, dead: refs.filter((r) => !resolves(r, lookup)).length, gaps: tableRows(text, 'Gaps').length, age };
+  return { id, present: true, dated: isDated(text), refs: refs.length, dead: refs.filter((r) => !resolves(r, lookup)).length, gaps: tableRows(text, 'Gaps').length, age };
 }
 
 /** Covered: the policy is there, dated, and names at least one piece of evidence that is in the tree. */

@@ -7,8 +7,12 @@ import { INPUTS } from './inputs.ts';
 /** Words as the publish guard counts them: letter and digit runs. */
 const words = (text: string): number => text.match(/[\p{L}\p{N}]+/gu)?.length ?? 0;
 
-/** A prose line that holds only images: a picture, not prose. */
-const IMAGE_ONLY = /^\s*(?:!\[[^\]]*\]\([^)]*\)\s*)+$/;
+const IMAGE = /!\[[^\]]*\]\([^)]*\)/g;
+/** A prose line that holds only images: a picture, not prose. With its images taken out, only space is left. */
+function imageOnly(text: string): boolean {
+  const rest = text.replace(IMAGE, '');
+  return rest !== text && rest.trim() === '';
+}
 
 /**
  * The share of a doc's content lines that are visual: table rows, fenced blocks (diagrams, commands) and image lines, against
@@ -23,7 +27,7 @@ export function visualShare(doc: Doc): number {
     else if (!inFence && line.trim().startsWith('|')) tables++;
   }
   const prose = doc.prose.filter((p) => p.kind !== 'heading');
-  const images = prose.filter((p) => IMAGE_ONLY.test(p.text)).length;
+  const images = prose.filter((p) => imageOnly(p.text)).length;
   const visual = fenced + tables + images;
   const total = visual + prose.length - images;
   return total === 0 ? 0 : (100 * visual) / total;

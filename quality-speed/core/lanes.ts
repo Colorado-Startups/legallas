@@ -26,7 +26,12 @@ const ADMIN_PAGES: readonly string[] = ['launch-readiness', 'projects', 'securit
 const MAX_BLACKSMITH_LANES = 30;
 const LANE_KEYS = new Set(['id', 'runner', 'cadence', 'collector', 'args', 'install', 'admin']);
 /** In the page's folder, or the shared kits in core/. No other way out of the folder, and never a shell. */
-const COLLECTOR = /^(?:\.\.\/\.\.\/core\/)?[a-z0-9][a-z0-9_-]*(?:\/[a-z0-9][a-z0-9_-]*)*(?:\.[a-z0-9]+)*\.ts$/;
+function isCollector(collector: string): boolean {
+  const NAME = /^[a-z0-9][a-z0-9_-]*$/;
+  const folders = (collector.startsWith('../../core/') ? collector.slice('../../core/'.length) : collector).split('/');
+  const [base = '', ...extensions] = (folders.pop() ?? '').split('.');
+  return folders.every((folder) => NAME.test(folder)) && NAME.test(base) && extensions.at(-1) === 'ts' && extensions.every((extension) => /^[a-z0-9]+$/.test(extension));
+}
 const ARG = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
 
 export interface Lane {
@@ -74,7 +79,7 @@ function laneErrors(item: Record<string, unknown>, slug: PageSlug, pageDir: stri
   if (admin === true && runner === 'linux') errors.push('a lane with the admin read-outs must be linux-hosted');
   if (args !== undefined && !(Array.isArray(args) && args.every((arg) => typeof arg === 'string' && ARG.test(arg)))) errors.push('args must be a list of plain words');
   if (install !== undefined && typeof install !== 'boolean') errors.push('install must be true or false');
-  if (typeof collector !== 'string' || !COLLECTOR.test(collector)) errors.push("collector must be a .ts file in the page's folder or core/");
+  if (typeof collector !== 'string' || !isCollector(collector)) errors.push("collector must be a .ts file in the page's folder or core/");
   else if (!existsSync(path.join(pageDir, collector))) errors.push('collector file is missing');
   return errors;
 }

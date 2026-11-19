@@ -54,6 +54,13 @@ export const load = <T>(name: string): T => JSON.parse(readFileSync(path.join(FI
 const clone = <T>(v: T): T => structuredClone(v);
 export const fixtureFetcher = (api: Api): Fetcher => async (p) => clone(api[p] ?? { status: 404, body: null });
 
+/** The fixture's own value under `key`, when it is an object or a list. Never an inherited one, so no path walks into a prototype. */
+function childOf(node: Record<string | number, unknown>, key: string | number): Record<string | number, unknown> {
+  const child = Object.hasOwn(node, key) ? node[key] : undefined;
+  if (typeof child !== 'object' || child === null) throw new Error('a plant path runs past the fixture');
+  return child as Record<string | number, unknown>;
+}
+
 /** Applies one change to the invented answers, workflows or variables. Throws on a path that doesn't exist, so a stale plant fails. */
 export function applyChange(api: Api, wf: WorkflowFacts, vars: Vars, change: Change): void {
   if (change.op === 'status') {
@@ -67,10 +74,7 @@ export function applyChange(api: Api, wf: WorkflowFacts, vars: Vars, change: Cha
   const at = change.at ?? [];
   if (root === undefined || at.length === 0) throw new Error('a plant needs a fixture and a path');
   let node = root as Record<string | number, unknown>;
-  for (const key of at.slice(0, -1)) {
-    node = node[key] as Record<string | number, unknown>;
-    if (typeof node !== 'object' || node === null) throw new Error('a plant path runs past the fixture');
-  }
+  for (const key of at.slice(0, -1)) node = childOf(node, key);
   const last = at[at.length - 1] as string | number;
   if (change.op === 'set') node[last] = clone(change.value);
   else if (Array.isArray(node)) node.splice(last as number, 1);

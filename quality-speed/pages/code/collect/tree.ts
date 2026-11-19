@@ -48,6 +48,6 @@ export function readRows(raw: unknown): FileRow[] {
   const files = (raw as { files?: unknown } | null)?.files;
   if (!Array.isArray(files)) return [];
   const score = (v: unknown) => typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 100;
-  const safe = (p: unknown) => typeof p === 'string' && /^[\w.@+-]+(\/[\w.@+-]+)*$/.test(p) && !p.split('/').some((s) => /^\.\.?$/.test(s)) && !outsideCode(p);
+  const safe = (p: unknown) => typeof p === 'string' && p.split('/').every((s) => /^[\w.@+-]+$/.test(s)) && !p.split('/').some((s) => /^\.\.?$/.test(s)) && !outsideCode(p);
   return files.filter((r): r is FileRow => Array.isArray(r) && r.length === 4 && safe(r[0]) && score(r[1]) && score(r[2]) && score(r[3]));
 }
