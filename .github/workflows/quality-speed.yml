@@ -819,7 +819,7 @@ jobs:
         run: node quality-speed/process/adapt.ts --state "$RUNNER_TEMP/state"
       - name: Process page
         if: hashFiles('quality-speed/process/config.json') != ''
-        uses: SoulCraft-Org/git-crafter/actions/pages@d3c15df43c8e373f431f4bf9800339e7c995494e # v4.6.4
+        uses: SoulCraft-Org/git-crafter/actions/pages@8023bd4683416f6d420bd20d137960b09c06b91e # v7.0.2
         with:
           pages: process
           config: quality-speed/process/config.json
